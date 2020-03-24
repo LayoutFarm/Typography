@@ -9,8 +9,8 @@ namespace Typography.OpenFont.Tables
     // https://www.microsoft.com/typography/otspec/GPOS.htm
     public partial class GPOS : GlyphShapingTableEntry
     {
-        public const string _N = "GPOS";
-        public override string Name => _N;
+        public const string Name = "GPOS";
+        internal GPOS(TableHeader header, BinaryReader input) : base(header, input) { }
         //
         protected override void ReadLookupTable(BinaryReader reader, long lookupTablePos,
                                                 ushort lookupType, ushort lookupFlags,
@@ -42,7 +42,7 @@ namespace Typography.OpenFont.Tables
 
         public abstract class LookupSubTable
         {
-            public GPOS OwnerGPos;
+            public GPOS? OwnerGPos;
 
             public abstract void DoGlyphPosition(IGlyphPositions inputGlyphs, int startAt, int len);
         }
@@ -124,17 +124,19 @@ namespace Typography.OpenFont.Tables
 
             class LkSubTableType1 : LookupSubTable
             {
-                ValueRecord _singleValue;
-                ValueRecord[] _multiValues;
-                public LkSubTableType1(ValueRecord singleValue)
+                ValueRecord? _singleValue;
+                ValueRecord?[]? _multiValues;
+                public LkSubTableType1(ValueRecord? singleValue, CoverageTable coverage)
                 {
                     this.Format = 1;
                     _singleValue = singleValue;
+                    CoverageTable = coverage;
                 }
-                public LkSubTableType1(ValueRecord[] valueRecords)
+                public LkSubTableType1(ValueRecord?[] valueRecords, CoverageTable coverage)
                 {
                     this.Format = 2;
                     _multiValues = valueRecords;
+                    CoverageTable = coverage;
                 }
                 public int Format { get; private set; }
                 public CoverageTable CoverageTable { get; set; }
@@ -166,11 +168,8 @@ namespace Typography.OpenFont.Tables
                             //ValueRecord 	Value 	        Defines positioning value(s)-applied to all glyphs in the Coverage table 
                             ushort coverage = reader.ReadUInt16();
                             ushort valueFormat = reader.ReadUInt16();
-                            var subTable = new LkSubTableType1(ValueRecord.CreateFrom(reader, valueFormat));
-                            //-------
-                            subTable.CoverageTable = CoverageTable.CreateFrom(reader, subTableStartAt + coverage);
-                            //-------
-                            return subTable;
+                            return new LkSubTableType1(ValueRecord.CreateFrom(reader, valueFormat),
+                                CoverageTable.CreateFrom(reader, subTableStartAt + coverage));
                         }
                     case 2:
                         {
@@ -184,15 +183,13 @@ namespace Typography.OpenFont.Tables
                             ushort coverage = reader.ReadUInt16();
                             ushort valueFormat = reader.ReadUInt16();
                             ushort valueCount = reader.ReadUInt16();
-                            var values = new ValueRecord[valueCount];
+                            var values = new ValueRecord?[valueCount];
                             for (int n = 0; n < valueCount; ++n)
                             {
                                 values[n] = ValueRecord.CreateFrom(reader, valueFormat);
                             }
-                            var subTable = new LkSubTableType1(values);
-                            subTable.CoverageTable = CoverageTable.CreateFrom(reader, subTableStartAt + coverage);
-                            //-------
-                            return subTable;
+                            return new LkSubTableType1(values,
+                                CoverageTable.CreateFrom(reader, subTableStartAt + coverage));
                         }
                 }
             }
@@ -203,9 +200,10 @@ namespace Typography.OpenFont.Tables
             class LkSubTableType2Fmt1 : LookupSubTable
             {
                 internal PairSetTable[] _pairSetTables;
-                public LkSubTableType2Fmt1(PairSetTable[] pairSetTables)
+                public LkSubTableType2Fmt1(PairSetTable[] pairSetTables, CoverageTable coverage)
                 {
                     _pairSetTables = pairSetTables;
+                    CoverageTable = coverage;
                 }
                 public CoverageTable CoverageTable { get; set; }
                 public override void DoGlyphPosition(IGlyphPositions inputGlyphs, int startAt, int len)
@@ -226,8 +224,8 @@ namespace Typography.OpenFont.Tables
 
                             if (pairSet.FindPairSet(second_glyph_index, out PairSet foundPairSet))
                             {
-                                ValueRecord v1 = foundPairSet.value1;
-                                ValueRecord v2 = foundPairSet.value2;
+                                ValueRecord? v1 = foundPairSet.value1;
+                                ValueRecord? v2 = foundPairSet.value2;
                                 //TODO: recheck for vertical writing ... (YAdvance)
                                 if (v1 != null)
                                 {
@@ -255,11 +253,12 @@ namespace Typography.OpenFont.Tables
                 internal readonly ClassDefTable _class1Def;
                 internal readonly ClassDefTable _class2Def;
 
-                public LkSubTableType2Fmt2(Lk2Class1Record[] class1records, ClassDefTable class1Def, ClassDefTable class2Def)
+                public LkSubTableType2Fmt2(Lk2Class1Record[] class1records, ClassDefTable class1Def, ClassDefTable class2Def, CoverageTable coverage)
                 {
                     _class1records = class1records;
                     _class1Def = class1Def;
                     _class2Def = class2Def;
+                    CoverageTable = coverage;
                 }
                 public CoverageTable CoverageTable { get; set; }
                 public override void DoGlyphPosition(IGlyphPositions inputGlyphs, int startAt, int len)
@@ -290,8 +289,8 @@ namespace Typography.OpenFont.Tables
                                     //TODO: recheck for vertical writing ... (YAdvance)
                                     Lk2Class2Record pair = class1Rec.class2Records[class2_no];
 
-                                    ValueRecord v1 = pair.value1;
-                                    ValueRecord v2 = pair.value2;
+                                    ValueRecord? v1 = pair.value1;
+                                    ValueRecord? v2 = pair.value2;
 
                                     if (v1 != null && v1.XAdvance != 0)
                                     {
@@ -365,10 +364,10 @@ namespace Typography.OpenFont.Tables
                 //ValueRecord 	Value1 	Positioning for first glyph-empty if ValueFormat1 = 0
                 //ValueRecord 	Value2 	Positioning for second glyph-empty if ValueFormat2 = 0
                 //--------------------------------
-                public readonly ValueRecord value1;//null= empty
-                public readonly ValueRecord value2;//null= empty
+                public readonly ValueRecord? value1;//null= empty
+                public readonly ValueRecord? value2;//null= empty
 
-                public Lk2Class2Record(ValueRecord value1, ValueRecord value2)
+                public Lk2Class2Record(ValueRecord? value1, ValueRecord? value2)
                 {
                     this.value1 = value1;
                     this.value2 = value2;
@@ -506,10 +505,8 @@ namespace Typography.OpenFont.Tables
                                 pairSetTable.ReadFrom(reader, value1Format, value2Format);
                                 pairSetTables[n] = pairSetTable;
                             }
-                            var subTable = new LkSubTableType2Fmt1(pairSetTables);
-                            //coverage
-                            subTable.CoverageTable = CoverageTable.CreateFrom(reader, subTableStartAt + coverage);
-                            return subTable;
+                            return new LkSubTableType2Fmt1(pairSetTables,
+                                CoverageTable.CreateFrom(reader, subTableStartAt + coverage));
                         }
                     case 2:
                         {
@@ -536,13 +533,10 @@ namespace Typography.OpenFont.Tables
                                 class1Records[c1] = new Lk2Class1Record(class2Records);
                             }
 
-                            var subTable = new LkSubTableType2Fmt2(class1Records,
-                                                ClassDefTable.CreateFrom(reader, subTableStartAt + classDef1_offset),
-                                                ClassDefTable.CreateFrom(reader, subTableStartAt + classDef2_offset));
-
-
-                            subTable.CoverageTable = CoverageTable.CreateFrom(reader, subTableStartAt + coverage);
-                            return subTable;
+                            return new LkSubTableType2Fmt2(class1Records,
+                                ClassDefTable.CreateFrom(reader, subTableStartAt + classDef1_offset),
+                                ClassDefTable.CreateFrom(reader, subTableStartAt + classDef2_offset),
+                                CoverageTable.CreateFrom(reader, subTableStartAt + coverage));
                         }
                 }
             }
@@ -563,13 +557,18 @@ namespace Typography.OpenFont.Tables
             /// </summary>
             class LkSubTableType4 : LookupSubTable
             {
-                public LkSubTableType4()
+                public LkSubTableType4(CoverageTable markCoverageTable, CoverageTable baseCoverageTable, MarkArrayTable markArrayTable, BaseArrayTable baseArrayTable)
                 {
+                    MarkCoverageTable = markCoverageTable;
+                    BaseCoverageTable = baseCoverageTable;
+                    MarkArrayTable = markArrayTable;
+                    BaseArrayTable = baseArrayTable;
                 }
+
                 public CoverageTable MarkCoverageTable { get; set; }
                 public CoverageTable BaseCoverageTable { get; set; }
-                public BaseArrayTable BaseArrayTable { get; set; }
                 public MarkArrayTable MarkArrayTable { get; set; }
+                public BaseArrayTable BaseArrayTable { get; set; }
 
                 public override void DoGlyphPosition(IGlyphPositions inputGlyphs, int startAt, int len)
                 {
@@ -700,11 +699,11 @@ namespace Typography.OpenFont.Tables
                 ushort baseArrayOffset = reader.ReadUInt16();
 
                 //read mark array table
-                var lookupType4 = new LkSubTableType4();
-                lookupType4.MarkCoverageTable = CoverageTable.CreateFrom(reader, subTableStartAt + markCoverageOffset);
-                lookupType4.BaseCoverageTable = CoverageTable.CreateFrom(reader, subTableStartAt + baseCoverageOffset);
-                lookupType4.MarkArrayTable = MarkArrayTable.CreateFrom(reader, subTableStartAt + markArrayOffset);
-                lookupType4.BaseArrayTable = BaseArrayTable.CreateFrom(reader, subTableStartAt + baseArrayOffset, markClassCount);
+                var lookupType4 = new LkSubTableType4(
+                    CoverageTable.CreateFrom(reader, subTableStartAt + markCoverageOffset),
+                    CoverageTable.CreateFrom(reader, subTableStartAt + baseCoverageOffset),
+                    MarkArrayTable.CreateFrom(reader, subTableStartAt + markArrayOffset),
+                    BaseArrayTable.CreateFrom(reader, subTableStartAt + baseArrayOffset, markClassCount));
 #if DEBUG
                 lookupType4.dbugTest();
 #endif
@@ -713,6 +712,14 @@ namespace Typography.OpenFont.Tables
 
             class LkSubTableType5 : LookupSubTable
             {
+                public LkSubTableType5(CoverageTable markCoverage, CoverageTable ligatureCoverage, MarkArrayTable markArrayTable, LigatureArrayTable ligatureArrayTable)
+                {
+                    MarkCoverage = markCoverage;
+                    LigatureCoverage = ligatureCoverage;
+                    MarkArrayTable = markArrayTable;
+                    LigatureArrayTable = ligatureArrayTable;
+                }
+
                 public CoverageTable MarkCoverage { get; set; }
                 public CoverageTable LigatureCoverage { get; set; }
                 public MarkArrayTable MarkArrayTable { get; set; }
@@ -749,17 +756,14 @@ namespace Typography.OpenFont.Tables
                 ushort markArrayOffset = reader.ReadUInt16();
                 ushort ligatureArrayOffset = reader.ReadUInt16();
                 //-----------------------
-                var subTable = new LkSubTableType5();
-                subTable.MarkCoverage = CoverageTable.CreateFrom(reader, subTableStartAt + markCoverageOffset);
-                subTable.LigatureCoverage = CoverageTable.CreateFrom(reader, subTableStartAt + ligatureCoverageOffset);
-                subTable.MarkArrayTable = MarkArrayTable.CreateFrom(reader, subTableStartAt + markArrayOffset);
+                var markCoverage = CoverageTable.CreateFrom(reader, subTableStartAt + markCoverageOffset);
+                var ligatureCoverage = CoverageTable.CreateFrom(reader, subTableStartAt + ligatureCoverageOffset);
+                var markArrayTable = MarkArrayTable.CreateFrom(reader, subTableStartAt + markArrayOffset);
 
                 reader.BaseStream.Seek(subTableStartAt + ligatureArrayOffset, SeekOrigin.Begin);
                 var ligatureArrayTable = new LigatureArrayTable();
                 ligatureArrayTable.ReadFrom(reader, classCount);
-                subTable.LigatureArrayTable = ligatureArrayTable;
-
-                return subTable;
+                return new LkSubTableType5(markCoverage, ligatureCoverage, markArrayTable, ligatureArrayTable);
             }
 
             //-----------------------------------------------------------------
@@ -770,6 +774,13 @@ namespace Typography.OpenFont.Tables
             /// </summary>
             class LkSubTableType6 : LookupSubTable
             {
+                public LkSubTableType6(CoverageTable markCoverage1, CoverageTable markCoverage2, MarkArrayTable mark1ArrayTable, Mark2ArrayTable mark2ArrayTable)
+                {
+                    MarkCoverage1 = markCoverage1;
+                    MarkCoverage2 = markCoverage2;
+                    Mark1ArrayTable = mark1ArrayTable;
+                    Mark2ArrayTable = mark2ArrayTable;
+                }
 
                 public CoverageTable MarkCoverage1 { get; set; }
                 public CoverageTable MarkCoverage2 { get; set; }
@@ -882,13 +893,11 @@ namespace Typography.OpenFont.Tables
                 ushort mark1ArrayOffset = reader.ReadUInt16();
                 ushort mark2ArrayOffset = reader.ReadUInt16();
                 //
-                var subTable = new LkSubTableType6();
-                subTable.MarkCoverage1 = CoverageTable.CreateFrom(reader, subTableStartAt + mark1CoverageOffset);
-                subTable.MarkCoverage2 = CoverageTable.CreateFrom(reader, subTableStartAt + mark2CoverageOffset);
-                subTable.Mark1ArrayTable = MarkArrayTable.CreateFrom(reader, subTableStartAt + mark1ArrayOffset);
-                subTable.Mark2ArrayTable = Mark2ArrayTable.CreateFrom(reader, subTableStartAt + mark2ArrayOffset, classCount);
-
-                return subTable;
+                return new LkSubTableType6(
+                    CoverageTable.CreateFrom(reader, subTableStartAt + mark1CoverageOffset),
+                    CoverageTable.CreateFrom(reader, subTableStartAt + mark2CoverageOffset),
+                    MarkArrayTable.CreateFrom(reader, subTableStartAt + mark1ArrayOffset),
+                    Mark2ArrayTable.CreateFrom(reader, subTableStartAt + mark2ArrayOffset, classCount));
             }
 
             /// <summary>
@@ -918,10 +927,9 @@ namespace Typography.OpenFont.Tables
                             ushort posRuleSetCount = reader.ReadUInt16();
                             ushort[] posRuleSetOffsets = Utils.ReadUInt16Array(reader, posRuleSetCount);
 
-                            LkSubTableType7Fmt1 subTable = new LkSubTableType7Fmt1();
-                            subTable.PosRuleSetTables = CreateMultiplePosRuleSetTables(subTableStartAt, posRuleSetOffsets, reader);
-                            subTable.CoverageTable = CoverageTable.CreateFrom(reader, subTableStartAt + coverageOffset);
-                            return subTable;
+                            var posRuleSetTables = CreateMultiplePosRuleSetTables(subTableStartAt, posRuleSetOffsets, reader);
+                            var coverageTable = CoverageTable.CreateFrom(reader, subTableStartAt + coverageOffset);
+                            return new LkSubTableType7Fmt1(posRuleSetTables, coverageTable);
                         }
                     case 2:
                         {
@@ -937,17 +945,13 @@ namespace Typography.OpenFont.Tables
                             ushort posClassSetCount = reader.ReadUInt16();
                             ushort[] posClassSetOffsets = Utils.ReadUInt16Array(reader, posClassSetCount);
 
-                            var subTable = new LkSubTableType7Fmt2();
-                            subTable.ClassDefOffset = classDefOffset;
-
                             PosClassSetTable[] posClassSetTables = new PosClassSetTable[posClassSetCount];
-                            subTable.PosClassSetTables = posClassSetTables;
                             for (int n = 0; n < posClassSetCount; ++n)
                             {
                                 posClassSetTables[n] = PosClassSetTable.CreateFrom(reader, subTableStartAt + posClassSetOffsets[n]);
                             }
-                            subTable.CoverageTable = CoverageTable.CreateFrom(reader, subTableStartAt + coverageOffset);
-                            return subTable;
+                            var coverageTable = CoverageTable.CreateFrom(reader, subTableStartAt + coverageOffset);
+                            return new LkSubTableType7Fmt2(classDefOffset, posClassSetTables, coverageTable);
                         }
                     case 3:
                         {
@@ -958,23 +962,27 @@ namespace Typography.OpenFont.Tables
                             //uint16 	PosCount 	Number of PosLookupRecords
                             //Offset16 	Coverage[GlyphCount] 	Array of offsets to Coverage tables-from beginning of ContextPos subtable
                             //struct 	PosLookupRecord[PosCount] Array of positioning lookups-in design order
-                            var subTable = new LkSubTableType7Fmt3();
                             ushort glyphCount = reader.ReadUInt16();
                             ushort posCount = reader.ReadUInt16();
                             //read each lookahead record
                             ushort[] coverageOffsets = Utils.ReadUInt16Array(reader, glyphCount);
-                            subTable.PosLookupRecords = CreateMultiplePosLookupRecords(reader, posCount);
-                            subTable.CoverageTables = CoverageTable.CreateMultipleCoverageTables(subTableStartAt, coverageOffsets, reader);
-
-                            return subTable;
+                            var posLookupRecords = CreateMultiplePosLookupRecords(reader, posCount);
+                            var coverageTables = CoverageTable.CreateMultipleCoverageTables(subTableStartAt, coverageOffsets, reader);
+                            return new LkSubTableType7Fmt3(posLookupRecords, coverageTables);
                         }
                 }
             }
 
             class LkSubTableType7Fmt1 : LookupSubTable
             {
-                public CoverageTable CoverageTable { get; set; }
+                public LkSubTableType7Fmt1(PosRuleSetTable[] posRuleSetTables , CoverageTable coverageTable)
+                {
+                    PosRuleSetTables = posRuleSetTables;
+                    CoverageTable = coverageTable;
+                }
+
                 public PosRuleSetTable[] PosRuleSetTables { get; set; }
+                public CoverageTable CoverageTable { get; set; }
                 public override void DoGlyphPosition(IGlyphPositions inputGlyphs, int startAt, int len)
                 {
                     Utils.WarnUnimplemented("GPOS Lookup Sub Table Type 7 Format 1");
@@ -983,9 +991,16 @@ namespace Typography.OpenFont.Tables
 
             class LkSubTableType7Fmt2 : LookupSubTable
             {
+                public LkSubTableType7Fmt2(ushort classDefOffset, PosClassSetTable[] posClassSetTables, CoverageTable coverageTable)
+                {
+                    ClassDefOffset = classDefOffset;
+                    PosClassSetTables = posClassSetTables;
+                    CoverageTable = coverageTable;
+                }
+
                 public ushort ClassDefOffset { get; set; }
-                public CoverageTable CoverageTable { get; set; }
                 public PosClassSetTable[] PosClassSetTables { get; set; }
+                public CoverageTable CoverageTable { get; set; }
                 public override void DoGlyphPosition(IGlyphPositions inputGlyphs, int startAt, int len)
                 {
                     Utils.WarnUnimplemented("GPOS Lookup Sub Table Type 7 Format 2");
@@ -994,8 +1009,14 @@ namespace Typography.OpenFont.Tables
             }
             class LkSubTableType7Fmt3 : LookupSubTable
             {
-                public CoverageTable[] CoverageTables { get; set; }
+                public LkSubTableType7Fmt3(PosLookupRecord[] posLookupRecords, CoverageTable[] coverageTables)
+                {
+                    PosLookupRecords = posLookupRecords;
+                    CoverageTables = coverageTables;
+                }
+
                 public PosLookupRecord[] PosLookupRecords { get; set; }
+                public CoverageTable[] CoverageTables { get; set; }
                 public override void DoGlyphPosition(IGlyphPositions inputGlyphs, int startAt, int len)
                 {
                     Utils.WarnUnimplemented("GPOS Lookup Sub Table Type 7 Format 3");
@@ -1004,9 +1025,14 @@ namespace Typography.OpenFont.Tables
             //----------------------------------------------------------------
             class LkSubTableType8Fmt1 : LookupSubTable
             {
+                public LkSubTableType8Fmt1(PosRuleSetTable[] posRuleSetTables, CoverageTable coverageTable)
+                {
+                    PosRuleSetTables = posRuleSetTables;
+                    CoverageTable = coverageTable;
+                }
 
-                public CoverageTable CoverageTable { get; set; }
                 public PosRuleSetTable[] PosRuleSetTables { get; set; }
+                public CoverageTable CoverageTable { get; set; }
                 public override void DoGlyphPosition(IGlyphPositions inputGlyphs, int startAt, int len)
                 {
                     Utils.WarnUnimplemented("GPOS Lookup Sub Table Type 8 Format 1");
@@ -1016,17 +1042,22 @@ namespace Typography.OpenFont.Tables
             class LkSubTableType8Fmt2 : LookupSubTable
             {
                 ushort[] chainPosClassSetOffsetArray;
-                public LkSubTableType8Fmt2(ushort[] chainPosClassSetOffsetArray)
+
+                public LkSubTableType8Fmt2(ushort[] chainPosClassSetOffsetArray, ushort backtrackClassDefOffset, ushort inputClassDefOffset, ushort lookaheadClassDefOffset, PosClassSetTable[] posClassSetTables, CoverageTable coverageTable)
                 {
                     this.chainPosClassSetOffsetArray = chainPosClassSetOffsetArray;
+                    BacktrackClassDefOffset = backtrackClassDefOffset;
+                    InputClassDefOffset = inputClassDefOffset;
+                    LookaheadClassDefOffset = lookaheadClassDefOffset;
+                    PosClassSetTables = posClassSetTables;
+                    CoverageTable = coverageTable;
                 }
-                public CoverageTable CoverageTable { get; set; }
-                public PosClassSetTable[] PosClassSetTables { get; set; }
 
                 public ushort BacktrackClassDefOffset { get; set; }
                 public ushort InputClassDefOffset { get; set; }
                 public ushort LookaheadClassDefOffset { get; set; }
-
+                public PosClassSetTable[] PosClassSetTables { get; set; }
+                public CoverageTable CoverageTable { get; set; }
 
                 public override void DoGlyphPosition(IGlyphPositions inputGlyphs, int startAt, int len)
                 {
@@ -1035,10 +1066,18 @@ namespace Typography.OpenFont.Tables
             }
             class LkSubTableType8Fmt3 : LookupSubTable
             {
+                public LkSubTableType8Fmt3(PosLookupRecord[] posLookupRecords, CoverageTable[] backtrackCoverages, CoverageTable[] inputGlyphCoverages, CoverageTable[] lookaheadCoverages)
+                {
+                    PosLookupRecords = posLookupRecords;
+                    BacktrackCoverages = backtrackCoverages;
+                    InputGlyphCoverages = inputGlyphCoverages;
+                    LookaheadCoverages = lookaheadCoverages;
+                }
+
+                public PosLookupRecord[] PosLookupRecords { get; set; }
                 public CoverageTable[] BacktrackCoverages { get; set; }
                 public CoverageTable[] InputGlyphCoverages { get; set; }
                 public CoverageTable[] LookaheadCoverages { get; set; }
-                public PosLookupRecord[] PosLookupRecords { get; set; }
 
                 //Chaining Context Positioning Format 3: Coverage-based Chaining Context Glyph Positioning
                 //USHORT 	PosFormat 	                    Format identifier-format = 3
@@ -1083,10 +1122,9 @@ namespace Typography.OpenFont.Tables
                             ushort chainPosRuleSetCount = reader.ReadUInt16();
                             ushort[] chainPosRuleSetOffsetList = Utils.ReadUInt16Array(reader, chainPosRuleSetCount);
 
-                            LkSubTableType8Fmt1 subTable = new LkSubTableType8Fmt1();
-                            subTable.PosRuleSetTables = CreateMultiplePosRuleSetTables(subTableStartAt, chainPosRuleSetOffsetList, reader);
-                            subTable.CoverageTable = CoverageTable.CreateFrom(reader, subTableStartAt + coverageOffset);
-                            return subTable;
+                            var posRuleSetTables = CreateMultiplePosRuleSetTables(subTableStartAt, chainPosRuleSetOffsetList, reader);
+                            var coverageTable = CoverageTable.CreateFrom(reader, subTableStartAt + coverageOffset);
+                            return new LkSubTableType8Fmt1(posRuleSetTables, coverageTable);
                         }
                     case 2:
                         {
@@ -1101,25 +1139,19 @@ namespace Typography.OpenFont.Tables
 
                             ushort coverageOffset = reader.ReadUInt16();
                             ushort backTrackClassDefOffset = reader.ReadUInt16();
-                            ushort inpuClassDefOffset = reader.ReadUInt16();
-                            ushort lookadheadClassDefOffset = reader.ReadUInt16();
-                            ushort chainPosClassSetCnt = reader.ReadUInt16();
-                            ushort[] chainPosClassSetOffsetArray = Utils.ReadUInt16Array(reader, chainPosClassSetCnt);
+                            ushort inputClassDefOffset = reader.ReadUInt16();
+                            ushort lookaheadClassDefOffset = reader.ReadUInt16();
+                            ushort chainPosClassSetCount = reader.ReadUInt16();
+                            ushort[] chainPosClassSetOffsetArray = Utils.ReadUInt16Array(reader, chainPosClassSetCount);
 
-                            LkSubTableType8Fmt2 subTable = new LkSubTableType8Fmt2(chainPosClassSetOffsetArray);
-                            subTable.BacktrackClassDefOffset = backTrackClassDefOffset;
-                            subTable.InputClassDefOffset = inpuClassDefOffset;
-                            subTable.LookaheadClassDefOffset = lookadheadClassDefOffset;
                             //----------
-                            PosClassSetTable[] posClassSetTables = new PosClassSetTable[chainPosClassSetCnt];
-                            for (int n = 0; n < chainPosClassSetCnt; ++n)
+                            PosClassSetTable[] posClassSetTables = new PosClassSetTable[chainPosClassSetCount];
+                            for (int n = 0; n < chainPosClassSetCount; ++n)
                             {
                                 posClassSetTables[n] = PosClassSetTable.CreateFrom(reader, subTableStartAt + chainPosClassSetOffsetArray[n]);
                             }
-                            subTable.PosClassSetTables = posClassSetTables;
-
-                            subTable.CoverageTable = CoverageTable.CreateFrom(reader, subTableStartAt + coverageOffset);
-                            return subTable;
+                            var coverageTable = CoverageTable.CreateFrom(reader, subTableStartAt + coverageOffset);
+                            return new LkSubTableType8Fmt2(chainPosClassSetOffsetArray, backTrackClassDefOffset, inputClassDefOffset, lookaheadClassDefOffset, posClassSetTables, coverageTable);
                         }
                     case 3:
                         {
@@ -1134,8 +1166,6 @@ namespace Typography.OpenFont.Tables
                             //uint16 	PosCount 	                    Number of PosLookupRecords
                             //struct 	PosLookupRecord[PosCount] 	    Array of PosLookupRecords,in design order
 
-                            var subTable = new LkSubTableType8Fmt3();
-
                             ushort backtrackGlyphCount = reader.ReadUInt16();
                             ushort[] backtrackCoverageOffsets = Utils.ReadUInt16Array(reader, backtrackGlyphCount);
                             ushort inputGlyphCount = reader.ReadUInt16();
@@ -1145,13 +1175,13 @@ namespace Typography.OpenFont.Tables
                             ushort[] lookaheadCoverageOffsets = Utils.ReadUInt16Array(reader, lookaheadGlyphCount);
 
                             ushort posCount = reader.ReadUInt16();
-                            subTable.PosLookupRecords = CreateMultiplePosLookupRecords(reader, posCount);
+                            var posLookupRecords = CreateMultiplePosLookupRecords(reader, posCount);
 
-                            subTable.BacktrackCoverages = CoverageTable.CreateMultipleCoverageTables(subTableStartAt, backtrackCoverageOffsets, reader);
-                            subTable.InputGlyphCoverages = CoverageTable.CreateMultipleCoverageTables(subTableStartAt, inputGlyphCoverageOffsets, reader);
-                            subTable.LookaheadCoverages = CoverageTable.CreateMultipleCoverageTables(subTableStartAt, lookaheadCoverageOffsets, reader);
+                            var backtrackCoverages = CoverageTable.CreateMultipleCoverageTables(subTableStartAt, backtrackCoverageOffsets, reader);
+                            var inputGlyphCoverages = CoverageTable.CreateMultipleCoverageTables(subTableStartAt, inputGlyphCoverageOffsets, reader);
+                            var lookaheadCoverages = CoverageTable.CreateMultipleCoverageTables(subTableStartAt, lookaheadCoverageOffsets, reader);
 
-                            return subTable;
+                            return new LkSubTableType8Fmt3(posLookupRecords, backtrackCoverages, inputGlyphCoverages, lookaheadCoverages);
                         }
                 }
             }

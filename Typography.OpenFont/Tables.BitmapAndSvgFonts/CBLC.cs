@@ -36,10 +36,9 @@ namespace Typography.OpenFont.Tables
     {
         BitmapSizeTable[] _bmpSizeTables;
 
-        public const string _N = "CBLC";
-        public override string Name => _N;
+        public const string Name = "CBLC";
 
-        protected override void ReadContentFrom(BinaryReader reader)
+        internal CBLC(TableHeader header, BinaryReader reader) : base(header, reader)
         {
             long cblcBeginPos = reader.BaseStream.Position;
             ushort majorVersion = reader.ReadUInt16(); //3

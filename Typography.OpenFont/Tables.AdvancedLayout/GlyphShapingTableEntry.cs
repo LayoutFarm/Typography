@@ -34,11 +34,10 @@ namespace Typography.OpenFont.Tables
         public ushort MajorVersion { get; private set; }
         public ushort MinorVersion { get; private set; }
 
-        public ScriptList ScriptList { get; private set; }
-        public FeatureList FeatureList { get; private set; }
+        public ScriptList? ScriptList { get; private set; }
+        public FeatureList? FeatureList { get; private set; }
 
-
-        protected override void ReadContentFrom(BinaryReader reader)
+        internal GlyphShapingTableEntry(TableHeader header, BinaryReader reader) : base(header, reader)
         {
             //-------------------------------------------
             // GPOS/GSUB Header

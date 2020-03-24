@@ -12,8 +12,6 @@ namespace Typography.OpenFont.CFF
     public class CffEvaluationEngine
     {
 
-        CFF.Cff1Font _cff1Font;
-
         float _scale = 1;//default 
         Stack<Type2EvaluationStack> _evalStackPool = new Stack<Type2EvaluationStack>();
 
@@ -77,16 +75,15 @@ namespace Typography.OpenFont.CFF
         {
 
         }
-        public void Run(IGlyphTranslator tx, Cff1Font cff1Font, Cff1GlyphData glyphData, float scale = 1)
+        public void Run(IGlyphTranslator tx, Cff1GlyphData glyphData, float scale = 1)
         {
-            Run(tx, cff1Font, glyphData.GlyphInstructions, scale);
+            Run(tx, glyphData.GlyphInstructions, scale);
         }
-        internal void Run(IGlyphTranslator tx, Cff1Font cff1Font, Type2Instruction[] instructionList, float scale = 1)
+        internal void Run(IGlyphTranslator tx, Type2Instruction[] instructionList, float scale = 1)
         {
 
             //all fields are set to new values***
 
-            _cff1Font = cff1Font;
             _scale = scale;
 
             double currentX = 0, currentY = 0;
@@ -114,12 +111,13 @@ namespace Typography.OpenFont.CFF
         {
             //recursive ***
 
-            Type2EvaluationStack evalStack = GetFreeEvalStack(tx); //**
+            Type2EvaluationStack evalStack = GetFreeEvalStack(); //**
 #if DEBUG
             //evalStack.dbugGlyphIndex = instructionList.dbugGlyphIndex;
 #endif
             evalStack._currentX = currentX;
             evalStack._currentY = currentY;
+            evalStack.GlyphTranslator = tx;
 
             for (int i = 0; i < instructionList.Length; ++i)
             {
@@ -264,7 +262,7 @@ namespace Typography.OpenFont.CFF
             ReleaseEvalStack(evalStack);//****
         }
 
-        Type2EvaluationStack GetFreeEvalStack(IGlyphTranslator tx)
+        Type2EvaluationStack GetFreeEvalStack()
         {
             if (_evalStackPool.Count > 0)
             {
@@ -272,7 +270,7 @@ namespace Typography.OpenFont.CFF
             }
             else
             {
-                return new Type2EvaluationStack(tx);
+                return new Type2EvaluationStack();
             }
         }
         void ReleaseEvalStack(Type2EvaluationStack evalStack)
@@ -291,12 +289,12 @@ namespace Typography.OpenFont.CFF
         double[] _argStack = new double[50];
         int _currentIndex = 0; //current stack index
 
-        IGlyphTranslator _glyphTranslator;
+        IGlyphTranslator? _glyphTranslator;
 #if DEBUG
 
         public int dbugGlyphIndex;
 #endif
-        public Type2EvaluationStack(IGlyphTranslator translator) => _glyphTranslator = translator;
+        public Type2EvaluationStack() { }
 
         public void Reset()
         {
@@ -304,11 +302,13 @@ namespace Typography.OpenFont.CFF
             _currentX = _currentY = 0;
             _glyphTranslator = null;
         }
-        public IGlyphTranslator GlyphTranslator
+        public IGlyphTranslator? GlyphTranslator
         {
             get => _glyphTranslator;
             set => _glyphTranslator = value;
         }
+        [System.Diagnostics.CodeAnalysis.DoesNotReturn]
+        private void ThrowNullGlyphTranslator() => throw new InvalidOperationException(nameof(GlyphTranslator) + " not set");
         public void Push(double value)
         {
             _argStack[_currentIndex] = value;
@@ -345,6 +345,7 @@ namespace Typography.OpenFont.CFF
         /// </summary>
         public void R_MoveTo()
         {
+            if (_glyphTranslator is null) ThrowNullGlyphTranslator();
             //|- dx1 dy1 rmoveto(21) |-
 
             //moves the current point to
@@ -369,6 +370,7 @@ namespace Typography.OpenFont.CFF
         /// </summary>
         public void H_MoveTo()
         {
+            if (_glyphTranslator is null) ThrowNullGlyphTranslator();
             //|- dx1 hmoveto(22) |-
 
             //moves the current point 
@@ -380,6 +382,7 @@ namespace Typography.OpenFont.CFF
         }
         public void V_MoveTo()
         {
+            if (_glyphTranslator is null) ThrowNullGlyphTranslator();
             //|- dy1 vmoveto (4) |-
             //moves the current point 
             //dy1 units in the vertical direction.
@@ -395,6 +398,7 @@ namespace Typography.OpenFont.CFF
         }
         public void R_LineTo()
         {
+            if (_glyphTranslator is null) ThrowNullGlyphTranslator();
             //|- {dxa dya}+  rlineto (5) |-
 
             //appends a line from the current point to 
@@ -420,7 +424,7 @@ namespace Typography.OpenFont.CFF
         }
         public void H_LineTo()
         {
-
+            if (_glyphTranslator is null) ThrowNullGlyphTranslator();
             //|- dx1 {dya dxb}*  hlineto (6) |-
             //|- {dxa dyb}+  hlineto (6) |-
 
@@ -470,6 +474,7 @@ namespace Typography.OpenFont.CFF
         }
         public void V_LineTo()
         {
+            if (_glyphTranslator is null) ThrowNullGlyphTranslator();
             //|- dy1 {dxa dyb}*  vlineto (7) |-
             //|- {dya dxb}+  vlineto (7) |-
 
@@ -521,7 +526,7 @@ namespace Typography.OpenFont.CFF
 
         public void RR_CurveTo()
         {
-
+            if (_glyphTranslator is null) ThrowNullGlyphTranslator();
             //|- {dxa dya dxb dyb dxc dyc}+  rrcurveto (8) |-
 
             //appends a Bézier curve, defined by dxa...dyc, to the current point.
@@ -568,7 +573,7 @@ namespace Typography.OpenFont.CFF
         }
         public void HH_CurveTo()
         {
-
+            if (_glyphTranslator is null) ThrowNullGlyphTranslator();
             //|- dy1? {dxa dxb dyb dxc}+ hhcurveto (27) |-
 
             //appends one or more Bézier curves, as described by the 
@@ -615,6 +620,7 @@ namespace Typography.OpenFont.CFF
         }
         public void HV_CurveTo()
         {
+            if (_glyphTranslator is null) ThrowNullGlyphTranslator();
             //|- dx1 dx2 dy2 dy3 {dya dxb dyb dxc dxd dxe dye dyf}* dxf? hvcurveto (31) |-
 
             //|- {dxa dxb dyb dyc dyd dxe dye dxf}+ dyf? hvcurveto (31) |-
@@ -773,6 +779,7 @@ namespace Typography.OpenFont.CFF
         }
         public void R_CurveLine()
         {
+            if (_glyphTranslator is null) ThrowNullGlyphTranslator();
 
 #if DEBUG
 
@@ -816,6 +823,7 @@ namespace Typography.OpenFont.CFF
         }
         public void R_LineCurve()
         {
+            if (_glyphTranslator is null) ThrowNullGlyphTranslator();
 #if DEBUG
 
 #endif
@@ -857,7 +865,7 @@ namespace Typography.OpenFont.CFF
         }
         public void VH_CurveTo()
         {
-
+            if (_glyphTranslator is null) ThrowNullGlyphTranslator();
 #if DEBUG
 
 
@@ -999,6 +1007,7 @@ namespace Typography.OpenFont.CFF
         }
         public void VV_CurveTo()
         {
+            if (_glyphTranslator is null) ThrowNullGlyphTranslator();
             // |- dx1? {dya dxb dyb dyc}+  vvcurveto (26) |-
             //appends one or more curves to the current point. 
             //If the argument count is a multiple of four, the curve starts and ends vertical. 

@@ -503,7 +503,7 @@ namespace Typography.TextLayout
     {
         List<GlyphPos> _glyphPosList = new List<GlyphPos>();
 
-        Typeface _typeface;
+        Typeface? _typeface;
         public GlyphPosStream() { }
 
         public int Count => _glyphPosList.Count;
@@ -513,13 +513,14 @@ namespace Typography.TextLayout
             _typeface = null;
             _glyphPosList.Clear();
         }
-        public Typeface Typeface
+        public Typeface? Typeface
         {
             get => _typeface;
             set => _typeface = value;
         }
         public void AddGlyph(ushort o_offset, ushort glyphIndex, Glyph glyph)
         {
+            if (_typeface is null) throw new InvalidOperationException(nameof(Typeface) + " not set");
             if (!glyph.HasOriginalAdvancedWidth)
             {
                 //TODO: review here, 

@@ -53,12 +53,22 @@ namespace Typography.WebFont
         public uint origLength;
         public uint origChecksum;
 
+        public WoffTableDirectory(uint tag, uint offset, uint compLength, uint origLength, uint origChecksum, long expectedStartAt, string name)
+        {
+            this.tag = tag;
+            this.offset = offset;
+            this.compLength = compLength;
+            this.origLength = origLength;
+            this.origChecksum = origChecksum;
+            ExpectedStartAt = expectedStartAt;
+            Name = name;
+        }
+
+        public long ExpectedStartAt { get; set; }
+        public string Name { get; set; }
         //translated values
         //public UnreadTableEntry unreadTableEntry; //simulate 
-        public string Name { get; set; }
-        public long ExpectedStartAt { get; set; }
 #if DEBUG
-        public WoffTableDirectory() { }
         public override string ToString()
         {
             return Name;
@@ -69,15 +79,14 @@ namespace Typography.WebFont
     public delegate bool ZlibDecompressStreamFunc(byte[] compressedInput, byte[] decompressOutput);
     public static class WoffDefaultZlibDecompressFunc
     {
-        public static ZlibDecompressStreamFunc DecompressHandler;
+        public static ZlibDecompressStreamFunc? DecompressHandler;
     }
     class WoffReader
     {
-        WoffHeader _header;
 
-        public ZlibDecompressStreamFunc DecompressHandler;
+        public ZlibDecompressStreamFunc? DecompressHandler;
 
-        public PreviewFontInfo ReadPreview(BinaryReader reader)
+        public PreviewFontInfo? ReadPreview(BinaryReader reader)
         {
             //read preview only
             //WOFF File
@@ -87,9 +96,8 @@ namespace Typography.WebFont
             //ExtendedMetadata  An optional block of extended metadata, represented in XML format and compressed for storage in the WOFF file.
             //PrivateData       An optional block of private data for the font designer, foundry, or vendor to use.
 
-            PreviewFontInfo fontPreviewInfo = null;
-            _header = ReadWOFFHeader(reader);
-            if (_header == null)
+            var header = ReadWOFFHeader(reader);
+            if (header == null)
             {
 #if DEBUG
                 System.Diagnostics.Debug.WriteLine("can't read ");
@@ -98,7 +106,7 @@ namespace Typography.WebFont
             }
 
             //
-            WoffTableDirectory[] woffTableDirs = ReadTableDirectories(reader);
+            WoffTableDirectory[] woffTableDirs = ReadTableDirectories(header, reader);
             if (woffTableDirs == null)
             {
                 return null;
@@ -124,7 +132,7 @@ namespace Typography.WebFont
             //for font preview, we may not need to extract 
             using (MemoryStream decompressStream = new MemoryStream())
             {
-                if (Extract(reader, woffTableDirs, decompressStream))
+                if (Extract(DecompressHandler, reader, woffTableDirs, decompressStream))
                 {
                     using (ByteOrderSwappingBinaryReader reader2 = new ByteOrderSwappingBinaryReader(decompressStream))
                     {
@@ -141,10 +149,10 @@ namespace Typography.WebFont
                 }
             }
 
-            return fontPreviewInfo;
+            return null;
 
         }
-        internal Typeface Read(BinaryReader reader)
+        internal Typeface? Read(BinaryReader reader)
         {
             //WOFF File
             //WOFFHeader        File header with basic font type and version, along with offsets to metadata and private data blocks.
@@ -152,8 +160,8 @@ namespace Typography.WebFont
             //FontTables        The font data tables from the input sfnt font, compressed to reduce bandwidth requirements.
             //ExtendedMetadata  An optional block of extended metadata, represented in XML format and compressed for storage in the WOFF file.
             //PrivateData       An optional block of private data for the font designer, foundry, or vendor to use.
-            _header = ReadWOFFHeader(reader);
-            if (_header == null)
+            var header = ReadWOFFHeader(reader);
+            if (header == null)
             {
 #if DEBUG
                 System.Diagnostics.Debug.WriteLine("can't read ");
@@ -162,7 +170,7 @@ namespace Typography.WebFont
             }
 
             //
-            WoffTableDirectory[] woffTableDirs = ReadTableDirectories(reader);
+            WoffTableDirectory[] woffTableDirs = ReadTableDirectories(header, reader);
             if (woffTableDirs == null)
             {
                 return null;
@@ -188,7 +196,7 @@ namespace Typography.WebFont
 
             using (MemoryStream decompressStream = new MemoryStream())
             {
-                if (Extract(reader, woffTableDirs, decompressStream))
+                if (Extract(DecompressHandler, reader, woffTableDirs, decompressStream))
                 {
                     using (ByteOrderSwappingBinaryReader reader2 = new ByteOrderSwappingBinaryReader(decompressStream))
                     {
@@ -200,7 +208,7 @@ namespace Typography.WebFont
             }
             return null;
         }
-        public Typeface Read(Stream inputStream)
+        public Typeface? Read(Stream inputStream)
         {
             using (ByteOrderSwappingBinaryReader reader = new ByteOrderSwappingBinaryReader(inputStream))
             {
@@ -214,17 +222,18 @@ namespace Typography.WebFont
             for (int i = 0; i < woffTableDirs.Length; ++i)
             {
                 WoffTableDirectory woffTableDir = woffTableDirs[i];
-                tableEntryCollection.AddEntry(
+                var unreadTableEntry =
                     new UnreadTableEntry(
                         new TableHeader(woffTableDir.tag,
                             woffTableDir.origChecksum,
                             (uint)woffTableDir.ExpectedStartAt,
-                            woffTableDir.origLength)));
+                            woffTableDir.origLength));
+                tableEntryCollection.AddEntry(unreadTableEntry.Name, unreadTableEntry);
             }
 
             return tableEntryCollection;
         }
-        static WoffHeader ReadWOFFHeader(BinaryReader reader)
+        static WoffHeader? ReadWOFFHeader(BinaryReader reader)
         {
             //WOFFHeader
             //UInt32  signature         0x774F4646 'wOFF'
@@ -271,7 +280,7 @@ namespace Typography.WebFont
             return header;
         }
 
-        WoffTableDirectory[] ReadTableDirectories(BinaryReader reader)
+        WoffTableDirectory[] ReadTableDirectories(WoffHeader header, BinaryReader reader)
         {
 
             //The table directory is an array of WOFF table directory entries, as defined below.
@@ -280,7 +289,7 @@ namespace Typography.WebFont
             //Its size is calculated by multiplying the numTables value in the WOFF header times the size of a single WOFF table directory.
             //Each table directory entry specifies the size and location of a single font data table. 
 
-            uint tableCount = (uint)_header.numTables; //?
+            uint tableCount = (uint)header.numTables; //?
             //tableDirs = new WoffTableDirectory[tableCount];
             long expectedStartAt = 0;
 
@@ -296,19 +305,18 @@ namespace Typography.WebFont
                 //UInt32 origLength     Length of the uncompressed table, excluding padding.
                 //UInt32 origChecksum   Checksum of the uncompressed table.
 
-                WoffTableDirectory table = new WoffTableDirectory();
-                table.tag = reader.ReadUInt32();
-                table.offset = reader.ReadUInt32();
-                table.compLength = reader.ReadUInt32();
-                table.origLength = reader.ReadUInt32();
-                table.origChecksum = reader.ReadUInt32();
+                var tag = reader.ReadUInt32();
+                var offset = reader.ReadUInt32();
+                var compLength = reader.ReadUInt32();
+                var origLength = reader.ReadUInt32();
+                var origChecksum = reader.ReadUInt32();
 
-                table.ExpectedStartAt = expectedStartAt;
-                table.Name = Utils.TagToString(table.tag);
+                var name = Utils.TagToString(tag);
                 //var tableHeader = new TableHeader(tag, origChecksum, (uint)expectedStartAt, origLength);
                 //var unreadTable = new UnreadTableEntry(tableHeader);
                 //tableEntryCollection.AddEntry(unreadTable); 
                 //table.unreadTableEntry = unreadTable;
+                WoffTableDirectory table = new WoffTableDirectory(tag, offset, compLength, origLength, origChecksum, expectedStartAt, name);
 
                 tableDirs[i] = table;
                 expectedStartAt += table.origLength;
@@ -317,7 +325,7 @@ namespace Typography.WebFont
             return tableDirs;
         }
 
-        bool Extract(BinaryReader reader, WoffTableDirectory[] tables, Stream newDecompressedStream)
+        bool Extract(ZlibDecompressStreamFunc decompressHandler, BinaryReader reader, WoffTableDirectory[] tables, Stream newDecompressedStream)
         {
             for (int i = 0; i < tables.Length; ++i)
             {
@@ -340,8 +348,8 @@ namespace Typography.WebFont
                 }
                 else
                 {
-                    var decompressedBuffer = new byte[table.origLength];
-                    if (!DecompressHandler(compressedBuffer, decompressedBuffer))
+                    byte[]? decompressedBuffer = new byte[table.origLength];
+                    if (!decompressHandler(compressedBuffer, decompressedBuffer))
                     {
                         //if not pass set to null
                         decompressedBuffer = null;

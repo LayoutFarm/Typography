@@ -12,10 +12,10 @@ namespace Typography.OpenFont.CFF
         //This is our extension
         //-----------------------
 
-        List<Type2Instruction> _step1List;
-        List<Type2Instruction> _step2List;
+        List<Type2Instruction>? _step1List;
+        List<Type2Instruction>? _step2List;
 
-        void CompactStep1OnlyLoadInt(List<Type2Instruction> insts)
+        void CompactStep1OnlyLoadInt(List<Type2Instruction> step1List, List<Type2Instruction> insts)
         {
             int j = insts.Count;
             CompactRange _latestCompactRange = CompactRange.None;
@@ -32,7 +32,7 @@ namespace Typography.OpenFont.CFF
                         default: throw new NotSupportedException();
                         case 0: break; //nothing
                         case 2:
-                            _step1List.Add(new Type2Instruction(OperatorName.LoadShort2,
+                            step1List.Add(new Type2Instruction(OperatorName.LoadShort2,
                                       (((ushort)insts[startCollectAt].Value) << 16) |
                                       (((ushort)insts[startCollectAt + 1].Value))
                                       ));
@@ -40,7 +40,7 @@ namespace Typography.OpenFont.CFF
                             collecting_count -= 2;
                             break;
                         case 1:
-                            _step1List.Add(insts[startCollectAt]);
+                            step1List.Add(insts[startCollectAt]);
                             startCollectAt += 1;
                             collecting_count -= 1;
                             break;
@@ -55,7 +55,7 @@ namespace Typography.OpenFont.CFF
                         case 0: break;//nothing
                         case 4:
                             {
-                                _step1List.Add(new Type2Instruction(OperatorName.LoadSbyte4,
+                                step1List.Add(new Type2Instruction(OperatorName.LoadSbyte4,
                                    (((byte)insts[startCollectAt].Value) << 24) |
                                    (((byte)insts[startCollectAt + 1].Value) << 16) |
                                    (((byte)insts[startCollectAt + 2].Value) << 8) |
@@ -66,7 +66,7 @@ namespace Typography.OpenFont.CFF
                             }
                             break;
                         case 3:
-                            _step1List.Add(new Type2Instruction(OperatorName.LoadSbyte3,
+                            step1List.Add(new Type2Instruction(OperatorName.LoadSbyte3,
                                 (((byte)insts[startCollectAt].Value) << 24) |
                                 (((byte)insts[startCollectAt + 1].Value) << 16) |
                                 (((byte)insts[startCollectAt + 2].Value) << 8)
@@ -75,7 +75,7 @@ namespace Typography.OpenFont.CFF
                             collecting_count -= 3;
                             break;
                         case 2:
-                            _step1List.Add(new Type2Instruction(OperatorName.LoadShort2,
+                            step1List.Add(new Type2Instruction(OperatorName.LoadShort2,
                               (((ushort)insts[startCollectAt].Value) << 16) |
                               ((ushort)insts[startCollectAt + 1].Value)
                               ));
@@ -83,7 +83,7 @@ namespace Typography.OpenFont.CFF
                             collecting_count -= 2;
                             break;
                         case 1:
-                            _step1List.Add(insts[startCollectAt]);
+                            step1List.Add(insts[startCollectAt]);
                             startCollectAt += 1;
                             collecting_count -= 1;
                             break;
@@ -178,7 +178,7 @@ namespace Typography.OpenFont.CFF
                         FlushWaitingNumbers();
                     }
 
-                    _step1List.Add(inst);
+                    step1List.Add(inst);
                     _latestCompactRange = CompactRange.None;
                 }
             }
@@ -199,15 +199,15 @@ namespace Typography.OpenFont.CFF
             }
             return 0;
         }
-        void CompactStep2MergeLoadIntWithNextCommand()
+        void CompactStep2MergeLoadIntWithNextCommand(List<Type2Instruction> step1List, List<Type2Instruction> step2List)
         {
             //a second pass
             //check if we can merge some load int( LoadInt, LoadSByte4, LoadShort2) except LoadSByte3 
             //to next instruction command or not
-            int j = _step1List.Count;
+            int j = step1List.Count;
             for (int i = 0; i < j; ++i)
             {
-                Type2Instruction i0 = _step1List[i];
+                Type2Instruction i0 = step1List[i];
 
                 if (i + 1 < j)
                 {
@@ -215,7 +215,7 @@ namespace Typography.OpenFont.CFF
                     byte merge_flags = IsLoadIntOrMergeableLoadIntExtension((OperatorName)i0.Op);
                     if (merge_flags > 0)
                     {
-                        Type2Instruction i1 = _step1List[i + 1];
+                        Type2Instruction i1 = step1List[i + 1];
                         //check i1 has empty space for i0 or not
                         bool canbe_merged = false;
                         switch ((OperatorName)i1.Op)
@@ -248,25 +248,25 @@ namespace Typography.OpenFont.CFF
                             if (merge_flags > 3) { throw new NotSupportedException(); }
 #endif
 
-                            _step2List.Add(new Type2Instruction((byte)((merge_flags << 6) | i1.Op), i0.Value));
+                            step2List.Add(new Type2Instruction((byte)((merge_flags << 6) | i1.Op), i0.Value));
                             i += 1;
                         }
                         else
                         {
-                            _step2List.Add(i0);
+                            step2List.Add(i0);
                         }
                     }
                     else
                     {
                         //this is the last one
-                        _step2List.Add(i0);
+                        step2List.Add(i0);
                     }
 
                 }
                 else
                 {
                     //this is the last one
-                    _step2List.Add(i0);
+                    step2List.Add(i0);
                 }
             }
         }
@@ -281,16 +281,14 @@ namespace Typography.OpenFont.CFF
             if (_step1List == null)
             {
                 _step1List = new List<Type2Instruction>();
-            }
+            } else _step1List.Clear();
             if (_step2List == null)
             {
                 _step2List = new List<Type2Instruction>();
-            }
-            _step1List.Clear();
-            _step2List.Clear();
+            } else _step2List.Clear();
             //
-            CompactStep1OnlyLoadInt(insts);
-            CompactStep2MergeLoadIntWithNextCommand();
+            CompactStep1OnlyLoadInt(_step1List, insts);
+            CompactStep2MergeLoadIntWithNextCommand(_step1List, _step2List);
 #if DEBUG
 
             //you can check/compare the compact form and the original form

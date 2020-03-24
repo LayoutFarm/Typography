@@ -11,8 +11,7 @@ namespace Typography.OpenFont.Tables
     /// </summary>
     class HorizontalMetrics : TableEntry
     {
-        public const string _N = "hmtx";
-        public override string Name => _N;
+        public const string Name = "hmtx";
         //
         //https://www.microsoft.com/typography/otspec/hmtx.htm
         // A font rendering engine must use the advanceWidths in the hmtx table for the advances of a CFF OFF font,
@@ -26,16 +25,6 @@ namespace Typography.OpenFont.Tables
 
         List<ushort> _advanceWidths; //in font design unit
         List<short> _leftSideBearings;//lsb, in font design unit
-        int _numOfHMetrics;
-        int _numGlyphs;
-        public HorizontalMetrics(UInt16 numOfHMetrics, UInt16 numGlyphs)
-        {
-            //The value numOfHMetrics comes from the 'hhea' table**   
-            _advanceWidths = new List<ushort>(numGlyphs);
-            _leftSideBearings = new List<short>(numGlyphs);
-            _numOfHMetrics = numOfHMetrics;
-            _numGlyphs = numGlyphs;
-        }
         public ushort GetAdvanceWidth(ushort index)
         {
             return _advanceWidths[index];
@@ -49,8 +38,12 @@ namespace Typography.OpenFont.Tables
             advWidth = _advanceWidths[index];
             lsb = _leftSideBearings[index];
         }
-        protected override void ReadContentFrom(BinaryReader input)
+        public HorizontalMetrics(UInt16 numOfHMetrics, UInt16 numGlyphs, TableHeader header, BinaryReader input) : base(header, input)
         {
+            //The value numOfHMetrics comes from the 'hhea' table**   
+            _advanceWidths = new List<ushort>(numGlyphs);
+            _leftSideBearings = new List<short>(numGlyphs);
+
             //===============================================================================
             //1. hMetrics : have both advance width and leftSideBearing(lsb)
             //Paired advance width and left side bearing values for each glyph. 
@@ -58,7 +51,6 @@ namespace Typography.OpenFont.Tables
             //If the font is monospaced, only one entry need be in the array, 
             //but that entry is required. The last entry applies to all subsequent glyphs
 
-            int numOfHMetrics = _numOfHMetrics;
             for (int i = 0; i < numOfHMetrics; i++)
             {
                 _advanceWidths.Add(input.ReadUInt16());
@@ -69,7 +61,6 @@ namespace Typography.OpenFont.Tables
             //2. (only) LeftSideBearing:  (same advanced width (eg. monospace font), vary only left side bearing)
             //Here the advanceWidth is assumed to be the same as the advanceWidth for the last entry above.
             //The number of entries in this array is derived from numGlyphs (from 'maxp' table) minus numberOfHMetrics.
-            int numGlyphs = _numGlyphs;
             int nEntries = numGlyphs - numOfHMetrics;
             ushort advanceWidth = _advanceWidths[numOfHMetrics - 1];
 

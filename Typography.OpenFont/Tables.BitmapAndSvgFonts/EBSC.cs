@@ -30,10 +30,9 @@ namespace Typography.OpenFont.Tables
     /// </summary>
     class EBSC : TableEntry
     {
-        public const string _N = "EBSC";
-        public override string Name => _N;
+        public const string Name = "EBSC";
 
-        protected override void ReadContentFrom(BinaryReader reader)
+        public EBSC(TableHeader header, BinaryReader reader) : base(header, reader)
         {
 
         }

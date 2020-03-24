@@ -13,7 +13,7 @@
     <FileAlignment>512</FileAlignment>
     <LangVersion>8.0</LangVersion>
     <Nullable>enable</Nullable>
-	<NoWarn>CS8632<!--<Nullable>enable</Nullable> does not work with tranditional .csprojs--></NoWarn>
+    <NoWarn>CS8632<!--<Nullable>enable</Nullable> does not work with tranditional .csprojs--></NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -40,8 +40,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ExtensionAttribute.cs" />
+    <Compile Include="HashCode.cs" />
     <Compile Include="System.Numerics.ForNet20.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TupleElementNames.cs" />
+    <Compile Include="ValueTuple.cs" />
   </ItemGroup>
   <Import Project="..\..\..\Typography.OpenFont\Typography.OpenFont.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -29,8 +29,8 @@ namespace Typography.OpenFont.Tables
 
     class AttachmentListTable
     {
-        AttachPoint[] _attachPoints;
-        public CoverageTable CoverageTable { get; private set; }
+        AttachPoint[]? _attachPoints;
+        public CoverageTable? CoverageTable { get; private set; }
         public static AttachmentListTable CreateFrom(BinaryReader reader, long beginAt)
         {
             AttachmentListTable attachmentListTable = new AttachmentListTable();

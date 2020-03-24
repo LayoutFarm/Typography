@@ -36,6 +36,12 @@ namespace Typography.OpenFont
             }
         }
 
+        public TrueTypeInterpreter(Typeface typeface) { 
+            SetTypeFace(typeface);
+            // https://github.com/dotnet/roslyn/issues/39740
+            if (_currentTypeFace is { } t) _currentTypeFace = t; else throw new NotImplementedException();
+            if (_interpreter is { } i) _interpreter = i; else throw new NotImplementedException();
+        }
 
         public GlyphPointF[] HintGlyph(ushort glyphIndex, float glyphSizeInPixel)
         {
@@ -45,13 +51,14 @@ namespace Typography.OpenFont
             //1. start with original points/contours from glyph 
             int horizontalAdv = _currentTypeFace.GetHAdvanceWidthFromGlyphIndex(glyphIndex);
             int hFrontSideBearing = _currentTypeFace.GetHFrontSideBearingFromGlyphIndex(glyphIndex);
-
+            if (!(glyph.TtfWoffInfo is var (endPoints, glyphPoints)))
+                throw new NotSupportedException("Only TTF glyphs are supported");
             return HintGlyph(horizontalAdv,
                 hFrontSideBearing,
                 glyph.MinX,
                 glyph.MaxY,
-                glyph.GlyphPoints,
-                glyph.EndPoints,
+                glyphPoints,
+                endPoints,
                 glyph.GlyphInstructions,
                 glyphSizeInPixel);
 
@@ -63,7 +70,7 @@ namespace Typography.OpenFont
             int maxY,
             GlyphPointF[] glyphPoints,
             ushort[] contourEndPoints,
-            byte[] instructions,
+            byte[]? instructions,
             float glyphSizeInPixel)
         {
 
@@ -150,9 +157,9 @@ namespace Typography.OpenFont
         ExecutionStack _stack;
         InstructionStream[] _functions;
         InstructionStream[] _instructionDefs;
-        float[] _controlValueTable;
+        float[]? _controlValueTable;
         int[] _storage;
-        ushort[] _contours;
+        ushort[]? _contours;
         float _scale;
         int _ppem;
         int _callStackSize;
@@ -179,7 +186,7 @@ namespace Typography.OpenFont
             Execute(new InstructionStream(instructions), false, true);
         }
 
-        public void SetControlValueTable(int[] cvt, float scale, float ppem, byte[] cvProgram)
+        public void SetControlValueTable(int[]? cvt, float scale, float ppem, byte[]? cvProgram)
         {
             if (_scale == scale || cvt == null)
                 return;
@@ -216,7 +223,7 @@ namespace Typography.OpenFont
             }
         }
 
-        public void HintGlyph(GlyphPointF[] glyphPoints, ushort[] contours, byte[] instructions)
+        public void HintGlyph(GlyphPointF[] glyphPoints, ushort[] contours, byte[]? instructions)
         {
             if (instructions == null || instructions.Length == 0)
                 return;
@@ -325,6 +332,8 @@ namespace Typography.OpenFont
                     // ==== CONTROL VALUE TABLE ====
                     case OpCode.WCVTP:
                         {
+                            if (_controlValueTable is null)
+                                throw new NotSupportedException();
                             var value = _stack.PopFloat();
                             var loc = CheckIndex(_stack.Pop(), _controlValueTable.Length);
                             _controlValueTable[loc] = value;
@@ -332,6 +341,8 @@ namespace Typography.OpenFont
                         break;
                     case OpCode.WCVTF:
                         {
+                            if (_controlValueTable is null)
+                                throw new NotSupportedException();
                             var value = _stack.Pop();
                             var loc = CheckIndex(_stack.Pop(), _controlValueTable.Length);
                             _controlValueTable[loc] = value * _scale;
@@ -505,6 +516,7 @@ namespace Typography.OpenFont
                     case OpCode.SHC0:
                     case OpCode.SHC1:
                         {
+                            if (_contours is null) throw new NotSupportedException();
                             Zone zone;
                             int point;
                             var displacement = ComputeDisplacement((int)opcode, out zone, out point);
@@ -527,6 +539,7 @@ namespace Typography.OpenFont
                     case OpCode.SHZ0:
                     case OpCode.SHZ1:
                         {
+                            if (_contours is null) throw new NotSupportedException();
                             Zone zone;
                             int point;
                             var displacement = ComputeDisplacement((int)opcode, out zone, out point);
@@ -666,6 +679,7 @@ namespace Typography.OpenFont
                     case OpCode.UTP: _zp0.TouchState[_stack.Pop()] &= ~GetTouchState(); break;
                     case OpCode.IUP0:
                     case OpCode.IUP1:
+                        if (_contours is null) throw new NotSupportedException();
                         // bail if no contours (empty outline)
                         if (_contours.Length == 0)
                         {
@@ -1172,6 +1186,7 @@ namespace Typography.OpenFont
                     case OpCode.DELTAC2:
                     case OpCode.DELTAC3:
                         {
+                            if (_controlValueTable is null) throw new NotSupportedException();
                             var last = _stack.Pop();
                             for (int i = 1; i <= last; i++)
                             {
@@ -1291,7 +1306,11 @@ namespace Typography.OpenFont
             return index;
         }
 
-        float ReadCvt() { return _controlValueTable[CheckIndex(_stack.Pop(), _controlValueTable.Length)]; }
+        float ReadCvt()
+        {
+            if (_controlValueTable is null) throw new NotSupportedException();
+            return _controlValueTable[CheckIndex(_stack.Pop(), _controlValueTable.Length)];
+        }
 
         void OnVectorsUpdated()
         {

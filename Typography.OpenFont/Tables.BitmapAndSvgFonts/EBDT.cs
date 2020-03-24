@@ -35,10 +35,9 @@ namespace Typography.OpenFont.Tables
     /// </summary>
     class EBDT : TableEntry
     {
-        public const string _N = "EBDT";
-        public override string Name => _N;
+        public const string Name = "EBDT";
 
-        protected override void ReadContentFrom(BinaryReader reader)
+        internal EBDT(TableHeader header, BinaryReader reader) : base(header, reader)
         {
             ushort majorVersion = reader.ReadUInt16();
             ushort minorVersion = reader.ReadUInt16();

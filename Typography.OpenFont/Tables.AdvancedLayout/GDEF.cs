@@ -64,11 +64,10 @@ namespace Typography.OpenFont.Tables
 
     class GDEF : TableEntry
     {
-        public const string _N = "GDEF";
-        public override string Name => _N;
+        public const string Name = "GDEF";
         //
         long _tableStartAt;
-        protected override void ReadContentFrom(BinaryReader reader)
+        public GDEF(TableHeader header, BinaryReader reader) : base(header, reader)
         {
             _tableStartAt = reader.BaseStream.Position;
             //-----------------------------------------
@@ -164,11 +163,11 @@ namespace Typography.OpenFont.Tables
         }
         public int MajorVersion { get; private set; }
         public int MinorVersion { get; private set; }
-        public ClassDefTable GlyphClassDef { get; private set; }
-        public AttachmentListTable AttachmentListTable { get; private set; }
-        public LigCaretList LigCaretList { get; private set; }
-        public ClassDefTable MarkAttachmentClassDef { get; private set; }
-        public MarkGlyphSetsTable MarkGlyphSetsTable { get; private set; }
+        public ClassDefTable? GlyphClassDef { get; private set; }
+        public AttachmentListTable? AttachmentListTable { get; private set; }
+        public LigCaretList? LigCaretList { get; private set; }
+        public ClassDefTable? MarkAttachmentClassDef { get; private set; }
+        public MarkGlyphSetsTable? MarkGlyphSetsTable { get; private set; }
 
         //------------------------
         /// <summary>
@@ -191,64 +190,55 @@ namespace Typography.OpenFont.Tables
         void FillClassDefs(Glyph[] inputGlyphs)
         {
             //1. glyph def 
-            ClassDefTable classDef = GlyphClassDef;
+            var classDef = GlyphClassDef;
             if (classDef == null) return;
             //-----------------------------------------
 
-            switch (classDef.Format)
+            if (classDef.format1 is var (startGlyph, classValues))
             {
-                default:
-                    Utils.WarnUnimplemented("GDEF GlyphClassDef Format {0}", classDef.Format);
-                    break;
-                case 1:
-                    {
-                        ushort startGlyph = classDef.startGlyph;
-                        ushort[] classValues = classDef.classValueArray;
-                        int gIndex = startGlyph;
-                        for (int i = 0; i < classValues.Length; ++i)
-                        {
+                int gIndex = startGlyph;
+                for (int i = 0; i < classValues?.Length; ++i)
+                {
 #if DEBUG
-                            ushort classV = classValues[i];
-                            if (classV > (ushort)GlyphClassKind.Component)
-                            {
-
-                            }
-#endif
-
-                            inputGlyphs[gIndex].GlyphClass = (GlyphClassKind)classValues[i];
-                            gIndex++;
-                        }
+                    ushort classV = classValues[i];
+                    if (classV > (ushort)GlyphClassKind.Component)
+                    {
 
                     }
-                    break;
-                case 2:
-                    {
-                        ClassDefTable.ClassRangeRecord[] records = classDef.records;
-                        for (int n = 0; n < records.Length; ++n)
-                        {
-                            ClassDefTable.ClassRangeRecord rec = records[n];
-
-#if DEBUG
-
-                            if (rec.classNo > (ushort)GlyphClassKind.Component)
-                            {
-
-                            }
 #endif
 
-                            GlyphClassKind glyphKind = (GlyphClassKind)rec.classNo;
-                            for (int i = rec.startGlyphId; i <= rec.endGlyphId; ++i)
-                            {
-                                inputGlyphs[i].GlyphClass = glyphKind;
-                            }
-                        }
-                    }
-                    break;
+                    inputGlyphs[gIndex].GlyphClass = (GlyphClassKind)classValues[i];
+                    gIndex++;
+                }
+
             }
+            else if (classDef.format2 is { } records)
+            {
+                for (int n = 0; n < records?.Length; ++n)
+                {
+                    ClassDefTable.ClassRangeRecord rec = records[n];
+
+#if DEBUG
+
+                    if (rec.classNo > (ushort)GlyphClassKind.Component)
+                    {
+
+                    }
+#endif
+
+                    GlyphClassKind glyphKind = (GlyphClassKind)rec.classNo;
+                    for (int i = rec.startGlyphId; i <= rec.endGlyphId; ++i)
+                    {
+                        inputGlyphs[i].GlyphClass = glyphKind;
+                    }
+                }
+            }
+            else
+                throw new NotImplementedException();
         }
         void FillAttachPoints(Glyph[] inputGlyphs)
         {
-            AttachmentListTable attachmentListTable = this.AttachmentListTable;
+            AttachmentListTable? attachmentListTable = this.AttachmentListTable;
             if (attachmentListTable == null) { return; }
             //-----------------------------------------
 
@@ -265,50 +255,36 @@ namespace Typography.OpenFont.Tables
             //that can be used in lookup tables within the GSUB or GPOS table to control how mark glyphs within a glyph sequence are treated by lookups.
             //For more information on the use of mark attachment classes, 
             //see the description of lookup flags in the “Lookup Table” section of the chapter, OpenType Layout Common Table Formats.
-            ClassDefTable markAttachmentClassDef = this.MarkAttachmentClassDef;
+            ClassDefTable? markAttachmentClassDef = this.MarkAttachmentClassDef;
             if (markAttachmentClassDef == null) return;
             //-----------------------------------------
 
-            switch (markAttachmentClassDef.Format)
+            if (markAttachmentClassDef.format1 is var (startGlyph, classValues))
             {
-                default:
-                    Utils.WarnUnimplemented("GDEF MarkAttachmentClassDef Table Format {0}", markAttachmentClassDef.Format);
-                    break;
-                case 1:
-                    {
-                        ushort startGlyph = markAttachmentClassDef.startGlyph;
-                        ushort[] classValues = markAttachmentClassDef.classValueArray;
-
-                        int len = classValues.Length;
-                        int gIndex = startGlyph;
-                        for (int i = 0; i < len; ++i)
-                        {
+                int gIndex = startGlyph;
+                for (int i = 0; i < classValues.Length; ++i)
+                {
 #if DEBUG
-                            Glyph dbugTestGlyph = inputGlyphs[gIndex];
+                    Glyph dbugTestGlyph = inputGlyphs[gIndex];
 #endif
-                            inputGlyphs[gIndex].MarkClassDef = classValues[i];
-                            gIndex++;
-                        }
+                    inputGlyphs[gIndex].MarkClassDef = classValues[i];
+                    gIndex++;
+                }
 
-                    }
-                    break;
-                case 2:
+            }
+            else if (markAttachmentClassDef.format2 is { } records)
+            {
+                for (int n = 0; n < records.Length; ++n)
+                {
+                    ClassDefTable.ClassRangeRecord rec = records[n];
+                    for (int i = rec.startGlyphId; i <= rec.endGlyphId; ++i)
                     {
-                        ClassDefTable.ClassRangeRecord[] records = markAttachmentClassDef.records;
-                        int len = records.Length;
-                        for (int n = 0; n < len; ++n)
-                        {
-                            ClassDefTable.ClassRangeRecord rec = records[n];
-                            for (int i = rec.startGlyphId; i <= rec.endGlyphId; ++i)
-                            {
 #if DEBUG
-                                Glyph dbugTestGlyph = inputGlyphs[i];
+                        Glyph dbugTestGlyph = inputGlyphs[i];
 #endif
-                                inputGlyphs[i].MarkClassDef = rec.classNo;
-                            }
-                        }
+                        inputGlyphs[i].MarkClassDef = rec.classNo;
                     }
-                    break;
+                }
             }
         }
         void FillMarkGlyphSets(Glyph[] inputGlyphs)
@@ -317,7 +293,7 @@ namespace Typography.OpenFont.Tables
             //A Mark Glyph Sets table is used to define sets of mark glyphs that can be used in lookup tables within the GSUB or GPOS table to control 
             //how mark glyphs within a glyph sequence are treated by lookups. For more information on the use of mark glyph sets,
             //see the description of lookup flags in the “Lookup Table” section of the chapter, OpenType Layout Common Table Formats.
-            MarkGlyphSetsTable markGlyphSets = this.MarkGlyphSetsTable;
+            MarkGlyphSetsTable? markGlyphSets = this.MarkGlyphSetsTable;
             if (markGlyphSets == null) return;
             //-----------------------------------------
 

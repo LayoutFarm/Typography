@@ -29,7 +29,7 @@ namespace Typography.OpenFont.Tables
     {
 
 
-        public FeatureTable[] featureTables;
+        public FeatureTable[]? featureTables;
         public static FeatureList CreateFrom(BinaryReader reader, long beginAt)
         {
             //https://www.microsoft.com/typography/otspec/chapter2.htm
@@ -133,6 +133,12 @@ namespace Typography.OpenFont.Tables
             //--------------------------
 
             ushort[] _lookupListIndices;
+
+            public FeatureTable(ushort[] lookupListIndices)
+            {
+                _lookupListIndices = lookupListIndices;
+            }
+
             public static FeatureTable CreateFrom(BinaryReader reader, long beginAt)
             {
                 reader.BaseStream.Seek(beginAt, SeekOrigin.Begin);
@@ -140,8 +146,7 @@ namespace Typography.OpenFont.Tables
                 ushort featureParams = reader.ReadUInt16();
                 ushort lookupCount = reader.ReadUInt16();
 
-                FeatureTable featureTable = new FeatureTable();
-                featureTable._lookupListIndices = Utils.ReadUInt16Array(reader, lookupCount);
+                FeatureTable featureTable = new FeatureTable(Utils.ReadUInt16Array(reader, lookupCount));
                 return featureTable;
             }
             public ushort[] LookupListIndices => _lookupListIndices;

@@ -54,16 +54,15 @@ namespace Typography.OpenFont.Tables
 
     class CFFTable : TableEntry
     {
-        public const string _N = "CFF ";//4 chars, left 1 blank whitespace
-        public override string Name => _N;
+        public const string Name = "CFF ";//4 chars, left 1 blank whitespace
         //
 
-        Cff1FontSet _cff1FontSet;
+        Cff1FontSet? _cff1FontSet;
         //
-        internal Cff1FontSet Cff1FontSet => _cff1FontSet;
-        protected override void ReadContentFrom(BinaryReader reader)
+        internal Cff1FontSet? Cff1FontSet => _cff1FontSet;
+        public CFFTable(TableHeader h, BinaryReader reader) : base(h, reader)
         {
-            uint tableOffset = this.Header.Offset;
+            uint tableOffset = h.Offset;
             //
             //
             //Table 8 Header Format
@@ -85,8 +84,7 @@ namespace Typography.OpenFont.Tables
                 default: throw new NotSupportedException();
                 case 1:
                     {
-                        Cff1Parser cff1 = new Cff1Parser();
-                        cff1.ParseAfterHeader(tableOffset, reader);
+                        Cff1Parser cff1 = new Cff1Parser(tableOffset, reader);
                         _cff1FontSet = cff1.ResultCff1FontSet;
                     }
                     break;

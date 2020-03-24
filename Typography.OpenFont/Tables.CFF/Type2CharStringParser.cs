@@ -67,7 +67,7 @@ namespace Typography.OpenFont.CFF
         bool _dbug_OnlyOp;
 
         [System.ThreadStatic]
-        static System.Text.StringBuilder s_dbugSb;
+        static System.Text.StringBuilder? s_dbugSb;
 
         public override string ToString()
         {
@@ -411,7 +411,7 @@ namespace Typography.OpenFont.CFF
             _insts[0] = new Type2Instruction(OperatorName.GlyphWidth, firstInst.Value);
         }
 
-
+        public void ClearAll() => _insts.Clear();
 
 
         internal List<Type2Instruction> InnerInsts => _insts;
@@ -504,8 +504,18 @@ namespace Typography.OpenFont.CFF
         //and encoded as the difference from nominalWidthX
 
 
-        public Type2CharStringParser()
+        public Type2CharStringParser(List<byte[]>? globalSubrRawBufferList, List<byte[]>? localSubrRawBufferList)
         {
+            _globalSubrRawBufferList = globalSubrRawBufferList;
+            _localSubrRawBufferList = localSubrRawBufferList;
+            if (globalSubrRawBufferList != null)
+            {
+                _globalSubrBias = CalculateBias(globalSubrRawBufferList.Count);
+            }
+            if (localSubrRawBufferList != null)
+            {
+                _localSubrBias = CalculateBias(localSubrRawBufferList.Count);
+            }
         }
 
 #if DEBUG
@@ -516,27 +526,11 @@ namespace Typography.OpenFont.CFF
         bool _foundSomeStem = false;
         bool _enterPathConstructionSeq = false;
 
-        Type2GlyphInstructionList _insts;
+        Type2GlyphInstructionList _insts = new Type2GlyphInstructionList();
         int _current_integer_count = 0;
         bool _doStemCount = true;
-        Cff1Font _currentCff1Font;
-        int _globalSubrBias;
-        int _localSubrBias;
-
-        public void SetCurrentCff1Font(Cff1Font currentCff1Font)
-        {
-            //this will provide subr buffer for callsubr callgsubr
-            _currentCff1Font = currentCff1Font;
-
-            if (_currentCff1Font._globalSubrRawBufferList != null)
-            {
-                _globalSubrBias = CalculateBias(currentCff1Font._globalSubrRawBufferList.Count);
-            }
-            if (_currentCff1Font._localSubrRawBufferList != null)
-            {
-                _localSubrBias = CalculateBias(currentCff1Font._localSubrRawBufferList.Count);
-            }
-        }
+        List<byte[]>? _globalSubrRawBufferList, _localSubrRawBufferList;
+        int _globalSubrBias, _localSubrBias;
 
 
         static int CalculateBias(int nsubr)
@@ -770,7 +764,7 @@ namespace Typography.OpenFont.CFF
                     case (byte)Type2Operator1.callsubr:
                         {
                             //get local subr proc
-                            if (_currentCff1Font != null)
+                            if (_localSubrRawBufferList is { } localSubrBuffers)
                             {
                                 Type2Instruction inst = _insts.RemoveLast();
                                 if (!inst.IsLoadInt)
@@ -782,13 +776,13 @@ namespace Typography.OpenFont.CFF
                                     _current_integer_count--;
                                 }
                                 //subr_no must be adjusted with proper bias value 
-                                ParseType2CharStringBuffer(_currentCff1Font._localSubrRawBufferList[inst.Value + _localSubrBias]);
+                                ParseType2CharStringBuffer(localSubrBuffers[inst.Value + _localSubrBias]);
                             }
                         }
                         break;
                     case (byte)Type2Operator1.callgsubr:
                         {
-                            if (_currentCff1Font != null)
+                            if (_globalSubrRawBufferList is { } globalSubrBuffers)
                             {
                                 Type2Instruction inst = _insts.RemoveLast();
                                 if (!inst.IsLoadInt)
@@ -801,7 +795,7 @@ namespace Typography.OpenFont.CFF
                                 }
                                 //subr_no must be adjusted with proper bias value 
                                 //load global subr
-                                ParseType2CharStringBuffer(_currentCff1Font._globalSubrRawBufferList[inst.Value + _globalSubrBias]);
+                                ParseType2CharStringBuffer(globalSubrBuffers[inst.Value + _globalSubrBias]);
                             }
                         }
                         break;
@@ -820,14 +814,10 @@ namespace Typography.OpenFont.CFF
             _enterPathConstructionSeq = false;
             _doStemCount = true;
 
-            _insts = new Type2GlyphInstructionList();
+            _insts.ClearAll();
             //--------------------
 #if DEBUG
             _dbugInstructionListMark++;
-            if (_currentCff1Font == null)
-            {
-                throw new NotSupportedException();
-            }
             //
             _insts.dbugGlyphIndex = dbugCurrentGlyphIndex;
 

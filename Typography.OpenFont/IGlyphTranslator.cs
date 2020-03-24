@@ -412,10 +412,10 @@ namespace Typography.OpenFont
         }
         //-----------
         //for CFF1
-        public static void Read(this IGlyphTranslator tx, CFF.Cff1Font cff1Font, CFF.Cff1GlyphData glyphData, float scale = 1)
+        public static void Read(this IGlyphTranslator tx, CFF.Cff1GlyphData glyphData, float scale = 1)
         {
             CFF.CffEvaluationEngine evalEngine = new CFF.CffEvaluationEngine();
-            evalEngine.Run(tx, cff1Font, glyphData.GlyphInstructions, scale);
+            evalEngine.Run(tx, glyphData.GlyphInstructions, scale);
         }
     }
 

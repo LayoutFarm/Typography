@@ -73,11 +73,10 @@ namespace Typography.OpenFont.Tables
 
     partial class Cmap : TableEntry
     {
-        public const string _N = "cmap";
-        public override string Name => _N;
+        public const string Name = "cmap";
 
-        CharacterMap[] _charMaps = null;
-        List<CharMapFormat14> _charMap14List;
+        CharacterMap[] _charMaps;
+        List<CharMapFormat14>? _charMap14List;
         Dictionary<int, ushort> _codepointToGlyphs = new Dictionary<int, ushort>();
 
 
@@ -139,7 +138,7 @@ namespace Typography.OpenFont.Tables
             return found;
         }
 
-        protected override void ReadContentFrom(BinaryReader input)
+        public Cmap(TableHeader header, BinaryReader input) : base(header, input)
         {
             //https://www.microsoft.com/typography/otspec/cmap.htm
             long beginAt = input.BaseStream.Position;

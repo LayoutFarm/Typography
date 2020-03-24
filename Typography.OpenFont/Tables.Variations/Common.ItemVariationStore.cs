@@ -22,7 +22,7 @@ namespace Typography.OpenFont.Tables
     {
 
         public VariationRegion[] variationRegions;
-        public void ReadContentFrom(BinaryReader reader)
+        public ItemVariationStoreTable(BinaryReader reader)
         {
 
 
@@ -40,8 +40,7 @@ namespace Typography.OpenFont.Tables
             variationRegions = new VariationRegion[regionCount];
             for (int i = 0; i < regionCount; ++i)
             {
-                var variationRegion = new VariationRegion();
-                variationRegion.ReadContent(reader, axisCount);
+                var variationRegion = new VariationRegion(reader, axisCount);
                 variationRegions[i] = variationRegion;
             }
         }
@@ -54,7 +53,7 @@ namespace Typography.OpenFont.Tables
         //Each RegionAxisCoordinates record provides coordinate values for a region along a single axis:
 
         public RegionAxisCoordinate[] regionAxes;
-        public void ReadContent(BinaryReader reader, int axisCount)
+        public VariationRegion(BinaryReader reader, int axisCount)
         {
             regionAxes = new RegionAxisCoordinate[axisCount];
             for (int i = 0; i < axisCount; ++i)
