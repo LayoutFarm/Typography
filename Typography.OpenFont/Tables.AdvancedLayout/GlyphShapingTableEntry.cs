@@ -34,8 +34,8 @@ namespace Typography.OpenFont.Tables
         public ushort MajorVersion { get; private set; }
         public ushort MinorVersion { get; private set; }
 
-        public ScriptList? ScriptList { get; private set; }
-        public FeatureList? FeatureList { get; private set; }
+        public ScriptList ScriptList { get; private set; }
+        public FeatureList FeatureList { get; private set; }
 
         internal GlyphShapingTableEntry(TableHeader header, BinaryReader reader) : base(header, reader)
         {

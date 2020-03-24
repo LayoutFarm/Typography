@@ -162,9 +162,8 @@ namespace PixelFarmTextBox.WinForms
             _devVxsTextPrinter.UpdateGlyphLayoutSettings();
 
             //------- 
-            var editableTextBlockLayoutEngine = new EditableTextBlockLayoutEngine();
-            editableTextBlockLayoutEngine.DefaultTypeface = _basicOptions.Typeface;
-            editableTextBlockLayoutEngine.FontSizeInPts = _basicOptions.FontSizeInPoints;
+            var editableTextBlockLayoutEngine =
+                new EditableTextBlockLayoutEngine(_basicOptions.Typeface, _basicOptions.FontSizeInPoints);
             editableTextBlockLayoutEngine.LoadText("ABCD\r\n   EFGH!");
             editableTextBlockLayoutEngine.DoLayout();
 

@@ -1,4 +1,5 @@
 ﻿//MIT, 2014-present, WinterDev
+using System;
 using System.Collections.Generic;
 
 namespace Typography.TextLayout
@@ -10,7 +11,7 @@ namespace Typography.TextLayout
         int _caretCharIndex = 0;//default  
         //TODO: temp public, review accessibility here again
         public List<char> _charBuffer = new List<char>();
-        public PxScaledGlyphPlan[] _glyphPlans;
+        public PxScaledGlyphPlan[] _glyphPlans => throw new NotImplementedException("Where is this initialized!?");
         public List<UserCodePointToGlyphIndex> _userCodePointToGlyphIndexMap = new List<UserCodePointToGlyphIndex>();
 
         bool _contentChanged = true;

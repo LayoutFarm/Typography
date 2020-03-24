@@ -680,8 +680,7 @@ namespace SampleWinForms
             Typeface typeface = _basicOptions.Typeface;
             float fontSizeInPoints = _basicOptions.FontSizeInPoints;
 
-            var layout = new Typography.TextLayout.GlyphLayout();
-            layout.Typeface = typeface;
+            var layout = new Typography.TextLayout.GlyphLayout(typeface);
             layout.ScriptLang = _basicOptions.ScriptLang;
             layout.PositionTechnique = _basicOptions.PositionTech;
             layout.EnableLigature = false;// true
@@ -839,7 +838,7 @@ namespace SampleWinForms
             OpenFontReader openFontReader = new OpenFontReader();
             using (FileStream fs = new FileStream(filename, FileMode.Open))
             {
-                PreviewFontInfo previewFontInfo = openFontReader.ReadPreview(fs);
+                IPreviewFontInfo previewFontInfo = openFontReader.ReadPreview(fs);
             }
         }
 

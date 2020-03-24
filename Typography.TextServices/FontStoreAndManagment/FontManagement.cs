@@ -4,16 +4,15 @@ using System.Collections.Generic;
 using System.IO;
 using Typography.OpenFont;
 
-
 namespace Typography.FontManagement
 {
 
     public class InstalledTypeface
     {
-        internal InstalledTypeface(string fontName,
-            string fontSubFamily,
-            string tFamilyName,
-            string tSubFamilyName,
+        internal InstalledTypeface(string? fontName,
+            string? fontSubFamily,
+            string? tFamilyName,
+            string? tSubFamilyName,
             string fontPath,
             TypefaceStyle typefaceStyle,
             ushort weight)
@@ -29,10 +28,10 @@ namespace Typography.FontManagement
             Weight = weight;
         }
 
-        public string FontName { get; internal set; }
-        public string FontSubFamily { get; internal set; }
-        public string TypographicFamilyName { get; internal set; }
-        public string TypographicFontSubFamily { get; internal set; }
+        public string? FontName { get; internal set; }
+        public string? FontSubFamily { get; internal set; }
+        public string? TypographicFamilyName { get; internal set; }
+        public string? TypographicFontSubFamily { get; internal set; }
         public TypefaceStyle TypefaceStyle { get; internal set; }
         public ushort Weight { get; internal set; }
 
@@ -91,7 +90,7 @@ namespace Typography.FontManagement
 
     public interface IInstalledTypefaceProvider
     {
-        InstalledTypeface GetInstalledTypeface(string fontName, TypefaceStyle style);
+        InstalledTypeface? GetInstalledTypeface(string fontName, TypefaceStyle style);
     }
 
     public class InstalledTypefaceCollection : IInstalledTypefaceProvider
@@ -114,10 +113,10 @@ namespace Typography.FontManagement
             }
 
 #if DEBUG
-            public string dbugGroupName;
+            public string? dbugGroupName;
             public override string ToString()
             {
-                return dbugGroupName;
+                return dbugGroupName ?? "";
             }
 #endif
 
@@ -132,8 +131,8 @@ namespace Typography.FontManagement
 
         InstalledTypefaceGroup _regular, _bold, _italic, _bold_italic;
         List<InstalledTypefaceGroup> _allGroups = new List<InstalledTypefaceGroup>();
-        FontNameDuplicatedHandler _fontNameDuplicatedHandler;
-        FontNotFoundHandler _fontNotFoundHandler;
+        FontNameDuplicatedHandler? _fontNameDuplicatedHandler;
+        FontNotFoundHandler? _fontNotFoundHandler;
 
         Dictionary<string, InstalledTypeface> _otherFontNames = new Dictionary<string, InstalledTypeface>();
 
@@ -160,7 +159,7 @@ namespace Typography.FontManagement
             _fontNotFoundHandler = fontNotFoundHandler;
         }
 
-        static InstalledTypefaceCollection s_intalledTypefaces;
+        static InstalledTypefaceCollection? s_intalledTypefaces;
         public static InstalledTypefaceCollection GetSharedTypefaceCollection(FirstInitFontCollectionDelegate initdel)
         {
             if (s_intalledTypefaces == null)
@@ -175,7 +174,7 @@ namespace Typography.FontManagement
         {
             s_intalledTypefaces = installedTypefaceCollection;
         }
-        public static InstalledTypefaceCollection GetSharedTypefaceCollection()
+        public static InstalledTypefaceCollection? GetSharedTypefaceCollection()
         {
             return s_intalledTypefaces;
         }
@@ -197,7 +196,7 @@ namespace Typography.FontManagement
 
         bool AddFontPreview(PreviewFontInfo previewFont, string srcPath)
         {
-            _onlyFontNames[previewFont.Name] = true;
+            _onlyFontNames[previewFont.Name ?? ""] = true;
 
             TypefaceStyle typefaceStyle = TypefaceStyle.Regular;
             switch (previewFont.OS2TranslatedStyle)
@@ -219,7 +218,7 @@ namespace Typography.FontManagement
             //---------------
             //some font subfam="Bold Italic" but OS2TranslatedStyle is only Italic
             //so we should check the subfam name too!
-            string[] fontSubFamUpperCaseName_split = previewFont.SubFamilyName.ToUpper().Split(' ');
+            string[] fontSubFamUpperCaseName_split = (previewFont.SubFamilyName ?? "").ToUpper().Split(' ');
             if (fontSubFamUpperCaseName_split.Length > 1)
             {
                 if (typefaceStyle != (TypefaceStyle.Bold | TypefaceStyle.Italic))
@@ -259,30 +258,30 @@ namespace Typography.FontManagement
                 using (Stream stream = src.ReadFontStream())
                 {
                     var reader = new OpenFontReader();
-                    PreviewFontInfo previewFont = reader.ReadPreview(stream);
-                    if (previewFont == null || string.IsNullOrEmpty(previewFont.Name))
+                    if (!(reader.ReadPreview(stream) is { } previewFont) || string.IsNullOrEmpty(previewFont.Name))
                     {
                         //err!
                         return false;
                     }
-                    if (previewFont.IsFontCollection)
+                    if (previewFont is PreviewFontCollectionInfo collectionPreview)
                     {
-                        int mbCount = previewFont.MemberCount;
+                        int mbCount = collectionPreview.Fonts.Length;
                         bool totalResult = true;
                         for (int i = 0; i < mbCount; ++i)
                         {
                             //extract and each members
-                            if (!AddFontPreview(previewFont.GetMember(i), src.PathName))
+                            if (!AddFontPreview(collectionPreview.Fonts[i], src.PathName))
                             {
                                 totalResult = false;
                             }
                         }
                         return totalResult;
                     }
-                    else
+                    else if (previewFont is PreviewFontInfo fontPreview)
                     {
-                        return AddFontPreview(previewFont, src.PathName);
+                        return AddFontPreview(fontPreview, src.PathName);
                     }
+                    else throw new NotImplementedException();
 
                 }
             }
@@ -298,9 +297,9 @@ namespace Typography.FontManagement
 
 
 
-            InstalledTypefaceGroup selectedFontGroup = null;
+            InstalledTypefaceGroup? selectedFontGroup = null;
 
-            string fontSubFamUpperCaseName = newTypeface.TypographicFontSubFamily;
+            string? fontSubFamUpperCaseName = newTypeface.TypographicFontSubFamily;
             bool use_typographicSubFam = true;
             if (fontSubFamUpperCaseName == null)
             {
@@ -308,6 +307,7 @@ namespace Typography.FontManagement
                 fontSubFamUpperCaseName = newTypeface.FontSubFamily;
                 use_typographicSubFam = false;
             }
+            if (fontSubFamUpperCaseName == null) throw new NotImplementedException();
             fontSubFamUpperCaseName = fontSubFamUpperCaseName.ToUpper();
             //--------------
 
@@ -363,7 +363,7 @@ namespace Typography.FontManagement
             //------------------
             //for font management
             //we use 'typographic family name' if avaliable,            
-            string register_name = newTypeface.TypographicFamilyName;
+            string? register_name = newTypeface.TypographicFamilyName;
             bool use_typographicFontFam = true;
             if (register_name == null)
             {
@@ -371,6 +371,7 @@ namespace Typography.FontManagement
                 register_name = newTypeface.FontName;
                 use_typographicFontFam = false;
             }
+            if (register_name == null) throw new NotImplementedException();
 
             register_name = register_name.ToUpper(); //***  
             bool register_result = false;
@@ -403,6 +404,7 @@ namespace Typography.FontManagement
             }
 
             if (use_typographicFontFam &&
+                newTypeface.FontName != null &&
                 newTypeface.FontName != newTypeface.TypographicFamilyName &&
                 newTypeface.TypefaceStyle == TypefaceStyle.Regular)
             {
@@ -415,7 +417,7 @@ namespace Typography.FontManagement
 
         }
 
-        public InstalledTypeface GetInstalledTypeface(string fontName, string subFamName)
+        public InstalledTypeface? GetInstalledTypeface(string fontName, string subFamName)
         {
             string upperCaseFontName = fontName.ToUpper();
             string upperCaseSubFamName = subFamName.ToUpper();
@@ -444,7 +446,7 @@ namespace Typography.FontManagement
             return null; //not found
         }
 
-        public InstalledTypeface GetInstalledTypeface(string fontName, TypefaceStyle wellknownSubFam)
+        public InstalledTypeface? GetInstalledTypeface(string fontName, TypefaceStyle wellknownSubFam)
         {
             //not auto resolve
             InstalledTypefaceGroup selectedFontGroup;
@@ -554,16 +556,90 @@ namespace Typography.FontManagement
 
     }
 
+    public class TypefaceStore
+    {
 
+        FontNotFoundHandler? _fontNotFoundHandler;
+        Dictionary<InstalledTypeface, Typeface?> _loadedTypefaces = new Dictionary<InstalledTypeface, Typeface?>();
+
+        public TypefaceStore(InstalledTypefaceCollection fontCollection)
+        {
+            FontCollection = fontCollection;
+        }
+
+        /// <summary>
+        /// font collection of the store
+        /// </summary>
+        public InstalledTypefaceCollection FontCollection { get; set; }
+        public void SetFontNotFoundHandler(FontNotFoundHandler fontNotFoundHandler)
+        {
+            _fontNotFoundHandler = fontNotFoundHandler;
+        }
+        public Typeface? GetTypeface(InstalledTypeface installedFont)
+        {
+            return GetTypefaceOrCreateNew(installedFont);
+        }
+        public Typeface? GetTypeface(string fontname, string fontSubFam)
+        {
+
+            var installedFont = FontCollection.GetInstalledTypeface(fontname, fontSubFam);
+            //convert from   
+            if (installedFont == null && _fontNotFoundHandler != null)
+            {
+                installedFont = _fontNotFoundHandler(this.FontCollection, fontname, fontSubFam);
+            }
+            if (installedFont == null)
+            {
+                return null;
+            }
+            return GetTypefaceOrCreateNew(installedFont);
+        }
+        /// <summary>
+        /// get typeface from wellknown style
+        /// </summary>
+        /// <param name="fontname"></param>
+        /// <param name="style"></param>
+        /// <returns></returns>
+        public Typeface? GetTypeface(string fontname, TypefaceStyle style)
+        {
+            var installedFont = FontCollection.GetInstalledTypeface(fontname, style);
+            if (installedFont == null && _fontNotFoundHandler != null)
+            {
+                installedFont = _fontNotFoundHandler(this.FontCollection, fontname, InstalledTypefaceCollection.GetSubFam(style));
+            }
+            if (installedFont == null)
+            {
+                return null;
+            }
+            return GetTypefaceOrCreateNew(installedFont);
+        }
+        Typeface? GetTypefaceOrCreateNew(InstalledTypeface installedFont)
+        {
+            //load 
+            //check if we have create this typeface or not 
+            Typeface? typeface;
+            if (!_loadedTypefaces.TryGetValue(installedFont, out typeface))
+            {
+                //TODO: review how to load font here
+                using (var fs = new FileStream(installedFont.FontPath, FileMode.Open, FileAccess.Read))
+                {
+                    var reader = new OpenFontReader();
+                    typeface = reader.Read(fs, installedFont.ActualStreamOffset);
+                }
+                return _loadedTypefaces[installedFont] = typeface;
+            }
+            return typeface;
+        }
+    }
     public static class InstalledTypefaceCollectionExtensions
     {
 
         public delegate R MyFunc<T1, T2, R>(T1 t1, T2 t2);
         public delegate R MyFunc<T, R>(T t);
 
-        public static Action<InstalledTypefaceCollection> CustomSystemFontListLoader;
+        public static Action<InstalledTypefaceCollection>? CustomSystemFontListLoader;
 
-        public static MyFunc<string, Stream> CustomFontStreamLoader;
+        public static MyFunc<string, Stream>? CustomFontStreamLoader;
 
 
         public static void LoadFontsFromFolder(this InstalledTypefaceCollection fontCollection, string folder, bool recursive = false)

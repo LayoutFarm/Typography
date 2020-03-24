@@ -13,8 +13,8 @@ namespace Typography.TextLayout
     {
 
         readonly Typeface _typeface;
-        GPOS _gposTable;
-        internal List<GPOS.LookupTable> _lookupTables;
+        readonly GPOS? _gposTable;
+        internal List<GPOS.LookupTable>? _lookupTables;
         public GlyphSetPosition(Typeface typeface, string lang)
         {
             this.Lang = lang;
@@ -24,12 +24,12 @@ namespace Typography.TextLayout
 
             if (_gposTable == null) { return; }
 
-            ScriptTable scriptTable = _gposTable.ScriptList[lang];
+            var scriptTable = _gposTable.ScriptList[lang];
             //---------
             if (scriptTable == null) { return; }   // early exit if no lookup tables
                                                    //---------
 
-            ScriptTable.LangSysTable defaultLang = scriptTable.defaultLang;
+            var defaultLang = scriptTable.defaultLang;
             if (defaultLang == null) { return; }   // early exit if no default language
 
             if (defaultLang.HasRequireFeature)

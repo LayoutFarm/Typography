@@ -10,6 +10,7 @@
     <IPhoneResourcePrefix>Resources</IPhoneResourcePrefix>
     <AssemblyName>Xamarin.iOS.GLES2</AssemblyName>
 	<LangVersion>latest</LangVersion>
+	<NoWarn>CS8632<!--<Nullable>enable</Nullable> does not work with tranditional .csprojs--></NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhoneSimulator' ">
     <DebugSymbols>true</DebugSymbols>
@@ -91,6 +92,12 @@
     <AppExtensionDebugBundleId />
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)..\..\..\Typography.TextServices\FontStoreAndManagment\FontManagement.cs">
+      <Link>DevTextPrinter\FontManagement.cs</Link>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)..\..\..\PixelFarm.Typography\3_Typography_Contours\GlyphOutlineBuilderBase.cs">
+      <Link>GlyphOutlineBuilder\GlyphOutlineBuilderBase.cs</Link>
+    </Compile>
     <Compile Include="App\CustomApp.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="AppDelegate.cs" />

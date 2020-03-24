@@ -57,7 +57,7 @@ namespace DrawingGL.Text
         {
             throw new System.NotImplementedException();
         }
-        public override GlyphLayout GlyphLayoutMan { get; } = new GlyphLayout();
+        public override GlyphLayout GlyphLayoutMan { get; } = new GlyphLayout(null); // Refactor please
 
         public override Typeface Typeface
         {

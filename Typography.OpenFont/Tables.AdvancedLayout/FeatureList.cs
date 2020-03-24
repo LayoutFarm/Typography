@@ -28,8 +28,13 @@ namespace Typography.OpenFont.Tables
     public class FeatureList
     {
 
+        public FeatureTable[] featureTables;
 
-        public FeatureTable[]? featureTables;
+        public FeatureList(FeatureTable[] featureTables)
+        {
+            this.featureTables = featureTables;
+        }
+
         public static FeatureList CreateFrom(BinaryReader reader, long beginAt)
         {
             //https://www.microsoft.com/typography/otspec/chapter2.htm
@@ -49,7 +54,6 @@ namespace Typography.OpenFont.Tables
             //----------------------------------------------------
             reader.BaseStream.Seek(beginAt, SeekOrigin.Begin);
             //
-            FeatureList featureList = new FeatureList();
             ushort featureCount = reader.ReadUInt16();
             FeatureRecord[] featureRecords = new FeatureRecord[featureCount];
             for (int i = 0; i < featureCount; ++i)
@@ -60,13 +64,13 @@ namespace Typography.OpenFont.Tables
                     reader.ReadUInt16()); //Offset16 
             }
             //read each feature table
-            FeatureTable[] featureTables = featureList.featureTables = new FeatureTable[featureCount];
+            FeatureTable[] featureTables = new FeatureTable[featureCount];
             for (int i = 0; i < featureCount; ++i)
             {
                 FeatureRecord frecord = featureRecords[i];
                 (featureTables[i] = FeatureTable.CreateFrom(reader, beginAt + frecord.offset)).FeatureTag = frecord.featureTag;
             }
-            return featureList;
+            return new FeatureList(featureTables);
         }
         struct FeatureRecord
         {

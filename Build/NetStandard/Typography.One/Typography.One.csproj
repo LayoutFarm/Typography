@@ -18,7 +18,7 @@
   <Import Project="..\..\..\Unpack_SH\Unpack_SH.projitems" Label="Shared" />
 
   <ItemGroup>
-    <Compile Include="..\..\..\Demo\Shared\DevTextPrinter\FontManagement.cs" Link="DevTextPrinter\FontManagement.cs" />
+    <Compile Include="..\..\..\Typography.TextServices\FontStoreAndManagment\FontManagement.cs" Link="DevTextPrinter\FontManagement.cs" />
     <Compile Include="..\..\..\Demo\Shared\GlyphOutlineBuilder\GlyphOutlineBuilder.cs" Link="GlyphPathBuilder\GlyphOutlineBuilder.cs" />
     <Compile Include="..\..\..\PixelFarm.Typography\3_Typography_Contours\GlyphMeshCollection.cs" Link="DevTextPrinter\GlyphMeshCollection.cs" />
     <Compile Include="..\..\..\PixelFarm.Typography\3_Typography_Contours\GlyphOutlineBuilderBase.cs" Link="GlyphPathBuilder\GlyphOutlineBuilderBase.cs" />

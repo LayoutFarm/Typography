@@ -28,16 +28,6 @@ namespace LayoutFarm
         {
             _system_id = PixelFarm.Drawing.Internal.RequestFontCacheAccess.GetNewCacheSystemId();
 
-            //set up typography text service
-            _txtServices = new TextServices();
-            //default, user can set this later
-
-            _txtServices.InstalledFontCollection = InstalledTypefaceCollection.GetSharedTypefaceCollection(collection =>
-            {
-                collection.SetFontNameDuplicatedHandler((f0, f1) => FontNameDuplicatedDecision.Skip);
-
-            });
-
 
             //create typography service
             //you can implement this service on your own
@@ -62,10 +52,11 @@ namespace LayoutFarm
             {
                 //TODO: handle error here
             }
+            _txtServices = new TextServices(InstalledTypefaceCollection.GetSharedTypefaceCollection(collection =>
+            {
+                collection.SetFontNameDuplicatedHandler((f0, f1) => FontNameDuplicatedDecision.Skip);
 
-            _txtServices.SetDefaultScriptLang(scLang);
-            _txtServices.CurrentScriptLang = scLang;
-
+            }), scLang);
             // ... or specific the scriptlang manully, eg. ...
             //_shapingServices.SetDefaultScriptLang(scLang);
             //_shapingServices.SetCurrentScriptLang(scLang);
@@ -119,7 +110,7 @@ namespace LayoutFarm
                 ref measureResult);
         }
         //
-        ReusableTextBuffer _reusableTextBuffer = new ReusableTextBuffer();
+        ReusableTextBuffer _reusableTextBuffer;
         //
         public void CalculateUserCharGlyphAdvancePos(ref TextBufferSpan textBufferSpan,
             ILineSegmentList lineSegs,
@@ -139,7 +130,9 @@ namespace LayoutFarm
             int j = mylineSegs.Count;
             int pos = 0; //start at 0
 
-            _reusableTextBuffer.SetRawCharBuffer(textBufferSpan.GetRawCharBuffer());
+            if(_reusableTextBuffer == null)
+                _reusableTextBuffer = new ReusableTextBuffer(textBufferSpan.GetRawCharBuffer());
+            else _reusableTextBuffer.SetRawCharBuffer(textBufferSpan.GetRawCharBuffer());
 
             short minOffsetY = 0;
             short maxOffsetY = 0;

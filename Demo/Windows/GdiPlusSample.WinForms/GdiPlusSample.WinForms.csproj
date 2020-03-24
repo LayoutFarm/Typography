@@ -12,6 +12,7 @@
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <LangVersion>8.0</LangVersion>
+    <NoWarn>CS8632<!--<Nullable>enable</Nullable> does not work with tranditional .csprojs--></NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -51,7 +52,7 @@
     <Compile Include="..\..\..\PixelFarm\PixelFarm.Painter\2_General\TextBaseline.cs">
       <Link>DevTextPrinter\TextBaseline.cs</Link>
     </Compile>
-    <Compile Include="..\..\Shared\DevTextPrinter\FontManagement.cs">
+    <Compile Include="..\..\..\Typography.TextServices\FontStoreAndManagment\FontManagement.cs">
       <Link>DevTextPrinter\FontManagement.cs</Link>
     </Compile>
     <Compile Include="..\..\Shared\GlyphOutlineBuilder\GlyphOutlineBuilder.cs">

@@ -6,7 +6,7 @@ using System.Windows.Forms;
 // 
 using Typography.TextLayout;
 using Typography.Contours;
-using Typography.TextServices;
+using Typography.FontManagement;
 using Typography.OpenFont;
 using Typography.OpenFont.Extensions;
 namespace SampleWinForms
@@ -17,7 +17,7 @@ namespace SampleWinForms
         //for this sample code,
         //create text printer env for developer.
         DevGdiTextPrinter _currentTextPrinter = new DevGdiTextPrinter();
-        InstalledFontCollection installedFontCollection;
+        InstalledTypefaceCollection installedFontCollection;
         TypefaceStore _typefaceStore;
         public Form1()
         {
@@ -51,7 +51,7 @@ namespace SampleWinForms
             //
 
             //1. create font collection             
-            installedFontCollection = new InstalledFontCollection();
+            installedFontCollection = new InstalledTypefaceCollection();
             //2. set some essential handler
             installedFontCollection.SetFontNameDuplicatedHandler((f1, f2) => FontNameDuplicatedDecision.Skip);
 
@@ -61,11 +61,11 @@ namespace SampleWinForms
 
             //---------- 
             //show result
-            InstalledFont selectedFF = null;
+            InstalledTypeface selectedFF = null;
             int selected_index = 0;
             int ffcount = 0;
             bool found = false;
-            foreach (InstalledFont ff in installedFontCollection.GetInstalledFontIter())
+            foreach (InstalledTypeface ff in installedFontCollection.GetInstalledFontIter())
             {
                 if (!found && ff.FontName == "Source Sans Pro")
                 {
@@ -78,8 +78,7 @@ namespace SampleWinForms
             }
             //set default font for current text printer
             //
-            _typefaceStore = new TypefaceStore();
-            _typefaceStore.FontCollection = installedFontCollection;
+            _typefaceStore = new TypefaceStore(installedFontCollection);
             //set default font for current text printer
             _currentTextPrinter.Typeface = _typefaceStore.GetTypeface(selectedFF);
             //---------- 
@@ -89,7 +88,7 @@ namespace SampleWinForms
             lstFontList.SelectedIndex = selected_index;
             lstFontList.SelectedIndexChanged += (s, e) =>
             {
-                InstalledFont ff = lstFontList.SelectedItem as InstalledFont;
+                InstalledTypeface ff = lstFontList.SelectedItem as InstalledTypeface;
                 if (ff != null)
                 {
                     _currentTextPrinter.Typeface = _typefaceStore.GetTypeface(ff);

@@ -6,6 +6,12 @@ namespace Typography.TextLayout
 
     public class TextRunFontStyle
     {
+        public TextRunFontStyle(string name, float sizeInPoints)
+        {
+            Name = name;
+            SizeInPoints = sizeInPoints;
+        }
+
         //font spec
         //resolve later        
         public string Name { get; set; }
@@ -31,12 +37,13 @@ namespace Typography.TextLayout
         GlyphPlanSequence _glyphPlanSeq; //1 text run 1 glyph plan sequence
 
         float _runWidth;
-        public TextRun(TextBuffer srcTextBuffer, int startAt, int len, WordSpanKind kind)
+        public TextRun(TextBuffer srcTextBuffer, int startAt, int len, WordSpanKind kind, TextRunFontStyle fontStyle)
         {
             _srcText = srcTextBuffer;
             _startAt = startAt;
             _len = len;
             _kind = kind;
+            FontStyle = fontStyle;
 
         }
         internal void SetGlyphPlanSeq(GlyphPlanSequence seq)
