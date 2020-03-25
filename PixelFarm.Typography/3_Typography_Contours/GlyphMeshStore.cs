@@ -5,7 +5,11 @@ using System.Collections.Generic;
 
 using PixelFarm.Drawing;
 using PixelFarm.Contours;
+using PixelFarm.CpuBlit;
+
 using Typography.OpenFont;
+
+
 
 namespace Typography.Contours
 {
@@ -134,7 +138,7 @@ namespace Typography.Contours
 
                 if (FlipGlyphUpward)
                 {
-                    using (VxsTemp.Borrow(out var v1))
+                    using (Tools.BorrowVxs(out var v1))
                     {
                         _tovxs.WriteUnFlattenOutput(v1, 1);
                         return v1.CreateTrim(s_invertY);
@@ -143,7 +147,7 @@ namespace Typography.Contours
                 }
                 else
                 {
-                    using (VxsTemp.Borrow(out var v1))
+                    using (Tools.BorrowVxs(out var v1))
                     {
                         _tovxs.WriteUnFlattenOutput(v1, 1);
                         return v1.CreateTrim();
@@ -155,7 +159,7 @@ namespace Typography.Contours
 
                 if (FlipGlyphUpward)
                 {
-                    using (VxsTemp.Borrow(out var v1))
+                    using (Tools.BorrowVxs(out var v1))
                     {
                         _currentGlyphBuilder.ReadShapes(_tovxs);
                         _tovxs.WriteUnFlattenOutput(v1, 1); //write to temp buffer first 
@@ -167,7 +171,7 @@ namespace Typography.Contours
                 else
                 {
                     //no dynamic outline
-                    using (VxsTemp.Borrow(out var v1))
+                    using (Tools.BorrowVxs(out var v1))
                     {
                         _currentGlyphBuilder.ReadShapes(_tovxs);
                         //TODO: review here,
@@ -248,7 +252,7 @@ namespace Typography.Contours
 
                     if (FlipGlyphUpward)
                     {
-                        using (VxsTemp.Borrow(out var v1))
+                        using (Tools.BorrowVxs(out var v1))
                         {
                             _tovxs.WriteOutput(v1);
                             //write to temp buffer first  
@@ -259,7 +263,7 @@ namespace Typography.Contours
                     }
                     else
                     {
-                        using (VxsTemp.Borrow(out var v1))
+                        using (Tools.BorrowVxs(out var v1))
                         {
                             _tovxs.WriteOutput(v1);
                             glyphMeshData.vxsStore = v1.CreateTrim();
@@ -271,7 +275,7 @@ namespace Typography.Contours
 
                     if (FlipGlyphUpward)
                     {
-                        using (VxsTemp.Borrow(out var v1))
+                        using (Tools.BorrowVxs(out var v1))
                         {
                             _currentGlyphBuilder.ReadShapes(_tovxs);
                             _tovxs.WriteOutput(v1); //write to temp buffer first 
@@ -283,7 +287,7 @@ namespace Typography.Contours
                     else
                     {
                         //no dynamic outline
-                        using (VxsTemp.Borrow(out var v1))
+                        using (Tools.BorrowVxs(out var v1))
                         {
                             _currentGlyphBuilder.ReadShapes(_tovxs);
                             //TODO: review here,

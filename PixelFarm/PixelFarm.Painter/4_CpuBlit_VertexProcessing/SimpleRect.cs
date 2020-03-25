@@ -24,7 +24,9 @@
 using PixelFarm.Drawing;
 namespace PixelFarm.CpuBlit.VertexProcessing
 {
-
+    /// <summary>
+    /// simple rect vertex generator
+    /// </summary>
     public class SimpleRect
     {
         RectD _bounds;

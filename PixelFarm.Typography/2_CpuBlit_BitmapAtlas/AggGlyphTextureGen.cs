@@ -32,7 +32,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             //1. builder read shape and translate it with _txToVxs
             builder.ReadShapes(_txToVxs);
 
-            using (VxsTemp.Borrow(out var glyphVxs, out var vxs2))
+            using (Tools.BorrowVxs(out var glyphVxs, out var vxs2))
             {
                 //2. write translated data (in the _txToVxs) to glyphVxs
 

@@ -109,7 +109,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                         {
                             List<SimpleBitmapAtlas> atlasList = atlasBuilder.LoadAtlasInfo(dataStream);
                             foundAtlas = atlasList[0];
-                            foundAtlas.MainBitmap = MemBitmap.LoadBitmap(fontImgStream);
+                            foundAtlas.SetMainBitmap(MemBitmap.LoadBitmap(fontImgStream), true);
                             _createdAtlases.Add(atlasName, foundAtlas);
                         }
                         catch (Exception ex)

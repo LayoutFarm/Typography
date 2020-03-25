@@ -160,7 +160,6 @@
     <Compile Include="2_General\TempContext.cs" />
     <Compile Include="2_General\TextBaseline.cs" />
     <Compile Include="3_Cpu_Blit\ColorRGBAf.cs" />
-    <Compile Include="3_Cpu_Blit\PainterExtensions.cs" />
     <Compile Include="2_General\ColorEx.cs" />
     <Compile Include="4_CpuBlit_VertexProcessing\BoundingRect.cs" />
     <Compile Include="4_CpuBlit_VertexProcessing\CurveFlattener.cs" />

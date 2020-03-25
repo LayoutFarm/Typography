@@ -303,7 +303,7 @@ namespace PixelFarm.Drawing
         Invalid = -1,
         None = 3
     }
-    public enum RenderSurfaceOrientation
+    public enum RenderSurfaceOriginKind
     {
         LeftTop,
         LeftBottom,

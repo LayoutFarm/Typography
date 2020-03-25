@@ -46,7 +46,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
         /// name of this item in string( eg. bitmap unqiue name)
         /// </summary>
         public string UniqueName { get; set; }
-        public Rectangle area;
+        public Rectangle Area;
         public void SetImageBuffer(int[] imgBuffer, bool isBigEndian = false)
         {
             Source = imgBuffer;

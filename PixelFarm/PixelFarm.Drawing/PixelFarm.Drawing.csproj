@@ -26,6 +26,7 @@
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Prefer32Bit>false</Prefer32Bit>
+    <LangVersion>7.3</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -35,7 +36,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <PlatformTarget>x86</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
@@ -318,9 +319,6 @@
     </Compile>
     <Compile Include="..\PixelFarm.Painter\3_Cpu_Blit\MemBitmap.cs">
       <Link>0_REF_Painter\0_REF_CpuBlit\MemBitmap.cs</Link>
-    </Compile>
-    <Compile Include="..\PixelFarm.Painter\3_Cpu_Blit\PainterExtensions.cs">
-      <Link>0_REF_Painter\0_REF_CpuBlit\PainterExtensions.cs</Link>
     </Compile>
     <Compile Include="..\PixelFarm.Painter\4_CpuBlit_VertexProcessing\BoundingRect.cs">
       <Link>0_REF_Painter\4_CpuBlit_VertexProcessing\BoundingRect.cs</Link>
@@ -659,7 +657,7 @@
     <Compile Include="7_CpuBlitPainter\PathReconstruction\OutlineTracer.cs" />
     <Compile Include="7_CpuBlitPainter\PathReconstruction\ReconstructedRegionData.cs" />
     <Compile Include="7_CpuBlitPainter\PathReconstruction\VxsRegion.cs" />
-    <Compile Include="7_CpuBlitPainter\AggPainter\AggPainterPool.cs" />
+    <Compile Include="7_CpuBlitPainter\AggPainter\Tools.cs" />
     <Compile Include="7_CpuBlitPainter\RenderSurface\AggRenderSurface.cs" />
     <Compile Include="7_CpuBlitPainter\RenderSurface\AggRenderSurface_RenderImages.cs" />
     <Compile Include="4_IO\ImageReaders.cs" />

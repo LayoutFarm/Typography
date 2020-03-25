@@ -86,7 +86,7 @@ namespace Typography.Contours
         /// <param name="scale"></param>
         public void WriteOutput(VertexStore output, float scale = 1)
         {
-            using (VectorToolBox.Borrow(out CurveFlattener f))
+            using (Tools.BorrowCurveFlattener(out var f))
             {
                 WriteOutput(output, f, scale);
             }
@@ -103,13 +103,15 @@ namespace Typography.Contours
                 curveFlattener.MakeVxs(_vxs, output);
             }
             else
-            {
+            {   
+                //TODO-use struct, AffineMat
                 var mat = PixelFarm.CpuBlit.VertexProcessing.Affine.New(
                     new PixelFarm.CpuBlit.VertexProcessing.AffinePlan(
                         PixelFarm.CpuBlit.VertexProcessing.AffineMatrixCommand.Scale, scale, scale));
+
                 //transform -> flatten ->output
                 //TODO: review here again***
-                using (VxsTemp.Borrow(out var v1))
+                using (Tools.BorrowVxs(out var v1))
                 {
                     curveFlattener.MakeVxs(_vxs, mat, output);
                 }

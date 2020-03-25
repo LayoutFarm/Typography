@@ -86,7 +86,7 @@ namespace PixelFarm.Drawing
 
         //
         public abstract void Clear(Color color);
-        public abstract RenderSurfaceOrientation Orientation { get; set; }
+        public abstract RenderSurfaceOriginKind Orientation { get; set; }
         public abstract void DrawLine(double x1, double y1, double x2, double y2);
         // 
         public abstract void DrawRect(double left, double top, double width, double height);

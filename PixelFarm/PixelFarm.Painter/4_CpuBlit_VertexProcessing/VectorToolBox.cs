@@ -2,13 +2,11 @@
 
 using System;
 using System.Collections.Generic;
-using PixelFarm.CpuBlit.VertexProcessing;
+using PixelFarm.Drawing;
 
 namespace PixelFarm.CpuBlit.VertexProcessing
 {
-    using PixelFarm.Drawing;
 
-    //-----------------------------------
     public struct VxsContext1 : IDisposable
     {
         internal readonly VertexStore _vxs;
@@ -66,71 +64,17 @@ namespace PixelFarm.CpuBlit.VertexProcessing
     }
 
 
-}
-namespace PixelFarm.Drawing
-{
-
-    using PixelFarm.CpuBlit;
-
-    public static class VxsTemp
+    static class VxsTemp
     {
 
-        public static VxsContext1 Borrow(out VertexStore vxs)
-        {
-            return new VxsContext1(out vxs);
-        }
-        public static VxsContext2 Borrow(out VertexStore vxs1, out VertexStore vxs2)
-        {
-            return new VxsContext2(out vxs1, out vxs2);
-        }
-        public static VxsContext3 Borrow(out VertexStore vxs1,
-            out VertexStore vxs2, out VertexStore vxs3)
-        {
-            return new VxsContext3(out vxs1, out vxs2, out vxs3);
-        }
-        /// <summary>
-        /// create contour(closed, open) from input flatten XYs,and put into output vxs
-        /// </summary>
-        /// <param name="flattenXYs"></param>
-        /// <param name="vxs"></param>
-        /// <param name="closedContour"></param>
-        /// <returns></returns>
-        public static VxsContext1 Borrow(float[] flattenXYs, out VertexStore vxs, bool closedContour = true)
-        {
-            VxsContext1 context1 = Borrow(out vxs);
-            using (VectorToolBox.Borrow(vxs, out PathWriter pw))
-            {
-                if (closedContour)
-                {
-                    pw.WritePolygon(flattenXYs);
-                }
-                else
-                {
-                    pw.WritePolylines(flattenXYs);
-                }
-            }
-            return context1;
-        }
-        public static VxsContext1 Borrow(double[] flattenXYs, out VertexStore vxs, bool closedContour = true)
-        {
-            VxsContext1 context1 = Borrow(out vxs);
-            using (VectorToolBox.Borrow(vxs, out PathWriter pw))
-            {
-                pw.MoveTo(flattenXYs[0], flattenXYs[1]);
-                for (int i = 2; i < flattenXYs.Length;)
-                {
-                    pw.LineTo(flattenXYs[i], flattenXYs[i + 1]);
-                    i += 2;
-                }
-                if (closedContour)
-                {
-                    pw.CloseFigure();
-                }
-            }
-            return context1;
-        }
-        //for net20 -- check this
-        //TODO: https://stackoverflow.com/questions/18333885/threadstatic-v-s-threadlocalt-is-generic-better-than-attribute
+        public static VxsContext1 Borrow(out VertexStore vxs) => new VxsContext1(out vxs);
+
+        public static VxsContext2 Borrow(out VertexStore vxs1, out VertexStore vxs2) => new VxsContext2(out vxs1, out vxs2);
+
+        public static VxsContext3 Borrow(out VertexStore vxs1, out VertexStore vxs2, out VertexStore vxs3) => new VxsContext3(out vxs1, out vxs2, out vxs3);
+
+        ////for net20 -- check this
+        ////TODO: https://stackoverflow.com/questions/18333885/threadstatic-v-s-threadlocalt-is-generic-better-than-attribute
 
         [System.ThreadStatic]
         static Stack<VertexStore> s_vxsPool = new Stack<VertexStore>();
@@ -165,7 +109,7 @@ namespace PixelFarm.Drawing
 
 
 
-    public static class VectorToolBox
+    static class VectorToolBox
     {
 
         public static TempContext<Stroke> Borrow(out Stroke stroke)
@@ -208,6 +152,7 @@ namespace PixelFarm.Drawing
             }
             return Temp<Arc>.Borrow(out arc);
         }
+
         public static TempContext<SvgArcSegment> Borrow(out SvgArcSegment arc)
         {
             if (!Temp<SvgArcSegment>.IsInit())
@@ -216,38 +161,10 @@ namespace PixelFarm.Drawing
             }
             return Temp<SvgArcSegment>.Borrow(out arc);
         }
-        public static TempContext<Ellipse> Borrow(out Ellipse ellipse)
-        {
-            if (!Temp<Ellipse>.IsInit())
-            {
-                Temp<Ellipse>.SetNewHandler(() => new Ellipse());
-            }
-            return Temp<Ellipse>.Borrow(out ellipse);
-        }
-        public static TempContext<Spiral> Borrow(out Spiral spiral)
-        {
-            if (!Temp<Spiral>.IsInit())
-            {
-                Temp<Spiral>.SetNewHandler(() => new Spiral());
-            }
-            return Temp<Spiral>.Borrow(out spiral);
-        }
-        public static TempContext<SimpleRect> Borrow(out SimpleRect simpleRect)
-        {
-            if (!Temp<SimpleRect>.IsInit())
-            {
-                Temp<SimpleRect>.SetNewHandler(() => new SimpleRect());
-            }
-            return Temp<SimpleRect>.Borrow(out simpleRect);
-        }
-        public static TempContext<RoundedRect> Borrow(out RoundedRect roundRect)
-        {
-            if (!Temp<RoundedRect>.IsInit())
-            {
-                Temp<RoundedRect>.SetNewHandler(() => new RoundedRect());
-            }
-            return Temp<RoundedRect>.Borrow(out roundRect);
-        }
+
+
+
+
         public static TempContext<VxsClipper> Borrow(out VxsClipper clipper)
         {
             if (!Temp<VxsClipper>.IsInit())
@@ -258,16 +175,7 @@ namespace PixelFarm.Drawing
             }
             return Temp<VxsClipper>.Borrow(out clipper);
         }
-        public static TempContext<CurveFlattener> Borrow(out CurveFlattener flattener)
-        {
-            if (!Temp<CurveFlattener>.IsInit())
-            {
-                Temp<CurveFlattener>.SetNewHandler(
-                    () => new CurveFlattener(),
-                    f => f.Reset());
-            }
-            return Temp<CurveFlattener>.Borrow(out flattener);
-        }
+
         public static TempContext<PolygonSimplifier> Borrow(out PolygonSimplifier flattener)
         {
             if (!Temp<PolygonSimplifier>.IsInit())
@@ -278,156 +186,7 @@ namespace PixelFarm.Drawing
             }
             return Temp<PolygonSimplifier>.Borrow(out flattener);
         }
-        public static TempContext<ShapeBuilder> Borrow(out ShapeBuilder shapeBuilder)
-        {
-            if (!Temp<ShapeBuilder>.IsInit())
-            {
-                Temp<ShapeBuilder>.SetNewHandler(
-                    () => new ShapeBuilder(),
-                    f => f.Reset());
-            }
 
-            TempContext<ShapeBuilder> context = Temp<ShapeBuilder>.Borrow(out shapeBuilder);
-            shapeBuilder.InitVxs();//make it ready-to-use
-            return context;
-        }
-    }
-
-
-    public class ShapeBuilder
-    {
-        VertexStore _vxs;
-        public void Reset()
-        {
-            if (_vxs != null)
-            {
-                VxsTemp.ReleaseVxs(_vxs);
-                _vxs = null;
-            }
-        }
-        public ShapeBuilder InitVxs()
-        {
-            Reset();
-            VxsTemp.Borrow(out _vxs);
-            return this;
-        }
-        public ShapeBuilder InitVxs(VertexStore src)
-        {
-            Reset();
-            VxsTemp.Borrow(out _vxs);
-            _vxs.AppendVertexStore(src);
-            return this;
-        }
-        public ShapeBuilder MoveTo(double x0, double y0)
-        {
-            _vxs.AddMoveTo(x0, y0);
-            return this;
-        }
-        public ShapeBuilder LineTo(double x1, double y1)
-        {
-            _vxs.AddLineTo(x1, y1);
-            return this;
-        }
-        public ShapeBuilder CloseFigure()
-        {
-            _vxs.AddCloseFigure();
-            return this;
-        }
-        public ShapeBuilder Scale(float s)
-        {
-            VxsTemp.Borrow(out VertexStore v2);
-            Affine aff = Affine.NewScaling(s, s);
-            aff.TransformToVxs(_vxs, v2);
-
-            //release _vxs
-            VxsTemp.ReleaseVxs(_vxs);
-            _vxs = v2;
-            return this;
-        }
-        public ShapeBuilder Stroke(Stroke stroke)
-        {
-            VxsTemp.Borrow(out VertexStore v2);
-            stroke.MakeVxs(_vxs, v2);
-            VxsTemp.ReleaseVxs(_vxs);
-            _vxs = v2;
-            return this;
-        }
-        public ShapeBuilder Stroke(float width)
-        {
-            VxsTemp.Borrow(out VertexStore v2);
-            using (VectorToolBox.Borrow(out Stroke stroke))
-            {
-                stroke.Width = width;
-                stroke.MakeVxs(_vxs, v2);
-            }
-            VxsTemp.ReleaseVxs(_vxs);
-            _vxs = v2;
-            return this;
-        }
-        public ShapeBuilder Curve4To(
-            double x1, double y1,
-            double x2, double y2,
-            double x3, double y3)
-        {
-            _vxs.AddVertex(x1, y1, VertexCmd.C4);
-            _vxs.AddVertex(x2, y2, VertexCmd.C4);
-            _vxs.AddVertex(x3, y3, VertexCmd.LineTo);
-            return this;
-        }
-        public ShapeBuilder Curve3To(
-           double x1, double y1,
-           double x2, double y2)
-        {
-            _vxs.AddVertex(x1, y1, VertexCmd.C3);
-            _vxs.AddVertex(x2, y2, VertexCmd.LineTo);
-            return this;
-        }
-        public ShapeBuilder NoMore()
-        {
-            _vxs.AddNoMore();
-            return this;
-        }
-        public VertexStore CreateTrim()
-        {
-            return _vxs.CreateTrim();
-        }
-
-        public ShapeBuilder TranslateToNewVxs(double dx, double dy)
-        {
-            VxsTemp.Borrow(out VertexStore v2);
-            int count = _vxs.Count;
-            VertexCmd cmd;
-            for (int i = 0; i < count; ++i)
-            {
-                cmd = _vxs.GetVertex(i, out double x, out double y);
-                x += dx;
-                y += dy;
-                v2.AddVertex(x, y, cmd);
-            }
-            VxsTemp.ReleaseVxs(_vxs);
-            _vxs = v2;
-            return this;
-        }
-        public ShapeBuilder Flatten(CurveFlattener flattener)
-        {
-            VxsTemp.Borrow(out VertexStore v2);
-            flattener.MakeVxs(_vxs, v2);
-            VxsTemp.ReleaseVxs(_vxs);
-            _vxs = v2;
-            return this;
-        }
-        /// <summary>
-        /// flatten with default setting
-        /// </summary>
-        /// <returns></returns>
-        public ShapeBuilder Flatten()
-        {
-            using (VectorToolBox.Borrow(out CurveFlattener flattener))
-            {
-                return Flatten(flattener);
-            }
-        }
-        public VertexStore CurrentSharedVxs => _vxs;
     }
 
 

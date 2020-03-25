@@ -20,18 +20,39 @@ using System.Collections.Generic;
 using PixelFarm.Drawing;
 namespace PixelFarm.CpuBlit.VertexProcessing
 {
+    public interface ILineSegmentWalkerOutput
+    {
+        void AddMoveTo(LineWalkerMark marker, double x, double y);
+        void AddLineTo(LineWalkerMark marker, double x, double y);
+    }
 
-    public delegate void LineSegmentDelegate(VertexStore vxs, VertexCmd cmd, double x, double y);
+    public delegate void LineSegmentDelegate(ILineSegmentWalkerOutput walkerOutput, LineWalkerMark markerSrc, VertexCmd cmd, double x, double y);
 
     public class LineWalkerMark
     {
-        readonly internal LineSegmentDelegate lineSegDel;
+        /// <summary>
+        /// each marker has it own delegate
+        /// </summary>
+        readonly LineSegmentDelegate _lineSegDel;
         public LineWalkerMark(double len, LineSegmentDelegate lineSegDel)
         {
             this.Len = len;
-            this.lineSegDel = lineSegDel;
+            _lineSegDel = lineSegDel;
         }
-        public double Len { get; set; }
+        public double Len { get; private set; }
+
+        internal void InvokeMoveTo(ILineSegmentWalkerOutput output, double x, double y)
+        {
+            _lineSegDel.Invoke(output, this, VertexCmd.MoveTo, x, y);
+        }
+        internal void InvokeLineTo(ILineSegmentWalkerOutput output, double x, double y)
+        {
+            _lineSegDel.Invoke(output, this, VertexCmd.LineTo, x, y);
+        }
+
+        public int Index { get; internal set; }
+        public string Name { get; set; }//optional
+        public object UserData { get; set; } //general user data
     }
 
     public enum LineWalkDashStyle
@@ -41,25 +62,29 @@ namespace PixelFarm.CpuBlit.VertexProcessing
     }
     public static class LineWalkerExtensions
     {
-        public static void AddMark(this LineWalker walker, double len, LineSegmentDelegate segDel)
+        public static LineWalkerMark AddMark(this LineWalker walker, double len, LineSegmentDelegate segDel)
         {
-            var mark = new LineWalkerMark(len, segDel);
-            walker.AddWalkMark(mark);
+            var walkerMark = new LineWalkerMark(len, segDel);
+            walker.AddMark(walkerMark);
+            return walkerMark;
         }
-        public static void AddMark(this LineWalker walker, double len, LineWalkDashStyle daskStyle)
+        public static LineWalkerMark AddMark(this LineWalker walker, double len, LineWalkDashStyle daskStyle)
         {
+            LineWalkerMark mark = null;
             switch (daskStyle)
             {
                 default: throw new NotSupportedException();
                 case LineWalkDashStyle.Solid:
-                    walker.AddWalkMark(new LineWalkerMark(len, SimpleSolidLine));
+                    mark = new LineWalkerMark(len, SimpleSolidLine);
                     break;
                 case LineWalkDashStyle.Blank:
-                    walker.AddWalkMark(new LineWalkerMark(len, SimpleBlankLine));
+                    mark = new LineWalkerMark(len, SimpleBlankLine);
                     break;
             }
+            walker.AddMark(mark);
+            return mark;
         }
-        static void SimpleSolidLine(VertexStore outputVxs, VertexCmd cmd, double x, double y)
+        static void SimpleSolidLine(ILineSegmentWalkerOutput output, LineWalkerMark walkerMark, VertexCmd cmd, double x, double y)
         {
             //solid               
             switch (cmd)
@@ -67,40 +92,46 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                 default: throw new NotSupportedException();
 
                 case VertexCmd.MoveTo:
-                    outputVxs.AddMoveTo(x, y);
+                    output.AddMoveTo(walkerMark, x, y);
                     break;
                 case VertexCmd.LineTo:
-                    outputVxs.AddLineTo(x, y);
+                    output.AddLineTo(walkerMark, x, y);
                     break;
             }
         }
-        static void SimpleBlankLine(VertexStore outputVxs, VertexCmd cmd, double x, double y)
+        static void SimpleBlankLine(ILineSegmentWalkerOutput output, LineWalkerMark walkerMark, VertexCmd cmd, double x, double y)
         {
 
         }
     }
+
+
     public class LineWalker
     {
-        WalkStateManager _walkStateMan = new WalkStateManager(); 
+        readonly WalkStateManager _walkStateMan = new WalkStateManager();
+
         public LineWalker()
         {
         }
-        public void ClearMarks()
+        public void Reset()
         {
             _walkStateMan.ClearAllMarkers();
+            _walkStateMan.Reset();
         }
-        public void AddWalkMark(LineWalkerMark walkerMark)
+        public void AddMark(LineWalkerMark walkerMark)
         {
             _walkStateMan.AddSegmentMark(walkerMark);
         }
 
-        public void Walk(VertexStore src, VertexStore output)
+        public void Walk(VertexStore src, ILineSegmentWalkerOutput output)
         {
             //
             //we do not flatten the curve 
             // 
-            _walkStateMan._output = output;
+
             _walkStateMan.Reset();
+            _walkStateMan._output = output;
+
             int count = src.Count;
             VertexCmd cmd;
             for (int i = 0; i < count; ++i)
@@ -134,45 +165,47 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         }
 
 
+
         class WalkStateManager
         {
 
-            List<LineWalkerMark> _marks = new List<LineWalkerMark>();
+            readonly List<LineWalkerMark> _marks = new List<LineWalkerMark>();
             LineWalkerMark _currentMark;
             int _nextMarkNo;
-
             double _expectedSegmentLen;
             WalkState _state;
             double _latest_X, _latest_Y;
             double _latest_moveto_X, _latest_moveto_Y;
 
             double _total_accum_len;
-            List<TmpPoint> _tempPoints = new List<TmpPoint>();
+            readonly List<VectorMath.Vector2> _tempPoints = new List<VectorMath.Vector2>();
 
 
-            //-------------------------------
-            internal VertexStore _output;
+            internal ILineSegmentWalkerOutput _output;
 
             public void AddSegmentMark(LineWalkerMark segMark)
             {
+                segMark.Index = _marks.Count;
                 _marks.Add(segMark);
             }
             public void ClearAllMarkers()
             {
                 _marks.Clear();
-                Reset();
             }
             public void Reset()
             {
-
                 _currentMark = null;
                 _nextMarkNo = 0;
-                _total_accum_len = 0;
                 _expectedSegmentLen = 0;
+
                 _state = WalkState.Init;
                 _nextMarkNo = 0;
                 _latest_X = _latest_Y =
                     _latest_moveto_Y = _latest_moveto_Y = 0;
+                _total_accum_len = 0;
+                _tempPoints.Clear();
+                _output = null;
+
             }
             //-----------------------------------------------------
             void StepToNextMarkerSegment()
@@ -207,25 +240,17 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                     for (int i = 0; i < j;)
                     {
                         //p0-p1
-                        TmpPoint p0 = _tempPoints[i];
-                        TmpPoint p1 = _tempPoints[i + 1];
+                        VectorMath.Vector2 p0 = _tempPoints[i];
+                        VectorMath.Vector2 p1 = _tempPoints[i + 1];
                         //-------------------------------
                         //a series of connected line
-                        //if ((_nextMarkNo % 2) == 1)
-                        //{
-                        //    if (i == 0)
-                        //    {
-                        //        //move to
-                        //        _output.AddMoveTo(p0.x, p0.y);
-                        //    }
-                        //    _output.AddLineTo(p1.x, p1.y);
-                        //}
+
                         if (i == 0)
                         {
                             //1st move to
-                            _currentMark.lineSegDel(_output, VertexCmd.MoveTo, p0.x, p0.y);
+                            _currentMark.InvokeMoveTo(_output, p0.x, p0.y);
                         }
-                        _currentMark.lineSegDel(_output, VertexCmd.LineTo, p1.x, p1.y);
+                        _currentMark.InvokeLineTo(_output, p1.x, p1.y);
 
                         //-------------------------------
                         double len = AggMath.calc_distance(p0.x, p0.y, p1.x, p1.y);
@@ -234,9 +259,6 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                         _latest_X = p1.x;
                         _latest_Y = p1.y;
                     }
-                    //------------
-
-
 
                     _tempPoints.Clear();
                 }
@@ -314,8 +336,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                     {
                         //***                        
                         //clear all previous collected points
-                        double tmp_expectedLen;
-                        ClearCollectedTmpPoints(out tmp_expectedLen);
+                        ClearCollectedTmpPoints(out double tmp_expectedLen);
                         //-----------------
                         //begin
                         if (tmp_expectedLen > 0)
@@ -326,7 +347,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                             new_remaining_len -= _expectedSegmentLen;
                             //each segment has its own line production procedure
                             //eg.  
-                            _currentMark.lineSegDel(_output, VertexCmd.LineTo, _latest_X = new_x, _latest_Y = new_y);
+                            _currentMark.InvokeLineTo(_output, _latest_X = new_x, _latest_Y = new_y);
                             StepToNextMarkerSegment();
                         }
                         //-----------------   
@@ -337,25 +358,6 @@ namespace PixelFarm.CpuBlit.VertexProcessing
 
                     }
                 }
-            }
-
-
-            struct TmpPoint
-            {
-                public readonly double x;
-                public readonly double y;
-                public TmpPoint(double x, double y)
-                {
-
-                    this.x = x;
-                    this.y = y;
-                }
-#if DEBUG
-                public override string ToString()
-                {
-                    return "(" + x + "," + y + ")";
-                }
-#endif
             }
 
 
@@ -370,8 +372,8 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                     //there are remaining segment that can be complete at this state
                     //so we just collect it                                        
                     _total_accum_len += remainingLen;
-                    _tempPoints.Add(new TmpPoint(_latest_X, _latest_Y));
-                    _tempPoints.Add(new TmpPoint(x, y));
+                    _tempPoints.Add(new VectorMath.Vector2(_latest_X, _latest_Y));
+                    _tempPoints.Add(new VectorMath.Vector2(x, y));
                 }
                 _latest_X = x;
                 _latest_Y = y;
@@ -381,11 +383,10 @@ namespace PixelFarm.CpuBlit.VertexProcessing
 
             }
 
-
             protected virtual void OnSegment(double new_x, double new_y)
             {
-                _currentMark.lineSegDel(_output, VertexCmd.MoveTo, _latest_X, _latest_Y);
-                _currentMark.lineSegDel(_output, VertexCmd.LineTo, new_x, new_y);
+                _currentMark.InvokeMoveTo(_output, _latest_X, _latest_Y);
+                _currentMark.InvokeLineTo(_output, new_x, new_y);
 
                 _total_accum_len = 0;
                 StepToNextMarkerSegment();

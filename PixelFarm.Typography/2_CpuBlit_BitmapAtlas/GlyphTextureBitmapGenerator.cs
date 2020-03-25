@@ -165,7 +165,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
 
                         var glyphToVxs = new GlyphTranslatorToVxs();
                         outlineBuilder.ReadShapes(glyphToVxs);
-                        using (VxsTemp.Borrow(out var vxs))
+                        using (Tools.BorrowVxs(out var vxs))
                         {
                             glyphToVxs.WriteUnFlattenOutput(vxs, pxscale);
                             BitmapAtlasItemSource glyphImg = gen3.GenerateMsdfTexture(vxs);
@@ -192,7 +192,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                         var glyphToVxs = new GlyphTranslatorToVxs();
                         outlineBuilder.ReadShapes(glyphToVxs);
 
-                        using (VxsTemp.Borrow(out var vxs))
+                        using (Tools.BorrowVxs(out var vxs))
                         {
                             glyphToVxs.WriteUnFlattenOutput(vxs, pxscale);
                             BitmapAtlasItemSource glyphImg = gen3.GenerateMsdfTexture(vxs);

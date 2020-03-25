@@ -21,7 +21,7 @@ namespace PixelFarm.CpuBlit
         //--------------------  
         SmoothingMode _smoothingMode;
         RenderQuality _renderQuality;
-        RenderSurfaceOrientation _orientation;
+        RenderSurfaceOriginKind _orientation;
         TargetBuffer _targetBuffer;
         float _fillOpacity = 1;
         bool _hasFillOpacity = false;
@@ -29,7 +29,7 @@ namespace PixelFarm.CpuBlit
         public AggPainter(AggRenderSurface aggsx)
         {
             //painter paint to target surface
-            _orientation = RenderSurfaceOrientation.LeftBottom;
+            _orientation = RenderSurfaceOriginKind.LeftBottom;
             //----------------------------------------------------
             _aggsx = _aggsx_0 = aggsx; //set this as default *** 
 
@@ -133,7 +133,7 @@ namespace PixelFarm.CpuBlit
             set => _renderQuality = value;
         }
 
-        public override RenderSurfaceOrientation Orientation
+        public override RenderSurfaceOriginKind Orientation
         {
             get => _orientation;
             set => _orientation = value;
