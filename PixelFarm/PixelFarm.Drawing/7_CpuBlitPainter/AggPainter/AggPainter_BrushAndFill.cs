@@ -316,7 +316,7 @@ namespace PixelFarm.CpuBlit
         {
             double ox = (left + width / 2);
             double oy = (top + height / 2);
-            if (_orientation == RenderSurfaceOrientation.LeftTop)
+            if (_orientation == RenderSurfaceOriginKind.LeftTop)
             {
                 //modified
                 oy = this.Height - oy;
@@ -337,8 +337,8 @@ namespace PixelFarm.CpuBlit
             //Agg
             //---------------------------------------------------------- 
 
-            using (VectorToolBox.Borrow(out Ellipse ellipseTool))
-            using (VxsTemp.Borrow(out var v1))
+            using (Tools.BorrowEllipse(out var ellipseTool))
+            using (Tools.BorrowVxs(out var v1))
             {
                 ellipseTool.Set(ox,
                          oy,
@@ -393,10 +393,10 @@ namespace PixelFarm.CpuBlit
             //Agg 
             //---------------------------------------------------------- 
 
-            using (VectorToolBox.Borrow(out SimpleRect rectTool))
-            using (VxsTemp.Borrow(out var v1))
+            using (Tools.BorrowRect(out var rectTool))
+            using (Tools.BorrowVxs(out var v1))
             {
-                if (_orientation == RenderSurfaceOrientation.LeftBottom)
+                if (_orientation == RenderSurfaceOriginKind.LeftBottom)
                 {
                     double right = left + width;
                     double bottom = top - height;

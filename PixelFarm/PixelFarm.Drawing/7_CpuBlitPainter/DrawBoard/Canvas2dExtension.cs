@@ -61,7 +61,7 @@ namespace PixelFarm.CpuBlit
             s_stroke.Width = strokeWidth;
             s_simpleRect.SetRect(left + .5, bottom + .5, right - .5, top - .5);
 
-            using (VxsTemp.Borrow(out var v1, out var v2))
+            using (Tools.BorrowVxs(out var v1, out var v2))
             {
                 gx.Render(s_stroke.MakeVxs(s_simpleRect.MakeVxs(v1), v2), color);
             }
@@ -107,7 +107,7 @@ namespace PixelFarm.CpuBlit
             //------------------------------------
 
             s_simpleRect.SetRect(left, bottom, right, top);
-            using (VxsTemp.Borrow(out var v1))
+            using (Tools.BorrowVxs(out var v1))
             {
                 gx.Render(s_simpleRect.MakeVxs(v1), fillColor);
             }
@@ -119,7 +119,7 @@ namespace PixelFarm.CpuBlit
             //------------------------------------
 
             s_ellipse.Set(x, y, radius, radius);
-            using (VxsTemp.Borrow(out var v1))
+            using (Tools.BorrowVxs(out var v1))
             {
                 g.Render(s_ellipse.MakeVxs(v1), color);
             }

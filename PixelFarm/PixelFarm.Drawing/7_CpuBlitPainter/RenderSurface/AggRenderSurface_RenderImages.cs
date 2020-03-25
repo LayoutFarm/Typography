@@ -333,7 +333,7 @@ namespace PixelFarm.CpuBlit
 
         public void Render(IBitmapSrc source, AffinePlan[] affinePlans)
         {
-            using (VxsTemp.Borrow(out var v1, out var v2))
+            using (Tools.BorrowVxs(out var v1, out var v2))
             {
 
                 BuildOrgImgRectVxs(source.Width, source.Height, v1);
@@ -365,7 +365,7 @@ namespace PixelFarm.CpuBlit
         }
         public void Render(IBitmapSrc source, ICoordTransformer coordtx)
         {
-            using (VxsTemp.Borrow(out var v1, out var v2))
+            using (Tools.BorrowVxs(out var v1, out var v2))
             {
 
                 BuildOrgImgRectVxs(
@@ -488,7 +488,7 @@ namespace PixelFarm.CpuBlit
 #endif
 
 
-                using (VxsTemp.Borrow(out var imgBoundsPath, out var v1))
+                using (Tools.BorrowVxs(out var imgBoundsPath, out var v1))
                 {
                     BuildOrgImgRectVxs(source.Width, source.Height, imgBoundsPath);
                     Affine destRectTransform = CreateAffine(destX, destY, _ox, _oy, scaleX, scaleY, angleRadians);
@@ -543,7 +543,7 @@ namespace PixelFarm.CpuBlit
                 //Affine destRectTransform = BuildImageBoundsPath(
                 //    source.Width, source.Height,
                 //    destX, destY, imgBoundsPath);
-                using (VxsTemp.Borrow(out var imgBoundsPath, out var v1))
+                using (Tools.BorrowVxs(out var imgBoundsPath, out var v1))
                 {
                     BuildOrgImgRectVxs(source.Width, source.Height, imgBoundsPath);
                     //...

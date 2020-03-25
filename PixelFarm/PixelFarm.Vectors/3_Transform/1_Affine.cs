@@ -92,6 +92,137 @@ namespace PixelFarm.CpuBlit.VertexProcessing
     //----------------------------------------------------------------------
 
 
+    public struct Quad2f
+    {
+        public float left_top_x;
+        public float left_top_y;
+
+        public float right_top_x;
+        public float right_top_y;
+
+        public float right_bottom_x;
+        public float right_bottom_y;
+
+
+        public float left_bottom_x;
+        public float left_bottom_y;
+
+        public Quad2f(float width, float height)
+        {
+            left_top_x = 0;              /**/left_top_y = 0;
+            right_top_x = 0 + width;     /**/right_top_y = 0;
+            right_bottom_x = right_top_x;   /**/right_bottom_y = 0 + height;
+            left_bottom_x = 0;           /**/left_bottom_y = right_bottom_y;
+        }
+        public Quad2f(float left, float top, float width, float height)
+        {
+            left_top_x = left;              /**/left_top_y = top;
+            right_top_x = left + width;     /**/right_top_y = top;
+            right_bottom_x = right_top_x;   /**/right_bottom_y = top + height;
+            left_bottom_x = left;           /**/left_bottom_y = right_bottom_y;
+        }
+        public Quad2f(float left, float top, float width, float height, float hostW, float hostH)
+        {
+            left_top_x = left / hostW;            /**/left_top_y = top / hostH;
+            right_top_x = (left + width) / hostW; /**/right_top_y = left_top_y;
+            right_bottom_x = right_top_x;         /**/right_bottom_y = (top + height) / hostH;
+            left_bottom_x = left_top_x;           /**/left_bottom_y = right_bottom_y;
+        }
+        /// <summary>
+        /// set corners from simple rect
+        /// </summary>
+        /// <param name="left"></param>
+        /// <param name=""></param>
+        public void SetCornersFromRect(float left, float top, float width, float height)
+        {
+            left_top_x = left;              /**/left_top_y = top;
+            right_top_x = left + width;     /**/right_top_y = top;
+            right_bottom_x = right_top_x;   /**/right_bottom_y = top + height;
+            left_bottom_x = left;           /**/left_bottom_y = right_bottom_y;
+        }
+        public void SetCornersFromRect(in PixelFarm.Drawing.RectangleF rect)
+        {
+            SetCornersFromRect(rect.Left, rect.Top, rect.Width, rect.Height);
+        }
+        public void SetCornersFromRect(in PixelFarm.Drawing.Rectangle rect)
+        {
+            SetCornersFromRect(rect.Left, rect.Top, rect.Width, rect.Height);
+        }
+        /// <summary>
+        /// set corner from rect and normalize value with w and h
+        /// </summary>
+        /// <param name="left"></param>
+        /// <param name="top"></param>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        /// <param name="hostW"></param>
+        /// <param name="hostH"></param>
+        public void SetCornersFromRect(float left, float top, float width, float height, float hostW, float hostH)
+        {
+            left_top_x = left / hostW;                /**/left_top_y = top / hostH;
+            right_top_x = (left + width) / hostW;     /**/right_top_y = left_top_y;
+            right_bottom_x = right_top_x;         /**/right_bottom_y = (top + height) / hostH;
+            left_bottom_x = left_top_x;           /**/left_bottom_y = right_bottom_y;
+        }
+
+        public void OffsetX(float dx)
+        {
+            left_top_x += dx;
+            right_top_x += dx;
+            right_bottom_x += dx;
+            left_bottom_x += dx;
+        }
+        public void OffsetY(float dy)
+        {
+            left_top_y += dy;
+            right_top_y += dy;
+            right_bottom_y += dy;
+            left_bottom_y += dy;
+        }
+        public void Offset(float dx, float dy)
+        {
+            left_top_x += dx;
+            right_top_x += dx;
+            right_bottom_x += dx;
+            left_bottom_x += dx;
+
+            left_top_y += dy;
+            right_top_y += dy;
+            right_bottom_y += dy;
+            left_bottom_y += dy;
+        }
+
+        /// <summary>
+        /// set corners from simple rect
+        /// </summary>
+        /// <param name="left"></param>
+        /// <param name="top"></param>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        public void SetCornersFromRect(float width, float height)
+        {
+
+            left_top_x = 0;              /**/left_top_y = 0;
+            right_top_x = 0 + width;     /**/right_top_y = 0;
+            right_bottom_x = right_top_x;   /**/right_bottom_y = 0 + height;
+            left_bottom_x = 0;           /**/left_bottom_y = right_bottom_y;
+        }
+        public void Transform(in AffineMat mat)
+        {
+            mat.Transform(ref left_top_x, ref left_top_y);
+            mat.Transform(ref right_top_x, ref right_top_y);
+            mat.Transform(ref right_bottom_x, ref right_bottom_y);
+            mat.Transform(ref left_bottom_x, ref left_bottom_y);
+        }
+        public void Transform(in Affine mat)
+        {
+            mat.Transform(ref left_top_x, ref left_top_y);
+            mat.Transform(ref right_top_x, ref right_top_y);
+            mat.Transform(ref right_bottom_x, ref right_bottom_y);
+            mat.Transform(ref left_bottom_x, ref left_bottom_y);
+        }
+    }
+
 
     /// <summary>
     /// struct version of Affine (Matrix)
@@ -252,8 +383,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
 
 
 
-        public static readonly AffineMat Iden = new AffineMat()
-        {
+        public static readonly AffineMat Iden = new AffineMat() {
             sx = 1,
             shy = 0,
             shx = 0,
@@ -272,6 +402,12 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             double tmp = x;
             x = tmp * sx + y * shx + tx;
             y = tmp * shy + y * sy + ty;
+        }
+        public void Transform(ref float x, ref float y)
+        {
+            double tmp = x;
+            x = (float)(tmp * sx + y * shx + tx);
+            y = (float)(tmp * shy + y * sy + ty);
         }
 
         public void ScaleRotateTranslate(

@@ -402,7 +402,7 @@ namespace PixelFarm.CpuBlit
             _cacheColorAndVertexList.Clear(); //clear prev data
 
             grBuilder.DilationValue = this.DilationValue;
-            using (VxsTemp.Borrow(out var tmpVxs))
+            using (Tools.BorrowVxs(out var tmpVxs))
             {
                 for (int i = 0; i < _vertexCount;)
                 {
