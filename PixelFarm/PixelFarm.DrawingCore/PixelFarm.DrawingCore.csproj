@@ -38,6 +38,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Folder Include="Properties\" />
+    <PackageReference Include="Nullable" Version="1.2.1" PrivateAssets="all" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\PixelFarm.PrimitiveGeo\AffinePlan.cs">

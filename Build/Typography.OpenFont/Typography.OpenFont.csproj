@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net20;netstandard2.0</TargetFrameworks>
+    <LangVersion>8.0</LangVersion>
+    <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <WarningsAsErrors>nullable</WarningsAsErrors>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="Nullable" Version="1.2.1" PrivateAssets="all" />
+    <PackageReference Condition="$(TargetFramework) != 'net20'" Include="System.Numerics.Vectors" Version="4.5.0" />
+	<Compile Condition="$(TargetFramework) == 'net20'" Include="..\NET20\*.cs" />
+  </ItemGroup>
+  
+  <Import Project="..\..\Typography.OpenFont\Typography.OpenFont.projitems" Label="Shared" />
+
+</Project>

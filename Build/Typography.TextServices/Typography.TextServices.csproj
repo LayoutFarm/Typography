@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net20;netstandard2.0</TargetFrameworks>
+    <LangVersion>8.0</LangVersion>
+    <Nullable>enable</Nullable>
+    <WarningsAsErrors>nullable</WarningsAsErrors>
+  </PropertyGroup>
+
+  <Import Project="..\..\Typography.TextServices\Typography.TextServices.projitems" Label="Shared" />
+
+  <ItemGroup>
+    <PackageReference Include="Nullable" Version="1.2.1" PrivateAssets="all" />
+    <ProjectReference Include="..\Typography.OpenFont\Typography.OpenFont.csproj" />
+    <ProjectReference Include="..\Typography.GlyphLayout\Typography.GlyphLayout.csproj" />
+    <ProjectReference Include="..\Typography.MsdfGen\Typography.MsdfGen.csproj" />
+    <ProjectReference Include="..\Typography.TextBreak\Typography.TextBreak.csproj" />
+    <ProjectReference Include="..\Typography.TextFlow\Typography.TextFlow.csproj" />
+  </ItemGroup>
+
+</Project>

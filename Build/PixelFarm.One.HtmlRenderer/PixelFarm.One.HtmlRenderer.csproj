@@ -1,0 +1,34 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net20;netstandard2.0</TargetFrameworks>
+    <LangVersion>8.0</LangVersion>
+	<DefineConstants>PIXEL_FARM; PIXEL_FARM_NET20; MINIMAL; GLES; WIN32; GL_ENABLE; SHARPZIPLIB;</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <NoWarn>CS8632<!--PixelFarm and Unpack are not annotated yet...--></NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Nullable" Version="1.2.1" PrivateAssets="all" />
+    <PackageReference Condition="$(TargetFramework) != 'net20'" Include="System.Numerics.Vectors" Version="4.5.0" />
+	<PackageReference Condition="$(TargetFramework) != 'net20'" Include="System.Runtime.CompilerServices.Unsafe" Version="4.7.0" />
+	<!--Include all code (the meaning of "One" in this project's name)-->
+    <Compile Include="..\..\**\*.cs" />
+	<!--Aside from Builds and Demos-->
+	<Compile Remove="..\..\Build\**\*.cs"/>
+	<Compile Remove="..\..\Demo\**\*.cs"/>
+	<!--But keep .NET Framework 2.0 code in the Build folder if needed-->
+	<Compile Include="..\NET20\*.cs" Condition="$(TargetFramework) == 'net20'"/>
+	<!--Remove unused and duplicate trash-->
+    <Compile Remove="..\..\PixelFarm\BackEnd.PaintFx\PdnPixelEffectPixelFarm\**\*.cs" />
+	<Compile Remove="..\..\PixelFarm\PixelFarm.BitmapBufferEx\BitmapBufferEx\00_Porting\**\*.cs" />
+	<!--Remove TextBreak tests etc-->
+	<Compile Remove="..\..\Typography.TextBreak\**\*.cs"/>
+	<!--But keep TextBreak itself-->
+	<Compile Include="..\..\Typography.TextBreak\Typography.TextBreak\**\*.cs"/>
+	<!--Remove assembly infos from other projects-->
+    <Compile Remove="..\..\**\Properties\**\*.cs" />
+	<!--Remove nullable attributes from Nullable package for other projects-->
+    <Compile Remove="..\..\**\obj\**\*.cs" />
+	<!--But keep nullable attributes for this project-->
+	<Compile Include="\obj\**\*.cs"/>
+  </ItemGroup>
+</Project>

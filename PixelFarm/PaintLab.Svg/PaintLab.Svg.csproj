@@ -12,8 +12,8 @@
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
-	<LangVersion>8.0</LangVersion>
-	<NoWarn>CS8632<!--<Nullable>enable</Nullable> does not work with tranditional .csprojs--></NoWarn>
+    <LangVersion>8.0</LangVersion>
+    <NoWarn>CS8632<!--<Nullable>enable</Nullable> does not work with tranditional .csprojs--></NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -148,9 +148,9 @@
     <Compile Include="Visuals\VgVisualDocHost.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\x_autogen2\PixelFarm.MiniAgg.One\PixelFarm.MiniAgg.One.csproj">
-      <Project>{4a14de16-355d-4d80-a189-82e26ced4907}</Project>
-      <Name>PixelFarm.MiniAgg.One</Name>
+    <ProjectReference Include="..\PixelFarm.Drawing\PixelFarm.Drawing.csproj">
+      <Project>{51d63482-5697-4b16-8401-506965624657}</Project>
+      <Name>PixelFarm.Drawing</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net20;netstandard2.0</TargetFrameworks>
+    <LangVersion>8.0</LangVersion>
+	<DefineConstants>PIXEL_FARM; PIXEL_FARM_NET20</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <NoWarn>CS8632<!--PixelFarm and Unpack are not annotated yet...--></NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Nullable" Version="1.2.1" PrivateAssets="all" />
+    <!--Don't duplicate NET20 code with OpenFont-->
+    <ProjectReference Include="..\Typography.OpenFont\Typography.OpenFont.csproj"/>
+	<!--For explanation of following logic, see PixelFarm.One.HtmlRenderer-->
+    <Compile Include="..\..\PixelFarm\**\*.cs" />
+    <Compile Remove="..\..\PixelFarm\BackEnd.PaintFx\PdnPixelEffectPixelFarm\**\*.cs" />
+	<Compile Remove="..\..\PixelFarm\PixelFarm.BitmapBufferEx\BitmapBufferEx\00_Porting\**\*.cs" />
+    <Compile Remove="..\..\PixelFarm\**\obj\**\*.cs" />
+    <Compile Remove="..\..\PixelFarm\**\Properties\**\*.cs" />
+  </ItemGroup>
+</Project>

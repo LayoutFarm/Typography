@@ -154,7 +154,9 @@
     <Compile Include="..\PixelFarm.Vectors\5_Clipper\ClipLiangBarsky.cs">
       <Link>0_REF_Vectors\5_Clipper\ClipLiangBarsky.cs</Link>
     </Compile>
-    <Compile Include="0_Base\ForNet20.cs" />
+    <Compile Include="..\..\Build\NET20\ForNet20.cs">
+      <Link>0_Base\ForNet20.cs</Link>
+	</Compile>
     <Compile Include="2_General\TempContext.cs" />
     <Compile Include="2_General\TextBaseline.cs" />
     <Compile Include="3_Cpu_Blit\ColorRGBAf.cs" />

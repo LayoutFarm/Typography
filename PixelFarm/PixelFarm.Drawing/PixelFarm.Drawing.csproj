@@ -39,6 +39,7 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Nullable" Version="1.2.1" PrivateAssets="all" />
     <Compile Include="..\PixelFarm.BitmapBufferEx\BitmapBufferEx\BitmapBuffer.cs">
       <Link>0_REF_BitmapBufferEx\BitmapBuffer.cs</Link>
     </Compile>
@@ -297,7 +298,7 @@
     <Compile Include="..\PixelFarm.CpuBlit\08_imageresampling\ImageTransform.cs">
       <Link>0_REF_CpuBlit\08_ImageResampling\ImageTransform.cs</Link>
     </Compile>
-    <Compile Include="..\PixelFarm.Painter\0_Base\ForNet20.cs">
+    <Compile Include="..\..\Build\NET20\ForNet20.cs">
       <Link>0_REF_Painter\0_Base\ForNet20.cs</Link>
     </Compile>
     <Compile Include="..\PixelFarm.Painter\2_General\ColorEx.cs">
