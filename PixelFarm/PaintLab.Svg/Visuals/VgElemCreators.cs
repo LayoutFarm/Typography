@@ -615,7 +615,6 @@ namespace PaintLab.Svg
                         throw new NotSupportedException();
                     }
                     break;
-
                 case "refX":
                     _spec.RefX = ParseGenericLength(attrValue);
                     break;

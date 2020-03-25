@@ -215,8 +215,8 @@ namespace SampleWinForms
                 return null;
             }
             MemBitmap memBitmap = new MemBitmap(bmpW, bmpH);
-            using (AggPainterPool.Borrow(memBitmap, out AggPainter p))
-            using (VgPaintArgsPool.Borrow(p, out VgPaintArgs paintArgs))
+            using (Tools.BorrowAggPainter(memBitmap, out var p))
+            using (Tools.More.BorrowVgPaintArgs(p, out var paintArgs))
             {
                 float orgX = p.OriginX;
                 float orgY = p.OriginY;

@@ -34,7 +34,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
 
     public static class VertexStoreTransformExtensions
     {
-       
+
         /// <summary>
         /// we do NOT store vxs, return original outputVxs
         /// </summary>
@@ -42,26 +42,40 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         /// <param name="outputVxs"></param>
         public static VertexStore TransformToVxs(this Affine aff, VertexStore src, VertexStore outputVxs)
         {
+#if DEBUG
+            if (src == outputVxs)
+            {
+                System.Diagnostics.Debugger.Break();
+            }
+#endif
+
             int count = src.Count;
             VertexCmd cmd;
-            double x, y;
             for (int i = 0; i < count; ++i)
             {
-                cmd = src.GetVertex(i, out x, out y);
+                cmd = src.GetVertex(i, out double x, out double y);
                 aff.Transform(ref x, ref y);
                 outputVxs.AddVertex(x, y, cmd);
             }
             //outputVxs.HasMoreThanOnePart = src.HasMoreThanOnePart;
             return outputVxs;
         }
-        public static VertexStore TransformToVxs(ref AffineMat aff, VertexStore src, VertexStore outputVxs)
+         
+        public static VertexStore TransformToVxs(this in AffineMat aff, VertexStore src, VertexStore outputVxs)
         {
+#if DEBUG
+            if (src == outputVxs)
+            {
+                System.Diagnostics.Debugger.Break();
+            }
+#endif
+
+
             int count = src.Count;
             VertexCmd cmd;
-            double x, y;
             for (int i = 0; i < count; ++i)
             {
-                cmd = src.GetVertex(i, out x, out y);
+                cmd = src.GetVertex(i, out double x, out double y);
                 aff.Transform(ref x, ref y);
                 outputVxs.AddVertex(x, y, cmd);
             }
@@ -76,12 +90,19 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         /// <param name="outputVxs"></param>
         public static VertexStore TransformToVxs(this ICoordTransformer tx, VertexStore src, VertexStore outputVxs)
         {
+#if DEBUG
+            if (src == outputVxs)
+            {
+                System.Diagnostics.Debugger.Break();
+            }
+#endif
+
+
             int count = src.Count;
             VertexCmd cmd;
-            double x, y;
             for (int i = 0; i < count; ++i)
             {
-                cmd = src.GetVertex(i, out x, out y);
+                cmd = src.GetVertex(i, out double x, out double y);
                 tx.Transform(ref x, ref y);
                 outputVxs.AddVertex(x, y, cmd);
             }
@@ -92,36 +113,49 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         /// </summary>
         /// <param name="src"></param>
         /// <param name="outputVxs"></param>
-        public static VertexStore TransformToVxs(this Bilinear bilinearTx, VertexStore src, VertexStore vxs)
+        public static VertexStore TransformToVxs(this Bilinear bilinearTx, VertexStore src, VertexStore outputVxs)
         {
+#if DEBUG
+            if (src == outputVxs)
+            {
+                System.Diagnostics.Debugger.Break();
+            }
+#endif
+
+
             int count = src.Count;
             VertexCmd cmd;
-            double x, y;
             for (int i = 0; i < count; ++i)
             {
-                cmd = src.GetVertex(i, out x, out y);
+                cmd = src.GetVertex(i, out double x, out double y);
                 bilinearTx.Transform(ref x, ref y);
-                vxs.AddVertex(x, y, cmd);
+                outputVxs.AddVertex(x, y, cmd);
             }
-            return vxs;
+            return outputVxs;
         }
         /// <summary>
         /// we do NOT store vxs, return original outputVxs
         /// </summary>
         /// <param name="src"></param>
         /// <param name="outputVxs"></param>
-        public static VertexStore TransformToVxs(this Perspective perspecitveTx, VertexStore src, VertexStore vxs)
+        public static VertexStore TransformToVxs(this Perspective perspecitveTx, VertexStore src, VertexStore outputVxs)
         {
+#if DEBUG
+            if (src == outputVxs)
+            {
+                System.Diagnostics.Debugger.Break();
+            }
+#endif
+
             VertexCmd cmd;
-            double x, y;
             int count = src.Count;
             for (int i = 0; i < count; ++i)
             {
-                cmd = src.GetVertex(i, out x, out y);
+                cmd = src.GetVertex(i, out double x, out double y);
                 perspecitveTx.Transform(ref x, ref y);
-                vxs.AddVertex(x, y, cmd);
+                outputVxs.AddVertex(x, y, cmd);
             }
-            return vxs;
+            return outputVxs;
         }
     }
 

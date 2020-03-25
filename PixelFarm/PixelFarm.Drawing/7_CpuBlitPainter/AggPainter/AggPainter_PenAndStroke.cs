@@ -119,7 +119,7 @@ namespace PixelFarm.CpuBlit
             using (VectorToolBox.Borrow(v1, out PathWriter pw))
             {
                 pw.Clear();
-                if (_orientation == RenderSurfaceOrientation.LeftBottom)
+                if (_orientation == RenderSurfaceOriginKind.LeftBottom)
                 {
                     //as original 
                     pw.MoveTo(x1, y1);
@@ -218,7 +218,7 @@ namespace PixelFarm.CpuBlit
 
                 if (LineRenderingTech == LineRenderingTechnique.StrokeVxsGenerator)
                 {
-                    using (VxsTemp.Borrow(out var v1))
+                    using (Tools.BorrowVxs(out var v1))
                     {
                         _aggsx.Render(_stroke.MakeVxs(vxs, v1), _strokeColor);
                     }
@@ -233,7 +233,7 @@ namespace PixelFarm.CpuBlit
                 if (LineRenderingTech == LineRenderingTechnique.StrokeVxsGenerator)
                 {
 
-                    using (VxsTemp.Borrow(out var v1))
+                    using (Tools.BorrowVxs(out var v1))
                     {
 
                         _lineDashGen.CreateDash(vxs, v1);
@@ -246,8 +246,7 @@ namespace PixelFarm.CpuBlit
 
                         for (int i = 0; i < n; ++i)
                         {
-                            double x, y;
-                            VertexCmd cmd = v1.GetVertex(i, out x, out y);
+                            VertexCmd cmd = v1.GetVertex(i, out double x, out double y);
                             switch (cmd)
                             {
                                 case VertexCmd.MoveTo:
@@ -266,7 +265,7 @@ namespace PixelFarm.CpuBlit
                 }
                 else
                 {
-                    using (VxsTemp.Borrow(out var v1))
+                    using (Tools.BorrowVxs(out var v1))
                     {
 
                         //TODO: check lineDash
@@ -285,7 +284,7 @@ namespace PixelFarm.CpuBlit
             if (this.RenderQuality == RenderQuality.Fast)
             {
 
-                if (_orientation == RenderSurfaceOrientation.LeftBottom)
+                if (_orientation == RenderSurfaceOriginKind.LeftBottom)
                 {
 
                     _bxt.DrawRectangle(
@@ -316,9 +315,9 @@ namespace PixelFarm.CpuBlit
             //Agg
 
 
-            using (VectorToolBox.Borrow(out SimpleRect rectTool))
+            using (Tools.BorrowRect(out var rectTool))
             {
-                if (_orientation == RenderSurfaceOrientation.LeftBottom)
+                if (_orientation == RenderSurfaceOriginKind.LeftBottom)
                 {
                     double right = left + width;
                     double bottom = top + height;
@@ -335,14 +334,14 @@ namespace PixelFarm.CpuBlit
 
                 if (LineRenderingTech == LineRenderingTechnique.StrokeVxsGenerator)
                 {
-                    using (VxsTemp.Borrow(out var v1, out var v2))
+                    using (Tools.BorrowVxs(out var v1, out var v2))
                     {
                         _aggsx.Render(_stroke.MakeVxs(rectTool.MakeVxs(v1), v2), _strokeColor);
                     }
                 }
                 else
                 {
-                    using (VxsTemp.Borrow(out var v1))
+                    using (Tools.BorrowVxs(out var v1))
                     {
                         _outlineRas.RenderVertexSnap(rectTool.MakeVxs(v1), _strokeColor);
                     }
@@ -355,7 +354,7 @@ namespace PixelFarm.CpuBlit
 
             double ox = (left + width / 2);
             double oy = (top + height / 2);
-            if (_orientation == RenderSurfaceOrientation.LeftTop)
+            if (_orientation == RenderSurfaceOriginKind.LeftTop)
             {
                 //modified
                 oy = this.Height - oy;
@@ -377,7 +376,7 @@ namespace PixelFarm.CpuBlit
 
 
 
-            using (VectorToolBox.Borrow(out Ellipse ellipseTool))
+            using (Tools.BorrowEllipse(out var ellipseTool))
             {
                 ellipseTool.Set(ox,
                        oy,
@@ -386,14 +385,14 @@ namespace PixelFarm.CpuBlit
                        _ellipseGenNSteps);
                 if (LineRenderingTech == LineRenderingTechnique.StrokeVxsGenerator)
                 {
-                    using (VxsTemp.Borrow(out var v1, out var v2))
+                    using (Tools.BorrowVxs(out var v1, out var v2))
                     {
                         _aggsx.Render(_stroke.MakeVxs(ellipseTool.MakeVxs(v1), v2), _strokeColor);
                     }
                 }
                 else
                 {
-                    using (VxsTemp.Borrow(out var v1))
+                    using (Tools.BorrowVxs(out var v1))
                     {
                         _outlineRas.RenderVertexSnap(ellipseTool.MakeVxs(v1), _strokeColor);
                     }

@@ -1,7 +1,7 @@
 ﻿//MIT, 2014-present, WinterDev
 
-using System; 
-using PixelFarm.Drawing; 
+using System;
+using PixelFarm.Drawing;
 namespace PaintLab.Svg
 {
     public class VgPaintArgs : VgVisitorBase
@@ -54,7 +54,9 @@ namespace PaintLab.Svg
 
     public static class VgPaintArgsPool
     {
-        public static PixelFarm.TempContext<VgPaintArgs> Borrow(Painter painter, out VgPaintArgs paintArgs)
+        public static PixelFarm.TempContext<VgPaintArgs> BorrowVgPaintArgs(
+            this PixelFarm.CpuBlit.Tools tools,
+            Painter painter, out VgPaintArgs paintArgs)
         {
             if (!PixelFarm.Temp<VgPaintArgs>.IsInit())
             {
@@ -67,6 +69,7 @@ namespace PaintLab.Svg
             paintArgs.P = painter;
             return context;
         }
+         
     }
 
 }

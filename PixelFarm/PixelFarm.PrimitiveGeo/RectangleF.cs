@@ -52,8 +52,7 @@ namespace PixelFarm.Drawing
         ///	and bottom coordinates.
         /// </remarks>
 
-        public static RectangleF FromLTRB(float left, float top,
-                           float right, float bottom)
+        public static RectangleF FromLTRB(float left, float top, float right, float bottom)
         {
             return new RectangleF(left, top, right - left, bottom - top);
         }
@@ -67,8 +66,7 @@ namespace PixelFarm.Drawing
         ///	RectangleF by the specified coordinate values.
         /// </remarks>
 
-        public static RectangleF Inflate(RectangleF rect,
-                          float x, float y)
+        public static RectangleF Inflate(in RectangleF rect, float x, float y)
         {
             RectangleF ir = new RectangleF(rect.X, rect.Y, rect.Width, rect.Height);
             ir.Inflate(x, y);
@@ -86,7 +84,7 @@ namespace PixelFarm.Drawing
         public void Inflate(float x, float y)
         {
             Inflate(new SizeF(x, y));
-        }
+        }        
 
         /// <summary>
         ///	Inflate Method
@@ -113,8 +111,7 @@ namespace PixelFarm.Drawing
         ///	RectangleFs. Returns null if there is no intersection.
         /// </remarks>
 
-        public static RectangleF Intersect(RectangleF a,
-                            RectangleF b)
+        public static RectangleF Intersect(in RectangleF a, in RectangleF b)
         {
             // MS.NET returns a non-empty rectangle if the two rectangles
             // touch each other
@@ -136,7 +133,7 @@ namespace PixelFarm.Drawing
         ///	and another RectangleF.
         /// </remarks>
 
-        public void Intersect(RectangleF rect)
+        public void Intersect(in RectangleF rect)
         {
             this = RectangleF.Intersect(this, rect);
         }
@@ -150,7 +147,7 @@ namespace PixelFarm.Drawing
         ///	RectangleFs.
         /// </remarks>
 
-        public static RectangleF Union(RectangleF a, RectangleF b)
+        public static RectangleF Union(in RectangleF a, in RectangleF b)
         {
             return FromLTRB(Math.Min(a.Left, b.Left),
                      Math.Min(a.Top, b.Top),
@@ -168,7 +165,7 @@ namespace PixelFarm.Drawing
         ///	properties of the two RectangleFs.
         /// </remarks>
 
-        public static bool operator ==(RectangleF left, RectangleF right)
+        public static bool operator ==(in RectangleF left, in RectangleF right)
         {
             return (left.X == right.X) && (left.Y == right.Y) &&
                                 (left.Width == right.Width) && (left.Height == right.Height);
@@ -184,7 +181,7 @@ namespace PixelFarm.Drawing
         ///	properties of the two RectangleFs.
         /// </remarks>
 
-        public static bool operator !=(RectangleF left, RectangleF right)
+        public static bool operator !=(in RectangleF left, in RectangleF right)
         {
             return (left.X != right.X) || (left.Y != right.Y) ||
                                 (left.Width != right.Width) || (left.Height != right.Height);
@@ -198,7 +195,7 @@ namespace PixelFarm.Drawing
         ///	Converts a Rectangle object to a RectangleF.
         /// </remarks>
 
-        public static implicit operator RectangleF(Rectangle r)
+        public static implicit operator RectangleF(in Rectangle r)
         {
             return new RectangleF(r.X, r.Y, r.Width, r.Height);
         }
@@ -435,7 +432,7 @@ namespace PixelFarm.Drawing
         ///	RectangleF.
         /// </remarks>
 
-        public bool Contains(RectangleF rect)
+        public bool Contains(in RectangleF rect)
         {
             return X <= rect.X && Right >= rect.Right && Y <= rect.Y && Bottom >= rect.Bottom;
         }
@@ -448,12 +445,8 @@ namespace PixelFarm.Drawing
         ///	Checks equivalence of this RectangleF and an object.
         /// </remarks>
 
-        public override bool Equals(object obj)
-        {
-            if (!(obj is RectangleF))
-                return false;
-            return (this == (RectangleF)obj);
-        }
+        public override bool Equals(object obj) => (obj is RectangleF rect) && rect == this;
+
 
         /// <summary>
         ///	GetHashCode Method
@@ -477,13 +470,13 @@ namespace PixelFarm.Drawing
         ///	Checks if a RectangleF intersects with this one.
         /// </remarks>
 
-        public bool IntersectsWith(RectangleF rect)
+        public bool IntersectsWith(in RectangleF rect)
         {
             return !((Left >= rect.Right) || (Right <= rect.Left) ||
                 (Top >= rect.Bottom) || (Bottom <= rect.Top));
         }
 
-        private bool IntersectsWithInclusive(RectangleF r)
+        private bool IntersectsWithInclusive(in RectangleF r)
         {
             return !((Left > r.Right) || (Right < r.Left) ||
                 (Top > r.Bottom) || (Bottom < r.Top));
@@ -529,5 +522,7 @@ namespace PixelFarm.Drawing
             return String.Format("{{X={0},Y={1},Width={2},Height={3}}}",
                          _x, _y, _width, _height);
         }
+
+        public RectangleF CreateNormalizedRect(float totalW, float totalH) => new RectangleF(_x / totalW, _y / totalH, _width / totalW, _height / totalH);
     }
 }

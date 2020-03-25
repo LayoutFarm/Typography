@@ -31,6 +31,12 @@ namespace Msdfgen
             this.scaleX = scaleX;
             this.scaleY = scaleY;
         }
+
+        //my extension
+        public bool UseCustomImageSize { get; set; }
+        public int CustomWidth { get; set; }
+        public int CustomHeight { get; set; }
+        public int CustomBorder { get; set; }
     }
 
     public static class SdfGenerator

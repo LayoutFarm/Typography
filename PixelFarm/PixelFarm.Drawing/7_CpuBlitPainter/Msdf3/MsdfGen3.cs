@@ -16,11 +16,11 @@ namespace Msdfgen
     /// </summary>
     public class MsdfGen3
     {
-        PixelFarm.CpuBlit.Rasterization.PrebuiltGammaTable _prebuiltThresholdGamma_100;
-        PixelFarm.CpuBlit.Rasterization.PrebuiltGammaTable _prebuiltThresholdGamma_OverlappedBorder;
-        PixelFarm.CpuBlit.Rasterization.PrebuiltGammaTable _prebuiltThresholdGamma_50;
-        MsdfEdgePixelBlender _msdfEdgePxBlender = new MsdfEdgePixelBlender();
-        StrokeMath _strokeMath = new StrokeMath();
+        readonly PixelFarm.CpuBlit.Rasterization.PrebuiltGammaTable _prebuiltThresholdGamma_100;
+        readonly PixelFarm.CpuBlit.Rasterization.PrebuiltGammaTable _prebuiltThresholdGamma_OverlappedBorder;
+        readonly PixelFarm.CpuBlit.Rasterization.PrebuiltGammaTable _prebuiltThresholdGamma_50;
+        readonly MsdfEdgePixelBlender _msdfEdgePxBlender = new MsdfEdgePixelBlender();
+        readonly StrokeMath _strokeMath = new StrokeMath();
 
         public MsdfGen3()
         {
@@ -54,10 +54,10 @@ namespace Msdfgen
             //this will create overlapped area outside the shape.
 
             PixelFarm.VectorMath.Vector2 ext_vec = vector.NewLength(w);
-            x0 = x0 - ext_vec.x;
-            y0 = y0 - ext_vec.y;
-            x1 = x1 + ext_vec.x;
-            y1 = y1 + ext_vec.y;
+            x0 -= ext_vec.x;
+            y0 -= ext_vec.y;
+            x1 += ext_vec.x;
+            y1 += ext_vec.y;
 
             //rotate 90 degree to create a height vector that point to 'outside' of the 'rectbox' shape.
             //the box height= w
@@ -87,7 +87,7 @@ namespace Msdfgen
         void CreateBorder(VertexStore vxs, Vertex2d prev, Vertex2d now, Vertex2d next0, Vertex2d next1)
         {
             //now we are on now
-            using (VxsTemp.Borrow(out var vxs1))
+            using (Tools.BorrowVxs(out var vxs1))
             {
                 vxs.AddMoveTo(now.x, now.y);
 
@@ -146,7 +146,7 @@ namespace Msdfgen
                 //then we create an 'inner border' of a line from c0 to c1
                 //and we create an 'outer border' of a line from c0 to c1
                 //
-                using (VxsTemp.Borrow(out var v1))
+                using (Tools.BorrowVxs(out var v1))
                 {
                     //1. inner-border, set fill mode to inform proper color encoding of inner border
                     _msdfEdgePxBlender.FillMode = MsdfEdgePixelBlender.BlenderFillMode.InnerBorder;
@@ -213,9 +213,9 @@ namespace Msdfgen
                         {
                             //approximate 
                             CubicSegment cs = (CubicSegment)ownerSeg;
-                            using (VxsTemp.Borrow(out var v1))
-                            using (VectorToolBox.Borrow(out ShapeBuilder b))
-                            using (VectorToolBox.Borrow(out Stroke strk))
+                            using (Tools.BorrowVxs(out var v1))
+                            using (Tools.BorrowShapeBuilder(out var b))
+                            using (Tools.BorrowStroke(out var strk))
                             {
 
                                 b.MoveTo(cs.P0.x + _dx, cs.P0.y + _dy) //...
@@ -247,9 +247,10 @@ namespace Msdfgen
                     case EdgeSegmentKind.QuadraticSegment:
                         {
                             QuadraticSegment qs = (QuadraticSegment)ownerSeg;
-                            using (VectorToolBox.Borrow(out ShapeBuilder b))
-                            using (VxsTemp.Borrow(out var v1))
-                            using (VectorToolBox.Borrow(out Stroke strk))
+
+                            using (Tools.BorrowVxs(out var v1))
+                            using (Tools.BorrowShapeBuilder(out var b))                            
+                            using (Tools.BorrowStroke(out var strk))
                             {
 
                                 b.MoveTo(qs.P0.x + _dx, qs.P0.y + _dy)//...
@@ -354,8 +355,8 @@ namespace Msdfgen
 
             //
             using (MemBitmap bmpLut = new MemBitmap(imgW, imgH))
-            using (AggPainterPool.Borrow(bmpLut, out AggPainter painter))
-            using (VectorToolBox.Borrow(out ShapeBuilder sh))
+            using (Tools.BorrowAggPainter(bmpLut, out var painter))
+            using (Tools.BorrowShapeBuilder(out var sh))
             {
 
 
@@ -490,7 +491,7 @@ namespace Msdfgen
 
 
 
-        Dictionary<int, bool> _uniqueCorners = new Dictionary<int, bool>();
+        readonly Dictionary<int, bool> _uniqueCorners = new Dictionary<int, bool>();
 
         List<CornerList> MakeUniqueList(List<CornerList> primaryOverlappedList)
         {
@@ -848,12 +849,11 @@ namespace Msdfgen
                   edgeThreshold);
             }
 
-            return new PixelFarm.CpuBlit.BitmapAtlas.BitmapAtlasItemSource(w, h)
-            {
+            return new PixelFarm.CpuBlit.BitmapAtlas.BitmapAtlasItemSource(w, h) {
                 Source = ConvertToIntBmp(frgbBmp, flipY),
                 TextureXOffset = (float)translate.x,
                 TextureYOffset = (float)translate.y
-            };             
+            };
         }
 
         static int[] ConvertToIntBmp(FloatRGBBmp input, bool flipY)

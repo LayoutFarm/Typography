@@ -65,23 +65,46 @@ namespace PixelFarm.Drawing
             return outputVxs;
         }
         public static VertexStore ScaleToNewVxs(this VertexStore src, double s, VertexStore outputVxs)
-        {
+        {   
+           
+            AffineMat mat = AffineMat.Iden;
+            mat.Scale(s, s);
+            return mat.TransformToVxs(src, outputVxs);
+
             //TODO: review here
-            Affine aff = Affine.NewScaling(s, s);
-            return aff.TransformToVxs(src, outputVxs);
+            //use struct
+            //Affine aff = Affine.NewScaling(s, s);
+            //return aff.TransformToVxs(src, outputVxs);
         }
         public static VertexStore ScaleToNewVxs(this VertexStore src, double sx, double sy, VertexStore outputVxs)
         {
-            //TODO: review here
-            Affine aff = Affine.NewScaling(sx, sy);
-            return aff.TransformToVxs(src, outputVxs);
+            AffineMat mat = AffineMat.Iden;
+            mat.Scale(sx, sy);
+            return mat.TransformToVxs(src, outputVxs);
+
+            ////TODO: review here, use struct mat
+            //Affine aff = Affine.NewScaling(sx, sy);
+            //return aff.TransformToVxs(src, outputVxs);
         }
 
-        public static VertexStore RotateToNewVxs(this VertexStore src, double deg, VertexStore outputVxs)
+        public static VertexStore RotateDegToNewVxs(this VertexStore src, double deg, VertexStore outputVxs)
         {
-            //TODO: review here
-            Affine aff = Affine.NewRotationDeg(deg);
-            return aff.TransformToVxs(src, outputVxs);
+            AffineMat mat = AffineMat.Iden;
+            mat.RotateDeg(deg);
+            return mat.TransformToVxs(src, outputVxs);
+
+            //TODO: review here, use struct mat
+            //Affine aff = Affine.NewRotationDeg(deg);
+            //return aff.TransformToVxs(src, outputVxs);
+        }
+        public static VertexStore RotateRadToNewVxs(this VertexStore src, double rad, VertexStore outputVxs)
+        {
+
+            AffineMat mat = AffineMat.Iden;
+            mat.Rotate(rad);
+            return mat.TransformToVxs(src, outputVxs);
+            //Affine aff = Affine.NewRotation(rad);
+            //return aff.TransformToVxs(src, outputVxs);
         }
     }
 }

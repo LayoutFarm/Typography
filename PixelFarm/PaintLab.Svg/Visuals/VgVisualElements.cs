@@ -495,8 +495,8 @@ namespace PaintLab.Svg
                         {
                             //create rect path around img
 
-                            using (VectorToolBox.Borrow(out SimpleRect ss))
-                            using (VxsTemp.Borrow(out VertexStore vxs))
+                            using (Tools.BorrowRect(out var ss))
+                            using (Tools.BorrowVxs(out VertexStore vxs))
                             {
                                 SvgImageSpec imgSpec = (SvgImageSpec)_visualSpec;
                                 ss.SetRect(0, imgSpec.Height.Number, imgSpec.Width.Number, 0);
@@ -529,7 +529,7 @@ namespace PaintLab.Svg
                         else
                         {
                             //have some tx
-                            using (VxsTemp.Borrow(out var v1))
+                            using (Tools.BorrowVxs(out var v1))
                             {
                                 currentTx.TransformToVxs(VxsPath, v1);
                                 visitor.Current = this;
@@ -712,8 +712,8 @@ namespace PaintLab.Svg
                             //TODO: review this num conversion
                             maskBmp = new MemBitmap((int)maskSpec.Width.Number, (int)maskSpec.Height.Number);
                             //use software renderer for mask-bitmap
-                            using (AggPainterPool.Borrow(maskBmp, out AggPainter painter))
-                            using (VgPaintArgsPool.Borrow(painter, out VgPaintArgs paintArgs2))
+                            using (Tools.BorrowAggPainter(maskBmp, out var painter))
+                            using (Tools.More.BorrowVgPaintArgs(painter, out var paintArgs2))
                             {
                                 painter.FillColor = Color.Black;
                                 painter.Clear(Color.White);
@@ -930,7 +930,7 @@ namespace PaintLab.Svg
                     if (currentTx != null)
                     {
                         //have some tx
-                        using (VxsTemp.Borrow(out var v1))
+                        using (Tools.BorrowVxs(out var v1))
                         {
                             currentTx.TransformToVxs(clipVxs, v1);
                             p.SetClipRgn(v1);
@@ -1004,63 +1004,66 @@ namespace PaintLab.Svg
                                     //check if we need scale or not
 
                                     Image img = this.ImageBinder.LocalImage;
-
-                                    if (currentTx != null)
+                                    if (img != null)
                                     {
+                                        if (currentTx != null)
+                                        {
 
-                                        if (_imgW == 0 || _imgH == 0)
-                                        {
-                                            //only X,and Y
-                                            RenderQuality prevQ = p.RenderQuality;
-                                            //p.RenderQuality = RenderQuality.Fast;
-                                            p.DrawImage(this.ImageBinder.LocalImage, _imgX, _imgY, currentTx);
-                                            p.RenderQuality = prevQ;
-                                        }
-                                        else if (_imgW == img.Width && _imgH == img.Height)
-                                        {
-                                            RenderQuality prevQ = p.RenderQuality;
-                                            //p.RenderQuality = RenderQuality.Fast;
-                                            p.DrawImage(this.ImageBinder.LocalImage, _imgX, _imgY, currentTx);
-                                            p.RenderQuality = prevQ;
+                                            if (_imgW == 0 || _imgH == 0)
+                                            {
+                                                //only X,and Y
+                                                RenderQuality prevQ = p.RenderQuality;
+                                                //p.RenderQuality = RenderQuality.Fast;
+                                                p.DrawImage(this.ImageBinder.LocalImage, _imgX, _imgY, currentTx);
+                                                p.RenderQuality = prevQ;
+                                            }
+                                            else if (_imgW == img.Width && _imgH == img.Height)
+                                            {
+                                                RenderQuality prevQ = p.RenderQuality;
+                                                //p.RenderQuality = RenderQuality.Fast;
+                                                p.DrawImage(this.ImageBinder.LocalImage, _imgX, _imgY, currentTx);
+                                                p.RenderQuality = prevQ;
+                                            }
+                                            else
+                                            {
+
+                                                RenderQuality prevQ = p.RenderQuality;
+                                                //p.RenderQuality = RenderQuality.Fast;
+                                                p.DrawImage(this.ImageBinder.LocalImage, _imgX, _imgY, currentTx);
+                                                p.RenderQuality = prevQ;
+                                            }
+
+
                                         }
                                         else
                                         {
+                                            if (_imgW == 0 || _imgH == 0)
+                                            {
+                                                //only X,and Y
+                                                RenderQuality prevQ = p.RenderQuality;
+                                                p.RenderQuality = RenderQuality.Fast;
+                                                p.DrawImage(this.ImageBinder.LocalImage, _imgX, _imgY);
+                                                p.RenderQuality = prevQ;
+                                            }
+                                            else if (_imgW == img.Width && _imgH == img.Height)
+                                            {
+                                                RenderQuality prevQ = p.RenderQuality;
+                                                p.RenderQuality = RenderQuality.Fast;
+                                                p.DrawImage(this.ImageBinder.LocalImage, _imgX, _imgY);
+                                                p.RenderQuality = prevQ;
+                                            }
+                                            else
+                                            {
 
-                                            RenderQuality prevQ = p.RenderQuality;
-                                            //p.RenderQuality = RenderQuality.Fast;
-                                            p.DrawImage(this.ImageBinder.LocalImage, _imgX, _imgY, currentTx);
-                                            p.RenderQuality = prevQ;
-                                        }
+                                                RenderQuality prevQ = p.RenderQuality;
+                                                p.RenderQuality = RenderQuality.Fast;
+                                                p.DrawImage(this.ImageBinder.LocalImage, _imgX, _imgY);
 
-
-                                    }
-                                    else
-                                    {
-                                        if (_imgW == 0 || _imgH == 0)
-                                        {
-                                            //only X,and Y
-                                            RenderQuality prevQ = p.RenderQuality;
-                                            p.RenderQuality = RenderQuality.Fast;
-                                            p.DrawImage(this.ImageBinder.LocalImage, _imgX, _imgY);
-                                            p.RenderQuality = prevQ;
-                                        }
-                                        else if (_imgW == img.Width && _imgH == img.Height)
-                                        {
-                                            RenderQuality prevQ = p.RenderQuality;
-                                            p.RenderQuality = RenderQuality.Fast;
-                                            p.DrawImage(this.ImageBinder.LocalImage, _imgX, _imgY);
-                                            p.RenderQuality = prevQ;
-                                        }
-                                        else
-                                        {
-
-                                            RenderQuality prevQ = p.RenderQuality;
-                                            p.RenderQuality = RenderQuality.Fast;
-                                            p.DrawImage(this.ImageBinder.LocalImage, _imgX, _imgY);
-
-                                            p.RenderQuality = prevQ;
+                                                p.RenderQuality = prevQ;
+                                            }
                                         }
                                     }
+
 
                                 }
                                 break;
@@ -1206,8 +1209,8 @@ namespace PaintLab.Svg
                                         //vxs caching 
                                         _latestStrokeW = (float)p.StrokeWidth;
 
-                                        using (VxsTemp.Borrow(out var v1))
-                                        using (VectorToolBox.Borrow(out Stroke stroke))
+                                        using (Tools.BorrowVxs(out var v1))
+                                        using (Tools.BorrowStroke(out var stroke))
                                         {
                                             stroke.Width = _latestStrokeW;
                                             stroke.MakeVxs(VxsPath, v1);
@@ -1319,7 +1322,7 @@ namespace PaintLab.Svg
                         else
                         {
                             //have some tx
-                            using (VxsTemp.Borrow(out var v1))
+                            using (Tools.BorrowVxs(out var v1))
                             {
                                 currentTx.TransformToVxs(VxsPath, v1);
 
@@ -1374,8 +1377,7 @@ namespace PaintLab.Svg
             int childCount = this.ChildCount;
             for (int i = 0; i < childCount; ++i)
             {
-                var node = GetChildNode(i) as VgVisualElement;
-                if (node != null)
+                if (GetChildNode(i) is VgVisualElement node)
                 {
                     node.Paint(vgPainterArgs);
                 }

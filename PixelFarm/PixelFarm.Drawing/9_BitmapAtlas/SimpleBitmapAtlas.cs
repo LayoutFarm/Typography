@@ -8,7 +8,7 @@ using System.Collections.Generic;
 namespace PixelFarm.CpuBlit.BitmapAtlas
 {
 
-    public class SimpleBitmapAtlas
+    public class SimpleBitmapAtlas : IDisposable
     {
 
         Dictionary<ushort, AtlasItem> _atlasItems = new Dictionary<ushort, AtlasItem>();
@@ -40,7 +40,32 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             _atlasItems.Add(item.UniqueUint16Name, item);
         }
         public bool UseSharedImage { get; set; }
-        public MemBitmap MainBitmap { get; set; }
+        public MemBitmap MainBitmap { get; private set; }
+        public bool IsMemBitmapOwner { get; private set; }
+        public void SetMainBitmap(MemBitmap mainBmp, bool isOwner)
+        {
+            if (MainBitmap != null && MainBitmap != mainBmp && IsMemBitmapOwner)
+            {
+                //dispose current main bmp
+                MainBitmap.Dispose();
+                MainBitmap = null;
+                IsMemBitmapOwner = false;
+            }
+
+            MainBitmap = mainBmp;
+            IsMemBitmapOwner = isOwner;
+        }
+
+        public void Dispose()
+        {
+            _atlasItems.Clear();
+            if (MainBitmap != null && IsMemBitmapOwner)
+            {
+                MainBitmap.Dispose();
+                MainBitmap = null;
+            }
+
+        }
         /// <summary>
         /// try get atlas item by unique name
         /// </summary>
@@ -82,8 +107,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             foreach (var kp in org._atlasItems)
             {
                 AtlasItem orgMapData = kp.Value;
-                cloneDic.Add(kp.Key, new AtlasItem(orgMapData.UniqueUint16Name)
-                {
+                cloneDic.Add(kp.Key, new AtlasItem(orgMapData.UniqueUint16Name) {
                     Left = orgMapData.Left + dx,
                     Top = orgMapData.Top + dy,
                     //

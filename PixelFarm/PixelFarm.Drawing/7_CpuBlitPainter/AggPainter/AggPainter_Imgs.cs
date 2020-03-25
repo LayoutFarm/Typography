@@ -41,7 +41,7 @@ namespace PixelFarm.CpuBlit
             this.UseSubPixelLcdEffect = false;
             _aggsx.UseSubPixelLcdEffect = false;
 
-            if (_orientation == RenderSurfaceOrientation.LeftTop)
+            if (_orientation == RenderSurfaceOriginKind.LeftTop)
             {
                 //place left upper corner at specific x y                    
                 _aggsx.Render(memBmp, left, this.Height - (top + memBmp.Height));
@@ -87,7 +87,7 @@ namespace PixelFarm.CpuBlit
             //before render an image we turn off vxs subpixel rendering
             this.UseSubPixelLcdEffect = false;
 
-            if (_orientation == RenderSurfaceOrientation.LeftTop)
+            if (_orientation == RenderSurfaceOriginKind.LeftTop)
             {
                 //place left upper corner at specific x y                    
                 _aggsx.Render(memBmp, left, this.Height - (top + memBmp.Height), srcX, srcY, srcW, srcH);
