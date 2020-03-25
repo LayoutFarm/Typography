@@ -147,7 +147,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\x_autogen2\PixelFarm.MiniAgg.One\PixelFarm.MiniAgg.One.csproj">
-      <Project>{4a14de16-355d-4d80-a189-82e26ced4907}</Project>
+      <Project>{fb5f78f5-c921-405d-8f21-42f7c15c2ad9}</Project>
       <Name>PixelFarm.MiniAgg.One</Name>
     </ProjectReference>
   </ItemGroup>

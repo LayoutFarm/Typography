@@ -49,7 +49,7 @@ namespace PixelFarm.CpuBlit
             //TODO: review drawing string  with agg here   
             if (_textPrinter != null)
             {
-                if (_orientation == RenderSurfaceOrientation.LeftBottom)
+                if (_orientation == RenderSurfaceOriginKind.LeftBottom)
                 {
                     _textPrinter.DrawString(text, x, y);
                 }

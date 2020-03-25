@@ -527,7 +527,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                         mat.Scale(scaleRatio);
                         mat.RotateDeg(xaxisRotationAngleDec);
                         mat.Translate(centerFormArc.cx, centerFormArc.cy);
-                        VertexStoreTransformExtensions.TransformToVxs(ref mat, v1, v2);
+                        VertexStoreTransformExtensions.TransformToVxs(mat, v1, v2);
                         v1 = v2;
                     }
                     else
@@ -544,7 +544,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                         mat.Translate(-centerFormArc.cx, -centerFormArc.cy);
                         mat.RotateDeg(xaxisRotationAngleDec);
                         mat.Translate(centerFormArc.cx, centerFormArc.cy);
-                        VertexStoreTransformExtensions.TransformToVxs(ref mat, v1, v2);
+                        VertexStoreTransformExtensions.TransformToVxs(mat, v1, v2);
                         v1 = v2;
                     }
                 }
@@ -565,7 +565,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                         mat.RotateDeg(scaleRatio);
                         mat.Translate(centerFormArc.cx, centerFormArc.cy);
                         //
-                        VertexStoreTransformExtensions.TransformToVxs(ref mat, v1, v2);
+                        VertexStoreTransformExtensions.TransformToVxs(mat, v1, v2);
                         v1 = v2;
 
                     }

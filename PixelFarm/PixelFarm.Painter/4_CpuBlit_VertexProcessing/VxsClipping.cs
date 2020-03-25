@@ -110,7 +110,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             }
             else
             {
-                using (VxsTemp.Borrow(out VertexStore v1))
+                using (VxsTemp.Borrow(out var v1))
                 using (VectorToolBox.Borrow(v1, out PathWriter pw))
                 {
                     foreach (List<IntPoint> polygon in _intersectedPolys)

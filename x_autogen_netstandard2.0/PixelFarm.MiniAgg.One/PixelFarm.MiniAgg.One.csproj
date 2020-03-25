@@ -206,7 +206,6 @@
     <Compile Include="..\..\PixelFarm\PixelFarm.Painter\2_General\TextBaseline.cs" Link="PixelFarm\PixelFarm.Painter\2_General\TextBaseline.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.Painter\3_Cpu_Blit\ColorRGBAf.cs" Link="PixelFarm\PixelFarm.Painter\3_Cpu_Blit\ColorRGBAf.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.Painter\3_Cpu_Blit\MemBitmap.cs" Link="PixelFarm\PixelFarm.Painter\3_Cpu_Blit\MemBitmap.cs" />
-    <Compile Include="..\..\PixelFarm\PixelFarm.Painter\3_Cpu_Blit\PainterExtensions.cs" Link="PixelFarm\PixelFarm.Painter\3_Cpu_Blit\PainterExtensions.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.Painter\4_CpuBlit_VertexProcessing\BoundingRect.cs" Link="PixelFarm\PixelFarm.Painter\4_CpuBlit_VertexProcessing\BoundingRect.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.Painter\4_CpuBlit_VertexProcessing\CurveFlattener.cs" Link="PixelFarm\PixelFarm.Painter\4_CpuBlit_VertexProcessing\CurveFlattener.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.Painter\4_CpuBlit_VertexProcessing\LineWalker.cs" Link="PixelFarm\PixelFarm.Painter\4_CpuBlit_VertexProcessing\LineWalker.cs" />
@@ -286,12 +285,12 @@
     <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\4_IO\StorageService.cs" Link="PixelFarm\PixelFarm.Drawing\4_IO\StorageService.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\5_VertexProcessoring\Figures.cs" Link="PixelFarm\PixelFarm.Drawing\5_VertexProcessoring\Figures.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\AggPainter\AggPainter.cs" Link="PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\AggPainter\AggPainter.cs" />
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\AggPainter\AggPainterPool.cs" Link="PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\AggPainter\AggPainterPool.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\AggPainter\AggPainter_BrushAndFill.cs" Link="PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\AggPainter\AggPainter_BrushAndFill.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\AggPainter\AggPainter_FontAndText.cs" Link="PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\AggPainter\AggPainter_FontAndText.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\AggPainter\AggPainter_Imgs.cs" Link="PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\AggPainter\AggPainter_Imgs.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\AggPainter\AggPainter_MaskAndClipping.cs" Link="PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\AggPainter\AggPainter_MaskAndClipping.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\AggPainter\AggPainter_PenAndStroke.cs" Link="PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\AggPainter\AggPainter_PenAndStroke.cs" />
+    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\AggPainter\Tools.cs" Link="PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\AggPainter\Tools.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\DrawBoard\AggRenderVx.cs" Link="PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\DrawBoard\AggRenderVx.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\DrawBoard\Canvas2dExtension.cs" Link="PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\DrawBoard\Canvas2dExtension.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\DrawBoard\CpuBlitRegion.cs" Link="PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\DrawBoard\CpuBlitRegion.cs" />

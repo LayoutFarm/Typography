@@ -218,10 +218,10 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                 _writer.Write((ushort)g.UniqueInt16Name);
 
                 //2. area
-                _writer.Write((ushort)g.area.Left);
-                _writer.Write((ushort)g.area.Top);
-                _writer.Write((ushort)g.area.Width);
-                _writer.Write((ushort)g.area.Height);
+                _writer.Write((ushort)g.Area.Left);
+                _writer.Write((ushort)g.Area.Top);
+                _writer.Write((ushort)g.Area.Width);
+                _writer.Write((ushort)g.Area.Height);
 
                 //3. texture offset                
 

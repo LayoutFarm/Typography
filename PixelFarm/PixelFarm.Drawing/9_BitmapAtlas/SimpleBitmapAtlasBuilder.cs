@@ -81,7 +81,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                                 currentX = 0;
                             }
                             //-------------------
-                            g.area = new Rectangle(currentX, currentY, g.Width, g.Height);
+                            g.Area = new Rectangle(currentX, currentY, g.Width, g.Height);
                             currentX += g.Width;
                         }
 
@@ -109,7 +109,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                                 maxRowHeight = g.Height;//reset, after start new row
                             }
                             //-------------------
-                            g.area = new Rectangle(currentX, currentY, g.Width, g.Height);
+                            g.Area = new Rectangle(currentX, currentY, g.Width, g.Height);
                             currentX += g.Width;
                         }
 
@@ -134,7 +134,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                                 maxRowHeight = g.Height;//reset, after start new row
                             }
                             //-------------------
-                            g.area = new Rectangle(currentX, currentY, g.Width, g.Height);
+                            g.Area = new Rectangle(currentX, currentY, g.Width, g.Height);
                             currentX += g.Width;
                         }
                     }
@@ -158,7 +158,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                 {
                     BitmapAtlasItemSource g = itemList[i];
                     BinPackRect newRect = binPacker.Insert(g.Width, g.Height);
-                    g.area = new Rectangle(newRect.X, newRect.Y, g.Width, g.Height);
+                    g.Area = new Rectangle(newRect.X, newRect.Y, g.Width, g.Height);
 
 
                     //recalculate proper max midth again, after arrange and compact space
@@ -179,7 +179,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                 {
                     BitmapAtlasItemSource g = itemList[i];
                     //copy glyph image buffer to specific area of final result buffer
-                    CopyToDest(g.GetImageBuffer(), g.Width, g.Height, mergeBmpBuffer, g.area.Left, g.area.Top, totalImgWidth);
+                    CopyToDest(g.GetImageBuffer(), g.Width, g.Height, mergeBmpBuffer, g.Area.Left, g.Area.Top, totalImgWidth);
                 }
             }
             else
@@ -190,7 +190,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                     BitmapAtlasItemSource g = itemList[i];
                     //copy glyph image buffer to specific area of final result buffer
 
-                    CopyToDest(g.GetImageBuffer(), g.Width, g.Height, mergeBmpBuffer, g.area.Left, g.area.Top, totalImgWidth);
+                    CopyToDest(g.GetImageBuffer(), g.Width, g.Height, mergeBmpBuffer, g.Area.Left, g.Area.Top, totalImgWidth);
                 }
             }
 
@@ -214,8 +214,8 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                 for (int i = 0; i < itemList.Count; ++i)
                 {
                     BitmapAtlasItemSource g = itemList[i];
-                    Rectangle rect = g.area;
-                    g.area = new Rectangle(rect.X, imgH - (rect.Y + rect.Height), rect.Width, rect.Height);
+                    Rectangle rect = g.Area;
+                    g.Area = new Rectangle(rect.X, imgH - (rect.Y + rect.Height), rect.Width, rect.Height);
                 }
 
 
@@ -291,7 +291,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
 
             foreach (BitmapAtlasItemSource src in _items.Values)
             {
-                Rectangle area = src.area; 
+                Rectangle area = src.Area; 
 
                 atlas.AddAtlasItem(new AtlasItem(src.UniqueInt16Name)
                 {
