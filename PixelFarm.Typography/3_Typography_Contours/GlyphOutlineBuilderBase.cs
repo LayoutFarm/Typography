@@ -60,14 +60,15 @@ namespace Typography.Contours
             //for true type font
             if (glyph.TtfWoffInfo is { } ttf)
                 (_outputContours, _outputGlyphPoints) = ttf;
+            else if (glyph.CffInfo is { } cff)
+            {
+                //------------
+                //temp fix for Cff Font
+                _cff = cff;
 
-
-            //------------
-            //temp fix for Cff Font
-            _cff = glyph.CffInfo;
-
-            //---------------
-
+                //---------------
+            }
+            else throw new System.NotImplementedException("Bitmap and SVG glyphs not implemented");
 
 
             if ((RecentFontSizeInPixels = Typeface.ConvPointsToPixels(sizeInPoints)) < 0)

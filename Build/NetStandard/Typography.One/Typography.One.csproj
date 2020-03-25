@@ -5,6 +5,7 @@
     <LangVersion>8.0</LangVersion>
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <WarningsAsErrors>nullable</WarningsAsErrors>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -14,8 +15,6 @@
   <Import Project="..\..\..\Typography.OpenFont\Typography.OpenFont.projitems" Label="Shared" />
 
   <Import Project="..\..\..\Typography.GlyphLayout\Typography.GlyphLayout.projitems" Label="Shared" />
-
-  <Import Project="..\..\..\Unpack_SH\Unpack_SH.projitems" Label="Shared" />
 
   <ItemGroup>
     <Compile Include="..\..\..\Typography.TextServices\FontStoreAndManagment\FontManagement.cs" Link="DevTextPrinter\FontManagement.cs" />

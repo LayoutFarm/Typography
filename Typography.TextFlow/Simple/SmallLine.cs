@@ -11,7 +11,7 @@ namespace Typography.TextLayout
         int _caretCharIndex = 0;//default  
         //TODO: temp public, review accessibility here again
         public List<char> _charBuffer = new List<char>();
-        public PxScaledGlyphPlan[] _glyphPlans => throw new NotImplementedException("Where is this initialized!?");
+        public PxScaledGlyphPlan[] _glyphPlans = new PxScaledGlyphPlan[100]; // no writes to this just yet
         public List<UserCodePointToGlyphIndex> _userCodePointToGlyphIndexMap = new List<UserCodePointToGlyphIndex>();
 
         bool _contentChanged = true;

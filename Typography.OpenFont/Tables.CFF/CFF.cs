@@ -612,11 +612,9 @@ namespace Typography.OpenFont.CFF
             //----------------------
             var (privateDict, localSubrRawBufferList, defaultWidthX, nominalWidthX)
                 = ReadPrivateDict(cffStartAt, privateDICTOffset, privateDICTSize);
-            if(!(ReadCharStringsIndex(cffStartAt, charStringsOffset, globalSubrRawBufferList, localSubrRawBufferList) is { } cff1Infos))
+            if(!(ReadCharStringsIndex(cffStartAt, charStringsOffset, globalSubrRawBufferList, localSubrRawBufferList) is { } glyphInstructions))
                 return;
-            
-            // ReadCharsets mutates glyphs, no return value
-            var glyphs = ReadCharsets(cffStartAt, charsetOffset, cff1Infos, uniqueStringTable);
+            var glyphs = ReadCharsets(cffStartAt, charsetOffset, glyphInstructions, uniqueStringTable);
 
             ReadEncodings(cffStartAt, encodingOffset);
 
@@ -881,7 +879,7 @@ namespace Typography.OpenFont.CFF
             }
             //TODO: ...
         }
-        Glyph[] ReadCharsets(uint cffStartAt, int charsetOffset, (ushort glyphIndex, Type2Instruction[] glyphInstructions)[] cff1Glyphs, string[] uniqueStringTable)
+        Glyph[] ReadCharsets(uint cffStartAt, int charsetOffset, Type2Instruction[][] glyphInstructions, string[] uniqueStringTable)
         {
             //Charset data is located via the offset operand to the
             //charset operator in the Top DICT.
@@ -899,14 +897,14 @@ namespace Typography.OpenFont.CFF
                 default:
                     throw new NotSupportedException();
                 case 0:
-                    return ReadCharsetsFormat0(cff1Glyphs, uniqueStringTable);
+                    return ReadCharsetsFormat0(glyphInstructions, uniqueStringTable);
                 case 1:
-                    return ReadCharsetsFormat1(cff1Glyphs, uniqueStringTable);
+                    return ReadCharsetsFormat1(glyphInstructions, uniqueStringTable);
                 case 2:
-                    return ReadCharsetsFormat2(cff1Glyphs, uniqueStringTable);
+                    return ReadCharsetsFormat2(glyphInstructions, uniqueStringTable);
             }
         }
-        Glyph[] ReadCharsetsFormat0((ushort glyphIndex, Type2Instruction[] glyphInstructions)[] cff1Glyphs, string[] uniqueStringTable)
+        Glyph[] ReadCharsetsFormat0(Type2Instruction[][] glyphInstructions, string[] uniqueStringTable)
         {
             //Table 17: Format 0
             //Type	    Name		        Description
@@ -921,8 +919,9 @@ namespace Typography.OpenFont.CFF
             //one less element in the glyph name array than nGlyphs because 
             //the .notdef glyph name is omitted.)
 
-            int nGlyphs = cff1Glyphs.Length;
+            int nGlyphs = glyphInstructions.Length;
             var glyphs = new Glyph[nGlyphs];
+            glyphs[0] = new Glyph(new Cff1GlyphData(".notdef", 0, glyphInstructions[0]));
             for (int i = 1; i < nGlyphs; ++i)
             {
 
@@ -938,11 +937,11 @@ namespace Typography.OpenFont.CFF
                 {
                     name = uniqueStringTable[sid - Cff1FontSet.N_STD_STRINGS - 1];
                 }
-                glyphs[i] = new Glyph(new Cff1GlyphData(name, cff1Glyphs[i].glyphIndex, cff1Glyphs[i].glyphInstructions));
+                glyphs[i] = new Glyph(new Cff1GlyphData(name, (ushort)i, glyphInstructions[i]));
             }
             return glyphs;
         }
-        Glyph[] ReadCharsetsFormat1((ushort glyphIndex, Type2Instruction[] glyphInstructions)[] cff1Glyphs, string[] uniqueStringTable)
+        Glyph[] ReadCharsetsFormat1(Type2Instruction[][] glyphInstructions, string[] uniqueStringTable)
         {
             //Table 18 Format 1
             //Type		Name	            Description
@@ -962,8 +961,9 @@ namespace Typography.OpenFont.CFF
             //that are well ordered
 
             // throw new NotSupportedException();
-            int nGlyphs = cff1Glyphs.Length;
+            int nGlyphs = glyphInstructions.Length;
             var glyphs = new Glyph[nGlyphs];
+            glyphs[0] = new Glyph(new Cff1GlyphData(".notdef", 0, glyphInstructions[0])); 
             for (int i = 1; i < nGlyphs;)
             {
                 int sid = _reader.ReadUInt16();// First glyph in range 
@@ -981,7 +981,7 @@ namespace Typography.OpenFont.CFF
                     {
                         name = uniqueStringTable[sid - Cff1FontSet.N_STD_STRINGS - 1];
                     }
-                    glyphs[i] = new Glyph(new Cff1GlyphData(name, cff1Glyphs[i].glyphIndex, cff1Glyphs[i].glyphInstructions));
+                    glyphs[i] = new Glyph(new Cff1GlyphData(name, (ushort)i, glyphInstructions[i]));
 
                     count--;
                     i++;
@@ -990,7 +990,7 @@ namespace Typography.OpenFont.CFF
             }
             return glyphs;
         }
-        Glyph[] ReadCharsetsFormat2((ushort glyphIndex, Type2Instruction[] glyphInstructions)[] cff1Glyphs, string[] uniqueStringTable)
+        Glyph[] ReadCharsetsFormat2(Type2Instruction[][] glyphInstructions, string[] uniqueStringTable)
         {
 
             //note:eg, Adobe's source-code-pro font
@@ -1011,8 +1011,9 @@ namespace Typography.OpenFont.CFF
             //Format 2 differs from format 1 only in the size of the nLeft field in each range. 
             //This format is most suitable for fonts with a large well - ordered charset — for example, for Asian CIDFonts.
 
-            int nGlyphs = cff1Glyphs.Length;
+            int nGlyphs = glyphInstructions.Length;
             var glyphs = new Glyph[nGlyphs];
+            glyphs[0] = new Glyph(new Cff1GlyphData(".notdef", 0, glyphInstructions[0]));
             for (int i = 1; i < nGlyphs;)
             {
                 int sid = _reader.ReadUInt16();// First glyph in range 
@@ -1030,7 +1031,7 @@ namespace Typography.OpenFont.CFF
                     {
                         name = uniqueStringTable[sid - Cff1FontSet.N_STD_STRINGS - 1];
                     }
-                    glyphs[i] = new Glyph(new Cff1GlyphData(name, cff1Glyphs[i].glyphIndex, cff1Glyphs[i].glyphInstructions));
+                    glyphs[i] = new Glyph(new Cff1GlyphData(name, (ushort)i, glyphInstructions[i]));
 
                     count--;
                     i++;
@@ -1053,7 +1054,7 @@ namespace Typography.OpenFont.CFF
             //are currently defined, as shown in Tables  27 and 28. 
             //TODO: ... 
         }
-        (ushort glyphIndex, Type2Instruction[] glyphInstructions)[]?
+        Type2Instruction[][]?
             ReadCharStringsIndex(uint cffStartAt, int charStringsOffset, List<byte[]>? globalSubrRawBufferList, List<byte[]>? localSubrRawBufferList)
         {
             //14. CharStrings INDEX
@@ -1095,7 +1096,7 @@ namespace Typography.OpenFont.CFF
             //TODO: review here 
 
 
-            var glyphs = new (ushort glyphIndex, Type2Instruction[] glyphInstructions)[glyphCount];
+            var glyphs = new Type2Instruction[glyphCount][];
 
             Type2CharStringParser type2Parser = new Type2CharStringParser(globalSubrRawBufferList, localSubrRawBufferList);
 
@@ -1121,9 +1122,8 @@ namespace Typography.OpenFont.CFF
                 }
 #endif
                 //now we can parse the raw glyph instructions 
-                var glyphIndex = (ushort)i;
 #if DEBUG
-                type2Parser.dbugCurrentGlyphIndex = glyphIndex;
+                type2Parser.dbugCurrentGlyphIndex = (ushort)i;
 #endif
                 Type2Instruction[] instructions;
                 Type2GlyphInstructionList instList = type2Parser.ParseType2CharString(buffer);
@@ -1145,7 +1145,7 @@ namespace Typography.OpenFont.CFF
 
                 }
 
-                glyphs[i] = (glyphIndex, instructions);
+                glyphs[i] = instructions;
             }
 
 #if DEBUG

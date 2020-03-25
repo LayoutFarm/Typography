@@ -13,7 +13,7 @@ namespace Typography.Contours
     {
         //hint glyph collection        
         //per typeface
-        Dictionary<ushort, T> _currentGlyphDic = null;
+        Dictionary<ushort, T>? _currentGlyphDic = null;
         Dictionary<GlyphKey, Dictionary<ushort, T>> _registerGlyphCollection = new Dictionary<GlyphKey, Dictionary<ushort, T>>();
 
         public void SetCacheInfo(Typeface typeface, float sizeInPts, HintTechnique hintTech)
@@ -31,10 +31,14 @@ namespace Typography.Contours
         }
         public bool TryGetCacheGlyph(ushort glyphIndex, out T vxs)
         {
+            if (_currentGlyphDic == null)
+                throw new System.InvalidOperationException(nameof(SetCacheInfo) + " not called");
             return _currentGlyphDic.TryGetValue(glyphIndex, out vxs);
         }
         public void RegisterCachedGlyph(ushort glyphIndex, T vxs)
         {
+            if (_currentGlyphDic == null)
+                throw new System.InvalidOperationException(nameof(SetCacheInfo) + " not called");
             _currentGlyphDic[glyphIndex] = vxs;
         }
         public void ClearAll()
