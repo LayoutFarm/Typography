@@ -194,7 +194,7 @@ namespace SampleWinForms.UI
 #if DEBUG
             DynamicOutline dynamicOutline = _builder.LatestGlyphFitOutline;
             if (dynamicOutline != null)
-            {   
+            {
                 //
                 if (DrawTrianglesAndEdges)
                 {
@@ -236,6 +236,13 @@ namespace SampleWinForms.UI
             }
         }
 
+
+
+        static readonly PixelFarm.Drawing.Color ColorLightGray = new PixelFarm.Drawing.Color(0xFF, 0xD3, 0xD3, 0xD3);
+        static readonly PixelFarm.Drawing.Color ColorGray = new PixelFarm.Drawing.Color(0xFF, 0x80, 0x80, 0x80);
+        static readonly PixelFarm.Drawing.Color ColorDeepPink = new PixelFarm.Drawing.Color(0xFF, 0xFF, 0x14, 0x93);
+
+       
         void DrawEdge(PixelFarm.Drawing.Painter painter, EdgeLine edge)
         {
             if (edge.IsOutside)
@@ -260,7 +267,7 @@ namespace SampleWinForms.UI
                             }
                             else
                             {
-                                painter.StrokeColor = PixelFarm.Drawing.Color.LightGray;
+                                painter.StrokeColor = ColorLightGray;
                             }
                             break;
                         case LineSlopeKind.Horizontal:
@@ -372,7 +379,7 @@ namespace SampleWinForms.UI
                 painter.Line(
                     edge.PX * _pxscale, edge.PY * _pxscale,
                     edge.QX * _pxscale, edge.QY * _pxscale,
-                    PixelFarm.Drawing.Color.Gray);
+                    ColorGray);
 
             }
         }
@@ -550,7 +557,7 @@ namespace SampleWinForms.UI
             if (boneIndex == 0)
             {
                 //for first bone 
-                _painter.FillRect(_branchHeadPos.X * pxscale, _branchHeadPos.Y * pxscale, 5, 5, PixelFarm.Drawing.Color.DeepPink);
+                _painter.FillRect(_branchHeadPos.X * pxscale, _branchHeadPos.Y * pxscale, 5, 5, ColorDeepPink);
             }
             if (!valid)
             {
