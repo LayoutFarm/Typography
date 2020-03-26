@@ -12,8 +12,7 @@ namespace Typography.OpenFont.Tables
     /// </summary>
     class EBLC : TableEntry
     {
-        public const string _N = "EBLC";
-        public override string Name => _N;
+        public const string Name = "EBLC";
         //
         //from https://docs.microsoft.com/en-us/typography/opentype/spec/eblc
         //EBLC - Embedded Bitmap Location Table
@@ -37,7 +36,7 @@ namespace Typography.OpenFont.Tables
         //Each strike is defined by one bitmapSizeTable.
 
         BitmapSizeTable[] _bmpSizeTables;
-        protected override void ReadContentFrom(BinaryReader reader)
+        internal EBLC(TableHeader header, BinaryReader reader) : base(header, reader)
         {
             // load each strike table
             long eblcBeginPos = reader.BaseStream.Position;

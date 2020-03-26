@@ -12,13 +12,12 @@ namespace Typography.OpenFont.Tables
 {
     public class BASE : TableEntry
     {
-        public const string _N = "BASE";
-        public override string Name => _N;
+        public const string Name = "BASE";
 
-        public AxisTable _horizontalAxis;
-        public AxisTable _verticalAxis;
+        public AxisTable? _horizontalAxis;
+        public AxisTable? _verticalAxis;
 
-        protected override void ReadContentFrom(BinaryReader reader)
+        internal BASE(TableHeader header, BinaryReader reader) : base(header, reader)
         {
             //BASE Header
 
@@ -92,8 +91,8 @@ namespace Typography.OpenFont.Tables
         public class AxisTable
         {
             public bool isVerticalAxis; //false = horizontal , true= verical axis
-            public string[] baseTagList;
-            public BaseScript[] baseScripts;
+            public string[]? baseTagList;
+            public BaseScript[]? baseScripts;
 #if DEBUG
             public override string ToString()
             {
@@ -256,8 +255,7 @@ namespace Typography.OpenFont.Tables
                 BaseScriptRecord baseScriptRecord = baseScriptRecord_offsets[i];
                 reader.BaseStream.Position = baseScriptListStartAt + baseScriptRecord.baseScriptOffset;
                 //
-                BaseScript baseScipt = ReadBaseScriptTable(reader);
-                baseScipt.ScriptIdenTag = baseScriptRecord.baseScriptTag;
+                BaseScript baseScipt = ReadBaseScriptTable(reader, baseScriptRecord.baseScriptTag);
                 baseScripts[i] = baseScipt;
             }
             return baseScripts;
@@ -287,9 +285,9 @@ namespace Typography.OpenFont.Tables
         {
             public string ScriptIdenTag;
             public BaseValues baseValues;
-            public BaseLangSysRecord[] baseLangSysRecords;
-            public MinMax MinMax;
-            public BaseScript() { }
+            public BaseLangSysRecord[]? baseLangSysRecords;
+            public MinMax? MinMax;
+            public BaseScript(string scriptIdenTag) => ScriptIdenTag = scriptIdenTag;
 
 #if DEBUG
             public override string ToString()
@@ -298,7 +296,7 @@ namespace Typography.OpenFont.Tables
             }
 #endif
         }
-        static BaseScript ReadBaseScriptTable(BinaryReader reader)
+        static BaseScript ReadBaseScriptTable(BinaryReader reader, string scriptIdenTag)
         {
             //BaseScript Table
             //A BaseScript table organizes and specifies the baseline data and min/max extent data for one script. 
@@ -321,7 +319,7 @@ namespace Typography.OpenFont.Tables
             ushort baseValueOffset = reader.ReadUInt16();
             ushort defaultMinMaxOffset = reader.ReadUInt16();
             ushort baseLangSysCount = reader.ReadUInt16();
-            BaseLangSysRecord[] baseLangSysRecords = null;
+            BaseLangSysRecord[]? baseLangSysRecords = null;
 
             if (baseLangSysCount > 0)
             {
@@ -341,7 +339,7 @@ namespace Typography.OpenFont.Tables
                 }
             }
 
-            BaseScript baseScript = new BaseScript();
+            BaseScript baseScript = new BaseScript(scriptIdenTag);
             baseScript.baseLangSysRecords = baseLangSysRecords;
             //--------------------
             if (baseValueOffset > 0)
@@ -559,7 +557,7 @@ namespace Typography.OpenFont.Tables
             ushort maxCoordOffset = reader.ReadUInt16();
             ushort featMinMaxCount = reader.ReadUInt16();
 
-            FeatureMinMaxOffset[] minMaxFeatureOffsets = null;
+            FeatureMinMaxOffset[]? minMaxFeatureOffsets = null;
             if (featMinMaxCount > 0)
             {
                 minMaxFeatureOffsets = new FeatureMinMaxOffset[featMinMaxCount];
@@ -613,7 +611,7 @@ namespace Typography.OpenFont.Tables
         {
             public BaseCoord minCoord;
             public BaseCoord maxCoord;
-            public FeatureMinMax[] featureMinMaxRecords;
+            public FeatureMinMax[]? featureMinMaxRecords;
         }
         public struct FeatureMinMax
         {

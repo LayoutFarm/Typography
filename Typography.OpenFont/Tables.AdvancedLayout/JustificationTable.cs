@@ -13,9 +13,8 @@ namespace Typography.OpenFont.Tables
     {
         //https://docs.microsoft.com/en-us/typography/opentype/spec/jstf
 
-        public const string _N = "JSTF";
-        public override string Name => _N;
-        JstfScriptTable[] _jsftScriptTables;
+        public const string Name = "JSTF";
+        JstfScriptTable[]? _jsftScriptTables;
 
         //The Justification table(JSTF) provides font developers with additional control over glyph substitution and
         //positioning in justified text.
@@ -23,7 +22,7 @@ namespace Typography.OpenFont.Tables
         //Text-processing clients now have more options to expand or 
         //shrink word and glyph spacing so text fills the specified line length.
 
-        protected override void ReadContentFrom(BinaryReader reader)
+        internal JSTF(TableHeader header, BinaryReader reader) : base(header, reader)
         {
             //test this with Arial font
 
@@ -61,8 +60,7 @@ namespace Typography.OpenFont.Tables
                 JstfScriptRecord rec = recs[i];
                 reader.BaseStream.Position = tableStartAt + rec.jstfScriptOffset;
 
-                JstfScriptTable jstfScriptTable = ReadJstfScriptTable(reader);
-                jstfScriptTable.ScriptTag = rec.jstfScriptTag;
+                JstfScriptTable jstfScriptTable = ReadJstfScriptTable(reader, rec.jstfScriptTag);
                 _jsftScriptTables[i] = jstfScriptTable;
             }
         }
@@ -79,14 +77,16 @@ namespace Typography.OpenFont.Tables
 
         public class JstfScriptTable
         {
-            public ushort[] extenderGlyphs;
+            public ushort[]? extenderGlyphs;
 
             public JstfLangSysRecord defaultLangSys;
-            public JstfLangSysRecord[] other;
+            public JstfLangSysRecord[]? other;
 
-            public JstfScriptTable()
+            public JstfScriptTable(string scriptTag)
             {
+                ScriptTag = scriptTag;
             }
+
             public string ScriptTag { get; set; }
 #if DEBUG
             public override string ToString()
@@ -96,7 +96,7 @@ namespace Typography.OpenFont.Tables
 #endif
         }
 
-        static JstfScriptTable ReadJstfScriptTable(BinaryReader reader)
+        static JstfScriptTable ReadJstfScriptTable(BinaryReader reader, string scriptTag)
         {
             //A Justification Script(JstfScript) table describes the justification information for a single script.
             //It consists of an offset to a table that defines extender glyphs(extenderGlyphOffset),
@@ -122,7 +122,7 @@ namespace Typography.OpenFont.Tables
             //uint16            jstfLangSysCount                Number of JstfLangSysRecords in this table - may be zero(0)
             //JstfLangSysRecord jstfLangSysRecords[jstfLangSysCount]    Array of JstfLangSysRecords, in alphabetical order by JstfLangSysTag
 
-            JstfScriptTable jstfScriptTable = new JstfScriptTable();
+            JstfScriptTable jstfScriptTable = new JstfScriptTable(scriptTag);
 
             long tableStartAt = reader.BaseStream.Position;
 
@@ -178,6 +178,10 @@ namespace Typography.OpenFont.Tables
         {
             public JstfPriority[] jstfPriority;
 
+            public JstfLangSysRecord(JstfPriority[] jstfPriority)
+            {
+                this.jstfPriority = jstfPriority;
+            }
         }
         static JstfLangSysRecord ReadJstfLangSysRecord(BinaryReader reader)
         {
@@ -213,7 +217,7 @@ namespace Typography.OpenFont.Tables
                 jstPriorities[i] = ReadJstfPriority(reader);
             }
 
-            return new JstfLangSysRecord() { jstfPriority = jstPriorities };
+            return new JstfLangSysRecord(jstPriorities);
 
         }
 

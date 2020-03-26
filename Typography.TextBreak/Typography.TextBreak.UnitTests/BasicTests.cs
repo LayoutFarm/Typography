@@ -9,8 +9,7 @@ public class BasicTests
     public void BasicTest(string input, string[] output, bool breakNumberAfterText = false)
     {
         var outputList = new List<int> { 0 };
-        var customBreaker = new CustomBreaker();
-        customBreaker.SetNewBreakHandler(vis => outputList.Add(vis.LatestBreakAt));
+        var customBreaker = new CustomBreaker(vis => outputList.Add(vis.LatestBreakAt));
 
         customBreaker.BreakNumberAfterText = breakNumberAfterText;
         //

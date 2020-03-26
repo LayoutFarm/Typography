@@ -8,22 +8,13 @@ namespace Typography.OpenFont
 
     public class Glyph
     {
-        //--------------------
-        //ttf
-        GlyphPointF[] glyphPoints;
-        ushort[] _contourEndPoints;
-
         ushort _orgAdvWidth;
-        bool _hasOrgAdvWidth;
-
-
-        Bounds _bounds;
 
         internal Glyph(
             GlyphPointF[] glyphPoints,
             ushort[] contourEndPoints,
             Bounds bounds,
-            byte[] glyphInstructions,
+            byte[]? glyphInstructions,
             ushort index)
         {
             //create from TTF 
@@ -31,21 +22,15 @@ namespace Typography.OpenFont
 #if DEBUG
             this.dbugId = s_debugTotalId++;
 #endif
-            this.glyphPoints = glyphPoints;
-            _contourEndPoints = contourEndPoints;
+            TtfWoffInfo = (contourEndPoints, glyphPoints);
             Bounds = bounds;
             GlyphInstructions = glyphInstructions;
             GlyphIndex = index;
 
         }
-        public Bounds Bounds
-        {
-            get => _bounds;
-            internal set => _bounds = value;
-        }
+        public Bounds Bounds { get; internal set; }
         //
-        public ushort[] EndPoints => _contourEndPoints;
-        public GlyphPointF[] GlyphPoints => glyphPoints;
+        public (ushort[] endPoints, GlyphPointF[] glyphPoints)? TtfWoffInfo { get; private set; }
         //
         public ushort OriginalAdvanceWidth
         {
@@ -53,37 +38,39 @@ namespace Typography.OpenFont
             set
             {
                 _orgAdvWidth = value;
-                _hasOrgAdvWidth = true;
+                HasOriginalAdvancedWidth = true;
             }
         }
-        public bool HasOriginalAdvancedWidth => _hasOrgAdvWidth;
+        public bool HasOriginalAdvancedWidth { get; private set; }
         //      
 
         internal static void OffsetXY(Glyph glyph, short dx, short dy)
         {
-
+            if (!(glyph.TtfWoffInfo is var (_, glyphPoints)))
+                throw new NotSupportedException("Only TTF glyphs are supported");
             //change data on current glyph
-            GlyphPointF[] glyphPoints = glyph.glyphPoints;
             for (int i = glyphPoints.Length - 1; i >= 0; --i)
             {
                 glyphPoints[i] = glyphPoints[i].Offset(dx, dy);
             }
             //-------------------------
-            Bounds orgBounds = glyph._bounds;
-            glyph._bounds = new Bounds(
+            Bounds orgBounds = glyph.Bounds;
+            glyph.Bounds = new Bounds(
                (short)(orgBounds.XMin + dx),
                (short)(orgBounds.YMin + dy),
                (short)(orgBounds.XMax + dx),
                (short)(orgBounds.YMax + dy));
 
         }
-        internal byte[] GlyphInstructions { get; set; }
+        public byte[]? GlyphInstructions { get; set; }
 
         public bool HasGlyphInstructions => this.GlyphInstructions != null;
 
         internal static void TransformNormalWith2x2Matrix(Glyph glyph, float m00, float m01, float m10, float m11)
         {
 
+            if (!(glyph.TtfWoffInfo is var (_, glyphPoints)))
+                throw new ArgumentException("Only TTF/WOFF glyphs are supported", nameof(glyph));
             //http://stackoverflow.com/questions/13188156/whats-the-different-between-vector2-transform-and-vector2-transformnormal-i
             //http://www.technologicalutopia.com/sourcecode/xnageometry/vector2.cs.htm
 
@@ -94,7 +81,6 @@ namespace Typography.OpenFont
             float new_ymax = 0;
 
 
-            GlyphPointF[] glyphPoints = glyph.glyphPoints;
             for (int i = glyphPoints.Length - 1; i >= 0; --i)
             {
                 GlyphPointF p = glyphPoints[i];
@@ -130,19 +116,25 @@ namespace Typography.OpenFont
                 }
             }
             //TODO: review here
-            glyph._bounds = new Bounds(
+            glyph.Bounds = new Bounds(
                (short)new_xmin, (short)new_ymin,
                (short)new_xmax, (short)new_ymax);
         }
 
         internal static Glyph Clone(Glyph original, ushort newGlyphIndex)
         {
-            return new Glyph(
-                Utils.CloneArray(original.glyphPoints),
-                Utils.CloneArray(original._contourEndPoints),
-                original.Bounds,
-                original.GlyphInstructions != null ? Utils.CloneArray(original.GlyphInstructions) : null,
-                newGlyphIndex);
+            if (original.TtfWoffInfo is var (endPoints, glyphPoints))
+                return new Glyph(
+                    Utils.CloneArray(glyphPoints),
+                    Utils.CloneArray(endPoints),
+                    original.Bounds,
+                    original.GlyphInstructions != null ? Utils.CloneArray(original.GlyphInstructions) : null,
+                    newGlyphIndex);
+            else if (original.CffInfo is { } data)
+                return new Glyph(data);
+            else if (original.BitmapSVGInfo is var (offset, len, format))
+                return new Glyph(original.GlyphIndex, offset, len, format);
+            else throw new NotImplementedException();
         }
 
         /// <summary>
@@ -152,37 +144,42 @@ namespace Typography.OpenFont
         /// <param name="dest"></param>
         internal static void AppendGlyph(Glyph dest, Glyph src)
         {
-            int org_dest_len = dest._contourEndPoints.Length;
-            int src_contour_count = src._contourEndPoints.Length;
-            ushort org_last_point = (ushort)(dest._contourEndPoints[org_dest_len - 1] + 1); //since start at 0 
+            if (!(src.TtfWoffInfo is var (srcEndPoints, srcGlyphPoints)))
+                throw new ArgumentException("Only TTF/WOFF glyphs are supported", nameof(src));
+            if (!(dest.TtfWoffInfo is var (destEndPoints, destGlyphPoints)))
+                throw new ArgumentException("Only TTF/WOFF glyphs are supported", nameof(src));
+            int org_dest_len = destEndPoints.Length;
+            int src_contour_count = srcEndPoints.Length;
+            ushort org_last_point = (ushort)(destEndPoints[org_dest_len - 1] + 1); //since start at 0 
 
-            dest.glyphPoints = Utils.ConcatArray(dest.glyphPoints, src.glyphPoints);
-            dest._contourEndPoints = Utils.ConcatArray(dest._contourEndPoints, src._contourEndPoints);
+            destEndPoints = Utils.ConcatArray(destEndPoints, srcEndPoints);
+            destGlyphPoints = Utils.ConcatArray(destGlyphPoints, srcGlyphPoints);
+            dest.TtfWoffInfo = (destEndPoints, destGlyphPoints);
 
             //offset latest append contour  end points
-            int newlen = dest._contourEndPoints.Length;
+            int newlen = destEndPoints.Length;
             for (int i = org_dest_len; i < newlen; ++i)
             {
-                dest._contourEndPoints[i] += (ushort)org_last_point;
+                destEndPoints[i] += org_last_point;
             }
             //calculate new bounds
             Bounds destBound = dest.Bounds;
             Bounds srcBound = src.Bounds;
-            short newXmin = (short)Math.Min(destBound.XMin, srcBound.XMin);
-            short newYMin = (short)Math.Min(destBound.YMin, srcBound.YMin);
-            short newXMax = (short)Math.Max(destBound.XMax, srcBound.XMax);
-            short newYMax = (short)Math.Max(destBound.YMax, srcBound.YMax);
+            short newXmin = Math.Min(destBound.XMin, srcBound.XMin);
+            short newYMin = Math.Min(destBound.YMin, srcBound.YMin);
+            short newXMax = Math.Max(destBound.XMax, srcBound.XMax);
+            short newYMax = Math.Max(destBound.YMax, srcBound.YMax);
 
-            dest._bounds = new Bounds(newXmin, newYMin, newXMax, newYMax);
+            dest.Bounds = new Bounds(newXmin, newYMin, newXMax, newYMax);
         }
 
         //
         public GlyphClassKind GlyphClass { get; set; }
         internal ushort MarkClassDef { get; set; }
-        public short MinX => _bounds.XMin;
-        public short MaxX => _bounds.XMax;
-        public short MinY => _bounds.YMin;
-        public short MaxY => _bounds.YMax;
+        public short MinX => Bounds.XMin;
+        public short MaxX => Bounds.XMax;
+        public short MinY => Bounds.YMin;
+        public short MaxY => Bounds.YMax;
 
        
 #if DEBUG
@@ -196,15 +193,23 @@ namespace Typography.OpenFont
         public override string ToString()
         {
             var stbuilder = new StringBuilder();
-            if (IsCffGlyph)
+            if (CffInfo is { } cff)
             {
                 stbuilder.Append("cff");
                 stbuilder.Append(",index=" + GlyphIndex);
-                stbuilder.Append(",name=" + _cff1GlyphData.Name);
+                stbuilder.Append(",name=" + cff.Name);
+            }
+            else if (BitmapSVGInfo is { } bitmapSvg)
+            {
+                stbuilder.Append("bitmapsvg");
+                stbuilder.Append(",index=" + GlyphIndex);
+                stbuilder.Append(",offset=" + bitmapSvg.streamOffset);
+                stbuilder.Append(",len=" + bitmapSvg.streamLen);
+                stbuilder.Append(",format=" + bitmapSvg.imgFormat);
             }
             else
             {
-                stbuilder.Append("ttf");
+                stbuilder.Append("ttfwoff");
                 stbuilder.Append(",index=" + GlyphIndex);
                 stbuilder.Append(",class=" + GlyphClass.ToString());
                 if (MarkClassDef != 0)
@@ -219,43 +224,29 @@ namespace Typography.OpenFont
         //--------------------
         //cff
 
-        internal CFF.Cff1Font _ownerCffFont;
-        internal CFF.Cff1GlyphData _cff1GlyphData; //temp
-        internal Glyph(CFF.Cff1Font owner, CFF.Cff1GlyphData cff1Glyph)
+        public CFF.Cff1GlyphData? CffInfo { get; }
+        internal Glyph(CFF.Cff1GlyphData cff1Glyph)
         {
 #if DEBUG
             this.dbugId = s_debugTotalId++;
 #endif
 
-            _ownerCffFont = owner;
             //create from CFF 
-            _cff1GlyphData = cff1Glyph;
+            CffInfo = cff1Glyph;
             this.GlyphIndex = cff1Glyph.GlyphIndex;
         }
-        public bool IsCffGlyph => _ownerCffFont != null;
-        public CFF.Cff1Font GetOwnerCff() => _ownerCffFont;
-        public CFF.Cff1GlyphData GetCff1GlyphData() => _cff1GlyphData;
         //math glyph info, temp , TODO: review here again
-        public MathGlyphs.MathGlyphInfo MathGlyphInfo { get; internal set; }
-        public bool HasMathGlyphInfo { get; internal set; }
-
-
+        public MathGlyphs.MathGlyphInfo? MathGlyphInfo { get; internal set; }
         //--------------------
         //Bitmap and Svg
 
-        uint _streamOffset;
-        uint _streamLen;
-        ushort _imgFormat;
+        internal (uint streamOffset, uint streamLen, ushort imgFormat)? BitmapSVGInfo { get; private set; }
         internal Glyph(ushort glyphIndex, uint streamOffset, uint streamLen, ushort imgFormat)
         {
             //_bmpGlyphSource = bmpGlyphSource;
-            _streamOffset = streamOffset;
-            _streamLen = streamLen;
-            _imgFormat = imgFormat;
+            BitmapSVGInfo = (streamOffset, streamLen, imgFormat);
             this.GlyphIndex = glyphIndex;
         }
-        internal uint BitmapStreamOffset => _streamOffset;
-        internal uint BitmapFormat => _imgFormat;
 
         //public void CopyBitmapContent(System.IO.Stream output)
         //{

@@ -92,14 +92,12 @@ namespace Typography.OpenFont.Tables
     //---------------------------------------
     class ClassDefTable
     {
-        public int Format { get; internal set; }
         //----------------
         //format 1
-        public ushort startGlyph;
-        public ushort[] classValueArray;
+        public (ushort startGlyph, ushort[] classValueArray)? format1;
         //---------------
         //format2
-        public ClassRangeRecord[] records;
+        public ClassRangeRecord[]? format2;
         public static ClassDefTable CreateFrom(BinaryReader reader, long beginAt)
         {
 
@@ -107,14 +105,15 @@ namespace Typography.OpenFont.Tables
 
             //---------
             ClassDefTable classDefTable = new ClassDefTable();
-            switch (classDefTable.Format = reader.ReadUInt16())
+            switch (reader.ReadUInt16())
             {
                 default: throw new NotSupportedException();
                 case 1:
                     {
-                        classDefTable.startGlyph = reader.ReadUInt16();
+                        var startGlyph = reader.ReadUInt16();
                         ushort glyphCount = reader.ReadUInt16();
-                        classDefTable.classValueArray = Utils.ReadUInt16Array(reader, glyphCount);
+                        var classValueArray = Utils.ReadUInt16Array(reader, glyphCount);
+                        classDefTable.format1 = (startGlyph, classValueArray);
                     }
                     break;
                 case 2:
@@ -128,7 +127,7 @@ namespace Typography.OpenFont.Tables
                                 reader.ReadUInt16(), //end glyph id
                                 reader.ReadUInt16()); //classNo
                         }
-                        classDefTable.records = records;
+                        classDefTable.format2 = records;
                     }
                     break;
             }
@@ -165,41 +164,36 @@ namespace Typography.OpenFont.Tables
 
         public int GetClassValue(ushort glyphIndex)
         {
-            switch (Format)
+            if (format1 is var (startGlyph, classValueArray))
             {
-                default: throw new NotSupportedException();
-                case 1:
-                    {
-                        if (glyphIndex >= startGlyph &&
-                            glyphIndex < classValueArray.Length)
-                        {
-                            return classValueArray[glyphIndex - startGlyph];
-                        }
-                        return -1;
-                    }
-                case 2:
-                    {
-
-                        for (int i = 0; i < records.Length; ++i)
-                        {
-                            //TODO: review a proper method here again
-                            //esp. binary search
-                            ClassRangeRecord rec = records[i];
-                            if (rec.startGlyphId <= glyphIndex)
-                            {
-                                if (glyphIndex <= rec.endGlyphId)
-                                {
-                                    return rec.classNo;
-                                }
-                            }
-                            else
-                            {
-                                return -1;//no need to go further
-                            }
-                        }
-                        return -1;
-                    }
+                if (glyphIndex >= startGlyph &&
+                    glyphIndex < classValueArray.Length)
+                {
+                    return classValueArray[glyphIndex - startGlyph];
+                }
+                return -1;
             }
+            else if (format2 is { } records)
+            {
+                for (int i = 0; i < records?.Length; ++i)
+                {
+                    //TODO: review a proper method here again
+                    //esp. binary search
+                    ClassRangeRecord rec = records[i];
+                    if (rec.startGlyphId <= glyphIndex)
+                    {
+                        if (glyphIndex <= rec.endGlyphId)
+                        {
+                            return rec.classNo;
+                        }
+                    }
+                    else
+                    {
+                        return -1;//no need to go further
+                    }
+                }
+                return -1;
+            } else throw new NotImplementedException();
         }
     }
 

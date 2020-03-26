@@ -8,16 +8,11 @@ namespace Typography.OpenFont.Tables
 
     class GVar : TableEntry
     {
-        public const string _N = "gvar";
-        public override string Name => _N;
+        public const string Name = "gvar";
 
         public ushort axisCount;
-        public GVar()
-        {
-
-        }
         //
-        protected override void ReadContentFrom(BinaryReader reader)
+        internal GVar(TableHeader header, BinaryReader reader) : base(header, reader)
         {
             //'gvar' header
 
@@ -56,7 +51,7 @@ namespace Typography.OpenFont.Tables
             ushort flags = reader.ReadUInt16();
             uint glyphVariationDataArrayOffset = reader.ReadUInt32();
 
-            uint[] glyphVariationDataOffsets = null;
+            uint[]? glyphVariationDataOffsets = null;
             if ((flags & 0x1) == 0)
             {
                 //bit 0 is clear-> use Offset16

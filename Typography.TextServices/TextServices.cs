@@ -40,11 +40,18 @@ namespace Typography.TextServices
         ScriptLang _scLang;
 
 
-        public TextServices()
+        public TextServices(InstalledTypefaceCollection installedCollection, ScriptLang defaultScriptLang)
         {
-
+            using var enumerator = installedCollection.GetInstalledFontIter().GetEnumerator();
+            enumerator.MoveNext();
             _typefaceStore = ActiveTypefaceCache.GetTypefaceStoreOrCreateNewIfNotExist();
-            _glyphLayout = new GlyphLayout();
+            _installedTypefaceCollection = installedCollection;
+            SetCurrentFont(_typefaceStore.GetTypeface(enumerator.Current), 0);
+            // https://github.com/dotnet/roslyn/issues/39740
+            if (_currentTypeface is { } t) _currentTypeface = t; else throw new NotImplementedException();
+            if (_glyphLayout is { } g) _glyphLayout = g; else throw new NotImplementedException();
+            if (_currentGlyphPlanSeqCache is { } s) _currentGlyphPlanSeqCache = s; else throw new NotImplementedException();
+            _scLang = _defaultScriptLang = _glyphLayout.ScriptLang = defaultScriptLang;
         }
         public void SetDefaultScriptLang(ScriptLang scLang)
         {
@@ -64,6 +71,7 @@ namespace Typography.TextServices
 
         public void SetCurrentFont(Typeface typeface, float fontSizeInPts)
         {
+            _glyphLayout ??= new GlyphLayout(typeface);
             //check if we have the cache-key or create a new one.
             var key = new TextShapingContextKey(typeface, _glyphLayout.ScriptLang);
             if (!_registerShapingContexts.TryGetValue(key, out _currentGlyphPlanSeqCache))
@@ -76,14 +84,14 @@ namespace Typography.TextServices
                 _currentGlyphPlanSeqCache = shapingContext;
             }
 
-            _currentTypeface = _glyphLayout.Typeface = typeface;
+            _currentTypeface = typeface;
             _fontSizeInPts = fontSizeInPts;
 
             //_glyphLayout.FontSizeInPoints = _fontSizeInPts = fontSizeInPts;
         }
-        public Typeface GetTypeface(string name, TypefaceStyle installedFontStyle)
+        public Typeface? GetTypeface(string name, TypefaceStyle installedFontStyle)
         {
-            InstalledTypeface inst = _installedTypefaceCollection.GetInstalledTypeface(name, InstalledTypefaceCollection.GetSubFam(installedFontStyle));
+            var inst = _installedTypefaceCollection.GetInstalledTypeface(name, InstalledTypefaceCollection.GetSubFam(installedFontStyle));
             if (inst != null)
             {
 
@@ -103,20 +111,19 @@ namespace Typography.TextServices
             _registerShapingContexts.Clear();
         }
 
-        CustomBreaker _textBreaker;
+        CustomBreaker? _textBreaker;
         List<TextBreak.BreakSpan> _breakSpans = new List<TextBreak.BreakSpan>();
         public IEnumerable<Typography.TextLayout.BreakSpan> BreakToLineSegments(char[] str, int startAt, int len)
         {
             //user must setup the CustomBreakerBuilder before use      
             if (_textBreaker == null)
             {
-                _textBreaker = Typography.TextBreak.CustomBreakerBuilder.NewCustomBreaker();
-                _textBreaker.SetNewBreakHandler(vis => _breakSpans.Add(vis.GetBreakSpan()));
+                _textBreaker = CustomBreakerBuilder.NewCustomBreaker(vis => _breakSpans.Add(vis.GetBreakSpan()));
 
 #if DEBUG
                 if (_textBreaker == null)
                 {
-
+                    throw new InvalidOperationException("Failed to load custom breakers");
                 }
 #endif
             }
@@ -159,7 +166,7 @@ namespace Typography.TextServices
                 else
                 {
                     //
-                    Typography.OpenFont.ScriptLang scLang;
+                    Typography.OpenFont.ScriptLang? scLang;
                     if (Typography.OpenFont.ScriptLangs.TryGetScriptLang(sample, out scLang))
                     {
                         //we should decide to use
@@ -277,7 +284,7 @@ namespace Typography.TextServices
         /// </summary>
         GlyphPlanSeqCollection[] _cacheSeqCollection1;
         //other len
-        Dictionary<int, GlyphPlanSeqCollection> _cacheSeqCollection2; //lazy init
+        Dictionary<int, GlyphPlanSeqCollection>? _cacheSeqCollection2; //lazy init
         public GlyphPlanSeqSet()
         {
             _cacheSeqCollection1 = new GlyphPlanSeqCollection[PREDEFINE_LEN];
@@ -448,7 +455,7 @@ namespace Typography.TextServices
         {
 
         }
-        static ActiveTypefaceCache s_typefaceStore;
+        static ActiveTypefaceCache? s_typefaceStore;
         public static ActiveTypefaceCache GetTypefaceStoreOrCreateNewIfNotExist()
         {
             if (s_typefaceStore == null)
@@ -475,7 +482,7 @@ namespace Typography.TextServices
                     {
                         var reader = new OpenFontReader();
 
-                        typeface = reader.Read(fontStream, installedFont.ActualStreamOffset);
+                        typeface = reader.Read(fontStream, installedFont.ActualStreamOffset) ?? throw new InvalidOperationException("Invalid font!");
                         typeface.Filename = installedFont.FontPath;
 
                     }
@@ -487,7 +494,7 @@ namespace Typography.TextServices
                     using (var fs = new FileStream(installedFont.FontPath, FileMode.Open, FileAccess.Read))
                     {
                         var reader = new OpenFontReader();
-                        typeface = reader.Read(fs, installedFont.ActualStreamOffset);
+                        typeface = reader.Read(fs, installedFont.ActualStreamOffset) ?? throw new InvalidOperationException("Invalid font!");
                         typeface.Filename = installedFont.FontPath;
                     }
 

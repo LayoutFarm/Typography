@@ -65,12 +65,20 @@ namespace Typography.OpenFont.Tables
     //---------------------
     public class ScriptTable
     {
-        public LangSysTable defaultLang;
         public LangSysTable[] langSysTables;
+        public LangSysTable? defaultLang;
         public uint scriptTag;
+
+        public ScriptTable(LangSysTable[] langSysTables, LangSysTable? defaultLang, uint scriptTag)
+        {
+            this.langSysTables = langSysTables;
+            this.defaultLang = defaultLang;
+            this.scriptTag = scriptTag;
+        }
+
         public string ScriptTagName => Utils.TagToString(this.scriptTag);
 
-        public static ScriptTable CreateFrom(BinaryReader reader, long beginAt)
+        public static ScriptTable CreateFrom(BinaryReader reader, long beginAt, uint scriptTag)
         {
             reader.BaseStream.Seek(beginAt, SeekOrigin.Begin);
             //---------------
@@ -80,10 +88,9 @@ namespace Typography.OpenFont.Tables
             //uint16 	LangSysCount 	Number of LangSysRecords for this script-excluding the DefaultLangSys
             //struct 	LangSysRecord[LangSysCount] 	Array of LangSysRecords-listed alphabetically by LangSysTag
             //---------------
-            ScriptTable scriptTable = new ScriptTable();
             ushort defaultLangSysOffset = reader.ReadUInt16();
             ushort langSysCount = reader.ReadUInt16();
-            LangSysTable[] langSysTables = scriptTable.langSysTables = new LangSysTable[langSysCount];
+            LangSysTable[] langSysTables = new LangSysTable[langSysCount];
             for (int i = 0; i < langSysCount; ++i)
             {
                 //-----------------------
@@ -98,12 +105,13 @@ namespace Typography.OpenFont.Tables
                     reader.ReadUInt16()); //offset
             }
 
+            LangSysTable? defaultLang = null;
             //-----------
             if (defaultLangSysOffset > 0)
             {
-                scriptTable.defaultLang = new LangSysTable(0, defaultLangSysOffset);
+                defaultLang = new LangSysTable(0, defaultLangSysOffset);
                 reader.BaseStream.Seek(beginAt + defaultLangSysOffset, SeekOrigin.Begin);
-                scriptTable.defaultLang.ReadFrom(reader);
+                defaultLang.ReadFrom(reader);
             }
 
 
@@ -116,7 +124,7 @@ namespace Typography.OpenFont.Tables
                 langSysTable.ReadFrom(reader);
             }
 
-            return scriptTable;
+            return new ScriptTable(langSysTables, defaultLang, scriptTag);
         }
 
 
@@ -137,7 +145,7 @@ namespace Typography.OpenFont.Tables
             public readonly ushort offset;
 
             //
-            public ushort[] featureIndexList { get; private set; }
+            public ushort[]? featureIndexList { get; private set; }
             public ushort RequireFeatureIndex { get; private set; }
 
             public LangSysTable(uint langSysTagIden, ushort offset)

@@ -17,15 +17,14 @@ namespace Typography.OpenFont.Tables
     /// </summary>
     class FVar : TableEntry
     {
-        public const string _N = "fvar";
-        public override string Name => _N;
+        public const string Name = "fvar";
 
 
         public VariableAxisRecord[] variableAxisRecords;
         public InstanceRecord[] instanceRecords;
 
         //
-        protected override void ReadContentFrom(BinaryReader reader)
+        internal FVar(TableHeader header, BinaryReader reader) : base(header, reader)
         {
             //Font variations header:
 
@@ -83,8 +82,7 @@ namespace Typography.OpenFont.Tables
             for (int i = 0; i < axisCount; ++i)
             {
                 long pos = reader.BaseStream.Position;
-                VariableAxisRecord varAxisRecord = new VariableAxisRecord();
-                varAxisRecord.ReadContent(reader);
+                VariableAxisRecord varAxisRecord = new VariableAxisRecord(reader);
                 variableAxisRecords[i] = varAxisRecord;
                 if (reader.BaseStream.Position != pos + axisSize)
                 {
@@ -99,8 +97,7 @@ namespace Typography.OpenFont.Tables
             {
                 long pos = reader.BaseStream.Position;
 
-                InstanceRecord instanecRec = new InstanceRecord();
-                instanecRec.ReadContent(reader, axisCount, instanceSize);
+                InstanceRecord instanecRec = new InstanceRecord(reader, axisCount, instanceSize);
 
                 if (reader.BaseStream.Position != pos + instanceSize)
                 {
@@ -133,7 +130,7 @@ namespace Typography.OpenFont.Tables
             public float maxValue;
             public ushort flags;
             public ushort axisNameID;
-            public void ReadContent(BinaryReader reader)
+            public VariableAxisRecord(BinaryReader reader)
             {
                 axisTag = Utils.TagToString(reader.ReadUInt32());//4
                 minValue = reader.ReadFixed();//4
@@ -170,7 +167,7 @@ namespace Typography.OpenFont.Tables
             public ushort flags;
             public float[] coordinates; //tuple record
             public ushort postScriptNameID;
-            public void ReadContent(BinaryReader reader, int axisCount, int instanceRecordSize)
+            public InstanceRecord(BinaryReader reader, int axisCount, int instanceRecordSize)
             {
                 long expectedEndPos = reader.BaseStream.Position + instanceRecordSize;
                 subfamilyNameID = reader.ReadUInt16();

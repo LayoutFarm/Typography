@@ -59,8 +59,8 @@ namespace Typography.OpenFont.Tables.BitmapFonts
         public sbyte flags;
 
         //-----
-        //reconstructed 
-        public IndexSubTableBase[] indexSubTables;
+        // to be reconstructed in CBLC constructor
+        public IndexSubTableBase[] indexSubTables = new IndexSubTableBase[0];
         //
         static void ReadSbitLineMetrics(BinaryReader reader, ref SbitLineMetrics lineMetric)
         {
@@ -206,6 +206,11 @@ namespace Typography.OpenFont.Tables.BitmapFonts
         public ushort firstGlyphIndex;
         public ushort lastGlyphIndex;
 
+        protected IndexSubTableBase(IndexSubHeader header)
+        {
+            this.header = header;
+        }
+
         public static IndexSubTableBase CreateFrom(BitmapSizeTable bmpSizeTable, BinaryReader reader)
         {
             //read IndexSubHeader
@@ -251,10 +256,7 @@ namespace Typography.OpenFont.Tables.BitmapFonts
                         int nElem = (bmpSizeTable.endGlyphIndex - bmpSizeTable.startGlyphIndex + 1);
                         uint[] offsetArray = Utils.ReadUInt32Array(reader, nElem);
                         //check 16 bit align padd
-                        IndexSubTable1 subTable = new IndexSubTable1();
-                        subTable.header = header;
-                        subTable.offsetArray = offsetArray;
-                        return subTable;
+                        return new IndexSubTable1(header, offsetArray);
                     }
                 case 2:
                     //IndexSubTable2: all glyphs have identical metrics
@@ -263,11 +265,9 @@ namespace Typography.OpenFont.Tables.BitmapFonts
                     //uint32               imageSize   All the glyphs are of the same size.
                     //BigGlyphMetrics      bigMetrics  All glyphs have the same metrics; glyph data may be compressed, byte-aligned, or bit-aligned.
                     {
-                        IndexSubTable2 subtable = new IndexSubTable2();
-                        subtable.header = header;
-                        subtable.imageSize = reader.ReadUInt32();
-                        BigGlyphMetrics.ReadBigGlyphMetric(reader, ref subtable.BigGlyphMetrics);
-                        return subtable;
+                        var imageSize = reader.ReadUInt32();
+                        var bigGlyphMetrics = BigGlyphMetrics.ReadBigGlyphMetric(reader);
+                        return new IndexSubTable2(header, imageSize, bigGlyphMetrics);
                     }
 
                 case 3:
@@ -279,10 +279,7 @@ namespace Typography.OpenFont.Tables.BitmapFonts
                         int nElem = (bmpSizeTable.endGlyphIndex - bmpSizeTable.startGlyphIndex + 1);
                         ushort[] offsetArray = Utils.ReadUInt16Array(reader, nElem);
                         //check 16 bit align padd
-                        IndexSubTable3 subTable = new IndexSubTable3();
-                        subTable.header = header;
-                        subTable.offsetArray = offsetArray;
-                        return subTable;
+                        return new IndexSubTable3(header, offsetArray);
                     }
                 case 4:
                     //IndexSubTable4: variable - metrics glyphs with sparse glyph codes
@@ -291,16 +288,13 @@ namespace Typography.OpenFont.Tables.BitmapFonts
                     //uint32              numGlyphs Array length.
                     //GlyphIdOffsetPair   glyphArray[numGlyphs + 1]   One per glyph.
                     {
-                        IndexSubTable4 subTable = new IndexSubTable4();
-                        subTable.header = header;
-
                         uint numGlyphs = reader.ReadUInt32();
-                        GlyphIdOffsetPair[] glyphArray = subTable.glyphArray = new GlyphIdOffsetPair[numGlyphs + 1];
+                        GlyphIdOffsetPair[] glyphArray = new GlyphIdOffsetPair[numGlyphs + 1];
                         for (int i = 0; i <= numGlyphs; ++i) //***
                         {
                             glyphArray[i] = new GlyphIdOffsetPair(reader.ReadUInt16(), reader.ReadUInt16());
                         }
-                        return subTable;
+                        return new IndexSubTable4(header, glyphArray);
                     }
                 case 5:
                     //IndexSubTable5: constant - metrics glyphs with sparse glyph codes
@@ -311,13 +305,10 @@ namespace Typography.OpenFont.Tables.BitmapFonts
                     //uint32              numGlyphs   Array length.
                     //uint16              glyphIdArray[numGlyphs]     One per glyph, sorted by glyph ID.
                     {
-                        IndexSubTable5 subTable = new IndexSubTable5();
-                        subTable.header = header;
-
-                        subTable.imageSize = reader.ReadUInt32();
-                        BigGlyphMetrics.ReadBigGlyphMetric(reader, ref subTable.BigGlyphMetrics);
-                        subTable.glyphIdArray = Utils.ReadUInt16Array(reader, (int)reader.ReadUInt32());
-                        return subTable;
+                        var imageSize = reader.ReadUInt32();
+                        var bigGlyphMetrics = BigGlyphMetrics.ReadBigGlyphMetric(reader);
+                        var glyphIdArray = Utils.ReadUInt16Array(reader, (int)reader.ReadUInt32());
+                        return new IndexSubTable5(header, imageSize, bigGlyphMetrics, glyphIdArray);
                     }
 
             }
@@ -358,8 +349,7 @@ namespace Typography.OpenFont.Tables.BitmapFonts
             //When there is an odd number of elements in these arrays 
             //**it is necessary to add an extra padding element to maintain proper alignment.
 
-
-            return null;
+            throw new NotSupportedException();
         }
 
         public abstract void BuildGlyphList(List<Glyph> glyphList);
@@ -371,6 +361,11 @@ namespace Typography.OpenFont.Tables.BitmapFonts
     {
         public override int SubTypeNo => 1;
         public uint[] offsetArray;
+
+        public IndexSubTable1(IndexSubHeader header, uint[] offsetArray) : base(header)
+        {
+            this.offsetArray = offsetArray;
+        }
 
         public override void BuildGlyphList(List<Glyph> glyphList)
         {
@@ -389,7 +384,13 @@ namespace Typography.OpenFont.Tables.BitmapFonts
     {
         public override int SubTypeNo => 2;
         public uint imageSize;
-        public BigGlyphMetrics BigGlyphMetrics = new BigGlyphMetrics();
+
+        public BigGlyphMetrics BigGlyphMetrics;
+        public IndexSubTable2(IndexSubHeader header, uint imageSize, BigGlyphMetrics bigGlyphMetrics) : base(header)
+        {
+            this.imageSize = imageSize;
+            this.BigGlyphMetrics = bigGlyphMetrics;
+        }
         public override void BuildGlyphList(List<Glyph> glyphList)
         {
             uint incrementalOffset = 0;//TODO: review this
@@ -407,6 +408,11 @@ namespace Typography.OpenFont.Tables.BitmapFonts
     {
         public override int SubTypeNo => 3;
         public ushort[] offsetArray;
+
+        public IndexSubTable3(IndexSubHeader header, ushort[] offsetArray) : base(header)
+        {
+            this.offsetArray = offsetArray;
+        }
         public override void BuildGlyphList(List<Glyph> glyphList)
         {
             int n = 0;
@@ -423,6 +429,11 @@ namespace Typography.OpenFont.Tables.BitmapFonts
     {
         public override int SubTypeNo => 4;
         public GlyphIdOffsetPair[] glyphArray;
+
+        public IndexSubTable4(IndexSubHeader header, GlyphIdOffsetPair[] glyphArray) : base(header)
+        {
+            this.glyphArray = glyphArray;
+        }
         public override void BuildGlyphList(List<Glyph> glyphList)
         {
             for (int i = 0; i < glyphArray.Length; ++i)
@@ -439,9 +450,16 @@ namespace Typography.OpenFont.Tables.BitmapFonts
     {
         public override int SubTypeNo => 5;
         public uint imageSize;
-        public BigGlyphMetrics BigGlyphMetrics = new BigGlyphMetrics();
+        public BigGlyphMetrics BigGlyphMetrics;
 
         public ushort[] glyphIdArray;
+
+        public IndexSubTable5(IndexSubHeader header, uint imageSize, BigGlyphMetrics bigGlyphMetrics, ushort[] glyphIdArray) : base(header)
+        {
+            this.imageSize = imageSize;
+            this.BigGlyphMetrics = bigGlyphMetrics;
+            this.glyphIdArray = glyphIdArray;
+        }
         public override void BuildGlyphList(List<Glyph> glyphList)
         {
             uint incrementalOffset = 0;//TODO: review this
@@ -494,10 +512,12 @@ namespace Typography.OpenFont.Tables.BitmapFonts
         public sbyte vertBearingY;
         public byte vertAdvance;
 
-        public const int SIZE = 8; //size of BigGlyphMetrics
-
-        public static void ReadBigGlyphMetric(BinaryReader reader, ref BigGlyphMetrics output)
+        public const int SIZE = 8; //size of BigGlyphMetrics = 8 bytes = pointer size on 64-bit systems
+        // NOTE! Microsoft recommendation: all structs less than 16 bytes in size can be passed by value, no need for "ref"
+        // https://docs.microsoft.com/en-us/dotnet/standard/design-guidelines/choosing-between-class-and-struct
+        public static BigGlyphMetrics ReadBigGlyphMetric(BinaryReader reader)
         {
+            var output = new BigGlyphMetrics();
             output.height = reader.ReadByte();
             output.width = reader.ReadByte();
 
@@ -508,6 +528,7 @@ namespace Typography.OpenFont.Tables.BitmapFonts
             output.vertBearingX = (sbyte)reader.ReadByte();
             output.vertBearingY = (sbyte)reader.ReadByte();
             output.vertAdvance = reader.ReadByte();
+            return output;
         }
     }
 
@@ -526,15 +547,17 @@ namespace Typography.OpenFont.Tables.BitmapFonts
         public sbyte bearingY;
         public byte advance;
 
-        public const int SIZE = 5; //size of SmallGlyphMetrics
-        public static void ReadSmallGlyphMetric(BinaryReader reader, ref SmallGlyphMetrics output)
+        public const int SIZE = 5; //size of SmallGlyphMetrics = 5 bytes
+        public static SmallGlyphMetrics ReadSmallGlyphMetric(BinaryReader reader)
         {
+            var output = new SmallGlyphMetrics();
             output.height = reader.ReadByte();
             output.width = reader.ReadByte();
 
             output.bearingX = (sbyte)reader.ReadByte();
             output.bearingY = (sbyte)reader.ReadByte();
             output.advance = reader.ReadByte();
+            return output;
         }
     }
 
@@ -709,7 +732,7 @@ namespace Typography.OpenFont.Tables.BitmapFonts
 
         public SmallGlyphMetrics smallMetrics;
         public byte pad;
-        public EbdtComponent[] components;
+        public EbdtComponent[]? components;
         //Format 8: small metrics, component data
         //Type              Name            Description
         //SmallGlyphMetrics smallMetrics    Metrics information for the glyph
@@ -734,7 +757,7 @@ namespace Typography.OpenFont.Tables.BitmapFonts
     {
         public override int FormatNumber => 9;
         public BigGlyphMetrics bigMetrics;
-        public EbdtComponent[] components;
+        public EbdtComponent[]? components;
 
         //Format 9: big metrics, component data
         //Type              Name            Description
@@ -780,8 +803,7 @@ namespace Typography.OpenFont.Tables.BitmapFonts
 
         public override void FillGlyphInfo(BinaryReader reader, Glyph bitmapGlyph)
         {
-            SmallGlyphMetrics smallGlyphMetric = new SmallGlyphMetrics();
-            SmallGlyphMetrics.ReadSmallGlyphMetric(reader, ref smallGlyphMetric);
+            var smallGlyphMetric = SmallGlyphMetrics.ReadSmallGlyphMetric(reader);
             uint dataLen = reader.ReadUInt32();
             bitmapGlyph.OriginalAdvanceWidth = smallGlyphMetric.advance;
             bitmapGlyph.Bounds = new Bounds(0, 0, smallGlyphMetric.width, smallGlyphMetric.height);
@@ -813,8 +835,7 @@ namespace Typography.OpenFont.Tables.BitmapFonts
 
         public override void FillGlyphInfo(BinaryReader reader, Glyph bitmapGlyph)
         {
-            BigGlyphMetrics bigGlyphMetric = new BigGlyphMetrics();
-            BigGlyphMetrics.ReadBigGlyphMetric(reader, ref bigGlyphMetric);
+            BigGlyphMetrics bigGlyphMetric = BigGlyphMetrics.ReadBigGlyphMetric(reader);
             uint dataLen = reader.ReadUInt32();
 
             bitmapGlyph.OriginalAdvanceWidth = bigGlyphMetric.horiAdvance;

@@ -29,11 +29,16 @@ namespace Typography.OpenFont.Tables
         LigGlyph[] _ligGlyphs;
         CoverageTable _coverageTable;
 
+        public LigCaretList(LigGlyph[] ligGlyphs, CoverageTable coverageTable)
+        {
+            _ligGlyphs = ligGlyphs;
+            _coverageTable = coverageTable;
+        }
+
         public static LigCaretList CreateFrom(BinaryReader reader, long beginAt)
         {
             reader.BaseStream.Seek(beginAt, SeekOrigin.Begin);
             //----
-            LigCaretList ligcaretList = new LigCaretList();
             ushort coverageOffset = reader.ReadUInt16();
             ushort ligGlyphCount = reader.ReadUInt16();
             ushort[] ligGlyphOffsets = Utils.ReadUInt16Array(reader, ligGlyphCount);
@@ -42,9 +47,7 @@ namespace Typography.OpenFont.Tables
             {
                 ligGlyphs[i] = LigGlyph.CreateFrom(reader, beginAt + ligGlyphOffsets[i]);
             }
-            ligcaretList._ligGlyphs = ligGlyphs;
-            ligcaretList._coverageTable = CoverageTable.CreateFrom(reader, beginAt + coverageOffset);
-            return ligcaretList;
+            return new LigCaretList(ligGlyphs, CoverageTable.CreateFrom(reader, beginAt + coverageOffset));
         }
     }
 
@@ -68,14 +71,17 @@ namespace Typography.OpenFont.Tables
     {
         ushort[] _caretValueOffsets;
 
+        public LigGlyph(ushort[] caretValueOffsets)
+        {
+            _caretValueOffsets = caretValueOffsets;
+        }
+
         public static LigGlyph CreateFrom(BinaryReader reader, long beginAt)
         {
             reader.BaseStream.Seek(beginAt, SeekOrigin.Begin);
             //----------
-            LigGlyph ligGlyph = new LigGlyph();
             ushort caretCount = reader.ReadUInt16();
-            ligGlyph._caretValueOffsets = Utils.ReadUInt16Array(reader, caretCount);
-            return ligGlyph;
+            return new LigGlyph(Utils.ReadUInt16Array(reader, caretCount));
         }
     }
 
@@ -195,21 +201,26 @@ namespace Typography.OpenFont.Tables
         ushort _format;
         uint[] _coverageOffset;
 
+        public MarkGlyphSetsTable(ushort format, uint[] coverageOffset)
+        {
+            _format = format;
+            _coverageOffset = coverageOffset;
+        }
+
         public static MarkGlyphSetsTable CreateFrom(BinaryReader reader, long beginAt)
         {
             reader.BaseStream.Seek(beginAt, SeekOrigin.Begin);
             //
-            MarkGlyphSetsTable markGlyphSetsTable = new MarkGlyphSetsTable();
-            markGlyphSetsTable._format = reader.ReadUInt16();
+            var format = reader.ReadUInt16();
             ushort markSetCount = reader.ReadUInt16();
-            uint[] coverageOffset = markGlyphSetsTable._coverageOffset = new uint[markSetCount];
+            uint[] coverageOffset = new uint[markSetCount];
             for (int i = 0; i < markSetCount; ++i)
             {
                 //Note that the array of offsets for the Coverage tables uses ULONG 
                 coverageOffset[i] = reader.ReadUInt32();//
             }
 
-            return markGlyphSetsTable;
+            return new MarkGlyphSetsTable(format, coverageOffset);
         }
     }
 }

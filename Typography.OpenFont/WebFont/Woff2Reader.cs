@@ -52,8 +52,14 @@ namespace Typography.WebFont
 
         public uint origLength;
         public uint transformLength;
+
+        public Woff2TableDirectory(string name)
+        {
+            Name = name;
+        }
+
         //translated values 
-        public string Name { get; set; } //translate from tag
+        public string Name { get; } //translate from tag
         public byte PreprocessingTransformation { get; set; }
         public long ExpectedStartAt { get; set; }
 #if DEBUG
@@ -69,7 +75,7 @@ namespace Typography.WebFont
 
     public static class Woff2DefaultBrotliDecompressFunc
     {
-        public static BrotliDecompressStreamFunc DecompressHandler;
+        public static BrotliDecompressStreamFunc? DecompressHandler;
     }
 
     class TransformedGlyf : UnreadTableEntry
@@ -84,15 +90,9 @@ namespace Typography.WebFont
         }
         public Woff2TableDirectory TableDir { get; }
 
-        public override T CreateTableEntry<T>(BinaryReader reader, T expectedResult)
+        public override T CreateTableEntry<T>(BinaryReader reader, OpenFontReader.TableReader<T> expectedResult)
         {
-            Glyf glyfTable = expectedResult as Glyf;
-
-            if (glyfTable == null) throw new System.NotSupportedException();
-
-            ReconstructGlyfTable(reader, TableDir, glyfTable);
-
-            return expectedResult;
+            return ReconstructGlyfTable(Header, reader, TableDir) is T t ? t : throw new System.NotSupportedException();
         }
 
 
@@ -120,7 +120,7 @@ namespace Typography.WebFont
         }
 
 
-        static void ReconstructGlyfTable(BinaryReader reader, Woff2TableDirectory woff2TableDir, Glyf glyfTable)
+        static Glyf ReconstructGlyfTable(TableHeader header, BinaryReader reader, Woff2TableDirectory woff2TableDir)
         {
             //fill the information to glyfTable 
             //reader.BaseStream.Position += woff2TableDir.transformLength;
@@ -158,7 +158,7 @@ namespace Typography.WebFont
             //UInt8     bboxBitmap[]            Bitmap(a numGlyphs-long bit array) indicating explicit bounding boxes
             //Int16     bboxStream[]            Stream of Int16 values representing glyph bounding box data
             //UInt8     instructionStream[]	    Stream of UInt8 values representing a set of instructions for each corresponding glyph
-
+            
             reader.BaseStream.Position = woff2TableDir.ExpectedStartAt;
 
             long start = reader.BaseStream.Position;
@@ -187,7 +187,7 @@ namespace Typography.WebFont
             long expected_EndAt = expected_InstructionStreamStartAt + instructionStreamSize;
 
             //--------------------------------------------- 
-            Glyph[] glyphs = new Glyph[numGlyphs];
+            Glyph?[] readingGlyphs = new Glyph?[numGlyphs];
             TempGlyph[] allGlyphs = new TempGlyph[numGlyphs];
             List<ushort> compositeGlyphs = new List<ushort>();
             int contourCount = 0;
@@ -262,6 +262,7 @@ namespace Typography.WebFont
                 System.Diagnostics.Debug.WriteLine("ERR!!");
             }
 #endif
+            var emptyGlyph = Glyf.GenerateTypefaceSpecificEmptyGlyph();
             //
             //1) nPoints stream,  npoint for each contour
 
@@ -313,9 +314,9 @@ namespace Typography.WebFont
             int pntContourIndex = 0;
             for (int i = 0; i < allGlyphs.Length; ++i)
             {
-                glyphs[i] = BuildSimpleGlyphStructure(reader,
+                readingGlyphs[i] = BuildSimpleGlyphStructure(reader,
                     ref allGlyphs[i],
-                    glyfTable._emptyGlyph,
+                    emptyGlyph,
                     pntPerContours, ref pntContourIndex,
                     flagStream, ref curFlagsIndex);
             }
@@ -348,7 +349,7 @@ namespace Typography.WebFont
                 for (ushort i = 0; i < j; ++i)
                 {
                     int compositeGlyphIndex = compositeGlyphs[i];
-                    glyphs[compositeGlyphIndex] = ReadCompositeGlyph(glyphs, reader, i, glyfTable._emptyGlyph);
+                    readingGlyphs[compositeGlyphIndex] = ReadCompositeGlyph(readingGlyphs, reader, i, emptyGlyph);
                 }
             }
 
@@ -379,11 +380,13 @@ namespace Typography.WebFont
 #endif
             int bitmapCount = (numGlyphs + 7) / 8;
             byte[] bboxBitmap = ExpandBitmap(reader.ReadBytes(bitmapCount));
+            var glyphs = new Glyph[numGlyphs];
             for (ushort i = 0; i < numGlyphs; ++i)
             {
                 TempGlyph tempGlyph = allGlyphs[i];
-                Glyph glyph = glyphs[i];
-
+                var glyph = readingGlyphs[i] ?? throw new System.NotSupportedException
+                    ($"Both {nameof(BuildSimpleGlyphStructure)} and {nameof(ReadCompositeGlyph)} failed to read the glyph at {i}");
+                glyphs[i] = glyph;
                 byte hasBbox = bboxBitmap[i];
                 if (hasBbox == 1)
                 {
@@ -449,13 +452,13 @@ namespace Typography.WebFont
 
             }
 #endif
-
-            glyfTable.Glyphs = glyphs;
+            return new Glyf(header, glyphs, emptyGlyph);
         }
 
         static Bounds FindSimpleGlyphBounds(Glyph glyph)
         {
-            GlyphPointF[] glyphPoints = glyph.GlyphPoints;
+            if (!(glyph.TtfWoffInfo is var (_, glyphPoints)))
+                throw new System.NotImplementedException("Built glyph is not WOFF glyph");
 
             int j = glyphPoints.Length;
             float xmin = float.MaxValue;
@@ -499,7 +502,7 @@ namespace Typography.WebFont
             return expandArr;
         }
 
-        static Glyph BuildSimpleGlyphStructure(BinaryReader glyphStreamReader,
+        static Glyph? BuildSimpleGlyphStructure(BinaryReader glyphStreamReader,
             ref TempGlyph tmpGlyph,
             Glyph emptyGlyph,
             ushort[] pntPerContours, ref int pntContourIndex,
@@ -729,7 +732,7 @@ namespace Typography.WebFont
             return Glyf.HasFlag(flags, Glyf.CompositeGlyphFlags.WE_HAVE_INSTRUCTIONS);
         }
 
-        static Glyph ReadCompositeGlyph(Glyph[] createdGlyphs, BinaryReader reader, ushort compositeGlyphIndex, Glyph emptyGlyph)
+        static Glyph ReadCompositeGlyph(Glyph?[] createdGlyphs, BinaryReader reader, ushort compositeGlyphIndex, Glyph emptyGlyph)
         {
 
             //Decoding of Composite Glyphs
@@ -750,22 +753,23 @@ namespace Typography.WebFont
 
 
 
-            Glyph finalGlyph = null;
+            Glyph? finalGlyph = null;
             Glyf.CompositeGlyphFlags flags;
             do
             {
                 flags = (Glyf.CompositeGlyphFlags)reader.ReadUInt16();
                 ushort glyphIndex = reader.ReadUInt16();
-                if (createdGlyphs[glyphIndex] == null)
+                var existingGlyph = createdGlyphs[glyphIndex];
+                if (existingGlyph == null)
                 {
                     // This glyph is not read yet, resolve it first!
                     long storedOffset = reader.BaseStream.Position;
                     Glyph missingGlyph = ReadCompositeGlyph(createdGlyphs, reader, glyphIndex, emptyGlyph);
-                    createdGlyphs[glyphIndex] = missingGlyph;
+                    createdGlyphs[glyphIndex] = existingGlyph = missingGlyph;
                     reader.BaseStream.Position = storedOffset;
                 }
 
-                Glyph newGlyph = Glyph.Clone(createdGlyphs[glyphIndex], compositeGlyphIndex);
+                Glyph newGlyph = Glyph.Clone(existingGlyph, compositeGlyphIndex);
 
                 short arg1 = 0;
                 short arg2 = 0;
@@ -973,17 +977,10 @@ namespace Typography.WebFont
         class TripleEncodingTable
         {
 
-            static TripleEncodingTable s_encTable;
+            static TripleEncodingTable? s_encTable;
 
             List<TripleEncodingRecord> _records = new List<TripleEncodingRecord>();
-            public static TripleEncodingTable GetEncTable()
-            {
-                if (s_encTable == null)
-                {
-                    s_encTable = new TripleEncodingTable();
-                }
-                return s_encTable;
-            }
+            public static TripleEncodingTable GetEncTable() => s_encTable ??= new TripleEncodingTable();
             private TripleEncodingTable()
             {
 
@@ -1252,10 +1249,12 @@ namespace Typography.WebFont
 #endif
                 _records.Add(rec);
             }
-            void BuildRecords(byte byteCount, byte xbits, byte ybits, ushort[] deltaXs, ushort[] deltaYs)
+            void BuildRecords(byte byteCount, byte xbits, byte ybits, ushort[]? deltaXs, ushort[]? deltaYs)
             {
                 if (deltaXs == null)
                 {
+                    if (deltaYs == null)
+                        throw new System.ArgumentException($"{nameof(deltaXs)} and {nameof(deltaYs)} cannot both be null");
                     //(set 1.1)
                     for (int y = 0; y < deltaYs.Length; ++y)
                     {
@@ -1302,13 +1301,12 @@ namespace Typography.WebFont
             TableDir = tableDir;
         }
         public Woff2TableDirectory TableDir { get; }
-        public override T CreateTableEntry<T>(BinaryReader reader, T expectedResult)
+        public override T CreateTableEntry<T>(BinaryReader reader, OpenFontReader.TableReader<T> expectedResult)
         {
-            GlyphLocations loca = expectedResult as GlyphLocations;
-            if (loca == null) throw new System.NotSupportedException();
-
-            //nothing todo here :)
-            return expectedResult;
+            //nothing todo here, read nothing :)
+            return
+                new GlyphLocations(-1, true, Header, new BinaryReader(Stream.Null)) is T t
+                ? t : throw new System.NotSupportedException();
         }
 
     }
@@ -1316,9 +1314,7 @@ namespace Typography.WebFont
     class Woff2Reader
     {
 
-        Woff2Header _header;
-
-        public BrotliDecompressStreamFunc DecompressHandler;
+        public BrotliDecompressStreamFunc? DecompressHandler;
 
         public Woff2Reader()
         {
@@ -1351,12 +1347,11 @@ namespace Typography.WebFont
         }
 #endif
 
-        public PreviewFontInfo ReadPreview(BinaryReader reader)
+        public PreviewFontInfo? ReadPreview(BinaryReader reader)
         {
-
-            _header = ReadHeader(reader);
-            if (_header == null) return null;  //=> return here and notify user too.  
-            Woff2TableDirectory[] woff2TablDirs = ReadTableDirectories(reader);
+            var header = ReadHeader(reader);
+            if (header == null) return null;  //=> return here and notify user too.
+            Woff2TableDirectory[] woff2TablDirs = ReadTableDirectories(header, reader);
             if (DecompressHandler == null)
             {
                 //if no Brotli decoder=> return here and notify user too.
@@ -1372,8 +1367,8 @@ namespace Typography.WebFont
             }
 
             //try read each compressed tables
-            byte[] compressedBuffer = reader.ReadBytes((int)_header.totalCompressSize);
-            if (compressedBuffer.Length != _header.totalCompressSize)
+            byte[] compressedBuffer = reader.ReadBytes((int)header.totalCompressSize);
+            if (compressedBuffer.Length != header.totalCompressSize)
             {
                 //error!
                 return null; //can't read this, notify user too.
@@ -1400,11 +1395,11 @@ namespace Typography.WebFont
                 }
             }
         }
-        internal Typeface Read(BinaryReader reader)
+        internal Typeface? Read(BinaryReader reader)
         {
-            _header = ReadHeader(reader);
-            if (_header == null) return null;  //=> return here and notify user too.  
-            Woff2TableDirectory[] woff2TablDirs = ReadTableDirectories(reader);
+            var header = ReadHeader(reader);
+            if (header == null) return null;  //=> return here and notify user too.
+            Woff2TableDirectory[] woff2TablDirs = ReadTableDirectories(header, reader);
             if (DecompressHandler == null)
             {
                 //if no Brotli decoder=> return here and notify user too.
@@ -1420,8 +1415,8 @@ namespace Typography.WebFont
             }
 
             //try read each compressed tables
-            byte[] compressedBuffer = reader.ReadBytes((int)_header.totalCompressSize);
-            if (compressedBuffer.Length != _header.totalCompressSize)
+            byte[] compressedBuffer = reader.ReadBytes((int)header.totalCompressSize);
+            if (compressedBuffer.Length != header.totalCompressSize)
             {
                 //error!
                 return null; //can't read this, notify user too.
@@ -1449,7 +1444,7 @@ namespace Typography.WebFont
                 }
             }
         }
-        public Typeface Read(Stream inputstream)
+        public Typeface? Read(Stream inputstream)
         {
             using (ByteOrderSwappingBinaryReader reader = new ByteOrderSwappingBinaryReader(inputstream))
             {
@@ -1459,7 +1454,7 @@ namespace Typography.WebFont
 
 
 
-        Woff2Header ReadHeader(BinaryReader reader)
+        Woff2Header? ReadHeader(BinaryReader reader)
         {
             //WOFF2 Header
             //UInt32  signature             0x774F4632 'wOF2'
@@ -1509,10 +1504,10 @@ namespace Typography.WebFont
             return header;
         }
 
-        Woff2TableDirectory[] ReadTableDirectories(BinaryReader reader)
+        Woff2TableDirectory[] ReadTableDirectories(Woff2Header header, BinaryReader reader)
         {
 
-            uint tableCount = (uint)_header.numTables; //?
+            uint tableCount = (uint)header.numTables; //?
             var tableDirs = new Woff2TableDirectory[tableCount];
 
             long expectedTableStartAt = 0;
@@ -1525,7 +1520,6 @@ namespace Typography.WebFont
                 //UIntBase128   origLength      length of original table
                 //UIntBase128   transformLength transformed length(if applicable)
 
-                Woff2TableDirectory table = new Woff2TableDirectory();
                 byte flags = reader.ReadByte();
                 //The interpretation of the flags field is as follows.
 
@@ -1535,7 +1529,7 @@ namespace Typography.WebFont
 
                 //interprete flags 
                 int knowTable = flags & 0x1F; //5 bits => known table or not  
-                string tableName = null;
+                string tableName;
                 if (knowTable < 63)
                 {
                     //this is known table
@@ -1545,8 +1539,7 @@ namespace Typography.WebFont
                 {
                     tableName = Utils.TagToString(reader.ReadUInt32()); //other tag 
                 }
-
-                table.Name = tableName;
+                Woff2TableDirectory table = new Woff2TableDirectory(tableName);
 
                 //Bits 6 and 7 indicate the preprocessing transformation version number(0 - 3) that was applied to each table.
 
@@ -1578,7 +1571,7 @@ namespace Typography.WebFont
                         break;
                     case 0:
                         {
-                            if (table.Name == Glyf._N)
+                            if (table.Name == Glyf.Name)
                             {
                                 if (!ReadUIntBase128(reader, out table.transformLength))
                                 {
@@ -1586,7 +1579,7 @@ namespace Typography.WebFont
                                 }
                                 expectedTableStartAt += table.transformLength;//***
                             }
-                            else if (table.Name == GlyphLocations._N)
+                            else if (table.Name == GlyphLocations.Name)
                             {
                                 //BUT by spec, transform 'loca' MUST has transformLength=0
                                 if (!ReadUIntBase128(reader, out table.transformLength))
@@ -1629,12 +1622,9 @@ namespace Typography.WebFont
             for (int i = 0; i < woffTableDirs.Length; ++i)
             {
                 Woff2TableDirectory woffTableDir = woffTableDirs[i];
-                UnreadTableEntry unreadTableEntry = null;
+                UnreadTableEntry unreadTableEntry;
 
-
-
-
-                if (woffTableDir.Name == Glyf._N && woffTableDir.PreprocessingTransformation == 0)
+                if (woffTableDir.Name == Glyf.Name && woffTableDir.PreprocessingTransformation == 0)
                 {
                     //this is transformed glyf table,
                     //we need another techqniue 
@@ -1644,7 +1634,7 @@ namespace Typography.WebFont
                     unreadTableEntry = new TransformedGlyf(tableHeader, woffTableDir);
 
                 }
-                else if (woffTableDir.Name == GlyphLocations._N && woffTableDir.PreprocessingTransformation == 0)
+                else if (woffTableDir.Name == GlyphLocations.Name && woffTableDir.PreprocessingTransformation == 0)
                 {
                     //this is transformed glyf table,
                     //we need another techqniue 
@@ -1660,7 +1650,7 @@ namespace Typography.WebFont
                                           woffTableDir.origLength);
                     unreadTableEntry = new UnreadTableEntry(tableHeader);
                 }
-                tableEntryCollection.AddEntry(unreadTableEntry);
+                tableEntryCollection.AddEntry(unreadTableEntry.Name, unreadTableEntry);
             }
 
             return tableEntryCollection;
@@ -1690,41 +1680,41 @@ namespace Typography.WebFont
             //-------------------------------------------------------------------
 
             //-- TODO:implement missing table too!
-            Cmap._N, //0
-            Head._N, //1
-            HorizontalHeader._N,//2
-            HorizontalMetrics._N,//3
-            MaxProfile._N,//4
-            NameEntry._N,//5
-            OS2Table._N, //6
-            PostTable._N,//7
-            CvtTable._N,//8
-            FpgmTable._N,//9
-            Glyf._N,//10
-            GlyphLocations._N,//11
-            PrepTable._N,//12
-            CFFTable._N,//13
+            Cmap.Name, //0
+            Head.Name, //1
+            HorizontalHeader.Name,//2
+            HorizontalMetrics.Name,//3
+            MaxProfile.Name,//4
+            NameEntry.Name,//5
+            OS2Table.Name, //6
+            PostTable.Name,//7
+            CvtTable.Name,//8
+            FpgmTable.Name,//9
+            Glyf.Name,//10
+            GlyphLocations.Name,//11
+            PrepTable.Name,//12
+            CFFTable.Name,//13
             "VORG",//14 
-            EBDT._N,//15, 
+            EBDT.Name,//15, 
 
             
             //---------------
-            EBLC._N,//16
-            Gasp._N,//17
-            HorizontalDeviceMetrics._N,//18
-            Kern._N,//19
+            EBLC.Name,//16
+            Gasp.Name,//17
+            HorizontalDeviceMetrics.Name,//18
+            Kern.Name,//19
             "LTSH",//20 
             "PCLT",//21
-            VerticalDeviceMetrics._N,//22
-            VerticalHeader._N,//23
-            VerticalMetrics._N,//24
-            BASE._N,//25
-            GDEF._N,//26
-            GPOS._N,//27
-            GSUB._N,//28            
-            EBSC._N, //29
+            VerticalDeviceMetrics.Name,//22
+            VerticalHeader.Name,//23
+            VerticalMetrics.Name,//24
+            BASE.Name,//25
+            GDEF.Name,//26
+            GPOS.Name,//27
+            GSUB.Name,//28            
+            EBSC.Name, //29
             "JSTF", //30
-            MathTable._N,//31
+            MathTable.Name,//31
              //---------------
 
 
@@ -1748,11 +1738,11 @@ namespace Typography.WebFont
             //15 =>	EBDT,	    31 =>MATH,	    47 =>fvar,	     63 =>arbitrary tag follows,...
             //-------------------------------------------------------------------
 
-            CBDT._N, //32
-            CBLC._N,//33
-            COLR._N,//34
-            CPAL._N,//35,
-            SvgTable._N,//36
+            CBDT.Name, //32
+            CBLC.Name,//33
+            COLR.Name,//34
+            CPAL.Name,//35,
+            SvgTable.Name,//36
             "sbix",//37
             "acnt",//38
             "avar",//39

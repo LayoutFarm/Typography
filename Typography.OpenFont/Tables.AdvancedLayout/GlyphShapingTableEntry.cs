@@ -37,8 +37,7 @@ namespace Typography.OpenFont.Tables
         public ScriptList ScriptList { get; private set; }
         public FeatureList FeatureList { get; private set; }
 
-
-        protected override void ReadContentFrom(BinaryReader reader)
+        internal GlyphShapingTableEntry(TableHeader header, BinaryReader reader) : base(header, reader)
         {
             //-------------------------------------------
             // GPOS/GSUB Header

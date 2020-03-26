@@ -50,7 +50,7 @@ namespace Typography.OpenFont.Tables
 
             ushort glyphCount = reader.ReadUInt16();
             ushort[] glyphs = Utils.ReadUInt16Array(reader, glyphCount);
-            return new CoverageFmt1() { _orderedGlyphIdList = glyphs };
+            return new CoverageFmt1(glyphs);
         }
 
         public override int FindPosition(ushort glyphIndex)
@@ -76,6 +76,11 @@ namespace Typography.OpenFont.Tables
 #endif
 
         internal ushort[] _orderedGlyphIdList;
+
+        public CoverageFmt1(ushort[] orderedGlyphIdList)
+        {
+            _orderedGlyphIdList = orderedGlyphIdList;
+        }
     }
 
     public class CoverageFmt2 : CoverageTable
@@ -130,12 +135,7 @@ namespace Typography.OpenFont.Tables
                 coverageIndices[i] = reader.ReadUInt16();
             }
 
-            return new CoverageFmt2()
-            {
-                _startIndices = startIndices,
-                _endIndices = endIndices,
-                _coverageIndices = coverageIndices
-            };
+            return new CoverageFmt2(startIndices, endIndices, coverageIndices);
         }
 
 #if DEBUG
@@ -154,6 +154,13 @@ namespace Typography.OpenFont.Tables
         internal ushort[] _startIndices;
         internal ushort[] _endIndices;
         internal ushort[] _coverageIndices;
+
+        public CoverageFmt2(ushort[] startIndices, ushort[] endIndices, ushort[] coverageIndices)
+        {
+            _startIndices = startIndices;
+            _endIndices = endIndices;
+            _coverageIndices = coverageIndices;
+        }
 
         private int RangeCount => _startIndices.Length;
     }

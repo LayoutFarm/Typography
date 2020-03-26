@@ -702,7 +702,9 @@ namespace Typography.TextBreak
                 }
             }
         }
-        public static bool TryGetFullLanguageNameFromLangCode(string langCode1, string langCode2, out string fullLangName)
+        
+        public static bool TryGetFullLanguageNameFromLangCode
+            (string langCode1, string langCode2, [System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out string? fullLangName)
         {
             if (!_init_data) InitData();
             //

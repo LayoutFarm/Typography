@@ -9,6 +9,8 @@
     <RootNamespace>Xamarin.iOS.GLES2</RootNamespace>
     <IPhoneResourcePrefix>Resources</IPhoneResourcePrefix>
     <AssemblyName>Xamarin.iOS.GLES2</AssemblyName>
+    <LangVersion>latest</LangVersion>
+    <NoWarn>CS8632<!--<Nullable>enable</Nullable> does not work with tranditional .csprojs--></NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhoneSimulator' ">
     <DebugSymbols>true</DebugSymbols>
@@ -90,6 +92,12 @@
     <AppExtensionDebugBundleId />
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)..\..\..\Typography.TextServices\FontStoreAndManagment\FontManagement.cs">
+      <Link>DevTextPrinter\FontManagement.cs</Link>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)..\..\..\PixelFarm.Typography\3_Typography_Contours\GlyphOutlineBuilderBase.cs">
+      <Link>GlyphOutlineBuilder\GlyphOutlineBuilderBase.cs</Link>
+    </Compile>
     <Compile Include="App\CustomApp.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="AppDelegate.cs" />
@@ -115,17 +123,9 @@
     <Reference Include="Xamarin.iOS" />
   </ItemGroup>
   <ItemGroup>
+	<ProjectReference Include="..\..\..\Build\Typography.OpenFont\Typography.OpenFont.csproj"/>
+	<ProjectReference Include="..\..\..\Build\Typography.GlyphLayout\Typography.GlyphLayout.csproj"/>
     <Content Include="Entitlements.plist" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\Build\NetStandard\Typography.GlyphLayout\Typography.GlyphLayout.csproj">
-      <Project>{c161ddea-0711-4d59-887c-c6a2fda2d74c}</Project>
-      <Name>Typography.GlyphLayout</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\Build\NetStandard\Typography.OpenFont\Typography.OpenFont.csproj">
-      <Project>{82d701b5-d844-4d5c-8643-26945adc2c5a}</Project>
-      <Name>Typography.OpenFont</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="..\..\Shared\DrawingGL.Common.projitems" Label="Shared" />
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />

@@ -19,18 +19,14 @@ namespace Typography.TextLayout
             return new string(_buffer, start, len);
         }
         //-------- 
-        internal char[] UnsafeGetInternalBuffer() => _buffer;
-        internal TextBuffer()
-        {
-
-        }
+        public char[] UnsafeGetInternalBuffer() => _buffer;
     }
 
     public class ReusableTextBuffer : TextBuffer
     {
-        public ReusableTextBuffer()
+        public ReusableTextBuffer(char[] buffer) : base(buffer)
         {
-            //for reusable textbuffer
+            _buffer = buffer;
         }
         public void SetRawCharBuffer(char[] buffer)
         {

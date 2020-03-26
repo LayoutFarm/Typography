@@ -11,8 +11,7 @@ namespace Typography.OpenFont.Tables
     /// </summary>
     class AVar : TableEntry
     {
-        public const string _N = "avar";
-        public override string Name => _N;
+        public const string Name = "avar";
 
         //The axis variations table('avar') is an optional table 
         //used in variable fonts that use OpenType Font Variations mechanisms. 
@@ -25,7 +24,7 @@ namespace Typography.OpenFont.Tables
         //other required or optional tables used in variable fonts.  
 
         SegmentMapRecord[] _axisSegmentMaps;
-        protected override void ReadContentFrom(BinaryReader reader)
+        internal AVar(TableHeader header, BinaryReader reader) : base(header, reader)
         {
 
             //The 'avar' table is comprised of a small header plus segment maps for each axis.
@@ -54,8 +53,7 @@ namespace Typography.OpenFont.Tables
             _axisSegmentMaps = new SegmentMapRecord[axisCount];
             for (int i = 0; i < axisCount; ++i)
             {
-                SegmentMapRecord segmentMap = new SegmentMapRecord();
-                segmentMap.ReadContent(reader);
+                SegmentMapRecord segmentMap = new SegmentMapRecord(reader);
                 _axisSegmentMaps[i] = segmentMap;
             }
 
@@ -69,7 +67,7 @@ namespace Typography.OpenFont.Tables
             //uint16        positionMapCount                    The number of correspondence pairs for this axis.
             //AxisValueMap  axisValueMaps[positionMapCount]     The array of axis value map records for this axis.
             public AxisValueMap[] axisValueMaps;
-            public void ReadContent(BinaryReader reader)
+            public SegmentMapRecord(BinaryReader reader)
             {
                 ushort positionMapCount = reader.ReadUInt16();
                 axisValueMaps = new AxisValueMap[positionMapCount];

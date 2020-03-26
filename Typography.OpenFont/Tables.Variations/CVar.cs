@@ -11,13 +11,8 @@ namespace Typography.OpenFont.Tables
     /// </summary>
     class CVar : TableEntry
     {
-        public const string _N = "cvar";
-        public override string Name => _N; 
-        public CVar()
-        {
-
-        }
-        protected override void ReadContentFrom(BinaryReader reader)
+        public const string Name = "cvar";
+        internal CVar(TableHeader header, BinaryReader reader) : base(header, reader)
         {
 
         }

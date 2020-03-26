@@ -12,8 +12,7 @@ namespace Typography.OpenFont.Tables
     /// </summary>
     class OS2Table : TableEntry
     {
-        public const string _N = "OS/2";
-        public override string Name => _N;
+        public const string Name = "OS/2";
         //
 
         // Type     Name of  Entry        Comments
@@ -106,8 +105,8 @@ namespace Typography.OpenFont.Tables
         {
             return version + "," + Utils.TagToString(this.achVendID);
         }
-#endif
-        protected override void ReadContentFrom(BinaryReader reader)
+# endif
+        public OS2Table(TableHeader header, BinaryReader reader) : base(header, reader)
         {
             //Six versions of the OS/2 table have been defined: versions 0 to 5
             //Versions 0 to 4 were defined in earlier versions of the OpenType or
@@ -135,6 +134,8 @@ namespace Typography.OpenFont.Tables
                     ReadVersion5(reader);
                     break;
             }
+            if (panose is { } x) panose = x; // https://github.com/dotnet/roslyn/issues/39740
+            else throw new System.NotImplementedException($"{nameof(panose)} is null.");
         }
         void ReadVersion0(BinaryReader reader)
         {

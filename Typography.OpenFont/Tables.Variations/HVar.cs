@@ -12,20 +12,16 @@ namespace Typography.OpenFont.Tables
     /// </summary>
     class HVar : TableEntry
     {
-        public const string _N = "HVAR";
-        public override string Name => _N;
+        public const string Name = "HVAR";
 
 
         ItemVariationStoreTable _itemVartionStore;
-        public HVar()
+        public HVar(TableHeader header, BinaryReader reader) : base(header, reader)
         {
             //The HVAR table is used in variable fonts to provide variations for horizontal glyph metrics values.
             //This can be used to provide variation data for advance widths in the 'hmtx' table.
             //In fonts with TrueType outlines, it can also be used to provide variation data for left and right side
             //bearings obtained from the 'hmtx' table and glyph bounding box.
-        }
-        protected override void ReadContentFrom(BinaryReader reader)
-        {
             long beginAt = reader.BaseStream.Position;
 
             //Horizontal metrics variations table:
@@ -48,8 +44,7 @@ namespace Typography.OpenFont.Tables
 
             //itemVariationStore
             reader.BaseStream.Position = beginAt + itemVariationStoreOffset;
-            _itemVartionStore = new ItemVariationStoreTable();
-            _itemVartionStore.ReadContentFrom(reader);
+            _itemVartionStore = new ItemVariationStoreTable(reader);
         }
     }
 }

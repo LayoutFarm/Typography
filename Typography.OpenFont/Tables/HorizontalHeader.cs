@@ -10,8 +10,7 @@ namespace Typography.OpenFont.Tables
     /// </summary>
     class HorizontalHeader : TableEntry
     {
-        public const string _N = "hhea";
-        public override string Name => _N;
+        public const string Name = "hhea";
 
         //-----
         // Type     Name            Description
@@ -35,10 +34,7 @@ namespace Typography.OpenFont.Tables
         //int16 metricDataFormat 	0 for current format.
         //uint16  numberOfHMetrics Number of hMetric entries in 'hmtx' table
 
-        public HorizontalHeader()
-        {
-        }
-        protected override void ReadContentFrom(BinaryReader input)
+        public HorizontalHeader(TableHeader header, BinaryReader input) : base(header, input)
         {
             Version = input.ReadUInt32(); //major + minor
             Ascent = input.ReadInt16();

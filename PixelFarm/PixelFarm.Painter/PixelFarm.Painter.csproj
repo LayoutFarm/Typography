@@ -12,6 +12,8 @@
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
+	<LangVersion>8.0</LangVersion>
+	<NoWarn>CS8632<!--<Nullable>enable</Nullable> does not work with tranditional .csprojs--></NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -152,7 +154,9 @@
     <Compile Include="..\PixelFarm.Vectors\5_Clipper\ClipLiangBarsky.cs">
       <Link>0_REF_Vectors\5_Clipper\ClipLiangBarsky.cs</Link>
     </Compile>
-    <Compile Include="0_Base\ForNet20.cs" />
+    <Compile Include="..\..\Build\NET20\ForNet20.cs">
+      <Link>0_Base\ForNet20.cs</Link>
+	</Compile>
     <Compile Include="2_General\TempContext.cs" />
     <Compile Include="2_General\TextBaseline.cs" />
     <Compile Include="3_Cpu_Blit\ColorRGBAf.cs" />

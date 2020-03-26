@@ -19,11 +19,12 @@ namespace Typography.TextLayout
         GlyphLayout _glyphLayout;
         UnscaledGlyphPlanList _outputGlyphPlan = new UnscaledGlyphPlanList();
 
-        public EditableTextBlockLayoutEngine()
+        public EditableTextBlockLayoutEngine(Typeface defaultTypeface, float fontSizeInPts = 10)
         {
             _textBlockLexer = new TextBlockLexer();
-            _glyphLayout = new GlyphLayout();
-            FontSizeInPts = 10; 
+            _glyphLayout = new GlyphLayout(defaultTypeface);
+            FontSizeInPts = fontSizeInPts;
+            DefaultTypeface = defaultTypeface;
         }
         public Typeface DefaultTypeface { get; set; }
         /// <summary>
@@ -46,9 +47,7 @@ namespace Typography.TextLayout
 
             //TODO: extend with custom lexer***  
             //test only ...
-            TextRunFontStyle fontStyle = new TextRunFontStyle();
-            fontStyle.Name = "tahoma";
-            fontStyle.SizeInPoints = FontSizeInPts;//10 pts;
+            TextRunFontStyle fontStyle = new TextRunFontStyle("tahoma", FontSizeInPts);//10 pts;
 
             TextBuffer buffer = new TextBuffer(text.ToCharArray());
             _textBlockLexer.Lex(buffer);
@@ -75,9 +74,7 @@ namespace Typography.TextLayout
                 else
                 {
                     //create a 'Run' for this span
-                    TextRun textRun = new TextRun(buffer, sp.start, sp.len, sp.kind);
-                    //add property font style to text run
-                    textRun.FontStyle = fontStyle;
+                    TextRun textRun = new TextRun(buffer, sp.start, sp.len, sp.kind, fontStyle);
                     line.AppendLast(textRun);
                 }
             }
@@ -125,7 +122,7 @@ namespace Typography.TextLayout
 
                 for (int r = 0; r < runCount; ++r)
                 {
-                    TextRun tt = runList[r] as TextRun;
+                    var tt = runList[r] as TextRun;
                     if (tt == null) continue;
                     //this is text run
                     if (tt.IsMeasured) continue;

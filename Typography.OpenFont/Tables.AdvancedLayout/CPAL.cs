@@ -8,14 +8,13 @@ namespace Typography.OpenFont.Tables
 {
     public class CPAL : TableEntry
     {
-        public const string _N = "CPAL";
-        public override string Name => _N;
+        public const string Name = "CPAL";
         //
 
         byte[] _colorBGRABuffer;
         // Read the CPAL table
         // https://www.microsoft.com/typography/otspec/cpal.htm
-        protected override void ReadContentFrom(BinaryReader reader)
+        internal CPAL(TableHeader header, BinaryReader reader) : base(header, reader)
         {
             long offset = reader.BaseStream.Position;
 

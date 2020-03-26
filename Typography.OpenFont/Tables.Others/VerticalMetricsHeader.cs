@@ -7,8 +7,7 @@ namespace Typography.OpenFont.Tables
 {
     class VerticalHeader : TableEntry
     {
-        public const string _N = "vhea";
-        public override string Name => _N;
+        public const string Name = "vhea";
 
         //vhea — Vertical Header Tables
         //The vertical header table(tag name: 'vhea') contains information needed for vertical fonts.The glyphs of vertical fonts are written either top to bottom or bottom to top. This table contains information that is general to the font as a whole. Information that pertains to specific glyphs is given in the vertical metrics table (tag name: 'vmtx') described separately.The formats of these tables are similar to those for horizontal metrics (hhea and hmtx).
@@ -87,7 +86,7 @@ namespace Typography.OpenFont.Tables
         public short CaretSlopeRun { get; set; }
         public short CaretOffset { get; set; }
         public ushort NumOfLongVerMetrics { get; set; }
-        protected override void ReadContentFrom(BinaryReader reader)
+        internal VerticalHeader(TableHeader header, BinaryReader reader) : base(header, reader)
         {
             uint version = reader.ReadUInt32();
             VersionMajor = (byte)(version >> 16);

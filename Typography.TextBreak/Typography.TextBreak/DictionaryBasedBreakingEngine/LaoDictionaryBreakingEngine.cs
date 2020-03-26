@@ -11,7 +11,7 @@ namespace Typography.TextBreak
     public class LaoDictionaryBreakingEngine : DictionaryBreakingEngine
     {
         CustomDic _customDic;
-        public void SetDictionaryData(CustomDic customDic)
+        public LaoDictionaryBreakingEngine(CustomDic customDic)
         {
             _customDic = customDic;
         }
@@ -22,7 +22,7 @@ namespace Typography.TextBreak
         {
             return s_canbeStartChars[c - _customDic.FirstChar];
         }
-        protected override WordGroup GetWordGroupForFirstChar(char c)
+        protected override WordGroup? GetWordGroupForFirstChar(char c)
         {
             return _customDic.GetWordGroupForFirstChar(c);
         }

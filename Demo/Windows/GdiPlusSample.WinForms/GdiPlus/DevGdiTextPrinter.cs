@@ -21,7 +21,7 @@ namespace SampleWinForms
         Typeface _currentTypeface;
         GlyphOutlineBuilder _currentGlyphPathBuilder;
         GlyphTranslatorToGdiPath _txToGdiPath;
-        GlyphLayout _glyphLayout = new GlyphLayout();
+        GlyphLayout _glyphLayout = new GlyphLayout(null); // To be refactored
         SolidBrush _fillBrush = new SolidBrush(Color.Black);
         Pen _outlinePen = new Pen(Color.Green);
         //

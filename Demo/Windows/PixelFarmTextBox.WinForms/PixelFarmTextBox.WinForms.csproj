@@ -10,6 +10,7 @@
     <AssemblyName>PixelFarmTextBox.WinForms</AssemblyName>
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <LangVersion>8.0</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -37,6 +38,19 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
+    <ProjectReference Include="..\..\..\Build\Typography.OpenFont\Typography.OpenFont.csproj"/>
+    <ProjectReference Include="..\..\..\Build\Typography.GlyphLayout\Typography.GlyphLayout.csproj"/>
+    <ProjectReference Include="..\..\..\Build\Typography.TextFlow\Typography.TextFlow.csproj"/>
+    <ProjectReference Include="..\..\..\Build\Unpack\Unpack.csproj"/>
+    <ProjectReference Include="..\..\..\Build\PixelFarm.MiniAgg.One\PixelFarm.MiniAgg.One.csproj"/>
+    <ProjectReference Include="..\..\..\PixelFarm.Typography\PixelFarm.Typography.csproj">
+      <Project>{540a2ea6-dae3-4625-8951-b2c3118603a4}</Project>
+      <Name>PixelFarm.Typography</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\TypographyTest.WinForms\TypographyTest.WinForms.csproj">
+      <Project>{9d2f3501-7705-4401-be13-a7613ca0c4bd}</Project>
+      <Name>TypographyTest.WinForms</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\gdiplussample.winforms\gdiplus\DevGdiTextPrinter.cs">
@@ -92,32 +106,6 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\Build\N20\Typography.GlyphLayout\Typography.GlyphLayout.csproj">
-      <Project>{c6807d05-09be-4313-9f8b-bd2d51c55819}</Project>
-      <Name>Typography.GlyphLayout</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\Build\N20\Typography.OpenFont\Typography.OpenFont.csproj">
-      <Project>{f7d71e61-9342-4dd7-9afd-69045f2ec98b}</Project>
-      <Name>Typography.OpenFont</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\Build\N20\Typography.TextServices\Typography.TextServices.csproj">
-      <Project>{6b0e034b-0ebd-4907-ad7f-437de66d78d4}</Project>
-      <Name>Typography.TextServices</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\PixelFarm.Typography\PixelFarm.Typography.csproj">
-      <Project>{540a2ea6-dae3-4625-8951-b2c3118603a4}</Project>
-      <Name>PixelFarm.Typography</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\x_autogen2\PixelFarm.MiniAgg.One\PixelFarm.MiniAgg.One.csproj">
-      <Project>{fb5f78f5-c921-405d-8f21-42f7c15c2ad9}</Project>
-      <Name>PixelFarm.MiniAgg.One</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\TypographyTest.WinForms\TypographyTest.WinForms.csproj">
-      <Project>{9d2f3501-7705-4401-be13-a7613ca0c4bd}</Project>
-      <Name>TypographyTest.WinForms</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

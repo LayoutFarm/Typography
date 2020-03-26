@@ -48,8 +48,7 @@ namespace Typography.OpenFont.Tables
 
     class PostTable : TableEntry
     {
-        public const string _N = "post";
-        public override string Name => _N;
+        public const string Name = "post";
         //
         uint _italicAngle;
         short _underlinePosition;
@@ -57,13 +56,13 @@ namespace Typography.OpenFont.Tables
 
         //---------------
 
-        Dictionary<ushort, string> _glyphNames;
-        Dictionary<string, ushort> _glyphIndiceByName;
+        Dictionary<ushort, string>? _glyphNames;
+        Dictionary<string, ushort>? _glyphIndiceByName;
 
         public int Version { get; private set; }
 
 
-        protected override void ReadContentFrom(BinaryReader reader)
+        public PostTable(TableHeader header, BinaryReader reader) : base(header, reader)
         {
             //header
             uint version = reader.ReadUInt32(); //16.16
@@ -149,7 +148,7 @@ namespace Typography.OpenFont.Tables
         }
 
 
-        internal Dictionary<ushort, string> GlyphNames => _glyphNames;
+        internal Dictionary<ushort, string>? GlyphNames => _glyphNames;
         //
         internal ushort GetGlyphIndex(string glyphName)
         {

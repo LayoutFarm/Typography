@@ -35,8 +35,7 @@ namespace TypographyTest
             SelectedTypefaceStyle = TypefaceStyle.Regular;
             FontSizeInPoints = 10;
             this.RenderChoice = RenderChoice.RenderWithTextPrinterAndMiniAgg;
-            _textServices = new TextServices();
-            _textServices.InstalledFontCollection = new InstalledTypefaceCollection();
+            _textServices = new TextServices(new InstalledTypefaceCollection(), ScriptLangs.Latin);
 
             _textServices.InstalledFontCollection.SetFontNameDuplicatedHandler(
                 (f0, f1) => FontNameDuplicatedDecision.Skip);

@@ -11,6 +11,7 @@
     <AssemblyName>FontRasterizer.Sample.WinForms</AssemblyName>
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <LangVersion>8.0</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -127,22 +128,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Build\N20\Typography.GlyphLayout\Typography.GlyphLayout.csproj">
-      <Project>{c6807d05-09be-4313-9f8b-bd2d51c55819}</Project>
-      <Name>Typography.GlyphLayout</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\Build\N20\Typography.TextServices\Typography.TextServices.csproj">
-      <Project>{6b0e034b-0ebd-4907-ad7f-437de66d78d4}</Project>
-      <Name>Typography.TextServices</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\Build\N20\Typography.OpenFont\Typography.OpenFont.csproj">
-      <Project>{29ed0dfe-373c-4e98-bd4b-43f8e5fb16f6}</Project>
-      <Name>Typography.OpenFont</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\Build\N20\Unpack\Unpack.csproj">
-      <Project>{901a60ed-baef-45f6-8919-6e07ee6bad8d}</Project>
-      <Name>Unpack</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\PixelFarm.Typography\PixelFarm.Typography.csproj">
       <Project>{540a2ea6-dae3-4625-8951-b2c3118603a4}</Project>
       <Name>PixelFarm.Typography</Name>
@@ -151,18 +136,21 @@
       <Project>{c5e5802d-6a45-4fe9-bae7-5f0ae91d72c1}</Project>
       <Name>BackEnd.Triangulation</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\PixelFarm\PaintLab.Svg\PaintLab.Svg.csproj">
-      <Project>{466dd2ae-eadc-4e20-82b3-da6d018006c5}</Project>
-      <Name>PaintLab.Svg</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\x_autogen2\PixelFarm.MiniAgg.One\PixelFarm.MiniAgg.One.csproj">
-      <Project>{fb5f78f5-c921-405d-8f21-42f7c15c2ad9}</Project>
-      <Name>PixelFarm.MiniAgg.One</Name>
-    </ProjectReference>
     <ProjectReference Include="..\TypographyTest.WinForms\TypographyTest.WinForms.csproj">
       <Project>{9d2f3501-7705-4401-be13-a7613ca0c4bd}</Project>
       <Name>TypographyTest.WinForms</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\PixelFarm.Typography\PixelFarm.Typography.csproj">
+      <Project>{540a2ea6-dae3-4625-8951-b2c3118603a4}</Project>
+      <Name>PixelFarm.Typography</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Build\Typography.OpenFont\Typography.OpenFont.csproj"/>
+    <ProjectReference Include="..\..\..\Build\Typography.GlyphLayout\Typography.GlyphLayout.csproj"/>
+    <ProjectReference Include="..\..\..\Build\Typography.TextBreak\Typography.TextBreak.csproj"/>
+    <ProjectReference Include="..\..\..\Build\Typography.TextFlow\Typography.TextFlow.csproj"/>
+    <ProjectReference Include="..\..\..\Build\Typography.TextServices\Typography.TextServices.csproj"/>
+    <ProjectReference Include="..\..\..\Build\Unpack\Unpack.csproj"/>
+    <ProjectReference Include="..\..\..\Build\PixelFarm.MiniAgg.One\PixelFarm.MiniAgg.One.csproj"/>
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

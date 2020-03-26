@@ -369,10 +369,10 @@ namespace Typography.OpenFont.MathGlyphs
         public bool IsShapeExtensible { get; internal set; }
 
         //optional 
-        public MathKern TopLeftMathKern { get { return _mathKernRec.TopLeft; } }
-        public MathKern TopRightMathKern { get { return _mathKernRec.TopRight; } }
-        public MathKern BottomLeftMathKern { get { return _mathKernRec.BottomLeft; } }
-        public MathKern BottomRightMathKern { get { return _mathKernRec.BottomRight; } }
+        public MathKern? TopLeftMathKern { get { return _mathKernRec.TopLeft; } }
+        public MathKern? TopRightMathKern { get { return _mathKernRec.TopRight; } }
+        public MathKern? BottomLeftMathKern { get { return _mathKernRec.BottomLeft; } }
+        public MathKern? BottomRightMathKern { get { return _mathKernRec.BottomRight; } }
         public bool HasSomeMathKern { get; private set; }
 
         //
@@ -386,18 +386,23 @@ namespace Typography.OpenFont.MathGlyphs
         /// <summary>
         /// vertical glyph construction
         /// </summary>
-        public MathGlyphConstruction VertGlyphConstruction;
+        public MathGlyphConstruction? VertGlyphConstruction;
         /// <summary>
         /// horizontal glyph construction
         /// </summary>
-        public MathGlyphConstruction HoriGlyphConstruction;
+        public MathGlyphConstruction? HoriGlyphConstruction;
 
     }
     public class MathGlyphConstruction
     {
-        public MathValueRecord GlyphAsm_ItalicCorrection;
-        public GlyphPartRecord[] GlyphAsm_GlyphPartRecords;
-        public MathGlyphVariantRecord[] glyphVariantRecords;
+        public MathGlyphVariantRecord[] GlyphVariantRecords;
+        public (MathValueRecord ItalicCorrection, GlyphPartRecord[] GlyphPartRecords)? GlyphAsm;
+
+        public MathGlyphConstruction(MathGlyphVariantRecord[] glyphVariantRecords, (MathValueRecord ItalicCorrection, GlyphPartRecord[] GlyphPartRecords)? glyphAsm)
+        {
+            GlyphVariantRecords = glyphVariantRecords;
+            GlyphAsm = glyphAsm;
+        }
     }
 
 
@@ -513,16 +518,16 @@ namespace Typography.OpenFont.MathGlyphs
     struct MathKernInfoRecord
     {
         //resolved value
-        public readonly MathKern TopRight;
-        public readonly MathKern TopLeft;
-        public readonly MathKern BottomRight;
-        public readonly MathKern BottomLeft;
-        public MathKernInfoRecord(MathKern topRight,
-             MathKern topLeft,
-             MathKern bottomRight,
-             MathKern bottomLeft)
+        public readonly MathKern? TopRight;
+        public readonly MathKern? TopLeft;
+        public readonly MathKern? BottomRight;
+        public readonly MathKern? BottomLeft;
+        public MathKernInfoRecord(MathKern? topRight,
+             MathKern? topLeft,
+             MathKern? bottomRight,
+             MathKern? bottomLeft)
         {
-            TopRight = topLeft;
+            TopRight = topRight;
             TopLeft = topLeft;
             BottomRight = bottomRight;
             BottomLeft = bottomLeft;
@@ -560,14 +565,14 @@ namespace Typography.OpenFont.Tables
 
         static MathGlyphInfo GetMathGlyphOrCreateNew(MathGlyphInfo[] mathGlyphInfos, ushort glyphIndex)
         {
-            return mathGlyphInfos[glyphIndex] ?? (mathGlyphInfos[glyphIndex] = new MathGlyphInfo(glyphIndex));
+            return mathGlyphInfos[glyphIndex] ??= new MathGlyphInfo(glyphIndex);
         }
         public void LoadMathGlyph(Typeface typeface, MathTable mathTable)
         {
             //expand math info to each glyph in typeface
 
             typeface._mathTable = mathTable;
-            Glyph[] allGlyphs = typeface.GetRawGlyphList();
+            Glyph[] allGlyphs = typeface.Glyphs;
 
             //expand all information to the glyph 
             int glyphCount = allGlyphs.Length;
@@ -621,10 +626,10 @@ namespace Typography.OpenFont.Tables
             {
                 //2.4 math kern
                 index = 0; //reset
-                if (mathTable._mathKernInfoCoverage != null)
+                if (mathTable._mathKernInfo is var (mathKernInfoRecords, mathKernInfoCoverage))
                 {
-                    MathKernInfoRecord[] kernRecs = mathTable._mathKernInfoRecords;
-                    foreach (ushort glyphIndex in mathTable._mathKernInfoCoverage.GetExpandedValueIter())
+                    MathKernInfoRecord[] kernRecs = mathKernInfoRecords;
+                    foreach (ushort glyphIndex in mathKernInfoCoverage.GetExpandedValueIter())
                     {
                         GetMathGlyphOrCreateNew(mathGlyphInfos, glyphIndex).SetMathKerns(kernRecs[index]);
                         index++;
@@ -673,12 +678,10 @@ namespace Typography.OpenFont.Tables
 
     class MathTable : TableEntry
     {
-        public const string _N = "MATH";
-        public override string Name => _N;
+        public const string Name = "MATH";
         //
         internal MathConstants _mathConstTable;
-
-        protected override void ReadContentFrom(BinaryReader reader)
+        internal MathTable(TableHeader header, BinaryReader reader) : base(header, reader)
         {
             //eg. latin-modern-math-regular.otf, asana-math.otf
 
@@ -700,15 +703,16 @@ namespace Typography.OpenFont.Tables
 
             //(1)
             reader.BaseStream.Position = beginAt + mathConstants_offset;
-            ReadMathConstantsTable(reader);
+            _mathConstTable = ReadMathConstantsTable(reader);
             //
             //(2)
             reader.BaseStream.Position = beginAt + mathGlyphInfo_offset;
-            ReadMathGlyphInfoTable(reader);
+            (_mathItalicCorrectionInfo, _mathTopAccentAttachmentTable, _extendedShapeCoverageTable, _mathKernInfo) =
+                ReadMathGlyphInfoTable(reader);
             //
             //(3)
             reader.BaseStream.Position = beginAt + mathVariants_offset;
-            ReadMathVariantsTable(reader);
+            _mathVariantsTable = ReadMathVariantsTable(reader);
 
             //NOTE: expose  MinConnectorOverlap via _mathConstTable
             _mathConstTable.MinConnectorOverlap = _mathVariantsTable.MinConnectorOverlap;
@@ -717,7 +721,7 @@ namespace Typography.OpenFont.Tables
         /// (1) MathConstants
         /// </summary>
         /// <param name="reader"></param>
-        void ReadMathConstantsTable(BinaryReader reader)
+        MathConstants ReadMathConstantsTable(BinaryReader reader)
         {
             //MathConstants Table
 
@@ -809,8 +813,7 @@ namespace Typography.OpenFont.Tables
             mc.RadicalKernAfterDegree = reader.ReadMathValueRecord();
             mc.RadicalDegreeBottomRaisePercent = reader.ReadInt16();
 
-
-            _mathConstTable = mc;
+            return mc;
         }
 
 
@@ -820,7 +823,8 @@ namespace Typography.OpenFont.Tables
         /// (2) MathGlyphInfo
         /// </summary>
         /// <param name="reader"></param>
-        void ReadMathGlyphInfoTable(BinaryReader reader)
+        (MathItalicsCorrectonInfoTable, MathTopAccentAttachmentTable, CoverageTable? extendedShapeCoverageTable,
+         (MathKernInfoRecord[], CoverageTable)? mathKernInfo) ReadMathGlyphInfoTable(BinaryReader reader)
         {
 
             //MathGlyphInfo Table
@@ -842,11 +846,11 @@ namespace Typography.OpenFont.Tables
 
             //(2.1)
             reader.BaseStream.Position = startAt + offsetTo_MathItalicsCorrectionInfo_Table;
-            ReadMathItalicCorrectionInfoTable(reader);
+            var italicCorrectionInfo = ReadMathItalicCorrectionInfoTable(reader);
 
             //(2.2)
             reader.BaseStream.Position = startAt + offsetTo_MathTopAccentAttachment_Table;
-            ReadMathTopAccentAttachment(reader);
+            var topAccentAttachment = ReadMathTopAccentAttachment(reader);
             //
 
 
@@ -861,21 +865,24 @@ namespace Typography.OpenFont.Tables
 
             //.... 
 
+            CoverageTable? extendedShapeCoverageTable = null;
             //(2.3)
             if (offsetTo_Extended_Shape_coverage_Table > 0)
             {
                 //may be null?, eg. found in font Linux Libertine Regular (https://sourceforge.net/projects/linuxlibertine/)
-                _extendedShapeCoverageTable = CoverageTable.CreateFrom(reader, startAt + offsetTo_Extended_Shape_coverage_Table);
+                extendedShapeCoverageTable = CoverageTable.CreateFrom(reader, startAt + offsetTo_Extended_Shape_coverage_Table);
             }
 
+            (MathKernInfoRecord[], CoverageTable)? mathKernInfo = null;
             //(2.4)
             if (offsetTo_MathKernInfo_Table > 0)
             {
                 //may be null? eg. latin-modern-math.otf => not found
                 //we found this in Asana-math-regular
                 reader.BaseStream.Position = startAt + offsetTo_MathKernInfo_Table;
-                ReadMathKernInfoTable(reader);
+                mathKernInfo = ReadMathKernInfoTable(reader);
             }
+            return (italicCorrectionInfo, topAccentAttachment, extendedShapeCoverageTable, mathKernInfo);
         }
 
 
@@ -886,11 +893,9 @@ namespace Typography.OpenFont.Tables
         /// <summary>
         /// (2.1)
         /// </summary>
-        /// <param name="reader"></param>
-        void ReadMathItalicCorrectionInfoTable(BinaryReader reader)
+        MathItalicsCorrectonInfoTable ReadMathItalicCorrectionInfoTable(BinaryReader reader)
         {
             long beginAt = reader.BaseStream.Position;
-            _mathItalicCorrectionInfo = new MathItalicsCorrectonInfoTable();
             //MathItalicsCorrectionInfo Table
             //Type           Name                           Description
             //Offset16       Coverage                       Offset to Coverage table - from the beginning of MathItalicsCorrectionInfo table.
@@ -898,13 +903,15 @@ namespace Typography.OpenFont.Tables
             //MathValueRecord ItalicsCorrection[ItalicsCorrectionCount]  Array of MathValueRecords defining italics correction values for each covered glyph. 
             ushort coverageOffset = reader.ReadUInt16();
             ushort italicCorrectionCount = reader.ReadUInt16();
-            _mathItalicCorrectionInfo.ItalicCorrections = reader.ReadMathValueRecords(italicCorrectionCount);
+            var italicCorrections = reader.ReadMathValueRecords(italicCorrectionCount);
+            CoverageTable? coverageTable = null;
             //read coverage ...
             if (coverageOffset > 0)
             {
                 //may be null?, eg. found in font Linux Libertine Regular (https://sourceforge.net/projects/linuxlibertine/)
-                _mathItalicCorrectionInfo.CoverageTable = CoverageTable.CreateFrom(reader, beginAt + coverageOffset);
+                coverageTable = CoverageTable.CreateFrom(reader, beginAt + coverageOffset);
             }
+            return new MathItalicsCorrectonInfoTable(italicCorrections, coverageTable);
         }
 
 
@@ -916,7 +923,7 @@ namespace Typography.OpenFont.Tables
         /// (2.2)
         /// </summary>
         /// <param name="reader"></param>
-        void ReadMathTopAccentAttachment(BinaryReader reader)
+        MathTopAccentAttachmentTable ReadMathTopAccentAttachment(BinaryReader reader)
         {
             //MathTopAccentAttachment Table
 
@@ -935,38 +942,34 @@ namespace Typography.OpenFont.Tables
 
 
             long beginAt = reader.BaseStream.Position;
-            _mathTopAccentAttachmentTable = new MathTopAccentAttachmentTable();
 
             ushort coverageOffset = reader.ReadUInt16();
             ushort topAccentAttachmentCount = reader.ReadUInt16();
-            _mathTopAccentAttachmentTable.TopAccentAttachment = reader.ReadMathValueRecords(topAccentAttachmentCount);
+            var topAccentAttachment = reader.ReadMathValueRecords(topAccentAttachmentCount);
+            CoverageTable? coverageTable = null;
             if (coverageOffset > 0)
             {
                 //may be null?, eg. found in font Linux Libertine Regular (https://sourceforge.net/projects/linuxlibertine/)
-                _mathTopAccentAttachmentTable.CoverageTable = CoverageTable.CreateFrom(reader, beginAt + coverageOffset);
+                coverageTable = CoverageTable.CreateFrom(reader, beginAt + coverageOffset);
             }
-
+            return new MathTopAccentAttachmentTable(topAccentAttachment, coverageTable);
         }
 
         /// <summary>
         /// (2.3)
         /// </summary>
-        internal CoverageTable _extendedShapeCoverageTable;
+        internal CoverageTable? _extendedShapeCoverageTable;
 
 
         /// <summary>
         /// (2.4)
         /// </summary>
-        internal CoverageTable _mathKernInfoCoverage;
-        /// <summary>
-        /// (2.4)
-        /// </summary>
-        internal MathKernInfoRecord[] _mathKernInfoRecords;
+        internal (MathKernInfoRecord[], CoverageTable)? _mathKernInfo;
         /// <summary>
         /// (2.4)
         /// </summary>
         /// <param name="reader"></param>
-        void ReadMathKernInfoTable(BinaryReader reader)
+        (MathKernInfoRecord[] mathKernInfoRecords, CoverageTable mathKernInfoCoverage) ReadMathKernInfoTable(BinaryReader reader)
         {
             // MathKernInfo Table
 
@@ -1005,7 +1008,7 @@ namespace Typography.OpenFont.Tables
             ushort[] allKernRecOffset = Utils.ReadUInt16Array(reader, 4 * mathKernCount);//*** 
 
             //read each kern table  
-            _mathKernInfoRecords = new MathKernInfoRecord[mathKernCount];
+            var mathKernInfoRecords = new MathKernInfoRecord[mathKernCount];
             int index = 0;
             ushort m_kern_offset = 0;
 
@@ -1015,7 +1018,7 @@ namespace Typography.OpenFont.Tables
                 //top-right
                 m_kern_offset = allKernRecOffset[index];
 
-                MathKern topRight = null, topLeft = null, bottomRight = null, bottomLeft = null;
+                MathKern? topRight = null, topLeft = null, bottomRight = null, bottomLeft = null;
 
                 if (m_kern_offset > 0)
                 {
@@ -1044,14 +1047,14 @@ namespace Typography.OpenFont.Tables
                     bottomLeft = ReadMathKernTable(reader);
                 }
 
-                _mathKernInfoRecords[i] = new MathKernInfoRecord(topRight, topLeft, bottomRight, bottomLeft);
+                mathKernInfoRecords[i] = new MathKernInfoRecord(topRight, topLeft, bottomRight, bottomLeft);
 
                 index += 4;//***
             }
 
             //-----
-            _mathKernInfoCoverage = CoverageTable.CreateFrom(reader, beginAt + mathKernCoverage_offset);
-
+            var mathKernInfoCoverage = CoverageTable.CreateFrom(reader, beginAt + mathKernCoverage_offset);
+            return (mathKernInfoRecords, mathKernInfoCoverage);
         }
         /// <summary>
         /// (2.4)
@@ -1094,11 +1097,12 @@ namespace Typography.OpenFont.Tables
         /// (3)
         /// </summary>
         internal MathVariantsTable _mathVariantsTable;
+
         /// <summary>
         /// (3) MathVariants
         /// </summary>
         /// <param name="reader"></param>
-        void ReadMathVariantsTable(BinaryReader reader)
+        MathVariantsTable ReadMathVariantsTable(BinaryReader reader)
         {
             //MathVariants Table
 
@@ -1138,11 +1142,9 @@ namespace Typography.OpenFont.Tables
             //Offset16      VertGlyphConstruction[VertGlyphCount]  Array of offsets to MathGlyphConstruction tables - from the beginning of the MathVariants table, for shapes growing in vertical direction.
             //Offset16      HorizGlyphConstruction[HorizGlyphCount]    Array of offsets to MathGlyphConstruction tables - from the beginning of the MathVariants table, for shapes growing in horizontal direction.
 
-            _mathVariantsTable = new MathVariantsTable();
-
             long beginAt = reader.BaseStream.Position;
             //
-            _mathVariantsTable.MinConnectorOverlap = reader.ReadUInt16();
+            var minConnectorOverlap = reader.ReadUInt16();
             //
             ushort vertGlyphCoverageOffset = reader.ReadUInt16();
             ushort horizGlyphCoverageOffset = reader.ReadUInt16();
@@ -1152,18 +1154,19 @@ namespace Typography.OpenFont.Tables
             ushort[] horizonGlyphConstructions = Utils.ReadUInt16Array(reader, horizGlyphCount);
             //
 
-            _mathVariantsTable.vertCoverage = CoverageTable.CreateFrom(reader, beginAt + vertGlyphCoverageOffset);
+            var vertCoverage = CoverageTable.CreateFrom(reader, beginAt + vertGlyphCoverageOffset);
+            CoverageTable? horizCoverage = null;
             if (horizGlyphCoverageOffset > 0)
             {
                 //may be null?, eg. found in font Linux Libertine Regular (https://sourceforge.net/projects/linuxlibertine/)
-                _mathVariantsTable.horizCoverage = CoverageTable.CreateFrom(reader, beginAt + horizGlyphCoverageOffset);
+                horizCoverage = CoverageTable.CreateFrom(reader, beginAt + horizGlyphCoverageOffset);
             }
 
             //read math construction table
 
             //(3.1)
             //vertical
-            var vertGlyphConstructionTables = _mathVariantsTable.vertConstructionTables = new MathGlyphConstruction[vertGlyphCount];
+            var vertGlyphConstructionTables = new MathGlyphConstruction[vertGlyphCount];
             for (int i = 0; i < vertGlyphCount; ++i)
             {
                 reader.BaseStream.Position = beginAt + vertGlyphConstructions[i];
@@ -1172,12 +1175,14 @@ namespace Typography.OpenFont.Tables
 
             //(3.2)
             //horizon
-            var horizGlyphConstructionTables = _mathVariantsTable.horizConstructionTables = new MathGlyphConstruction[horizGlyphCount];
+            var horizGlyphConstructionTables = new MathGlyphConstruction[horizGlyphCount];
             for (int i = 0; i < horizGlyphCount; ++i)
             {
                 reader.BaseStream.Position = beginAt + horizonGlyphConstructions[i];
                 horizGlyphConstructionTables[i] = ReadMathGlyphConstructionTable(reader);
             }
+
+            return new MathVariantsTable(minConnectorOverlap, vertCoverage, horizCoverage, vertGlyphConstructionTables, horizGlyphConstructionTables);
         }
 
 
@@ -1217,12 +1222,10 @@ namespace Typography.OpenFont.Tables
 
             long beginAt = reader.BaseStream.Position;
 
-            var glyphConstructionTable = new MathGlyphConstruction();
-
             ushort glyphAsmOffset = reader.ReadUInt16();
             ushort variantCount = reader.ReadUInt16();
 
-            var variantRecords = glyphConstructionTable.glyphVariantRecords = new MathGlyphVariantRecord[variantCount];
+            var variantRecords = new MathGlyphVariantRecord[variantCount];
 
             for (int i = 0; i < variantCount; ++i)
             {
@@ -1232,21 +1235,21 @@ namespace Typography.OpenFont.Tables
                     );
             }
 
-
+            (MathValueRecord, GlyphPartRecord[])? glyphAsm = null;
             //read glyph asm table
             if (glyphAsmOffset > 0)//may be NULL
             {
                 reader.BaseStream.Position = beginAt + glyphAsmOffset;
-                FillGlyphAssemblyInfo(reader, glyphConstructionTable);
+                glyphAsm = ReadGlyphAssemblyInfo(reader);
             }
-            return glyphConstructionTable;
+            return new MathGlyphConstruction(variantRecords, glyphAsm);
         }
         /// <summary>
         /// (3.1, 3.2,)
         /// </summary>
         /// <param name="reader"></param>
         /// <param name="glyphConstruction"></param>
-        static void FillGlyphAssemblyInfo(BinaryReader reader, MathGlyphConstruction glyphConstruction)
+        static (MathValueRecord italicCorrection, GlyphPartRecord[] partRecords) ReadGlyphAssemblyInfo(BinaryReader reader)
         {
             //since MathGlyphConstructionTable: GlyphAssembly is 1:1 
             //---------
@@ -1269,9 +1272,9 @@ namespace Typography.OpenFont.Tables
             //Note that the glyphs comprising the assembly should be designed so that they align properly in the direction that is orthogonal to the direction of growth.
 
 
-            glyphConstruction.GlyphAsm_ItalicCorrection = reader.ReadMathValueRecord();
+            var italicCorrection = reader.ReadMathValueRecord();
             ushort partCount = reader.ReadUInt16();
-            var partRecords = glyphConstruction.GlyphAsm_GlyphPartRecords = new GlyphPartRecord[partCount];
+            var partRecords = new GlyphPartRecord[partCount];
             for (int i = 0; i < partCount; ++i)
             {
                 partRecords[i] = new GlyphPartRecord(
@@ -1282,6 +1285,7 @@ namespace Typography.OpenFont.Tables
                     reader.ReadUInt16()
                     );
             }
+            return (italicCorrection, partRecords);
         }
 
 
@@ -1309,14 +1313,24 @@ namespace Typography.OpenFont.Tables
         //    When positioning superscripts and subscripts, their default horizontal positions are also different by the amount of the italics correction of the preceding glyph.
 
         public MathValueRecord[] ItalicCorrections;
-        public CoverageTable CoverageTable;
+        public CoverageTable? CoverageTable;
 
-
+        public MathItalicsCorrectonInfoTable(MathValueRecord[] italicCorrections, CoverageTable? coverageTable)
+        {
+            ItalicCorrections = italicCorrections;
+            CoverageTable = coverageTable;
+        }
     }
     class MathTopAccentAttachmentTable
     {
         public MathValueRecord[] TopAccentAttachment;
-        public CoverageTable CoverageTable;
+        public CoverageTable? CoverageTable;
+
+        public MathTopAccentAttachmentTable(MathValueRecord[] topAccentAttachment, CoverageTable? coverageTable)
+        {
+            TopAccentAttachment = topAccentAttachment;
+            CoverageTable = coverageTable;
+        }
     }
 
 
@@ -1324,9 +1338,18 @@ namespace Typography.OpenFont.Tables
     {
         public ushort MinConnectorOverlap;
         public CoverageTable vertCoverage;
-        public CoverageTable horizCoverage;
+        public CoverageTable? horizCoverage;
         public MathGlyphConstruction[] vertConstructionTables;
         public MathGlyphConstruction[] horizConstructionTables;
+
+        public MathVariantsTable(ushort minConnectorOverlap, CoverageTable vertCoverage, CoverageTable? horizCoverage, MathGlyphConstruction[] vertConstructionTables, MathGlyphConstruction[] horizConstructionTables)
+        {
+            MinConnectorOverlap = minConnectorOverlap;
+            this.vertCoverage = vertCoverage;
+            this.horizCoverage = horizCoverage;
+            this.vertConstructionTables = vertConstructionTables;
+            this.horizConstructionTables = horizConstructionTables;
+        }
     }
 
 

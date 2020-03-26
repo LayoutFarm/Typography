@@ -26,7 +26,7 @@ namespace Typography.TextBreak
 #if DEBUG
         List<BreakAtInfo> dbugBreakAtList = new List<BreakAtInfo>();
 #endif
-        char[] _buffer;
+        char[]? _buffer;
 
         int _startIndex;
         int _endIndex;
@@ -127,6 +127,7 @@ namespace Typography.TextBreak
         //
         internal void SetCurrentIndex(int index)
         {
+            if (_buffer == null) throw new InvalidOperationException(nameof(LoadText) + " not called");
             _currentIndex = index;
             if (index < _endIndex)
             {

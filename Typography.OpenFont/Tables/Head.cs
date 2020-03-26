@@ -7,21 +7,17 @@ namespace Typography.OpenFont.Tables
 {
     class Head : TableEntry
     {
-        public const string _N = "head";
-        public override string Name => _N;
+        public const string Name = "head";
         //
         short _indexToLocFormat;
         Bounds _bounds;
-        public Head()
-        {
-        }
-        protected override void ReadContentFrom(BinaryReader input)
+        public Head(TableHeader header, BinaryReader input) : base(header, input)
         {
             Version = input.ReadUInt32(); // 0x00010000 for version 1.0.
             FontRevision = input.ReadUInt32();
             CheckSumAdjustment = input.ReadUInt32();
             MagicNumber = input.ReadUInt32();
-            if (MagicNumber != 0x5F0F3CF5) throw new Exception("Invalid magic number!" + MagicNumber.ToString("x"));
+            if (MagicNumber != 0x5F0F3CF5) throw new Exception("Invalid magic number! " + MagicNumber.ToString("x"));
             Flags = input.ReadUInt16();
             UnitsPerEm = input.ReadUInt16(); // valid is 16 to 16384
             Created = input.ReadUInt64(); //  International date (8-byte field). (?)
