@@ -172,7 +172,7 @@ namespace Typography.OpenFont.Tables
         {
 
             static Dictionary<string, ValueTagInfo> s_registerTags = new Dictionary<string, ValueTagInfo>();
-            public static bool TryGetValueTagInfo(string tag, out ValueTagInfo valueTagInfo)
+            public static bool TryGetValueTagInfo(string tag, [System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out ValueTagInfo? valueTagInfo)
             {
                 return s_registerTags.TryGetValue(tag, out valueTagInfo);
             }

@@ -19,7 +19,7 @@ namespace Typography.OpenFont
                 {
                     string[] seps = new string[] { " " };
 
-                    string line = strReader.ReadLine();
+                    string? line = strReader.ReadLine();
 
                     while (line != null)
                     {

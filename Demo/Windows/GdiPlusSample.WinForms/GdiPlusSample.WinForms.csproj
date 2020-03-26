@@ -52,9 +52,6 @@
     <Compile Include="..\..\..\PixelFarm\PixelFarm.Painter\2_General\TextBaseline.cs">
       <Link>DevTextPrinter\TextBaseline.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\Typography.TextServices\FontStoreAndManagment\FontManagement.cs">
-      <Link>DevTextPrinter\FontManagement.cs</Link>
-    </Compile>
     <Compile Include="..\..\Shared\GlyphOutlineBuilder\GlyphOutlineBuilder.cs">
       <Link>GlyphPathBuilder\GlyphOutlineBuilder.cs</Link>
     </Compile>
@@ -92,6 +89,9 @@
     </Compile>
     <ProjectReference Include="..\..\..\Build\Typography.OpenFont\Typography.OpenFont.csproj"/>
     <ProjectReference Include="..\..\..\Build\Typography.GlyphLayout\Typography.GlyphLayout.csproj"/>
+    <ProjectReference Include="..\..\..\Build\Typography.TextBreak\Typography.TextBreak.csproj"/>
+    <ProjectReference Include="..\..\..\Build\Typography.TextFlow\Typography.TextFlow.csproj"/>
+    <ProjectReference Include="..\..\..\Build\Typography.TextServices\Typography.TextServices.csproj"/>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

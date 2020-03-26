@@ -65,7 +65,7 @@ namespace Typography.TextBreak
                     WordSpan wordspan = new WordSpan(startAt, (byte)lineLen);
                     //each wordgroup contains text span
 
-                    DevelopingWordGroup found;
+                    DevelopingWordGroup? found;
                     if (!wordGroups.TryGetValue(c0, out found))
                     {
                         found = new DevelopingWordGroup(new WordSpan(startAt, 1));
@@ -463,6 +463,7 @@ namespace Typography.TextBreak
         }
         public string GetString(int index, int len)
         {
+            if (_charBuffer == null) throw new InvalidOperationException("Buffer not frozen yet");
             return new string(_charBuffer, index, len);
         }
     }

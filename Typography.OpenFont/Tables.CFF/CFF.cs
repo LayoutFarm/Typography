@@ -497,7 +497,7 @@ namespace Typography.OpenFont.CFF
             _nominalWidthX = nominalWidthX;
         }
 
-        public Glyph GetGlyphByName(string name)
+        public Glyph? GetGlyphByName(string name)
         {
             if (_cachedGlyphDicByName == null)
             {
@@ -512,7 +512,7 @@ namespace Typography.OpenFont.CFF
                 }
             }
 
-            _cachedGlyphDicByName.TryGetValue(name, out Glyph found);
+            _cachedGlyphDicByName.TryGetValue(name, out Glyph? found);
             return found;
         }
 
@@ -1702,8 +1702,7 @@ namespace Typography.OpenFont.CFF
 
         public static CFFOperator GetOperatorByKey(byte b0, byte b1)
         {
-            s_registered_Operators.TryGetValue((b1 << 8) | b0, out CFFOperator found);
-            return found;
+            return s_registered_Operators[(b1 << 8) | b0];
         }
 
 

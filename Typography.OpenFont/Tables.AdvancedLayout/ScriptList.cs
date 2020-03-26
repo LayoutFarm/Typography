@@ -15,7 +15,7 @@ namespace Typography.OpenFont.Tables
         private ScriptList() { }
         public new ScriptTable? this[string tagName]
         {
-            get { return TryGetValue(tagName, out ScriptTable ret) ? ret : null; }
+            get { return TryGetValue(tagName, out ScriptTable? ret) ? ret : null; }
         }
 
         public static ScriptList CreateFrom(BinaryReader reader, long beginAt)

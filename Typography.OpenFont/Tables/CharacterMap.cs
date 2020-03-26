@@ -184,7 +184,7 @@ namespace Typography.OpenFont.Tables
         {
             // Only check codepoint if nextCodepoint is a variation selector
 
-            if (_variationSelectors.TryGetValue(nextCodepoint, out VariationSelector sel))
+            if (_variationSelectors.TryGetValue(nextCodepoint, out VariationSelector? sel))
             {
 
                 // If the sequence is a non-default UVS, return the mapped glyph

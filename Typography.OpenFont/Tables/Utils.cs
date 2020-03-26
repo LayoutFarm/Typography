@@ -95,14 +95,14 @@ namespace Typography.OpenFont
             return newArr;
         }
 
-        public static void WarnUnimplemented(string format, params object[] args)
+        public static void WarnUnimplemented(string format, params object?[] args)
         {
 #if DEBUG
             System.Diagnostics.Debug.WriteLine("!STUB! " + string.Format(format, args));
 #endif
         }
 
-        internal static void WarnUnimplementedCollectAssocGlyphs(string msg)
+        internal static void WarnUnimplementedCollectAssocGlyphs(string? msg)
         {
 #if DEBUG
             System.Diagnostics.Debug.WriteLine("!STUB! UnimplementedCollectAssocGlyph :" + msg);

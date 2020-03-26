@@ -82,6 +82,7 @@ namespace Typography.TextBreak
 
         public string CopyCurrentSpanString()
         {
+            if (_buffer == null) throw new InvalidOperationException(nameof(LoadText) + " not called");
             return new string(_buffer, LatestSpanStartAt, LatestSpanLen);
         }
 

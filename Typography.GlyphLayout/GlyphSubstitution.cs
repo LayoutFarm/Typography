@@ -194,7 +194,7 @@ namespace Typography.TextLayout
             //if user dose not specific the unicode lanf bit ranges
             //the we try to select it ourself. 
 
-            if (ScriptLangs.TryGetUnicodeLangBitsArray(scLang.shortname, out UnicodeLangBits[] unicodeLangBitsRanges))
+            if (ScriptLangs.TryGetUnicodeLangBitsArray(scLang.shortname, out UnicodeLangBits[]? unicodeLangBitsRanges))
             {
                 //one lang may contains may ranges
                 if (selectedRangs != null)

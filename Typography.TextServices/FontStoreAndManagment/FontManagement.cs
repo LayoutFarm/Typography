@@ -103,7 +103,7 @@ namespace Typography.FontManagement
             {
                 _members.Add(registerName, installedFont);
             }
-            public bool TryGetValue(string registerName, out InstalledTypeface found)
+            public bool TryGetValue(string registerName, [System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out InstalledTypeface? found)
             {
                 return _members.TryGetValue(registerName, out found);
             }
@@ -376,7 +376,7 @@ namespace Typography.FontManagement
             register_name = register_name.ToUpper(); //***  
             bool register_result = false;
 
-            if (selectedFontGroup.TryGetValue(register_name, out InstalledTypeface found))
+            if (selectedFontGroup.TryGetValue(register_name, out InstalledTypeface? found))
             {
                 //TODO:
                 //we already have this font name
@@ -422,9 +422,9 @@ namespace Typography.FontManagement
             string upperCaseFontName = fontName.ToUpper();
             string upperCaseSubFamName = subFamName.ToUpper();
 
-            InstalledTypeface foundInstalledFont;
+            InstalledTypeface? foundInstalledFont;
             //find font group  
-            if (_subFamToFontGroup.TryGetValue(upperCaseSubFamName, out InstalledTypefaceGroup foundFontGroup))
+            if (_subFamToFontGroup.TryGetValue(upperCaseSubFamName, out InstalledTypefaceGroup? foundFontGroup))
             {
                 if (foundFontGroup.TryGetValue(upperCaseFontName, out foundInstalledFont))
                 {
@@ -450,7 +450,7 @@ namespace Typography.FontManagement
         {
             //not auto resolve
             InstalledTypefaceGroup selectedFontGroup;
-            InstalledTypeface _found;
+            InstalledTypeface? _found;
             switch (wellknownSubFam)
             {
                 default: return null;
@@ -547,7 +547,7 @@ namespace Typography.FontManagement
             fontName = fontName.ToUpper();
             foreach (InstalledTypefaceGroup typefaceGroup in _subFamToFontGroup.Values)
             {
-                if (typefaceGroup.TryGetValue(fontName, out InstalledTypeface found))
+                if (typefaceGroup.TryGetValue(fontName, out InstalledTypeface? found))
                 {
                     yield return found;
                 }

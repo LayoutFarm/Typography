@@ -74,16 +74,16 @@ namespace Typography.TextServices
             _glyphLayout ??= new GlyphLayout(typeface);
             //check if we have the cache-key or create a new one.
             var key = new TextShapingContextKey(typeface, _glyphLayout.ScriptLang);
-            if (!_registerShapingContexts.TryGetValue(key, out _currentGlyphPlanSeqCache))
+            if (!_registerShapingContexts.TryGetValue(key, out var currentGlyphPlanSeqCache))
             {
                 //not found
                 //the create the new one 
                 var shapingContext = new GlyphPlanCacheForTypefaceAndScriptLang(typeface, _glyphLayout.ScriptLang);
                 //shaping context setup ...
                 _registerShapingContexts.Add(key, shapingContext);
-                _currentGlyphPlanSeqCache = shapingContext;
+                currentGlyphPlanSeqCache = shapingContext;
             }
-
+            _currentGlyphPlanSeqCache = currentGlyphPlanSeqCache;
             _currentTypeface = typeface;
             _fontSizeInPts = fontSizeInPts;
 
@@ -316,7 +316,7 @@ namespace Typography.TextServices
                 {
                     _cacheSeqCollection2 = new Dictionary<int, GlyphPlanSeqCollection>();
                 }
-                GlyphPlanSeqCollection seqCol;
+                GlyphPlanSeqCollection? seqCol;
                 if (!_cacheSeqCollection2.TryGetValue(len, out seqCol))
                 {
                     //new one if not exist
@@ -473,7 +473,7 @@ namespace Typography.TextServices
         {
             //load 
             //check if we have create this typeface or not 
-            if (!_loadedTypefaces.TryGetValue(installedFont, out Typeface typeface))
+            if (!_loadedTypefaces.TryGetValue(installedFont, out Typeface? typeface))
             {
                 //TODO: review how to load font here 
                 if (Typography.FontManagement.InstalledTypefaceCollectionExtensions.CustomFontStreamLoader != null)
