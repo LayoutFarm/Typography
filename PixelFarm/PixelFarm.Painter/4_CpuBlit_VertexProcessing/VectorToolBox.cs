@@ -176,17 +176,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             return Temp<VxsClipper>.Borrow(out clipper);
         }
 
-        public static TempContext<PolygonSimplifier> Borrow(out PolygonSimplifier flattener)
-        {
-            if (!Temp<PolygonSimplifier>.IsInit())
-            {
-                Temp<PolygonSimplifier>.SetNewHandler(
-                    () => new PolygonSimplifier(),
-                    f => f.Reset());
-            }
-            return Temp<PolygonSimplifier>.Borrow(out flattener);
-        }
-
+        
     }
 
 

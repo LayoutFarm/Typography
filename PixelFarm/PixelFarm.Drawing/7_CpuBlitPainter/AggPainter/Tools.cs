@@ -215,7 +215,17 @@ namespace PixelFarm.CpuBlit
             }
             return Temp<CurveFlattener>.Borrow(out flattener);
         }
-           
+        public static TempContext<PolygonSimplifier> BorrowPolygonSimplifier(out PolygonSimplifier flattener)
+        {
+            if (!Temp<PolygonSimplifier>.IsInit())
+            {
+                Temp<PolygonSimplifier>.SetNewHandler(
+                    () => new PolygonSimplifier(),
+                    f => f.Reset());
+            }
+            return Temp<PolygonSimplifier>.Borrow(out flattener);
+        }
+
     }
 
     public class ShapeBuilder
