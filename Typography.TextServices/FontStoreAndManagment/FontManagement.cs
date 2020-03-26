@@ -410,7 +410,7 @@ namespace Typography.FontManagement
             {
                 //in this case, the code above register the typeface with TypographicFamilyName
                 //so we register this typeface with original name too
-                _otherFontNames.Add(newTypeface.FontName.ToUpper(), newTypeface);
+                try { _otherFontNames.Add(newTypeface.FontName.ToUpper(), newTypeface); } catch { }
             }
 
             return register_result;

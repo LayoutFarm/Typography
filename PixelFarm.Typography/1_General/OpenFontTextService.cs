@@ -1,4 +1,4 @@
-﻿//Apache2, 2014-present, WinterDev
+//Apache2, 2014-present, WinterDev
 using System;
 using System.Collections.Generic;
 using PixelFarm.Drawing;
@@ -19,6 +19,7 @@ namespace LayoutFarm
         /// instance of Typography lib's text service
         /// </summary>
         TextServices _txtServices;
+        ScriptLang _scLang;
         Dictionary<int, Typeface> _resolvedTypefaceCache = new Dictionary<int, Typeface>();
         readonly int _system_id;
         //
@@ -52,11 +53,7 @@ namespace LayoutFarm
             {
                 //TODO: handle error here
             }
-            _txtServices = new TextServices(InstalledTypefaceCollection.GetSharedTypefaceCollection(collection =>
-            {
-                collection.SetFontNameDuplicatedHandler((f0, f1) => FontNameDuplicatedDecision.Skip);
-
-            }), scLang);
+            _scLang = scLang;
             // ... or specific the scriptlang manully, eg. ...
             //_shapingServices.SetDefaultScriptLang(scLang);
             //_shapingServices.SetCurrentScriptLang(scLang);
@@ -64,12 +61,22 @@ namespace LayoutFarm
         }
         public void LoadSystemFonts()
         {
-            _txtServices.InstalledFontCollection.LoadSystemFonts();
+            var collection = InstalledTypefaceCollection.GetSharedTypefaceCollection(collection =>
+            {
+                collection.SetFontNameDuplicatedHandler((f0, f1) => FontNameDuplicatedDecision.Skip);
+            });
+            collection.LoadSystemFonts();
+            _txtServices = new TextServices(collection, _scLang);
         }
 
         public void LoadFontsFromFolder(string folder)
         {
-            _txtServices.InstalledFontCollection.LoadFontsFromFolder(folder);
+            var collection = InstalledTypefaceCollection.GetSharedTypefaceCollection(collection =>
+            {
+                collection.SetFontNameDuplicatedHandler((f0, f1) => FontNameDuplicatedDecision.Skip);
+            });
+            collection.LoadFontsFromFolder(folder);
+            _txtServices = new TextServices(collection, _scLang);
         }
         static bool TryGetScriptLangFromCurrentThreadCultureInfo(out Typography.OpenFont.ScriptLang scLang)
         {
@@ -219,7 +226,7 @@ namespace LayoutFarm
             {
                 //not found ask the typeface store to load that font
                 //....
-                typeface = _txtServices.GetTypeface(font.Name, PixelFarm.Drawing.FontStyleExtensions.ConvToInstalledFontStyle(font.Style));
+                typeface = _txtServices?.GetTypeface(font.Name, PixelFarm.Drawing.FontStyleExtensions.ConvToInstalledFontStyle(font.Style));
                 if (typeface == null)
                 {
                     throw new NotSupportedException(font.Name);
@@ -263,7 +270,9 @@ namespace LayoutFarm
             Typeface typeface = ResolveTypeface(font);
             _txtServices.SetCurrentFont(typeface, font.SizeInPoints);
 
-            _reusableTextBuffer.SetRawCharBuffer(textBufferSpan.GetRawCharBuffer());
+            if (_reusableTextBuffer == null)
+                _reusableTextBuffer = new ReusableTextBuffer(textBufferSpan.GetRawCharBuffer());
+            else _reusableTextBuffer.SetRawCharBuffer(textBufferSpan.GetRawCharBuffer());
 
             return _txtServices.GetUnscaledGlyphPlanSequence(_reusableTextBuffer, textBufferSpan.start, textBufferSpan.len);
         }
