@@ -63,49 +63,7 @@ namespace BitmapBufferEx
             }
         }
 
-#if DEBUG
-        /// <summary>
-        /// Draws a polyline. Add the first point also at the end of the array if the line should be closed.
-        /// </summary>
-        /// <param name="bmp">The WriteableBitmap.</param>
-        /// <param name="points">The points of the polyline in x and y pairs, therefore the array is interpreted as (x1, y1, x2, y2, ..., xn, yn).</param>
-        /// <param name="color">The color for the line.</param>
-        public static void dbugDrawPolylineAa(this BitmapBuffer bmp, int[] points, ColorInt color)
-        {
-            bmp.dbugDrawPolylineAa(points, color.ToPreMultAlphaColor());
-        }
 
-        /// <summary>
-        /// Draws a polyline anti-aliased. Add the first point also at the end of the array if the line should be closed.
-        /// </summary>
-        /// <param name="bmp">The WriteableBitmap.</param>
-        /// <param name="points">The points of the polyline in x and y pairs, therefore the array is interpreted as (x1, y1, x2, y2, ..., xn, yn).</param>
-        /// <param name="color">The color for the line.</param>
-        public static void dbugDrawPolylineAa(this BitmapBuffer bmp, int[] points, int color)
-        {
-            using (BitmapContext context = bmp.GetBitmapContext())
-            {
-                // Use refs for faster access (really important!) speeds up a lot!
-                int w = context.Width;
-                int h = context.Height;
-                int x1 = points[0];
-                int y1 = points[1];
-
-                for (int i = 2; i < points.Length; i += 2)
-                {
-                    //int x2 = points[i];
-                    //int y2 = points[i + 1];
-
-                    DrawLineAa(context, w, h,
-                        x1, y1,
-                        x1 += points[i], y1 += points[i + 1], //also update x1,y1 
-                        color);
-                    //x1 = x2;
-                    //y1 = y2;
-                }
-            }
-        }
-#endif
         /// <summary>
         /// Draws a triangle.
         /// </summary>

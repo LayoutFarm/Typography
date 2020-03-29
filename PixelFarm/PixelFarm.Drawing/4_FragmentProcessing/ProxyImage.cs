@@ -20,7 +20,8 @@
 
 using PixelFarm.Drawing;
 using PixelFarm.CpuBlit.PixelProcessing;
-namespace PixelFarm.CpuBlit.Imaging
+using PixelFarm.CpuBlit.Imaging;
+namespace PixelFarm.CpuBlit.FragmentProcessing
 {
     public abstract class ProxyImage : IBitmapBlender
     {

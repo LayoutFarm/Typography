@@ -32,189 +32,6 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\PixelFarm\BackEnd.PaintFx\PdnSharedProject\01_Core\Color\ColorBgra.cs">
-      <Link>PixelFarm\BackEnd.PaintFx\PdnSharedProject\01_Core\Color\ColorBgra.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\BackEnd.PaintFx\PdnSharedProject\01_Core\Color\HsvColor.cs">
-      <Link>PixelFarm\BackEnd.PaintFx\PdnSharedProject\01_Core\Color\HsvColor.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\BackEnd.PaintFx\PdnSharedProject\01_Core\Color\RgbColor.cs">
-      <Link>PixelFarm\BackEnd.PaintFx\PdnSharedProject\01_Core\Color\RgbColor.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\BackEnd.PaintFx\PdnSharedProject\01_Core\PdnResources.cs">
-      <Link>PixelFarm\BackEnd.PaintFx\PdnSharedProject\01_Core\PdnResources.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\BackEnd.PaintFx\PdnSharedProject\01_Core\PixelOps\BinaryPixelOp.cs">
-      <Link>PixelFarm\BackEnd.PaintFx\PdnSharedProject\01_Core\PixelOps\BinaryPixelOp.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\BackEnd.PaintFx\PdnSharedProject\01_Core\PixelOps\BinaryPixelOps.cs">
-      <Link>PixelFarm\BackEnd.PaintFx\PdnSharedProject\01_Core\PixelOps\BinaryPixelOps.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\BackEnd.PaintFx\PdnSharedProject\01_Core\PixelOps\IPixelOp.cs">
-      <Link>PixelFarm\BackEnd.PaintFx\PdnSharedProject\01_Core\PixelOps\IPixelOp.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\BackEnd.PaintFx\PdnSharedProject\01_Core\PixelOps\PixelOp.cs">
-      <Link>PixelFarm\BackEnd.PaintFx\PdnSharedProject\01_Core\PixelOps\PixelOp.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\BackEnd.PaintFx\PdnSharedProject\01_Core\PixelOps\UnaryPixelOp.cs">
-      <Link>PixelFarm\BackEnd.PaintFx\PdnSharedProject\01_Core\PixelOps\UnaryPixelOp.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\BackEnd.PaintFx\PdnSharedProject\01_Core\PixelOps\UnaryPixelOps.cs">
-      <Link>PixelFarm\BackEnd.PaintFx\PdnSharedProject\01_Core\PixelOps\UnaryPixelOps.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\BackEnd.PaintFx\PdnSharedProject\01_Core\RenderArgs.cs">
-      <Link>PixelFarm\BackEnd.PaintFx\PdnSharedProject\01_Core\RenderArgs.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\BackEnd.PaintFx\PdnSharedProject\01_Core\Renderer\GradientRenderer.cs">
-      <Link>PixelFarm\BackEnd.PaintFx\PdnSharedProject\01_Core\Renderer\GradientRenderer.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\BackEnd.PaintFx\PdnSharedProject\01_Core\Renderer\GradientRenderers.cs">
-      <Link>PixelFarm\BackEnd.PaintFx\PdnSharedProject\01_Core\Renderer\GradientRenderers.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\BackEnd.PaintFx\PdnSharedProject\01_Core\Renderer\Histogram.cs">
-      <Link>PixelFarm\BackEnd.PaintFx\PdnSharedProject\01_Core\Renderer\Histogram.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\BackEnd.PaintFx\PdnSharedProject\01_Core\Renderer\HistogramLuminosity.cs">
-      <Link>PixelFarm\BackEnd.PaintFx\PdnSharedProject\01_Core\Renderer\HistogramLuminosity.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\BackEnd.PaintFx\PdnSharedProject\01_Core\Renderer\HistogramRGB.cs">
-      <Link>PixelFarm\BackEnd.PaintFx\PdnSharedProject\01_Core\Renderer\HistogramRGB.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\BackEnd.PaintFx\PdnSharedProject\01_Core\ResamplingAlgorithm.cs">
-      <Link>PixelFarm\BackEnd.PaintFx\PdnSharedProject\01_Core\ResamplingAlgorithm.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\BackEnd.PaintFx\PdnSharedProject\01_Core\Scanline.cs">
-      <Link>PixelFarm\BackEnd.PaintFx\PdnSharedProject\01_Core\Scanline.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\BackEnd.PaintFx\PdnSharedProject\01_Core\Surface.cs">
-      <Link>PixelFarm\BackEnd.PaintFx\PdnSharedProject\01_Core\Surface.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\BackEnd.PaintFx\PdnSharedProject\01_Core\UserBlendOps\UserBlendOp.cs">
-      <Link>PixelFarm\BackEnd.PaintFx\PdnSharedProject\01_Core\UserBlendOps\UserBlendOp.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\BackEnd.PaintFx\PdnSharedProject\01_Core\UserBlendOps\UserBlendOps.cs">
-      <Link>PixelFarm\BackEnd.PaintFx\PdnSharedProject\01_Core\UserBlendOps\UserBlendOps.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\BackEnd.PaintFx\PdnSharedProject\01_Core\UserBlendOps\UserBlendOps.Generated.cs">
-      <Link>PixelFarm\BackEnd.PaintFx\PdnSharedProject\01_Core\UserBlendOps\UserBlendOps.Generated.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\BackEnd.PaintFx\PdnSharedProject\01_Core\Utility.cs">
-      <Link>PixelFarm\BackEnd.PaintFx\PdnSharedProject\01_Core\Utility.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\BackEnd.PaintFx\PdnSharedProject\02_Fx\Blur\BrightnessAndContrastRenderer.cs">
-      <Link>PixelFarm\BackEnd.PaintFx\PdnSharedProject\02_Fx\Blur\BrightnessAndContrastRenderer.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\BackEnd.PaintFx\PdnSharedProject\02_Fx\Blur\MotionBlurRenderer.cs">
-      <Link>PixelFarm\BackEnd.PaintFx\PdnSharedProject\02_Fx\Blur\MotionBlurRenderer.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\BackEnd.PaintFx\PdnSharedProject\02_Fx\Blur\ZoomBlurEffRenderer.cs">
-      <Link>PixelFarm\BackEnd.PaintFx\PdnSharedProject\02_Fx\Blur\ZoomBlurEffRenderer.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\BackEnd.PaintFx\PdnSharedProject\02_Fx\Convolution\ColorDiffEffect.cs">
-      <Link>PixelFarm\BackEnd.PaintFx\PdnSharedProject\02_Fx\Convolution\ColorDiffEffect.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\BackEnd.PaintFx\PdnSharedProject\02_Fx\Convolution\ConvolutionRenderer.cs">
-      <Link>PixelFarm\BackEnd.PaintFx\PdnSharedProject\02_Fx\Convolution\ConvolutionRenderer.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\BackEnd.PaintFx\PdnSharedProject\02_Fx\Convolution\EdgeDetectRenderer.cs">
-      <Link>PixelFarm\BackEnd.PaintFx\PdnSharedProject\02_Fx\Convolution\EdgeDetectRenderer.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\BackEnd.PaintFx\PdnSharedProject\02_Fx\Convolution\EmbossRenderer.cs">
-      <Link>PixelFarm\BackEnd.PaintFx\PdnSharedProject\02_Fx\Convolution\EmbossRenderer.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\BackEnd.PaintFx\PdnSharedProject\02_Fx\Convolution\GaussainBlurRenderer.cs">
-      <Link>PixelFarm\BackEnd.PaintFx\PdnSharedProject\02_Fx\Convolution\GaussainBlurRenderer.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\BackEnd.PaintFx\PdnSharedProject\02_Fx\Convolution\ReliefEffectRenderer.cs">
-      <Link>PixelFarm\BackEnd.PaintFx\PdnSharedProject\02_Fx\Convolution\ReliefEffectRenderer.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\BackEnd.PaintFx\PdnSharedProject\02_Fx\Histogram\HistogramRenderer.cs">
-      <Link>PixelFarm\BackEnd.PaintFx\PdnSharedProject\02_Fx\Histogram\HistogramRenderer.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\BackEnd.PaintFx\PdnSharedProject\02_Fx\Histogram\MedianRenderer.cs">
-      <Link>PixelFarm\BackEnd.PaintFx\PdnSharedProject\02_Fx\Histogram\MedianRenderer.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\BackEnd.PaintFx\PdnSharedProject\02_Fx\Histogram\OutlineRenderer.cs">
-      <Link>PixelFarm\BackEnd.PaintFx\PdnSharedProject\02_Fx\Histogram\OutlineRenderer.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\BackEnd.PaintFx\PdnSharedProject\02_Fx\Histogram\ReduceNoiseRenderer.cs">
-      <Link>PixelFarm\BackEnd.PaintFx\PdnSharedProject\02_Fx\Histogram\ReduceNoiseRenderer.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\BackEnd.PaintFx\PdnSharedProject\02_Fx\Histogram\SharpenRenderer.cs">
-      <Link>PixelFarm\BackEnd.PaintFx\PdnSharedProject\02_Fx\Histogram\SharpenRenderer.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\BackEnd.PaintFx\PdnSharedProject\02_Fx\Histogram\UnfocusRenderer.cs">
-      <Link>PixelFarm\BackEnd.PaintFx\PdnSharedProject\02_Fx\Histogram\UnfocusRenderer.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\BackEnd.PaintFx\PdnSharedProject\02_Fx\Levels\AutoLevelRenderer.cs">
-      <Link>PixelFarm\BackEnd.PaintFx\PdnSharedProject\02_Fx\Levels\AutoLevelRenderer.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\BackEnd.PaintFx\PdnSharedProject\02_Fx\Levels\SepiaRenderer.cs">
-      <Link>PixelFarm\BackEnd.PaintFx\PdnSharedProject\02_Fx\Levels\SepiaRenderer.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\BackEnd.PaintFx\PdnSharedProject\02_Fx\Material\BlugeEffectRenderer.cs">
-      <Link>PixelFarm\BackEnd.PaintFx\PdnSharedProject\02_Fx\Material\BlugeEffectRenderer.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\BackEnd.PaintFx\PdnSharedProject\02_Fx\Material\CloudEffect.cs">
-      <Link>PixelFarm\BackEnd.PaintFx\PdnSharedProject\02_Fx\Material\CloudEffect.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\BackEnd.PaintFx\PdnSharedProject\02_Fx\Material\GlowRenderer.cs">
-      <Link>PixelFarm\BackEnd.PaintFx\PdnSharedProject\02_Fx\Material\GlowRenderer.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\BackEnd.PaintFx\PdnSharedProject\02_Fx\Material\OilPaintRenderer.cs">
-      <Link>PixelFarm\BackEnd.PaintFx\PdnSharedProject\02_Fx\Material\OilPaintRenderer.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\BackEnd.PaintFx\PdnSharedProject\02_Fx\Material\PencilSketchRenderer.cs">
-      <Link>PixelFarm\BackEnd.PaintFx\PdnSharedProject\02_Fx\Material\PencilSketchRenderer.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\BackEnd.PaintFx\PdnSharedProject\02_Fx\Material\TileRenderer.cs">
-      <Link>PixelFarm\BackEnd.PaintFx\PdnSharedProject\02_Fx\Material\TileRenderer.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\BackEnd.PaintFx\PdnSharedProject\02_Fx\Material\TwistRenderer.cs">
-      <Link>PixelFarm\BackEnd.PaintFx\PdnSharedProject\02_Fx\Material\TwistRenderer.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\BackEnd.PaintFx\PdnSharedProject\02_Fx\Others\InkSketchRenderer.cs">
-      <Link>PixelFarm\BackEnd.PaintFx\PdnSharedProject\02_Fx\Others\InkSketchRenderer.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\BackEnd.PaintFx\PdnSharedProject\02_Fx\Others\JulianFractalRenderer.cs">
-      <Link>PixelFarm\BackEnd.PaintFx\PdnSharedProject\02_Fx\Others\JulianFractalRenderer.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\BackEnd.PaintFx\PdnSharedProject\02_Fx\Others\PerlinNoise2D.cs">
-      <Link>PixelFarm\BackEnd.PaintFx\PdnSharedProject\02_Fx\Others\PerlinNoise2D.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\BackEnd.PaintFx\PdnSharedProject\02_Fx\Others\RotateAndZoomRenderer.cs">
-      <Link>PixelFarm\BackEnd.PaintFx\PdnSharedProject\02_Fx\Others\RotateAndZoomRenderer.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\BackEnd.PaintFx\PdnSharedProject\02_Fx\PixelOps\HueAndSatRenderer.cs">
-      <Link>PixelFarm\BackEnd.PaintFx\PdnSharedProject\02_Fx\PixelOps\HueAndSatRenderer.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\BackEnd.PaintFx\PdnSharedProject\02_Fx\PixelOps\InvertColorRenderer.cs">
-      <Link>PixelFarm\BackEnd.PaintFx\PdnSharedProject\02_Fx\PixelOps\InvertColorRenderer.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\BackEnd.PaintFx\PdnSharedProject\02_Fx\PixelOps\PosterizeRenderer.cs">
-      <Link>PixelFarm\BackEnd.PaintFx\PdnSharedProject\02_Fx\PixelOps\PosterizeRenderer.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\BackEnd.PaintFx\PdnSharedProject\02_Fx\TransformEffect\RotateZoomEffect.cs">
-      <Link>PixelFarm\BackEnd.PaintFx\PdnSharedProject\02_Fx\TransformEffect\RotateZoomEffect.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\BackEnd.PaintFx\PdnSharedProject\02_Fx\TransformEffect\RotateZoomEffectConfigToken.cs">
-      <Link>PixelFarm\BackEnd.PaintFx\PdnSharedProject\02_Fx\TransformEffect\RotateZoomEffectConfigToken.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\BackEnd.PaintFx\PdnSharedProject\02_Fx\Wrap\PolarInversionEffect.cs">
-      <Link>PixelFarm\BackEnd.PaintFx\PdnSharedProject\02_Fx\Wrap\PolarInversionEffect.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\BackEnd.PaintFx\PdnSharedProject\02_Fx\Wrap\WarpEdgeBehavior.cs">
-      <Link>PixelFarm\BackEnd.PaintFx\PdnSharedProject\02_Fx\Wrap\WarpEdgeBehavior.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\BackEnd.PaintFx\PdnSharedProject\02_Fx\Wrap\WrapBasedEffRenderer.cs">
-      <Link>PixelFarm\BackEnd.PaintFx\PdnSharedProject\02_Fx\Wrap\WrapBasedEffRenderer.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\BackEnd.PaintFx\PdnSharedProject\EffectRendererBase.cs">
-      <Link>PixelFarm\BackEnd.PaintFx\PdnSharedProject\EffectRendererBase.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\BackEnd.PaintFx\PdnSharedProject\PlatformMemory.cs">
-      <Link>PixelFarm\BackEnd.PaintFx\PdnSharedProject\PlatformMemory.cs</Link>
-    </Compile>
     <Compile Include="..\..\PixelFarm\BackEnd.BurningMineCurve\curveutils\CubicBezier.cs">
       <Link>PixelFarm\BackEnd.BurningMineCurve\curveutils\CubicBezier.cs</Link>
     </Compile>
@@ -332,9 +149,6 @@
     <Compile Include="..\..\PixelFarm\PixelFarm.BitmapBufferEx\BitmapBufferEx\BitmapBuffer.cs">
       <Link>PixelFarm\PixelFarm.BitmapBufferEx\BitmapBufferEx\BitmapBuffer.cs</Link>
     </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.BitmapBufferEx\BitmapBufferEx\BitmapBufferExtensions\AntialiasingExtensions.cs">
-      <Link>PixelFarm\PixelFarm.BitmapBufferEx\BitmapBufferEx\BitmapBufferExtensions\AntialiasingExtensions.cs</Link>
-    </Compile>
     <Compile Include="..\..\PixelFarm\PixelFarm.BitmapBufferEx\BitmapBufferEx\BitmapBufferExtensions\BaseExtensions.cs">
       <Link>PixelFarm\PixelFarm.BitmapBufferEx\BitmapBufferEx\BitmapBufferExtensions\BaseExtensions.cs</Link>
     </Compile>
@@ -349,9 +163,6 @@
     </Compile>
     <Compile Include="..\..\PixelFarm\PixelFarm.BitmapBufferEx\BitmapBufferEx\BitmapBufferExtensions\FilterExtensions.cs">
       <Link>PixelFarm\PixelFarm.BitmapBufferEx\BitmapBufferEx\BitmapBufferExtensions\FilterExtensions.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.BitmapBufferEx\BitmapBufferEx\BitmapBufferExtensions\LineAaExtensions.cs">
-      <Link>PixelFarm\PixelFarm.BitmapBufferEx\BitmapBufferEx\BitmapBufferExtensions\LineAaExtensions.cs</Link>
     </Compile>
     <Compile Include="..\..\PixelFarm\PixelFarm.BitmapBufferEx\BitmapBufferEx\BitmapBufferExtensions\LineExtensions.cs">
       <Link>PixelFarm\PixelFarm.BitmapBufferEx\BitmapBufferEx\BitmapBufferExtensions\LineExtensions.cs</Link>
@@ -785,194 +596,170 @@
     <Compile Include="..\..\PixelFarm\PixelFarm.Vectors\6_Contours\Vertex.cs">
       <Link>PixelFarm\PixelFarm.Vectors\6_Contours\Vertex.cs</Link>
     </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\4_IO\ImageReaders.cs">
-      <Link>PixelFarm\PixelFarm.Drawing\4_IO\ImageReaders.cs</Link>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\1_IO\ImageReaders.cs">
+      <Link>PixelFarm\PixelFarm.Drawing\1_IO\ImageReaders.cs</Link>
     </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\4_IO\StorageService.cs">
-      <Link>PixelFarm\PixelFarm.Drawing\4_IO\StorageService.cs</Link>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\1_IO\StorageService.cs">
+      <Link>PixelFarm\PixelFarm.Drawing\1_IO\StorageService.cs</Link>
     </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\5_VertexProcessoring\Figures.cs">
-      <Link>PixelFarm\PixelFarm.Drawing\5_VertexProcessoring\Figures.cs</Link>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\2_CpuBlit\AggPainter.cs">
+      <Link>PixelFarm\PixelFarm.Drawing\2_CpuBlit\AggPainter.cs</Link>
     </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\AggPainter\AggPainter.cs">
-      <Link>PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\AggPainter\AggPainter.cs</Link>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\2_CpuBlit\AggPainter_BrushAndFill.cs">
+      <Link>PixelFarm\PixelFarm.Drawing\2_CpuBlit\AggPainter_BrushAndFill.cs</Link>
     </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\AggPainter\AggPainter_BrushAndFill.cs">
-      <Link>PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\AggPainter\AggPainter_BrushAndFill.cs</Link>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\2_CpuBlit\AggPainter_FontAndText.cs">
+      <Link>PixelFarm\PixelFarm.Drawing\2_CpuBlit\AggPainter_FontAndText.cs</Link>
     </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\AggPainter\AggPainter_FontAndText.cs">
-      <Link>PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\AggPainter\AggPainter_FontAndText.cs</Link>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\2_CpuBlit\AggPainter_Imgs.cs">
+      <Link>PixelFarm\PixelFarm.Drawing\2_CpuBlit\AggPainter_Imgs.cs</Link>
     </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\AggPainter\AggPainter_Imgs.cs">
-      <Link>PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\AggPainter\AggPainter_Imgs.cs</Link>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\2_CpuBlit\AggPainter_MaskAndClipping.cs">
+      <Link>PixelFarm\PixelFarm.Drawing\2_CpuBlit\AggPainter_MaskAndClipping.cs</Link>
     </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\AggPainter\AggPainter_MaskAndClipping.cs">
-      <Link>PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\AggPainter\AggPainter_MaskAndClipping.cs</Link>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\2_CpuBlit\AggPainter_PenAndStroke.cs">
+      <Link>PixelFarm\PixelFarm.Drawing\2_CpuBlit\AggPainter_PenAndStroke.cs</Link>
     </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\AggPainter\AggPainter_PenAndStroke.cs">
-      <Link>PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\AggPainter\AggPainter_PenAndStroke.cs</Link>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\2_CpuBlit\AggRenderSurface.cs">
+      <Link>PixelFarm\PixelFarm.Drawing\2_CpuBlit\AggRenderSurface.cs</Link>
     </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\AggPainter\Tools.cs">
-      <Link>PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\AggPainter\Tools.cs</Link>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\2_CpuBlit\AggRenderSurface_RenderImages.cs">
+      <Link>PixelFarm\PixelFarm.Drawing\2_CpuBlit\AggRenderSurface_RenderImages.cs</Link>
     </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\DrawBoard\AggRenderVx.cs">
-      <Link>PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\DrawBoard\AggRenderVx.cs</Link>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\2_CpuBlit\AggRenderVx.cs">
+      <Link>PixelFarm\PixelFarm.Drawing\2_CpuBlit\AggRenderVx.cs</Link>
     </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\DrawBoard\Canvas2dExtension.cs">
-      <Link>PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\DrawBoard\Canvas2dExtension.cs</Link>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\2_CpuBlit\Canvas2dExtension.cs">
+      <Link>PixelFarm\PixelFarm.Drawing\2_CpuBlit\Canvas2dExtension.cs</Link>
     </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\DrawBoard\CpuBlitRegion.cs">
-      <Link>PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\DrawBoard\CpuBlitRegion.cs</Link>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\2_CpuBlit\CpuBlitRegion.cs">
+      <Link>PixelFarm\PixelFarm.Drawing\2_CpuBlit\CpuBlitRegion.cs</Link>
     </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\DrawBoard\dbugVertexSourceIO.cs">
-      <Link>PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\DrawBoard\dbugVertexSourceIO.cs</Link>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\2_CpuBlit\GradientBrushes.cs">
+      <Link>PixelFarm\PixelFarm.Drawing\2_CpuBlit\GradientBrushes.cs</Link>
     </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\DrawBoard\GradientBrushes.cs">
-      <Link>PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\DrawBoard\GradientBrushes.cs</Link>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\2_CpuBlit\SvgRenderVx.cs">
+      <Link>PixelFarm\PixelFarm.Drawing\2_CpuBlit\SvgRenderVx.cs</Link>
     </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\DrawBoard\LineDashGenerator.cs">
-      <Link>PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\DrawBoard\LineDashGenerator.cs</Link>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\2_CpuBlit\Tools.cs">
+      <Link>PixelFarm\PixelFarm.Drawing\2_CpuBlit\Tools.cs</Link>
     </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\DrawBoard\RectBorderHelper.cs">
-      <Link>PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\DrawBoard\RectBorderHelper.cs</Link>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\2_CpuBlit\VertexStoreExtensions2.cs">
+      <Link>PixelFarm\PixelFarm.Drawing\2_CpuBlit\VertexStoreExtensions2.cs</Link>
     </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\DrawBoard\SvgRenderVx.cs">
-      <Link>PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\DrawBoard\SvgRenderVx.cs</Link>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\3_VertexProcessoring\BorderDouble.cs">
+      <Link>PixelFarm\PixelFarm.Drawing\3_VertexProcessoring\BorderDouble.cs</Link>
     </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\DrawBoard\VertexStoreExtensions2.cs">
-      <Link>PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\DrawBoard\VertexStoreExtensions2.cs</Link>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\3_VertexProcessoring\dbugVertexSourceIO.cs">
+      <Link>PixelFarm\PixelFarm.Drawing\3_VertexProcessoring\dbugVertexSourceIO.cs</Link>
     </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\Msdf3\ContourCornerAndAnalyzingElems.cs">
-      <Link>PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\Msdf3\ContourCornerAndAnalyzingElems.cs</Link>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\3_VertexProcessoring\Figures.cs">
+      <Link>PixelFarm\PixelFarm.Drawing\3_VertexProcessoring\Figures.cs</Link>
     </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\Msdf3\EdgeBmpLut.cs">
-      <Link>PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\Msdf3\EdgeBmpLut.cs</Link>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\3_VertexProcessoring\LineDashGenerator.cs">
+      <Link>PixelFarm\PixelFarm.Drawing\3_VertexProcessoring\LineDashGenerator.cs</Link>
     </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\Msdf3\MsdfGen3.cs">
-      <Link>PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\Msdf3\MsdfGen3.cs</Link>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\3_VertexProcessoring\RectBorderHelper.cs">
+      <Link>PixelFarm\PixelFarm.Drawing\3_VertexProcessoring\RectBorderHelper.cs</Link>
     </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\Msdf\BasicElements.cs">
-      <Link>PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\Msdf\BasicElements.cs</Link>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\4_FragmentProcessing\ClipProxyImage.cs">
+      <Link>PixelFarm\PixelFarm.Drawing\4_FragmentProcessing\ClipProxyImage.cs</Link>
     </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\Msdf\EdgeColor.cs">
-      <Link>PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\Msdf\EdgeColor.cs</Link>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\4_FragmentProcessing\GammaFuntions.cs">
+      <Link>PixelFarm\PixelFarm.Drawing\4_FragmentProcessing\GammaFuntions.cs</Link>
     </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\Msdf\EdgeColoring.cs">
-      <Link>PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\Msdf\EdgeColoring.cs</Link>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\4_FragmentProcessing\ICpuBlitImageFilter.cs">
+      <Link>PixelFarm\PixelFarm.Drawing\4_FragmentProcessing\ICpuBlitImageFilter.cs</Link>
     </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\Msdf\EdgeSegment.cs">
-      <Link>PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\Msdf\EdgeSegment.cs</Link>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\4_FragmentProcessing\ProxyImage.cs">
+      <Link>PixelFarm\PixelFarm.Drawing\4_FragmentProcessing\ProxyImage.cs</Link>
     </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\Msdf\EquationSolver.cs">
-      <Link>PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\Msdf\EquationSolver.cs</Link>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\5_PathReconstruction\BezierCurveReconstruction.cs">
+      <Link>PixelFarm\PixelFarm.Drawing\5_PathReconstruction\BezierCurveReconstruction.cs</Link>
     </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\Msdf\MsdfGen.cs">
-      <Link>PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\Msdf\MsdfGen.cs</Link>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\5_PathReconstruction\BitmapBasedRegion.cs">
+      <Link>PixelFarm\PixelFarm.Drawing\5_PathReconstruction\BitmapBasedRegion.cs</Link>
     </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\Msdf\SignedDistance.cs">
-      <Link>PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\Msdf\SignedDistance.cs</Link>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\5_PathReconstruction\FloodFill.cs">
+      <Link>PixelFarm\PixelFarm.Drawing\5_PathReconstruction\FloodFill.cs</Link>
     </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\Others\1_Base\BorderDouble.cs">
-      <Link>PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\Others\1_Base\BorderDouble.cs</Link>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\5_PathReconstruction\FloodFillTools.cs">
+      <Link>PixelFarm\PixelFarm.Drawing\5_PathReconstruction\FloodFillTools.cs</Link>
     </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\Others\1_Base\ClipProxyImage.cs">
-      <Link>PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\Others\1_Base\ClipProxyImage.cs</Link>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\5_PathReconstruction\MixedRegion.cs">
+      <Link>PixelFarm\PixelFarm.Drawing\5_PathReconstruction\MixedRegion.cs</Link>
     </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\Others\1_Base\GammaFuntions.cs">
-      <Link>PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\Others\1_Base\GammaFuntions.cs</Link>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\5_PathReconstruction\OutlineTracer.cs">
+      <Link>PixelFarm\PixelFarm.Drawing\5_PathReconstruction\OutlineTracer.cs</Link>
     </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\Others\1_Base\ImgFilters.cs">
-      <Link>PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\Others\1_Base\ImgFilters.cs</Link>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\5_PathReconstruction\PixelEvaluators.cs">
+      <Link>PixelFarm\PixelFarm.Drawing\5_PathReconstruction\PixelEvaluators.cs</Link>
     </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\Others\1_Base\ProxyImage.cs">
-      <Link>PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\Others\1_Base\ProxyImage.cs</Link>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\5_PathReconstruction\ReconstructedRegionData.cs">
+      <Link>PixelFarm\PixelFarm.Drawing\5_PathReconstruction\ReconstructedRegionData.cs</Link>
     </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\Others\3_Filter\BrightnesssAndContrast.cs">
-      <Link>PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\Others\3_Filter\BrightnesssAndContrast.cs</Link>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\5_PathReconstruction\VxsRegion.cs">
+      <Link>PixelFarm\PixelFarm.Drawing\5_PathReconstruction\VxsRegion.cs</Link>
     </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\Others\3_Filter\ImageFilters.cs">
-      <Link>PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\Others\3_Filter\ImageFilters.cs</Link>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\6_Msdf\BasicElements.cs">
+      <Link>PixelFarm\PixelFarm.Drawing\6_Msdf\BasicElements.cs</Link>
     </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\Others\3_Filter\InternalBrightnessAndContrastAdjustment.cs">
-      <Link>PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\Others\3_Filter\InternalBrightnessAndContrastAdjustment.cs</Link>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\6_Msdf\EdgeColor.cs">
+      <Link>PixelFarm\PixelFarm.Drawing\6_Msdf\EdgeColor.cs</Link>
     </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\Others\3_Filter\PatternFilterBilnearColorRGBA.cs">
-      <Link>PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\Others\3_Filter\PatternFilterBilnearColorRGBA.cs</Link>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\6_Msdf\EdgeColoring.cs">
+      <Link>PixelFarm\PixelFarm.Drawing\6_Msdf\EdgeColoring.cs</Link>
     </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\Others\3_Filter\RecursiveBlur.cs">
-      <Link>PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\Others\3_Filter\RecursiveBlur.cs</Link>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\6_Msdf\EdgeSegment.cs">
+      <Link>PixelFarm\PixelFarm.Drawing\6_Msdf\EdgeSegment.cs</Link>
     </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\Others\3_Filter\SharpenFilter.cs">
-      <Link>PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\Others\3_Filter\SharpenFilter.cs</Link>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\6_Msdf\EquationSolver.cs">
+      <Link>PixelFarm\PixelFarm.Drawing\6_Msdf\EquationSolver.cs</Link>
     </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\Others\3_Filter\StackBlur.cs">
-      <Link>PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\Others\3_Filter\StackBlur.cs</Link>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\6_Msdf\Msdf3\ContourCornerAndAnalyzingElems.cs">
+      <Link>PixelFarm\PixelFarm.Drawing\6_Msdf\Msdf3\ContourCornerAndAnalyzingElems.cs</Link>
     </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\Others\3_Filter\Transposer.cs">
-      <Link>PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\Others\3_Filter\Transposer.cs</Link>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\6_Msdf\Msdf3\EdgeBmpLut.cs">
+      <Link>PixelFarm\PixelFarm.Drawing\6_Msdf\Msdf3\EdgeBmpLut.cs</Link>
     </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\PathReconstruction\BezierCurveReconstruction.cs">
-      <Link>PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\PathReconstruction\BezierCurveReconstruction.cs</Link>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\6_Msdf\Msdf3\MsdfGen3.cs">
+      <Link>PixelFarm\PixelFarm.Drawing\6_Msdf\Msdf3\MsdfGen3.cs</Link>
     </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\PathReconstruction\BitmapBasedRegion.cs">
-      <Link>PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\PathReconstruction\BitmapBasedRegion.cs</Link>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\6_Msdf\MsdfGen.cs">
+      <Link>PixelFarm\PixelFarm.Drawing\6_Msdf\MsdfGen.cs</Link>
     </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\PathReconstruction\FloodFill.cs">
-      <Link>PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\PathReconstruction\FloodFill.cs</Link>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\6_Msdf\SignedDistance.cs">
+      <Link>PixelFarm\PixelFarm.Drawing\6_Msdf\SignedDistance.cs</Link>
     </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\PathReconstruction\FloodFillTools.cs">
-      <Link>PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\PathReconstruction\FloodFillTools.cs</Link>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_BitmapAtlas\AtlasImageBinder.cs">
+      <Link>PixelFarm\PixelFarm.Drawing\7_BitmapAtlas\AtlasImageBinder.cs</Link>
     </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\PathReconstruction\MixedRegion.cs">
-      <Link>PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\PathReconstruction\MixedRegion.cs</Link>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_BitmapAtlas\AtlasItem.cs">
+      <Link>PixelFarm\PixelFarm.Drawing\7_BitmapAtlas\AtlasItem.cs</Link>
     </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\PathReconstruction\OutlineTracer.cs">
-      <Link>PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\PathReconstruction\OutlineTracer.cs</Link>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_BitmapAtlas\AtlasItemSource.cs">
+      <Link>PixelFarm\PixelFarm.Drawing\7_BitmapAtlas\AtlasItemSource.cs</Link>
     </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\PathReconstruction\PixelEvaluators.cs">
-      <Link>PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\PathReconstruction\PixelEvaluators.cs</Link>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_BitmapAtlas\BinPacker.cs">
+      <Link>PixelFarm\PixelFarm.Drawing\7_BitmapAtlas\BinPacker.cs</Link>
     </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\PathReconstruction\ReconstructedRegionData.cs">
-      <Link>PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\PathReconstruction\ReconstructedRegionData.cs</Link>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_BitmapAtlas\BitmapAtlasFile.cs">
+      <Link>PixelFarm\PixelFarm.Drawing\7_BitmapAtlas\BitmapAtlasFile.cs</Link>
     </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\PathReconstruction\VxsRegion.cs">
-      <Link>PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\PathReconstruction\VxsRegion.cs</Link>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_BitmapAtlas\BitmapAtlasManager.cs">
+      <Link>PixelFarm\PixelFarm.Drawing\7_BitmapAtlas\BitmapAtlasManager.cs</Link>
     </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\RenderSurface\AggRenderSurface.cs">
-      <Link>PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\RenderSurface\AggRenderSurface.cs</Link>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_BitmapAtlas\MsdfImageGen.cs">
+      <Link>PixelFarm\PixelFarm.Drawing\7_BitmapAtlas\MsdfImageGen.cs</Link>
     </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\RenderSurface\AggRenderSurface_RenderImages.cs">
-      <Link>PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\RenderSurface\AggRenderSurface_RenderImages.cs</Link>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_BitmapAtlas\MultiGlyphSizeBitmapAtlasBuilder.cs">
+      <Link>PixelFarm\PixelFarm.Drawing\7_BitmapAtlas\MultiGlyphSizeBitmapAtlasBuilder.cs</Link>
     </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\9_BitmapAtlas\AtlasImageBinder.cs">
-      <Link>PixelFarm\PixelFarm.Drawing\9_BitmapAtlas\AtlasImageBinder.cs</Link>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_BitmapAtlas\SimpleBitmapAtlas.cs">
+      <Link>PixelFarm\PixelFarm.Drawing\7_BitmapAtlas\SimpleBitmapAtlas.cs</Link>
     </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\9_BitmapAtlas\AtlasItem.cs">
-      <Link>PixelFarm\PixelFarm.Drawing\9_BitmapAtlas\AtlasItem.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\9_BitmapAtlas\AtlasItemSource.cs">
-      <Link>PixelFarm\PixelFarm.Drawing\9_BitmapAtlas\AtlasItemSource.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\9_BitmapAtlas\BinPacker.cs">
-      <Link>PixelFarm\PixelFarm.Drawing\9_BitmapAtlas\BinPacker.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\9_BitmapAtlas\BitmapAtlasFile.cs">
-      <Link>PixelFarm\PixelFarm.Drawing\9_BitmapAtlas\BitmapAtlasFile.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\9_BitmapAtlas\BitmapAtlasManager.cs">
-      <Link>PixelFarm\PixelFarm.Drawing\9_BitmapAtlas\BitmapAtlasManager.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\9_BitmapAtlas\MsdfImageGen.cs">
-      <Link>PixelFarm\PixelFarm.Drawing\9_BitmapAtlas\MsdfImageGen.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\9_BitmapAtlas\MultiGlyphSizeBitmapAtlasBuilder.cs">
-      <Link>PixelFarm\PixelFarm.Drawing\9_BitmapAtlas\MultiGlyphSizeBitmapAtlasBuilder.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\9_BitmapAtlas\SimpleBitmapAtlas.cs">
-      <Link>PixelFarm\PixelFarm.Drawing\9_BitmapAtlas\SimpleBitmapAtlas.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\9_BitmapAtlas\SimpleBitmapAtlasBuilder.cs">
-      <Link>PixelFarm\PixelFarm.Drawing\9_BitmapAtlas\SimpleBitmapAtlasBuilder.cs</Link>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_BitmapAtlas\SimpleBitmapAtlasBuilder.cs">
+      <Link>PixelFarm\PixelFarm.Drawing\7_BitmapAtlas\SimpleBitmapAtlasBuilder.cs</Link>
     </Compile>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

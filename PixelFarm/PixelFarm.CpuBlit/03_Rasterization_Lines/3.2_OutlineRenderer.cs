@@ -258,7 +258,7 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
         public int SubPixelWidth => (int)_lineProfile.SubPixelWidth;
 
         //---------------------------------------------------------------------
-        public void ResetClipping() { _doClipping = false; }
+        public void ResetClipping() => _doClipping = false;
         public void SetClipBox(double x1, double y1, double x2, double y2)
         {
             _clippingRectangle.Left = LineCoordSat.Convert(x1);
@@ -274,10 +274,7 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
         }
 
         //---------------------------------------------------------------------
-        public byte GetCover(int d)
-        {
-            return _lineProfile.GetProfileValue(d);
-        }
+        public byte GetCover(int d) => _lineProfile.GetProfileValue(d);
 
         public void BlendSolidHSpan(int x, int y, int len, byte[] covers, int coversOffset)
         {
@@ -289,7 +286,7 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
             _destImageSurface.BlendSolidVSpan(x, y, len, Color, covers, coversOffset);
         }
 
-        public static bool AccurateJoinOnly { get { return false; } }
+        public static bool AccurateJoinOnly => false;
 
         public override void SemiDotHLine(CompareFunction cmp,
                            int xc1, int yc1, int xc2, int yc2,
@@ -426,9 +423,8 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
 
             //recursive
             if (lp.len > LineAA.MAX_LENGTH)
-            {
-                LineParameters lp1, lp2;
-                if (lp.Divide(out lp1, out lp2))
+            { 
+                if (lp.Divide(out LineParameters lp1, out LineParameters lp2))
                 {
                     //recursive
                     Line0NoClip(level + 1, lp1);
@@ -471,9 +467,8 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
         void Line1NoClip(LineParameters lp, int sx, int sy)
         {
             if (lp.len > LineAA.MAX_LENGTH)
-            {
-                LineParameters lp1, lp2;
-                if (lp.Divide(out lp1, out lp2))
+            { 
+                if (lp.Divide(out LineParameters lp1, out LineParameters lp2))
                 {
                     Line1NoClip(lp1, (lp.x1 + sx) >> 1, (lp.y1 + sy) >> 1);
                     Line1NoClip(lp2, lp1.x2 + (lp1.y2 - lp1.y1), lp1.y2 - (lp1.x2 - lp1.x1));

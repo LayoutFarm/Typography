@@ -41,9 +41,6 @@
     <Compile Include="..\PixelFarm.BitmapBufferEx\BitmapBufferEx\BitmapBuffer.cs">
       <Link>0_REF_BitmapBufferEx\BitmapBuffer.cs</Link>
     </Compile>
-    <Compile Include="..\PixelFarm.BitmapBufferEx\BitmapBufferEx\BitmapBufferExtensions\AntialiasingExtensions.cs">
-      <Link>0_REF_BitmapBufferEx\AntialiasingExtensions.cs</Link>
-    </Compile>
     <Compile Include="..\PixelFarm.BitmapBufferEx\BitmapBufferEx\BitmapBufferExtensions\BaseExtensions.cs">
       <Link>0_REF_BitmapBufferEx\BaseExtensions.cs</Link>
     </Compile>
@@ -58,9 +55,6 @@
     </Compile>
     <Compile Include="..\PixelFarm.BitmapBufferEx\BitmapBufferEx\BitmapBufferExtensions\FilterExtensions.cs">
       <Link>0_REF_BitmapBufferEx\FilterExtensions.cs</Link>
-    </Compile>
-    <Compile Include="..\PixelFarm.BitmapBufferEx\BitmapBufferEx\BitmapBufferExtensions\LineAaExtensions.cs">
-      <Link>0_REF_BitmapBufferEx\LineAaExtensions.cs</Link>
     </Compile>
     <Compile Include="..\PixelFarm.BitmapBufferEx\BitmapBufferEx\BitmapBufferExtensions\LineExtensions.cs">
       <Link>0_REF_BitmapBufferEx\LineExtensions.cs</Link>
@@ -608,78 +602,69 @@
     <Compile Include="..\PixelFarm.Vectors\6_Contours\Vertex.cs">
       <Link>0_REF_Painter\1_Vectors\6_Contours\Vertex.cs</Link>
     </Compile>
-    <Compile Include="4_IO\StorageService.cs" />
-    <Compile Include="5_VertexProcessoring\Figures.cs" />
-    <Compile Include="7_CpuBlitPainter\AggPainter\AggPainter.cs" />
-    <Compile Include="7_CpuBlitPainter\AggPainter\AggPainter_MaskAndClipping.cs" />
-    <Compile Include="7_CpuBlitPainter\AggPainter\AggPainter_BrushAndFill.cs" />
-    <Compile Include="7_CpuBlitPainter\AggPainter\AggPainter_PenAndStroke.cs" />
-    <Compile Include="7_CpuBlitPainter\AggPainter\AggPainter_FontAndText.cs" />
-    <Compile Include="7_CpuBlitPainter\DrawBoard\GradientBrushes.cs" />
-    <Compile Include="7_CpuBlitPainter\DrawBoard\AggRenderVx.cs" />
-    <Compile Include="7_CpuBlitPainter\DrawBoard\Canvas2dExtension.cs" />
-    <Compile Include="7_CpuBlitPainter\DrawBoard\dbugVertexSourceIO.cs" />
-    <Compile Include="7_CpuBlitPainter\DrawBoard\LineDashGenerator.cs" />
-    <Compile Include="7_CpuBlitPainter\DrawBoard\RectBorderHelper.cs" />
-    <Compile Include="7_CpuBlitPainter\DrawBoard\SvgRenderVx.cs" />
-    <Compile Include="7_CpuBlitPainter\DrawBoard\VertexStoreExtensions2.cs" />
-    <Compile Include="7_CpuBlitPainter\Msdf\BasicElements.cs" />
-    <Compile Include="7_CpuBlitPainter\Msdf3\EdgeBmpLut.cs" />
-    <Compile Include="7_CpuBlitPainter\Msdf\EdgeColor.cs" />
-    <Compile Include="7_CpuBlitPainter\Msdf\EdgeColoring.cs" />
-    <Compile Include="7_CpuBlitPainter\Msdf\EdgeSegment.cs" />
-    <Compile Include="7_CpuBlitPainter\Msdf\EquationSolver.cs" />
-    <Compile Include="7_CpuBlitPainter\Msdf\MsdfGen.cs" />
-    <Compile Include="7_CpuBlitPainter\Msdf\SignedDistance.cs" />
-    <Compile Include="7_CpuBlitPainter\Others\1_Base\BorderDouble.cs" />
-    <Compile Include="7_CpuBlitPainter\Others\1_Base\ClipProxyImage.cs" />
-    <Compile Include="7_CpuBlitPainter\Others\1_Base\GammaFuntions.cs" />
-    <Compile Include="7_CpuBlitPainter\Others\1_Base\ImgFilters.cs" />
-    <Compile Include="7_CpuBlitPainter\Others\1_Base\ProxyImage.cs" />
-    <Compile Include="7_CpuBlitPainter\Others\3_Filter\BrightnesssAndContrast.cs" />
-    <Compile Include="7_CpuBlitPainter\Others\3_Filter\ImageFilters.cs" />
-    <Compile Include="7_CpuBlitPainter\Others\3_Filter\InternalBrightnessAndContrastAdjustment.cs" />
-    <Compile Include="7_CpuBlitPainter\Others\3_Filter\PatternFilterBilnearColorRGBA.cs" />
-    <Compile Include="7_CpuBlitPainter\Others\3_Filter\RecursiveBlur.cs" />
-    <Compile Include="7_CpuBlitPainter\Others\3_Filter\SharpenFilter.cs" />
-    <Compile Include="7_CpuBlitPainter\Others\3_Filter\StackBlur.cs" />
-    <Compile Include="7_CpuBlitPainter\PathReconstruction\BezierCurveReconstruction.cs" />
-    <Compile Include="7_CpuBlitPainter\PathReconstruction\BitmapBasedRegion.cs" />
-    <Compile Include="7_CpuBlitPainter\DrawBoard\CpuBlitRegion.cs" />
-    <Compile Include="7_CpuBlitPainter\PathReconstruction\FloodFillTools.cs" />
-    <Compile Include="7_CpuBlitPainter\PathReconstruction\MixedRegion.cs" />
-    <Compile Include="7_CpuBlitPainter\PathReconstruction\PixelEvaluators.cs" />
-    <Compile Include="7_CpuBlitPainter\PathReconstruction\FloodFill.cs" />
-    <Compile Include="7_CpuBlitPainter\Others\3_Filter\Transposer.cs" />
-    <Compile Include="7_CpuBlitPainter\PathReconstruction\OutlineTracer.cs" />
-    <Compile Include="7_CpuBlitPainter\PathReconstruction\ReconstructedRegionData.cs" />
-    <Compile Include="7_CpuBlitPainter\PathReconstruction\VxsRegion.cs" />
-    <Compile Include="7_CpuBlitPainter\AggPainter\Tools.cs" />
-    <Compile Include="7_CpuBlitPainter\RenderSurface\AggRenderSurface.cs" />
-    <Compile Include="7_CpuBlitPainter\RenderSurface\AggRenderSurface_RenderImages.cs" />
-    <Compile Include="4_IO\ImageReaders.cs" />
-    <Compile Include="7_CpuBlitPainter\Msdf3\ContourCornerAndAnalyzingElems.cs" />
-    <Compile Include="7_CpuBlitPainter\Msdf3\MsdfGen3.cs" />
-    <Compile Include="9_BitmapAtlas\AtlasImageBinder.cs" />
-    <Compile Include="9_BitmapAtlas\AtlasItem.cs" />
-    <Compile Include="9_BitmapAtlas\BinPacker.cs" />
-    <Compile Include="9_BitmapAtlas\BitmapAtlasManager.cs" />
-    <Compile Include="9_BitmapAtlas\BitmapAtlasFile.cs" />
-    <Compile Include="9_BitmapAtlas\AtlasItemSource.cs" />
-    <Compile Include="9_BitmapAtlas\MsdfImageGen.cs" />
-    <Compile Include="9_BitmapAtlas\MultiGlyphSizeBitmapAtlasBuilder.cs" />
-    <Compile Include="9_BitmapAtlas\SimpleBitmapAtlas.cs" />
-    <Compile Include="9_BitmapAtlas\SimpleBitmapAtlasBuilder.cs" />
+    <Compile Include="1_IO\StorageService.cs" />
+    <Compile Include="3_VertexProcessoring\Figures.cs" />
+    <Compile Include="2_CpuBlit\AggPainter.cs" />
+    <Compile Include="2_CpuBlit\AggPainter_MaskAndClipping.cs" />
+    <Compile Include="2_CpuBlit\AggPainter_BrushAndFill.cs" />
+    <Compile Include="2_CpuBlit\AggPainter_PenAndStroke.cs" />
+    <Compile Include="2_CpuBlit\AggPainter_FontAndText.cs" />
+    <Compile Include="2_CpuBlit\GradientBrushes.cs" />
+    <Compile Include="2_CpuBlit\AggRenderVx.cs" />
+    <Compile Include="2_CpuBlit\Canvas2dExtension.cs" />
+    <Compile Include="3_VertexProcessoring\dbugVertexSourceIO.cs" />
+    <Compile Include="3_VertexProcessoring\LineDashGenerator.cs" />
+    <Compile Include="3_VertexProcessoring\RectBorderHelper.cs" />
+    <Compile Include="2_CpuBlit\SvgRenderVx.cs" />
+    <Compile Include="2_CpuBlit\VertexStoreExtensions2.cs" />
+    <Compile Include="6_Msdf\BasicElements.cs" />
+    <Compile Include="6_Msdf\Msdf3\EdgeBmpLut.cs" />
+    <Compile Include="6_Msdf\EdgeColor.cs" />
+    <Compile Include="6_Msdf\EdgeColoring.cs" />
+    <Compile Include="6_Msdf\EdgeSegment.cs" />
+    <Compile Include="6_Msdf\EquationSolver.cs" />
+    <Compile Include="6_Msdf\MsdfGen.cs" />
+    <Compile Include="6_Msdf\SignedDistance.cs" />
+    <Compile Include="3_VertexProcessoring\BorderDouble.cs" />
+    <Compile Include="4_FragmentProcessing\ClipProxyImage.cs" />
+    <Compile Include="4_FragmentProcessing\GammaFuntions.cs" />
+    <Compile Include="4_FragmentProcessing\ICpuBlitImageFilter.cs" />
+    <Compile Include="4_FragmentProcessing\ProxyImage.cs" />
+    <Compile Include="5_PathReconstruction\BezierCurveReconstruction.cs" />
+    <Compile Include="5_PathReconstruction\BitmapBasedRegion.cs" />
+    <Compile Include="2_CpuBlit\CpuBlitRegion.cs" />
+    <Compile Include="5_PathReconstruction\FloodFillTools.cs" />
+    <Compile Include="5_PathReconstruction\MixedRegion.cs" />
+    <Compile Include="5_PathReconstruction\PixelEvaluators.cs" />
+    <Compile Include="5_PathReconstruction\FloodFill.cs" />
+    <Compile Include="5_PathReconstruction\OutlineTracer.cs" />
+    <Compile Include="5_PathReconstruction\ReconstructedRegionData.cs" />
+    <Compile Include="5_PathReconstruction\VxsRegion.cs" />
+    <Compile Include="2_CpuBlit\Tools.cs" />
+    <Compile Include="2_CpuBlit\AggRenderSurface.cs" />
+    <Compile Include="2_CpuBlit\AggRenderSurface_RenderImages.cs" />
+    <Compile Include="1_IO\ImageReaders.cs" />
+    <Compile Include="6_Msdf\Msdf3\ContourCornerAndAnalyzingElems.cs" />
+    <Compile Include="6_Msdf\Msdf3\MsdfGen3.cs" />
+    <Compile Include="7_BitmapAtlas\AtlasImageBinder.cs" />
+    <Compile Include="7_BitmapAtlas\AtlasItem.cs" />
+    <Compile Include="7_BitmapAtlas\BinPacker.cs" />
+    <Compile Include="7_BitmapAtlas\BitmapAtlasManager.cs" />
+    <Compile Include="7_BitmapAtlas\BitmapAtlasFile.cs" />
+    <Compile Include="7_BitmapAtlas\AtlasItemSource.cs" />
+    <Compile Include="7_BitmapAtlas\MsdfImageGen.cs" />
+    <Compile Include="7_BitmapAtlas\MultiGlyphSizeBitmapAtlasBuilder.cs" />
+    <Compile Include="7_BitmapAtlas\SimpleBitmapAtlas.cs" />
+    <Compile Include="7_BitmapAtlas\SimpleBitmapAtlasBuilder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="7_CpuBlitPainter\AggPainter\AggPainter_Imgs.cs" />
+    <Compile Include="2_CpuBlit\AggPainter_Imgs.cs" />
   </ItemGroup>
   <ItemGroup />
-  <Import Project="..\BackEnd.PaintFx\PdnSharedProject\PdnSharedProject.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

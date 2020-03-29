@@ -56,6 +56,7 @@
     <Compile Include="BitmapBufferExtensions\FilterExtensions.cs" />
     <Compile Include="BitmapBufferExtensions\LineAaExtensions.cs" />
     <Compile Include="BitmapBufferExtensions\LineExtensions.cs" />
+    <Compile Include="BitmapBufferExtensions\ShapeExtensionAA.cs" />
     <Compile Include="BitmapBufferExtensions\ShapeExtensions.cs" />
     <Compile Include="BitmapBufferExtensions\SplineExtensions.cs" />
     <Compile Include="BitmapBufferExtensions\TransformationExtensions.cs" />

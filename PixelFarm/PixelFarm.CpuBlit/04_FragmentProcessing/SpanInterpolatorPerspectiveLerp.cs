@@ -105,7 +105,7 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
 
         //--------------------------------------------------------------------
         // Check if the equations were solved successfully
-        public bool IsValid { get { return _trans_dir.IsValid; } }
+        public bool IsValid =>_trans_dir.IsValid; 
 
         //----------------------------------------------------------------
         public void Begin(double x, double y, int len)

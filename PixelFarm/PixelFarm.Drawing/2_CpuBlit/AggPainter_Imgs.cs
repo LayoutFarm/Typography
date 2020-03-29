@@ -104,8 +104,7 @@ namespace PixelFarm.CpuBlit
         }
         public override void DrawImage(Image actualImage, double left, double top, int srcX, int srcY, int srcW, int srcH)
         {
-            MemBitmap memBmp = actualImage as MemBitmap;
-            if (memBmp == null)
+            if (!(actualImage is MemBitmap memBmp))
             {
                 //test with other bitmap 
                 return;
@@ -117,8 +116,7 @@ namespace PixelFarm.CpuBlit
         }
         public override void DrawImage(Image img, double left, double top)
         {
-            MemBitmap memBmp = img as MemBitmap;
-            if (memBmp == null)
+            if (!(img is MemBitmap memBmp))
             {
                 //test with other bitmap 
                 return;
@@ -130,8 +128,7 @@ namespace PixelFarm.CpuBlit
         }
         public override void DrawImage(Image img)
         {
-            MemBitmap memBmp = img as MemBitmap;
-            if (memBmp == null)
+            if (!(img is MemBitmap memBmp))
             {
                 //? TODO
                 return;
@@ -161,8 +158,7 @@ namespace PixelFarm.CpuBlit
         }
         public override void DrawImage(Image img, params AffinePlan[] affinePlans)
         {
-            MemBitmap memBmp = img as MemBitmap;
-            if (memBmp == null)
+            if (!(img is MemBitmap memBmp))
             {
                 //? TODO
                 return;
@@ -200,8 +196,7 @@ namespace PixelFarm.CpuBlit
         {
             //draw img with transform coord
             //
-            MemBitmap memBmp = actualImage as MemBitmap;
-            if (memBmp == null)
+            if (!(actualImage is MemBitmap memBmp))
             {
                 //? TODO
                 return;
@@ -232,12 +227,11 @@ namespace PixelFarm.CpuBlit
                                                    //before render an image we turn off vxs subpixel rendering
             this.UseSubPixelLcdEffect = false;
 
-            if (coordTx is Affine)
+            if (coordTx is Affine aff)
             {
-                Affine aff = (Affine)coordTx;
                 if (this.OriginX != 0 || this.OriginY != 0)
                 {
-                    coordTx = aff = aff * Affine.NewTranslation(this.OriginX, this.OriginY);
+                    coordTx = aff * Affine.NewTranslation(this.OriginX, this.OriginY);
                 }
             }
 
@@ -251,14 +245,12 @@ namespace PixelFarm.CpuBlit
         }
         public override void ApplyFilter(PixelFarm.Drawing.IImageFilter imgFilter)
         {
-
             //check if we can use this imgFilter
-            var cpuBlitImgFx = imgFilter as PaintFx.Effects.ICpuBlitImgFilter;
-            if (cpuBlitImgFx == null) return;
+            if (!(imgFilter is PixelFarm.CpuBlit.FragmentProcessing.ICpuBlitImgFilter cpuBlitImgFx)) return;
             // 
             cpuBlitImgFx.SetTarget(_aggsx.DestBitmapBlender);
             imgFilter.Apply();
         }
-        
+
     }
 }

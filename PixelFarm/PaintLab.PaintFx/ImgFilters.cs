@@ -1,16 +1,12 @@
 ﻿//MIT, 2014-present, WinterDev
 using PixelFarm.Drawing;
 using PixelFarm.CpuBlit.Imaging;
+using PixelFarm.CpuBlit.FragmentProcessing;
+
 using System;
 
 namespace PaintFx.Effects
-{
-
-
-    public interface ICpuBlitImgFilter
-    {
-        void SetTarget(PixelFarm.CpuBlit.PixelProcessing.BitmapBlenderBase targt);
-    }
+{   
     public abstract class CpuBlitImgFilter : PixelFarm.Drawing.IImageFilter, ICpuBlitImgFilter
     {
         protected PixelFarm.CpuBlit.PixelProcessing.BitmapBlenderBase _target;

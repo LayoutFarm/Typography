@@ -1,4 +1,4 @@
-//BSD, 2014-present, WinterDev
+﻿//BSD, 2014-present, WinterDev
 //----------------------------------------------------------------------------
 // Anti-Grain Geometry - Version 2.4
 // Copyright (C) 2002-2005 Maxim Shemanarev (http://www.antigrain.com)
@@ -106,7 +106,7 @@ namespace PixelFarm.CpuBlit.Imaging
         double _a;
         double _i0a;
         double _epsilon;
-         
+
         public ImageFilterKaiser(double b = 6.33)
         {
             _a = (b);

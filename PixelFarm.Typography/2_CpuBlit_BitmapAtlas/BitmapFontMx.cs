@@ -325,30 +325,30 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             }
         }
 #if DEBUG
-        /// <summary>
-        /// test only, shapen org image with Paint.net sharpen filter
-        /// </summary>
-        /// <param name="org"></param>
-        /// <param name="radius"></param>
-        /// <returns></returns>
-        static BitmapAtlasItemSource Sharpen(BitmapAtlasItemSource org, int radius)
-        {
+        ///// <summary>
+        ///// test only, shapen org image with Paint.net sharpen filter
+        ///// </summary>
+        ///// <param name="org"></param>
+        ///// <param name="radius"></param>
+        ///// <returns></returns>
+        //static BitmapAtlasItemSource Sharpen(BitmapAtlasItemSource org, int radius)
+        //{
 
-            BitmapAtlasItemSource newImg = new BitmapAtlasItemSource(org.Width, org.Height);
+        //    BitmapAtlasItemSource newImg = new BitmapAtlasItemSource(org.Width, org.Height);
 
-            PixelFarm.CpuBlit.Imaging.ShapenFilterPdn sharpen1 = new PixelFarm.CpuBlit.Imaging.ShapenFilterPdn();
-            int[] orgBuffer = org.GetImageBuffer();
-            unsafe
-            {
-                fixed (int* orgHeader = &orgBuffer[0])
-                {
-                    int[] output = sharpen1.Sharpen(orgHeader, org.Width, org.Height, org.Width * 4, radius);
-                    newImg.SetImageBuffer(output, org.IsBigEndian);
-                }
-            }
+        //    PixelFarm.CpuBlit.Imaging.ShapenFilterPdn sharpen1 = new PixelFarm.CpuBlit.Imaging.ShapenFilterPdn();
+        //    int[] orgBuffer = org.GetImageBuffer();
+        //    unsafe
+        //    {
+        //        fixed (int* orgHeader = &orgBuffer[0])
+        //        {
+        //            int[] output = sharpen1.Sharpen(orgHeader, org.Width, org.Height, org.Width * 4, radius);
+        //            newImg.SetImageBuffer(output, org.IsBigEndian);
+        //        }
+        //    }
 
-            return newImg;
-        }
+        //    return newImg;
+        //}
 #endif
 
     }
