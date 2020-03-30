@@ -56,7 +56,7 @@ namespace PixelFarm.CpuBlit.PrimitiveProcessing
         //
         // 
         //template<class T>
-        public static int Flags(int x, int y, RectInt clip_box)
+        public static int Flags(int x, int y, in RectInt clip_box)
         {
             return ((x > clip_box.Right) ? 1 : 0) |
                    ((y > clip_box.Top) ? 1 << 1 : 0) |
@@ -64,18 +64,18 @@ namespace PixelFarm.CpuBlit.PrimitiveProcessing
                    ((y < clip_box.Bottom) ? 1 << 3 : 0);
         }
 
-        public static int GetFlagsX(int x, RectInt clip_box)
+        public static int GetFlagsX(int x, in RectInt clip_box)
         {
             return ((x > clip_box.Right ? 1 : 0) | ((x < clip_box.Left ? 1 : 0) << 2));
         }
 
-        public static int GetFlagsY(int y, RectInt clip_box)
+        public static int GetFlagsY(int y, in RectInt clip_box)
         {
             return (((y > clip_box.Top ? 1 : 0) << 1) | ((y < clip_box.Bottom ? 1 : 0) << 3));
         }
 
         public static int DoClipLiangBarsky(int x1, int y1, int x2, int y2,
-                                          RectInt clip_box,
+                                          in RectInt clip_box,
                                           int[] x, int[] y)
         {
             int xIndex = 0;
@@ -220,7 +220,7 @@ namespace PixelFarm.CpuBlit.PrimitiveProcessing
         }
 
         public static bool ClipMovePoint(int x1, int y1, int x2, int y2,
-                             RectInt clip_box,
+                             in RectInt clip_box,
                              ref int x, ref int y, int flags)
         {
             int bound;
@@ -255,8 +255,8 @@ namespace PixelFarm.CpuBlit.PrimitiveProcessing
         //          (ret & 2) != 0  - Second point has been moved
         //
         //template<class T>
-        public static int ClipLineSegment(ref int x1, ref int y1, ref int x2, ref int y2,
-                                   RectInt clip_box)
+        public static int ClipLineSegment(ref int x1, ref int y1, 
+                                          ref int x2, ref int y2, in RectInt clip_box)
         {
             int f1 = Flags(x1, y1, clip_box);
             int f2 = Flags(x2, y2, clip_box);

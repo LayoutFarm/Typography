@@ -1,4 +1,5 @@
 //BSD, 2014-present, WinterDev
+//MatterHackers
 //----------------------------------------------------------------------------
 // Anti-Grain Geometry - Version 2.4
 // Copyright (C) 2002-2005 Maxim Shemanarev (http://www.antigrain.com)
@@ -143,7 +144,6 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
         LineRenderer _ren;
         LineAAVertexSequence _src_vertices = new LineAAVertexSequence();
         OutlineJoin _line_join;
-        bool _round_cap;
         int _start_x;
         int _start_y;
         public enum OutlineJoin
@@ -176,6 +176,18 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
 #if DEBUG
         static int dbuglatest_i = 0;
 #endif
+
+        public OutlineAARasterizer(LineRenderer ren)
+        {
+            _ren = ren;
+            _line_join = (OutlineRenderer.AccurateJoinOnly ?
+                            OutlineJoin.AccurateJoin :
+                            OutlineJoin.Round);
+            RoundCap = (false);
+            _start_x = (0);
+            _start_y = (0);
+        }
+
         void Draw(ref DrawVarsPart0 dv,
             ref DrawVarsPart1 dv1,
             ref DrawVarsPart2 dv2,
@@ -267,23 +279,10 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
 
         }
 
-        public OutlineAARasterizer(LineRenderer ren)
-        {
-            _ren = ren;
-            _line_join = (OutlineRenderer.AccurateJoinOnly ?
-                            OutlineJoin.AccurateJoin :
-                            OutlineJoin.Round);
-            _round_cap = (false);
-            _start_x = (0);
-            _start_y = (0);
-        }
-
-        public void Attach(LineRenderer ren) { _ren = ren; }
-
-
+        public void Attach(LineRenderer ren) => _ren = ren;
         public OutlineJoin LineJoin
         {
-            get { return _line_join; }
+            get => _line_join;
             set
             {
                 _line_join = OutlineRenderer.AccurateJoinOnly ?
@@ -291,11 +290,7 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
             }
         }
 
-        public bool RoundCap
-        {
-            get => _round_cap;
-            set => _round_cap = value;
-        }
+        public bool RoundCap { get; set; }
         public void MoveTo(int x, int y)
         {
             _src_vertices.ModifyLast(new LineAAVertex(_start_x = x, _start_y = y));
@@ -406,7 +401,7 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
                             x2 = v.x;
                             y2 = v.y;
                             LineParameters lp = new LineParameters(x1, y1, x2, y2, lprev);
-                            if (_round_cap)
+                            if (RoundCap)
                             {
                                 _ren.SemiDot(CompareDistStart, x1, y1, x1 + (y2 - y1), y1 - (x2 - x1));
                             }
@@ -415,7 +410,7 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
                                          y1 - (x2 - x1),
                                          x2 + (y2 - y1),
                                          y2 - (x2 - x1));
-                            if (_round_cap)
+                            if (RoundCap)
                             {
                                 _ren.SemiDot(CompareDistEnd, x2, y2, x2 + (y2 - y1), y2 - (x2 - x1));
                             }
@@ -439,7 +434,7 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
 
                             LineParameters lp1 = new LineParameters(x1, y1, x2, y2, lprev);
                             LineParameters lp2 = new LineParameters(x2, y2, x3, y3, lnext);
-                            if (_round_cap)
+                            if (RoundCap)
                             {
                                 _ren.SemiDot(CompareDistStart, x1, y1, x1 + (y2 - y1), y1 - (x2 - x1));
                             }
@@ -461,7 +456,7 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
                                 _ren.Line3(lp2, dv2.xb1, dv2.yb1,
                                                   x3 + (y3 - y2), y3 - (x3 - x2));
                             }
-                            if (_round_cap)
+                            if (RoundCap)
                             {
                                 _ren.SemiDot(CompareDistEnd, x3, y3, x3 + (y3 - y2), y3 - (x3 - x2));
                             }
@@ -508,7 +503,7 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
                                     break;
                             }
 
-                            if (_round_cap)
+                            if (RoundCap)
                             {
                                 _ren.SemiDot(CompareDistStart, x1, y1, x1 + (y2 - y1), y1 - (x2 - x1));
                             }
@@ -566,7 +561,7 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
                                              curr.x2 + (curr.y2 - curr.y1),
                                              curr.y2 - (curr.x2 - curr.x1));
                             }
-                            if (_round_cap)
+                            if (RoundCap)
                             {
                                 _ren.SemiDot(CompareDistEnd, curr.x2, curr.y2,
                                                curr.x2 + (curr.y2 - curr.y1),
@@ -606,11 +601,10 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
 #endif
         void AddPath(VertexStore vxs)
         {
-            double x;
-            double y;
+
             VertexCmd cmd;
             int index = 0;
-            while ((cmd = vxs.GetVertex(index++, out x, out y)) != VertexCmd.NoMore)
+            while ((cmd = vxs.GetVertex(index++, out double x, out double y)) != VertexCmd.NoMore)
             {
                 AddVertex(x, y, cmd);
             }
