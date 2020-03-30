@@ -112,7 +112,7 @@ namespace PixelFarm.CpuBlit
         /// <param name="vxs"></param>
         public override void Fill(VertexStore vxs)
         {
-            
+
             if (!_useDefaultBrush)
             {
                 Brush br = _curBrush;
@@ -167,10 +167,9 @@ namespace PixelFarm.CpuBlit
             if (_tessTool == null) { _tessTool = new TessTool(); }
             if (_gouraudVertBuilder == null) { _gouraudVertBuilder = new GouraudVerticeBuilder(); }
 
-            if (!(polygonGrBrush.InnerBrush is RGBAGouraudSpanGen spanGen))
+            if (!(polygonGrBrush.InnerBrush is RGBAGouraudSpanGen))
             {
-                spanGen = new RGBAGouraudSpanGen();
-                polygonGrBrush.InnerBrush = spanGen;
+                polygonGrBrush.InnerBrush = new RGBAGouraudSpanGen();
             }
 
 
@@ -222,7 +221,7 @@ namespace PixelFarm.CpuBlit
                 //modified
                 oy = this.Height - oy;
             }
-            
+
             //Agg
             //----------------------------------------------------------  
             using (Tools.BorrowEllipse(out var ellipseTool))
@@ -262,7 +261,7 @@ namespace PixelFarm.CpuBlit
         }
         public override void FillRect(double left, double top, double width, double height)
         {
-           
+
             //Agg 
             //---------------------------------------------------------- 
 

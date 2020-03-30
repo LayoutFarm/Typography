@@ -211,7 +211,7 @@ namespace PixelFarm.PathReconstruction
     }
 
 
-    public delegate bool PixelPreviewDelegate(int orgColor);
+
     public class Bmp32PixelEvalToleranceMatch : Bmp32PixelEvaluator
     {
 
@@ -229,7 +229,8 @@ namespace PixelFarm.PathReconstruction
         byte _b;
         byte _a;
         //-------------- 
-        PixelPreviewDelegate _pixelPreviewDel;
+
+        System.Func<int, bool> _pixelPreviewDel;
         bool _hasSkipColor;
         int _skipColorInt32;
 
@@ -253,7 +254,7 @@ namespace PixelFarm.PathReconstruction
                 (c.B << CO.B_SHIFT);
 
         }
-        public void SetCustomPixelChecker(PixelPreviewDelegate pixelPreviewDel)
+        public void SetCustomPixelChecker(System.Func<int, bool> pixelPreviewDel)
         {
             _pixelPreviewDel = pixelPreviewDel;
         }

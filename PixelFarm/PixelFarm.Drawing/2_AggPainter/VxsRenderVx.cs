@@ -1,5 +1,4 @@
-﻿//----------------------------------------------------------------------------
-//MIT, 2014-present, WinterDev
+﻿//MIT, 2014-present, WinterDev
 
 using System;
 using PixelFarm.Drawing;
@@ -14,9 +13,7 @@ namespace PixelFarm.CpuBlit
         public VxsRenderVx(VertexStore vxs)
         {
             _vxs = vxs;
-
         }
-
         public static object GetResolvedObject(VxsRenderVx vxsRenerVx)
         {
             return vxsRenerVx._resolvedObject;

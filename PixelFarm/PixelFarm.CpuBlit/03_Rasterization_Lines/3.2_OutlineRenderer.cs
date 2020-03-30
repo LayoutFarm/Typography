@@ -21,6 +21,53 @@ using PixelFarm.CpuBlit.FragmentProcessing;
 
 namespace PixelFarm.CpuBlit.Rasterization.Lines
 {
+    public class PreBuiltLineAAGammaTable
+    {
+        internal readonly byte[] _gammaValues;
+        public PreBuiltLineAAGammaTable(byte[] gammaValues)
+        {
+#if DEBUG
+            if (gammaValues.Length != LineProfileAnitAlias.AA_SCALE)
+            {
+                System.Diagnostics.Debugger.Break();
+                _gammaValues = gammaValues;
+            }
+#endif
+            _gammaValues = gammaValues;
+        }
+        public PreBuiltLineAAGammaTable(IGammaFunction generator) : this(generator.GetGamma)
+        { 
+        }
+        public PreBuiltLineAAGammaTable(Func<float, float> gammaValueGenerator)
+        {
+            if (gammaValueGenerator != null)
+            {
+                _gammaValues = new byte[LineProfileAnitAlias.AA_SCALE];
+                for (int i = LineProfileAnitAlias.AA_SCALE - 1; i >= 0; --i)
+                {
+                    //pass i to gamma func ***
+                    _gammaValues[i] = (byte)(AggMath.uround(gammaValueGenerator((float)i / LineProfileAnitAlias.AA_MASK) * LineProfileAnitAlias.AA_MASK));
+                }
+            }
+            else
+            {
+                _gammaValues = null;
+            }
+        }
+        public static readonly PreBuiltLineAAGammaTable None;
+
+        static PreBuiltLineAAGammaTable()
+        {
+            {
+                byte[] gammaValues = new byte[LineProfileAnitAlias.AA_SCALE];
+                for (int i = LineProfileAnitAlias.AA_SCALE - 1; i >= 0; --i)
+                {
+                    gammaValues[i] = (byte)(AggMath.uround(((float)(i) / LineProfileAnitAlias.AA_MASK) * LineProfileAnitAlias.AA_MASK));
+                }
+                None = new PreBuiltLineAAGammaTable(gammaValues);
+            }
+        }
+    }
     //==========================================================line_profile_aa
     //
     // See Implementation agg_line_profile_aa.cpp 
@@ -32,36 +79,23 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
 
         const int SUBPIX_MASK = SUBPIX_SCALE - 1;
         const int AA_SHIFT = 8;
-        const int AA_SCALE = 1 << AA_SHIFT;
-        const int AA_MASK = AA_SCALE - 1;
 
-        byte[] _profile = new byte[64];
+        public const int AA_SCALE = 1 << AA_SHIFT;
+        public const int AA_MASK = AA_SCALE - 1;
+
+        byte[] _profile;
         byte[] _gamma;
         float _subpixel_width;
         double _min_width;
         double _smoother_width;
 
-
-        readonly static byte[] s_gamma_none;
-        readonly static byte[] s_gamma_50;
-
-        static LineProfileAnitAlias()
-        {
-            //GammaNone => just return i***
-            s_gamma_none = new byte[AA_SCALE];
-            for (int i = AA_SCALE - 1; i >= 0; --i)
-            {
-                s_gamma_none[i] = (byte)(AggMath.uround(((float)(i) / AA_MASK) * AA_MASK));
-            }
-
-            s_gamma_50 = new byte[AA_SCALE];
-            for (int i = AA_SCALE - 1; i >= (AA_SCALE / 2); --i)
-            {
-                s_gamma_50[i] = 255;
-            }
-        }
+        PreBuiltLineAAGammaTable _gammaTable;
 
         public LineProfileAnitAlias(double w, IGammaFunction gamma_function)
+            : this(w, new PreBuiltLineAAGammaTable(gamma_function))
+        {
+        }
+        public LineProfileAnitAlias(double w, PreBuiltLineAAGammaTable preBuiltGammaTable)
         {
             //1. init value
             _subpixel_width = 0;
@@ -69,14 +103,21 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
             _smoother_width = 1.0;
 
             //2. set gamma before set width
-            SetGamma(gamma_function);
+            _gammaTable = preBuiltGammaTable;
+            _gamma = preBuiltGammaTable._gammaValues;
             //3. set width table
             SetWidth(w);
         }
         public float SubPixelWidth
         {
             get => _subpixel_width;
-            set => SetWidth(value);               //subpixel width
+            set
+            {
+                if (_subpixel_width != value)
+                {
+                    SetWidth(value);               //subpixel width
+                }
+            }
         }
 
         //#if DEBUG
@@ -105,34 +146,40 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
 
             return _profile[dist + SUBPIX_SCALE * 2];
         }
-        byte[] GetProfileBuffer(double w)
+
+        void UpdateProfileBuffer(double w)
         {
             _subpixel_width = AggMath.uround(w * SUBPIX_SCALE);
             int size = (int)_subpixel_width + SUBPIX_SCALE * 6;
-            if (size > _profile.Length)
+
+            if (_profile == null)
             {
-                //clear ?
-                _profile = new byte[size];
-                //m_profile.Resize(size);
-            }
-            return _profile;
-        }
-        void SetGamma(IGammaFunction gamma_function)
-        {
-            //TODO:review gamma again***
-            if (gamma_function == null)
-            {
-                //_gamma = s_gamma_none;
-                _gamma = s_gamma_50;
-            }
-            else
-            {
-                _gamma = new byte[AA_SCALE];
-                for (int i = AA_SCALE - 1; i >= 0; --i)
+                if (size > 64) //default size
                 {
-                    //pass i to gamma func ***
-                    _gamma[i] = (byte)(AggMath.uround(gamma_function.GetGamma((float)(i) / AA_MASK) * AA_MASK));
+                    _profile = new byte[size];
                 }
+                else
+                {
+                    _profile = new byte[64]; //default
+                }
+            }
+            else if (size > _profile.Length)
+            {
+                //set a new one
+                _profile = new byte[size];
+            }
+
+        }
+
+        //change gamma table
+        public void SetGamma(PreBuiltLineAAGammaTable preBuiltTable)
+        {
+            if (_gammaTable != preBuiltTable)
+            {
+                _gammaTable = preBuiltTable;
+                //when we change gamma,
+                //we need to update all profile
+                UpdateProfileBuffer(_smoother_width);
             }
         }
 
@@ -141,9 +188,9 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
         void SetWidth(double w)
         {
             if (w < 0.0) w = 0.0;
-            //
-            if (w < _smoother_width) w += w;
-            else/**/                  w += _smoother_width;
+
+            w += (w < _smoother_width) ? w : _smoother_width;
+
             //
             w *= 0.5;
             w -= _smoother_width;
@@ -172,7 +219,8 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
                 smoother_width /= k;
             }
 
-            byte[] ch = GetProfileBuffer(center_width + smoother_width);
+            UpdateProfileBuffer(center_width + smoother_width);
+
             int chIndex = 0;
             //
 #if DEBUG
@@ -189,41 +237,40 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
             int ch_smoother = ch_center + subpixel_center_width;
             //
             int i;
-            int val = _gamma[(int)(base_val * AA_MASK)];
+            byte val = _gamma[(int)(base_val * AA_MASK)];
             chIndex = ch_center;
+
+            byte[] myLineProfile = _profile;
+
             for (i = 0; i < subpixel_center_width; i++)
             {
-                ch[chIndex++] = (byte)val;
+                myLineProfile[chIndex++] = val;
             }
 
             for (i = 0; i < subpixel_smoother_width; i++)
             {
-                ch[ch_smoother++] =
+                myLineProfile[ch_smoother++] =
                     _gamma[(int)((base_val -
                                       base_val *
                                       ((double)(i) / subpixel_smoother_width)) * AA_MASK)];
             }
 
-            int n_smoother = ch.Length -
+            int n_smoother = myLineProfile.Length -
                                   subpixel_smoother_width -
                                   subpixel_center_width -
                                   SUBPIX_SCALE * 2;
             val = _gamma[0];
             for (i = 0; i < n_smoother; i++)
             {
-                ch[ch_smoother++] = (byte)val;
+                myLineProfile[ch_smoother++] = val;
             }
 
             chIndex = ch_center;
             for (i = 0; i < SUBPIX_SCALE * 2; i++)
             {
-                ch[--chIndex] = ch[ch_center++];
+                myLineProfile[--chIndex] = myLineProfile[ch_center++];
             }
 
-            for (i = ch.Length - 1; i >= 0; --i)
-            {
-                _profile[i] = ch[i];
-            }
         }
     }
 
@@ -406,7 +453,7 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
         {
             int r = ((SubPixelWidth + LineAA.SUBPIXEL_MARK) >> LineAA.SUBPIXEL_SHIFT);
             if (r < 1) r = 1;
-            
+
             var ei = new EllipseBresenhamInterpolator(r, r);
             int dx = 0;
             int dy = -r;

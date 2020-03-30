@@ -1,126 +1,32 @@
-﻿//MIT, 2016-present, WinterDev
+﻿//MIT, 2016-present, WinterDev 
+
+//----------------------------------------------------------------------------
+// Anti-Grain Geometry - Version 2.4
+//
+// C# Port port by: Lars Brubaker
+//                  larsbrubaker@gmail.com
+// Copyright (C) 2007-2011
+//
+// Permission to copy, use, modify, sell and distribute this software 
+// is granted provided this copyright notice appears in all copies. 
+// This software is provided "as is" without express or implied
+// warranty, and with no claim as to its suitability for any purpose.
+//
+//----------------------------------------------------------------------------
+//
+// Class StringPrinter.cs
+// 
+// Class to output the vertex source of a string as a run of glyphs.
+//----------------------------------------------------------------------------
+
 
 using System;
 using PixelFarm.Drawing;
 using PixelFarm.CpuBlit.VertexProcessing;
+using PixelFarm.VectorMath;
 
 namespace PixelFarm.CpuBlit
 {
-    //BSD, 2014-present, WinterDev
-
-    //----------------------------------------------------------------------------
-    // Anti-Grain Geometry - Version 2.4
-    //
-    // C# Port port by: Lars Brubaker
-    //                  larsbrubaker@gmail.com
-    // Copyright (C) 2007-2011
-    //
-    // Permission to copy, use, modify, sell and distribute this software 
-    // is granted provided this copyright notice appears in all copies. 
-    // This software is provided "as is" without express or implied
-    // warranty, and with no claim as to its suitability for any purpose.
-    //
-    //----------------------------------------------------------------------------
-    //
-    // Class StringPrinter.cs
-    // 
-    // Class to output the vertex source of a string as a run of glyphs.
-    //----------------------------------------------------------------------------
-
-
-    public static class PainterExtensions
-    {
-
-        public static void Line(this Painter p, double x1, double y1, double x2, double y2, Color color)
-        {
-            Color prevColor = p.StrokeColor;
-            p.StrokeColor = color;
-            p.DrawLine(x1, y1, x2, y2);
-            p.StrokeColor = prevColor;
-        }
-        public static void DrawRectangle(this Painter p, double left, double top, double width, double height, Color color)
-        {
-            Color prevColor = p.StrokeColor;
-            p.StrokeColor = color;
-            p.DrawRect(left, top, width, height);
-            p.StrokeColor = prevColor;
-        }
-        public static void DrawCircle(this Painter p, double centerX, double centerY, double radius)
-        {
-            p.DrawEllipse(centerX - radius, centerY - radius, radius + radius, radius + radius);
-        }
-        public static void FillCircle(this Painter p, double centerX, double centerY, double radius)
-        {
-            p.FillEllipse(centerX - radius, centerY - radius, radius + radius, radius + radius);
-        }
-        public static void FillCircle(this Painter p, double x, double y, double radius, Color color)
-        {
-            Color prevColor = p.FillColor;
-            p.FillColor = color;
-            p.FillCircle(x, y, radius);
-            p.FillColor = prevColor;
-        }
-        public static void FillRect(this Painter p, double left, double top, double width, double height, Color color)
-        {
-            Color prevColor = p.FillColor;
-            p.FillColor = color;
-            p.FillRect(left, top, width, height);
-            p.FillColor = prevColor;
-        }
-        public static void Fill(this Painter p, VertexStore vxs, Color color)
-        {
-            Color prevColor = p.FillColor;
-            p.FillColor = color;
-            p.Fill(vxs);
-            p.FillColor = prevColor;
-        }
-        public static void Draw(this Painter p, VertexStore vxs, Color color)
-        {
-            Color prevColor = p.StrokeColor;
-            p.StrokeColor = color;
-            p.Draw(vxs);
-            p.StrokeColor = prevColor;
-        }
-        public static void Fill(this Painter p, Region rgn, Color color)
-        {
-            Color prevColor = p.FillColor;
-            p.FillColor = color;
-            p.Fill(rgn);
-            p.FillColor = prevColor;
-        }
-
-        /// <summary>
-        /// create stroke-vxs from a given vxs, and fill stroke-vxs with input color
-        /// </summary>
-        /// <param name="p"></param>
-        /// <param name="vxs"></param>
-        /// <param name="strokeW"></param>
-        /// <param name="color"></param>
-        public static void FillStroke(this Painter p, VertexStore vxs, float strokeW, Color color)
-        {
-            Color prevColor = p.FillColor;
-            p.FillColor = color;
-
-            using (Tools.BorrowStroke(out var s))
-            using (Tools.BorrowVxs(out var v1))
-            {
-                s.Width = strokeW;
-                s.MakeVxs(vxs, v1);
-                p.Fill(v1);
-            }
-
-            p.FillColor = prevColor;
-        }
-
-#if DEBUG
-        static int dbugId = 0;
-#endif
-
-
-    }
-
-
-
 
     public sealed class Tools
     {
@@ -364,6 +270,174 @@ namespace PixelFarm.CpuBlit
         public VertexStore CurrentSharedVxs => _vxs;
     }
 
+    public static class PainterExtensions
+    {
+
+        public static void Line(this Painter p, double x1, double y1, double x2, double y2, Color color)
+        {
+            Color prevColor = p.StrokeColor;
+            p.StrokeColor = color;
+            p.DrawLine(x1, y1, x2, y2);
+            p.StrokeColor = prevColor;
+        }
+        public static void DrawRectangle(this Painter p, double left, double top, double width, double height, Color color)
+        {
+            Color prevColor = p.StrokeColor;
+            p.StrokeColor = color;
+            p.DrawRect(left, top, width, height);
+            p.StrokeColor = prevColor;
+        }
+        public static void DrawCircle(this Painter p, double centerX, double centerY, double radius)
+        {
+            p.DrawEllipse(centerX - radius, centerY - radius, radius + radius, radius + radius);
+        }
+        public static void FillCircle(this Painter p, double centerX, double centerY, double radius)
+        {
+            p.FillEllipse(centerX - radius, centerY - radius, radius + radius, radius + radius);
+        }
+        public static void FillCircle(this Painter p, double x, double y, double radius, Color color)
+        {
+            Color prevColor = p.FillColor;
+            p.FillColor = color;
+            p.FillCircle(x, y, radius);
+            p.FillColor = prevColor;
+        }
+        public static void FillRect(this Painter p, double left, double top, double width, double height, Color color)
+        {
+            Color prevColor = p.FillColor;
+            p.FillColor = color;
+            p.FillRect(left, top, width, height);
+            p.FillColor = prevColor;
+        }
+        public static void Fill(this Painter p, VertexStore vxs, Color color)
+        {
+            Color prevColor = p.FillColor;
+            p.FillColor = color;
+            p.Fill(vxs);
+            p.FillColor = prevColor;
+        }
+        public static void Draw(this Painter p, VertexStore vxs, Color color)
+        {
+            Color prevColor = p.StrokeColor;
+            p.StrokeColor = color;
+            p.Draw(vxs);
+            p.StrokeColor = prevColor;
+        }
+        public static void Fill(this Painter p, Region rgn, Color color)
+        {
+            Color prevColor = p.FillColor;
+            p.FillColor = color;
+            p.Fill(rgn);
+            p.FillColor = prevColor;
+        }
+
+        /// <summary>
+        /// create stroke-vxs from a given vxs, and fill stroke-vxs with input color
+        /// </summary>
+        /// <param name="p"></param>
+        /// <param name="vxs"></param>
+        /// <param name="strokeW"></param>
+        /// <param name="color"></param>
+        public static void FillStroke(this Painter p, VertexStore vxs, float strokeW, Color color)
+        {
+            Color prevColor = p.FillColor;
+            p.FillColor = color;
+
+            using (Tools.BorrowStroke(out var s))
+            using (Tools.BorrowVxs(out var v1))
+            {
+                s.Width = strokeW;
+                s.MakeVxs(vxs, v1);
+                p.Fill(v1);
+            }
+
+            p.FillColor = prevColor;
+        }
+
+#if DEBUG
+        static int dbugId = 0;
+#endif
+
+
+    }
+
+    public static class AggRenderSurfaceExtensions
+    {
+
+        public static void Rectangle(this AggRenderSurface gx, double left, double bottom, double right, double top, Color color, double strokeWidth = 1)
+        {
+
+            using (Tools.BorrowStroke(out var stroke))
+            using (Tools.BorrowRect(out var rect))
+            using (Tools.BorrowVxs(out var v1, out var v2))
+            {
+                stroke.Width = strokeWidth;
+                rect.SetRect(left + .5, bottom + .5, right - .5, top - .5);
+                gx.Render(stroke.MakeVxs(rect.MakeVxs(v1), v2), color);
+            }
+
+        }
+        public static void Rectangle(this AggRenderSurface gx, RectD rect, Color color, double strokeWidth = 1)
+        {
+            gx.Rectangle(rect.Left, rect.Bottom, rect.Right, rect.Top, color, strokeWidth);
+        }
+
+        public static void Rectangle(this AggRenderSurface gx, RectInt rect, Color color)
+        {
+            gx.Rectangle(rect.Left, rect.Bottom, rect.Right, rect.Top, color);
+        }
+
+        public static void FillRectangle(this AggRenderSurface gx, RectD rect, Color fillColor)
+        {
+            gx.FillRectangle(rect.Left, rect.Bottom, rect.Right, rect.Top, fillColor);
+        }
+
+        public static void FillRectangle(this AggRenderSurface gx, RectInt rect, Color fillColor)
+        {
+            gx.FillRectangle(rect.Left, rect.Bottom, rect.Right, rect.Top, fillColor);
+        }
+
+        public static void FillRectangle(this AggRenderSurface gx,
+            Vector2 leftBottom,
+            Vector2 rightTop, Color fillColor)
+        {
+            gx.FillRectangle(leftBottom.x, leftBottom.y, rightTop.x, rightTop.y, fillColor);
+        }
+
+        public static void FillRectangle(this AggRenderSurface gx, double left,
+            double bottom, double right, double top, Color fillColor)
+        {
+            if (right < left || top < bottom)
+            {
+                throw new ArgumentException();
+            }
+
+            using (Tools.BorrowRect(out var rect))
+            using (Tools.BorrowVxs(out var v1))
+            {
+                rect.SetRect(left, bottom, right, top);
+                gx.Render(rect.MakeVxs(v1), fillColor);
+            }
+
+        }
+        public static void Circle(this AggRenderSurface g, double x, double y, double radius, Color color)
+        {
+            using (Tools.BorrowEllipse(out var ellipse))
+            using (Tools.BorrowVxs(out var v1))
+            {
+                ellipse.Set(x, y, radius, radius);
+                g.Render(ellipse.MakeVxs(v1), color);
+            }
+
+        }
+        public static void Circle(this AggRenderSurface g, Vector2 origin, double radius, Color color)
+        {
+            Circle(g, origin.x, origin.y, radius, color);
+        }
+
+
+
+    }
 
 }
 
