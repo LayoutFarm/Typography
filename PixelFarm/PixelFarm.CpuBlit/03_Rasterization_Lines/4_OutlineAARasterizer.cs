@@ -1,4 +1,5 @@
 //BSD, 2014-present, WinterDev
+//MatterHackers
 //----------------------------------------------------------------------------
 // Anti-Grain Geometry - Version 2.4
 // Copyright (C) 2002-2005 Maxim Shemanarev (http://www.antigrain.com)

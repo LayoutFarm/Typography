@@ -4,7 +4,7 @@ using System;
 using PixelFarm.Drawing;
 using PixelFarm.CpuBlit.Imaging;
 using PixelFarm.CpuBlit.PixelProcessing;
-using BitmapBufferEx;
+ 
 namespace PixelFarm.CpuBlit
 {
 
@@ -160,15 +160,15 @@ namespace PixelFarm.CpuBlit
                         _aggsx = _aggsx_mask;//*** 
                         break;
                 }
-                TempMemPtr tmp = MemBitmap.GetBufferPtr(_aggsx.DestBitmap);
-                unsafe
-                {
-                    _bxt = new BitmapBuffer(
-                       _aggsx.Width,
-                       _aggsx.Height,
-                        tmp.Ptr,
-                        tmp.LengthInBytes);
-                }
+                //TempMemPtr tmp = MemBitmap.GetBufferPtr(_aggsx.DestBitmap);
+                //unsafe
+                //{
+                //    _bxt = new BitmapBuffer(
+                //       _aggsx.Width,
+                //       _aggsx.Height,
+                //        tmp.Ptr,
+                //        tmp.LengthInBytes);
+                //}
             }
         }
 

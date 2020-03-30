@@ -19,7 +19,8 @@
 //----------------------------------------------------------------------------
 
 using System;
-namespace PixelFarm.CpuBlit.FragmentProcessing
+using PixelFarm.CpuBlit.FragmentProcessing;
+namespace PixelFarm.CpuBlit.PixelProcessing
 {
     public struct GammaNone : IGammaFunction
     {

@@ -5,8 +5,7 @@ using PixelFarm.Drawing;
 using PixelFarm.CpuBlit.VertexProcessing;
 using PixelFarm.CpuBlit.FragmentProcessing;
 using PixelFarm.CpuBlit.PixelProcessing;
-
-using BitmapBufferEx;
+ 
 namespace PixelFarm.CpuBlit
 {
 
@@ -42,7 +41,6 @@ namespace PixelFarm.CpuBlit
             get => _lineRenderingTech;
             set
             {
-
                 if (value == LineRenderingTechnique.OutlineAARenderer && _outlineRas == null)
                 {
                     _lineProfileAA = new Rasterization.Lines.LineProfileAnitAlias(this.StrokeWidth, null);
@@ -102,15 +100,15 @@ namespace PixelFarm.CpuBlit
             //BitmapExt
             if (this.RenderQuality == RenderQuality.Fast)
             {
-                _bxt.DrawLine(
-                   (int)Math.Round(x1),
-                   (int)Math.Round(y1),
-                   (int)Math.Round(x2),
-                   (int)Math.Round(y2),
-                    _strokeColor.ToARGB()
-                   );
+                //_bxt.DrawLine(
+                //   (int)Math.Round(x1),
+                //   (int)Math.Round(y1),
+                //   (int)Math.Round(x2),
+                //   (int)Math.Round(y2),
+                //    _strokeColor.ToARGB()
+                //   );
 
-                return;
+                //return;
             }
 
             //----------------------------------------------------------
@@ -176,41 +174,41 @@ namespace PixelFarm.CpuBlit
             if (RenderQuality == RenderQuality.Fast)
             {
 
-                VertexCmd cmd;
-                int index = 0;
-                double lastMoveX = 0, lastMoveY = 0;
-                double lastX = 0, lastY = 0;
-                int stroke_color = _strokeColor.ToARGB();
-                while ((cmd = vxs.GetVertex(index++, out double x, out double y)) != VertexCmd.NoMore)
-                {
-                    switch (cmd)
-                    {
-                        case VertexCmd.MoveTo:
-                            lastX = lastMoveX = x;
-                            lastY = lastMoveY = y;
+                //VertexCmd cmd;
+                //int index = 0;
+                //double lastMoveX = 0, lastMoveY = 0;
+                //double lastX = 0, lastY = 0;
+                //int stroke_color = _strokeColor.ToARGB();
+                //while ((cmd = vxs.GetVertex(index++, out double x, out double y)) != VertexCmd.NoMore)
+                //{
+                //    switch (cmd)
+                //    {
+                //        case VertexCmd.MoveTo:
+                //            lastX = lastMoveX = x;
+                //            lastY = lastMoveY = y;
 
-                            break;
-                        case VertexCmd.LineTo:
+                //            break;
+                //        case VertexCmd.LineTo:
 
-                            //need rounding
-                            _bxt.DrawLine((int)Math.Round(lastX), (int)Math.Round(lastY), (int)Math.Round(x), (int)Math.Round(y), stroke_color);
+                //            //need rounding
+                //            _bxt.DrawLine((int)Math.Round(lastX), (int)Math.Round(lastY), (int)Math.Round(x), (int)Math.Round(y), stroke_color);
 
-                            lastX = x;
-                            lastY = y;
+                //            lastX = x;
+                //            lastY = y;
 
-                            break;
-                        case VertexCmd.Close:
+                //            break;
+                //        case VertexCmd.Close:
 
-                            _bxt.DrawLine((int)Math.Round(lastX), (int)Math.Round(lastY), (int)Math.Round(lastMoveX), (int)Math.Round(lastMoveY), stroke_color);
+                //            _bxt.DrawLine((int)Math.Round(lastX), (int)Math.Round(lastY), (int)Math.Round(lastMoveX), (int)Math.Round(lastMoveY), stroke_color);
 
-                            lastX = x;
-                            lastY = y;
+                //            lastX = x;
+                //            lastY = y;
 
-                            break;
-                    }
-                }
+                //            break;
+                //    }
+                //}
 
-                return;
+                //return;
             }
             if (_lineDashGen == null)
             {
@@ -284,31 +282,31 @@ namespace PixelFarm.CpuBlit
             if (this.RenderQuality == RenderQuality.Fast)
             {
 
-                if (_orientation == RenderSurfaceOriginKind.LeftBottom)
-                {
+                //if (_orientation == RenderSurfaceOriginKind.LeftBottom)
+                //{
 
-                    _bxt.DrawRectangle(
-                       (int)Math.Round(left),
-                       (int)Math.Round(top),
-                       (int)Math.Round(left + width),
-                       (int)Math.Round(top + height),
+                //    _bxt.DrawRectangle(
+                //       (int)Math.Round(left),
+                //       (int)Math.Round(top),
+                //       (int)Math.Round(left + width),
+                //       (int)Math.Round(top + height),
 
-                   ColorInt.FromArgb(_strokeColor.ToARGB()));
-                }
-                else
-                {
-                    //TODO: review here
-                    throw new NotSupportedException();
-                    //int canvasH = this.Height; 
-                    ////_simpleRectVxsGen.SetRect(left + 0.5, canvasH - (bottom + 0.5 + height), right - 0.5, canvasH - (top - 0.5 + height));
-                    //_bmpBuffer.DrawRectangle(
-                    //(int)Math.Round(left),
-                    //(int)Math.Round(top),
-                    //(int)Math.Round(left + width),
-                    //(int)Math.Round(top + height),
-                    //ColorInt.FromArgb(this.strokeColor.ToARGB()));
-                }
-                return; //exit
+                //   ColorInt.FromArgb(_strokeColor.ToARGB()));
+                //}
+                //else
+                //{
+                //    //TODO: review here
+                //    throw new NotSupportedException();
+                //    //int canvasH = this.Height; 
+                //    ////_simpleRectVxsGen.SetRect(left + 0.5, canvasH - (bottom + 0.5 + height), right - 0.5, canvasH - (top - 0.5 + height));
+                //    //_bmpBuffer.DrawRectangle(
+                //    //(int)Math.Round(left),
+                //    //(int)Math.Round(top),
+                //    //(int)Math.Round(left + width),
+                //    //(int)Math.Round(top + height),
+                //    //ColorInt.FromArgb(this.strokeColor.ToARGB()));
+                //}
+                //return; //exit
             }
 
             //----------------------------------------------------------
@@ -360,22 +358,7 @@ namespace PixelFarm.CpuBlit
                 oy = this.Height - oy;
             }
 
-            //---------------------------------------------------------- 
-            //BitmapExt
-            if (_renderQuality == RenderQuality.Fast)
-            {
-
-                _bxt.DrawEllipseCentered(
-                   (int)Math.Round(ox), (int)Math.Round(oy),
-                   (int)Math.Round(width / 2),
-                   (int)Math.Round(height / 2),
-                   _strokeColor.ToARGB());
-
-                return;
-            }
-
-
-
+           
             using (Tools.BorrowEllipse(out var ellipseTool))
             {
                 ellipseTool.Set(ox,

@@ -1,7 +1,7 @@
 ﻿//MIT, 2014-present, WinterDev
 using PixelFarm.Drawing;
 using PixelFarm.CpuBlit.Imaging;
-using PixelFarm.CpuBlit.FragmentProcessing;
+using PixelFarm.CpuBlit.PixelProcessing;
 
 using System;
 

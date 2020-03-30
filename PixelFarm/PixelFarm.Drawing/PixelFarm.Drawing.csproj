@@ -38,42 +38,6 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\PixelFarm.BitmapBufferEx\BitmapBufferEx\BitmapBuffer.cs">
-      <Link>0_REF_BitmapBufferEx\BitmapBuffer.cs</Link>
-    </Compile>
-    <Compile Include="..\PixelFarm.BitmapBufferEx\BitmapBufferEx\BitmapBufferExtensions\BaseExtensions.cs">
-      <Link>0_REF_BitmapBufferEx\BaseExtensions.cs</Link>
-    </Compile>
-    <Compile Include="..\PixelFarm.BitmapBufferEx\BitmapBufferEx\BitmapBufferExtensions\BlitExtensions.cs">
-      <Link>0_REF_BitmapBufferEx\BlitExtensions.cs</Link>
-    </Compile>
-    <Compile Include="..\PixelFarm.BitmapBufferEx\BitmapBufferEx\BitmapBufferExtensions\ConvertExtensions.cs">
-      <Link>0_REF_BitmapBufferEx\ConvertExtensions.cs</Link>
-    </Compile>
-    <Compile Include="..\PixelFarm.BitmapBufferEx\BitmapBufferEx\BitmapBufferExtensions\FillExtensions.cs">
-      <Link>0_REF_BitmapBufferEx\FillExtensions.cs</Link>
-    </Compile>
-    <Compile Include="..\PixelFarm.BitmapBufferEx\BitmapBufferEx\BitmapBufferExtensions\FilterExtensions.cs">
-      <Link>0_REF_BitmapBufferEx\FilterExtensions.cs</Link>
-    </Compile>
-    <Compile Include="..\PixelFarm.BitmapBufferEx\BitmapBufferEx\BitmapBufferExtensions\LineExtensions.cs">
-      <Link>0_REF_BitmapBufferEx\LineExtensions.cs</Link>
-    </Compile>
-    <Compile Include="..\PixelFarm.BitmapBufferEx\BitmapBufferEx\BitmapBufferExtensions\ShapeExtensions.cs">
-      <Link>0_REF_BitmapBufferEx\ShapeExtensions.cs</Link>
-    </Compile>
-    <Compile Include="..\PixelFarm.BitmapBufferEx\BitmapBufferEx\BitmapBufferExtensions\SplineExtensions.cs">
-      <Link>0_REF_BitmapBufferEx\SplineExtensions.cs</Link>
-    </Compile>
-    <Compile Include="..\PixelFarm.BitmapBufferEx\BitmapBufferEx\BitmapBufferExtensions\TransformationExtensions.cs">
-      <Link>0_REF_BitmapBufferEx\TransformationExtensions.cs</Link>
-    </Compile>
-    <Compile Include="..\PixelFarm.BitmapBufferEx\BitmapBufferEx\BitmapBufferFactory.cs">
-      <Link>0_REF_BitmapBufferEx\BitmapBufferFactory.cs</Link>
-    </Compile>
-    <Compile Include="..\PixelFarm.BitmapBufferEx\BitmapBufferEx\BitmapContext.cs">
-      <Link>0_REF_BitmapBufferEx\BitmapContext.cs</Link>
-    </Compile>
     <Compile Include="..\BackEnd.BurningMineCurve\curveutils\CubicBezier.cs">
       <Link>0_REF_Painter\1_Vectors\4_BurningMineCurves\CubicBezier.cs</Link>
     </Compile>
@@ -626,10 +590,10 @@
     <Compile Include="6_Msdf\MsdfGen.cs" />
     <Compile Include="6_Msdf\SignedDistance.cs" />
     <Compile Include="3_VertexProcessoring\BorderDouble.cs" />
-    <Compile Include="4_FragmentProcessing\ClipProxyImage.cs" />
-    <Compile Include="4_FragmentProcessing\GammaFuntions.cs" />
-    <Compile Include="4_FragmentProcessing\ICpuBlitImageFilter.cs" />
-    <Compile Include="4_FragmentProcessing\ProxyImage.cs" />
+    <Compile Include="4_PixelProcessing\ClipProxyImage.cs" />
+    <Compile Include="4_PixelProcessing\GammaFuntions.cs" />
+    <Compile Include="4_PixelProcessing\ICpuBlitImageFilter.cs" />
+    <Compile Include="4_PixelProcessing\ProxyImage.cs" />
     <Compile Include="5_PathReconstruction\BezierCurveReconstruction.cs" />
     <Compile Include="5_PathReconstruction\BitmapBasedRegion.cs" />
     <Compile Include="2_CpuBlit\CpuBlitRegion.cs" />

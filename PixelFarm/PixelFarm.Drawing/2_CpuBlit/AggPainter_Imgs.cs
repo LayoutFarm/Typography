@@ -5,7 +5,7 @@ using PixelFarm.Drawing;
 using PixelFarm.CpuBlit.VertexProcessing;
 using PixelFarm.CpuBlit.Imaging;
 
-using BitmapBufferEx;
+
 namespace PixelFarm.CpuBlit
 {
 
@@ -16,24 +16,6 @@ namespace PixelFarm.CpuBlit
 
         void DrawBitmap(MemBitmap memBmp, double left, double top)
         {
-            //check image caching system 
-            if (_renderQuality == RenderQuality.Fast)
-            {
-                TempMemPtr tmp = MemBitmap.GetBufferPtr(memBmp);
-                unsafe
-                {
-                    BitmapBuffer srcBmp = new BitmapBuffer(memBmp.Width, memBmp.Height, tmp.Ptr, tmp.LengthInBytes);
-                    try
-                    {
-                        _bxt.CopyBlit(this.OriginX + (int)left, this.OriginY + (int)top, srcBmp);
-                    }
-                    catch (Exception ex)
-                    {
-
-                    }
-                }
-                return;
-            }
 
             //save, restore later... 
             bool useSubPix = UseSubPixelLcdEffect;
@@ -59,28 +41,6 @@ namespace PixelFarm.CpuBlit
         }
         void DrawBitmap(MemBitmap memBmp, double left, double top, int srcX, int srcY, int srcW, int srcH)
         {
-            //check image caching system 
-            if (_renderQuality == RenderQuality.Fast)
-            {
-                TempMemPtr tmp = MemBitmap.GetBufferPtr(memBmp);
-                unsafe
-                {
-                    BitmapBuffer srcBmp = new BitmapBuffer(memBmp.Width, memBmp.Height, tmp.Ptr, tmp.LengthInBytes);
-                    try
-                    {
-                        var src = new BitmapBufferEx.RectD(srcX, srcY, srcW, srcH);
-                        var dest = new BitmapBufferEx.RectD(left, top, srcW, srcH);
-
-                        BitmapBuffer bmpBuffer = new BitmapBuffer(memBmp.Width, memBmp.Height, tmp.Ptr, tmp.LengthInBytes);
-                        _bxt.CopyBlit(dest, bmpBuffer, src);
-                    }
-                    catch (Exception ex)
-                    {
-
-                    }
-                }
-                return;
-            }
 
             //save, restore later... 
             bool useSubPix = UseSubPixelLcdEffect;
@@ -134,19 +94,7 @@ namespace PixelFarm.CpuBlit
                 return;
             }
 
-            if (_renderQuality == RenderQuality.Fast)
-            {
-                //todo, review here again
-                TempMemPtr tmp = MemBitmap.GetBufferPtr(memBmp);
-                BitmapBuffer srcBmp = new BitmapBuffer(img.Width, img.Height, tmp.Ptr, tmp.LengthInBytes);
 
-                //_bxt.BlitRender(srcBmp, false, 1, null);
-                //_bxt.Blit(0, 0, srcBmp.PixelWidth, srcBmp.PixelHeight, srcBmp, 0, 0, srcBmp.PixelWidth, srcBmp.PixelHeight,
-                //    ColorInt.FromArgb(255, 255, 255, 255),
-                //    BitmapBufferExtensions.BlendMode.Alpha);
-                _bxt.FastAlphaBlit(0, 0, srcBmp, 0, 0, srcBmp.PixelWidth, srcBmp.PixelHeight);
-                return;
-            }
             //-------------------------------
             bool useSubPix = UseSubPixelLcdEffect; //save, restore later... 
                                                    //before render an image we turn off vxs subpixel rendering
@@ -161,25 +109,6 @@ namespace PixelFarm.CpuBlit
             if (!(img is MemBitmap memBmp))
             {
                 //? TODO
-                return;
-            }
-
-            if (_renderQuality == RenderQuality.Fast)
-            {
-                //todo, review here again
-                TempMemPtr tmp = MemBitmap.GetBufferPtr(memBmp);
-                BitmapBuffer srcBmp = new BitmapBuffer(img.Width, img.Height, tmp.Ptr, tmp.LengthInBytes);
-                if (affinePlans != null && affinePlans.Length > 0)
-                {
-                    _bxt.BlitRender(srcBmp, false, 1, new BitmapBufferEx.MatrixTransform(affinePlans));
-                }
-                else
-                {
-                    //_bxt.BlitRender(srcBmp, false, 1, null);
-                    _bxt.Blit(0, 0, srcBmp.PixelWidth, srcBmp.PixelHeight, srcBmp, 0, 0, srcBmp.PixelWidth, srcBmp.PixelHeight,
-                        ColorInt.FromArgb(255, 255, 255, 255),
-                        BitmapBufferExtensions.BlendMode.Alpha);
-                }
                 return;
             }
 
@@ -199,27 +128,6 @@ namespace PixelFarm.CpuBlit
             if (!(actualImage is MemBitmap memBmp))
             {
                 //? TODO
-                return;
-            }
-
-            if (_renderQuality == RenderQuality.Fast)
-            {
-                //todo, review here again
-                //TempMemPtr tmp = ActualBitmap.GetBufferPtr(actualImg);
-                //BitmapBuffer srcBmp = new BitmapBuffer(actualImage.Width, actualImage.Height, tmp.Ptr, tmp.LengthInBytes); 
-                //_bxt.BlitRender(srcBmp, false, 1, new BitmapBufferEx.MatrixTransform(affinePlans));
-
-                //if (affinePlans != null && affinePlans.Length > 0)
-                //{
-                //    _bxt.BlitRender(srcBmp, false, 1, new BitmapBufferEx.MatrixTransform(affinePlans));
-                //}
-                //else
-                //{
-                //    //_bxt.BlitRender(srcBmp, false, 1, null);
-                //    _bxt.Blit(0, 0, srcBmp.PixelWidth, srcBmp.PixelHeight, srcBmp, 0, 0, srcBmp.PixelWidth, srcBmp.PixelHeight,
-                //        ColorInt.FromArgb(255, 255, 255, 255),
-                //        BitmapBufferExtensions.BlendMode.Alpha);
-                //}
                 return;
             }
 
@@ -246,7 +154,7 @@ namespace PixelFarm.CpuBlit
         public override void ApplyFilter(PixelFarm.Drawing.IImageFilter imgFilter)
         {
             //check if we can use this imgFilter
-            if (!(imgFilter is PixelFarm.CpuBlit.FragmentProcessing.ICpuBlitImgFilter cpuBlitImgFx)) return;
+            if (!(imgFilter is PixelFarm.CpuBlit.PixelProcessing.ICpuBlitImgFilter cpuBlitImgFx)) return;
             // 
             cpuBlitImgFx.SetTarget(_aggsx.DestBitmapBlender);
             imgFilter.Apply();

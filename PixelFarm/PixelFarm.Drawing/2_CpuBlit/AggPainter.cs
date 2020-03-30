@@ -6,21 +6,19 @@ using PixelFarm.Drawing;
 using PixelFarm.CpuBlit.VertexProcessing;
 using PixelFarm.CpuBlit.PixelProcessing;
 
-using BitmapBufferEx;
+ 
 namespace PixelFarm.CpuBlit
 {
 
     public partial class AggPainter : Painter
     {
 
-        AggRenderSurface _aggsx; //target rendering surface  
-        BitmapBuffer _bxt;
-        //--------------------
+        AggRenderSurface _aggsx; //target rendering surface   
         AggRenderSurface _aggsx_0; //primary render surface
 
         //--------------------  
         SmoothingMode _smoothingMode;
-        RenderQuality _renderQuality;
+        
         RenderSurfaceOriginKind _orientation;
         TargetBuffer _targetBuffer;
         float _fillOpacity = 1;
@@ -127,11 +125,7 @@ namespace PixelFarm.CpuBlit
         public override void Clear(Color color) => _aggsx.Clear(color);
         public override void SetOrigin(float x, float y) => _aggsx.SetScanlineRasOrigin(x, y);
 
-        public override RenderQuality RenderQuality
-        {
-            get => _renderQuality;
-            set => _renderQuality = value;
-        }
+        public override RenderQuality RenderQuality { get; set; }
 
         public override RenderSurfaceOriginKind Orientation
         {

@@ -23,7 +23,7 @@
 //----------------------------------------------------------------------------
 
 using PixelFarm.Drawing;
-namespace PixelFarm.CpuBlit.FragmentProcessing
+namespace PixelFarm.CpuBlit.PixelProcessing
 {
     public sealed class ClipProxyImage : ProxyImage
     {

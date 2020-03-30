@@ -18,10 +18,9 @@
 //          http://www.antigrain.com
 //----------------------------------------------------------------------------
 
-using PixelFarm.Drawing;
-using PixelFarm.CpuBlit.PixelProcessing;
+using PixelFarm.Drawing; 
 using PixelFarm.CpuBlit.Imaging;
-namespace PixelFarm.CpuBlit.FragmentProcessing
+namespace PixelFarm.CpuBlit.PixelProcessing
 {
     public abstract class ProxyImage : IBitmapBlender
     {

@@ -103,7 +103,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GdiPlusSample.WinForms_2", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xamarin.Android.OpenGL", "Demo\Android\Xamarin.OpenGL\Xamarin.Android.OpenGL.csproj", "{B824FFB2-D057-490A-8967-892C0E20C0B6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PaintLab.PaintFx", "..\PixelFarm\src\PixelFarm\PaintLab.PaintFx\PaintLab.PaintFx.csproj", "{A533E1C7-AB74-4BCF-BC7A-12D4DBBFA918}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PaintLab.PaintFx.MiniAgg", "..\PixelFarm\src\PixelFarm\PaintLab.PaintFx\PaintLab.PaintFx.MiniAgg.csproj", "{A533E1C7-AB74-4BCF-BC7A-12D4DBBFA918}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution

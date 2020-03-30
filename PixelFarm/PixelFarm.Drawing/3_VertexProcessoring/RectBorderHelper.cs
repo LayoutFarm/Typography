@@ -1,20 +1,12 @@
 ﻿//MIT, 2018-present, WinterDev
 using System;
+using PixelFarm.Drawing;
 namespace PixelFarm.CpuBlit.VertexProcessing
 {
 
     public class SimpleRectBorderBuilder
     {
 
-        struct PointF
-        {
-            public readonly float X, Y;
-            public PointF(float x, float y)
-            {
-                X = x;
-                Y = y;
-            }
-        }
 
         //sum of both inner-outer border***
         public float LeftBorderWidth { get; set; }

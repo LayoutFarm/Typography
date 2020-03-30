@@ -6,7 +6,7 @@ using PixelFarm.Drawing;
 using PixelFarm.CpuBlit.VertexProcessing;
 using PixelFarm.CpuBlit.FragmentProcessing;
 
-using BitmapBufferEx;
+
 namespace PixelFarm.CpuBlit
 {
 
@@ -79,9 +79,8 @@ namespace PixelFarm.CpuBlit
         {
             AggRenderVx aggRenderVx = (AggRenderVx)renderVx;
             //fill with brush 
-            if (brush is SolidBrush)
+            if (brush is SolidBrush solidBrush)
             {
-                SolidBrush solidBrush = (SolidBrush)brush;
                 Color prevColor = _fillColor;
                 _fillColor = solidBrush.Color;
                 Fill(aggRenderVx._vxs);
@@ -108,108 +107,12 @@ namespace PixelFarm.CpuBlit
         }
 
         /// <summary>
-        /// fill with BitmapBufferExtension lib
-        /// </summary>
-        void FillWithBxt(VertexStore vxs, CustomBlendOp blendOp = null)
-        {
-            //transate the vxs/snap to command
-            double x = 0;
-            double y = 0;
-            double offsetOrgX = this.OriginX;
-            double offsetOrgY = this.OriginY;
-
-
-            VertexCmd cmd;
-            int index = 0;
-            int latestMoveToX = 0, latestMoveToY = 0;
-            int latestX = 0, latestY = 0;
-
-
-            bool closed = false;
-
-            _reusablePolygonList.Clear();
-
-            while ((cmd = vxs.GetVertex(index++, out x, out y)) != VertexCmd.NoMore)
-            {
-                x += offsetOrgX;
-                y += offsetOrgY;
-
-                switch (cmd)
-                {
-                    case VertexCmd.MoveTo:
-                        {
-                            if (_reusablePolygonList.Count > 0)
-                            {
-                                //no drawline
-                                _reusablePolygonList.Clear();
-                            }
-
-                            closed = false;
-                            _reusablePolygonList.Add(latestMoveToX = latestX = (int)Math.Round(x));
-                            _reusablePolygonList.Add(latestMoveToY = latestY = (int)Math.Round(y));
-
-                        }
-                        break;
-                    case VertexCmd.LineTo:
-                    case VertexCmd.C3:
-                    case VertexCmd.C4:
-                        {
-                            //collect to the polygon
-                            _reusablePolygonList.Add(latestX = (int)Math.Round(x));
-                            _reusablePolygonList.Add(latestY = (int)Math.Round(y));
-                        }
-                        break;
-                    case VertexCmd.Close:
-                        {
-                            if (_reusablePolygonList.Count > 0)
-                            {
-                                //flush by draw line
-                                _reusablePolygonList.Add(latestX = latestMoveToX);
-                                _reusablePolygonList.Add(latestY = latestMoveToY);
-
-                                //TODO: optimize, using array,
-
-                                _bxt.FillPolygon(
-                                    _reusablePolygonList.ToArray(),
-                                    _fillColor.ToARGB(), blendOp);
-                            }
-
-                            _reusablePolygonList.Clear();
-                            closed = true;
-                        }
-                        break;
-                    default:
-                        break;
-                }
-            }
-            //---------------
-            if (!closed && (_reusablePolygonList.Count > 0) &&
-               (latestX == latestMoveToX) && (latestY == latestMoveToY))
-            {
-
-                //flush by draw line
-                _reusablePolygonList.Add(latestMoveToX);
-                _reusablePolygonList.Add(latestMoveToY);
-
-                _bxt.FillPolygon(
-                    _reusablePolygonList.ToArray(),
-                    _fillColor.ToARGB(), blendOp);
-            }
-        }
-
-        public BitmapBufferEx.CustomBlendOp CurrentBxtBlendOp { get; set; } //tmp!
-        /// <summary>
         /// fill vxs, we do NOT store vxs
         /// </summary>
         /// <param name="vxs"></param>
         public override void Fill(VertexStore vxs)
         {
-            //
-            if (_useDefaultBrush && _renderQuality == RenderQuality.Fast)
-            {
-                FillWithBxt(vxs, CurrentBxtBlendOp);
-                return;
-            }
+            
             if (!_useDefaultBrush)
             {
                 Brush br = _curBrush;
@@ -258,15 +161,13 @@ namespace PixelFarm.CpuBlit
         }
         PolygonGradientBrush ResolvePolygonGradientBrush(Drawing.PolygonGradientBrush polygonGrBrush)
         {
-            PolygonGradientBrush brush = polygonGrBrush.InnerBrush as PolygonGradientBrush;
-            if (brush != null) return brush;
+            if (polygonGrBrush.InnerBrush is PolygonGradientBrush brush) return brush;
 
             // 
             if (_tessTool == null) { _tessTool = new TessTool(); }
             if (_gouraudVertBuilder == null) { _gouraudVertBuilder = new GouraudVerticeBuilder(); }
 
-            RGBAGouraudSpanGen spanGen = polygonGrBrush.InnerBrush as RGBAGouraudSpanGen;
-            if (spanGen == null)
+            if (!(polygonGrBrush.InnerBrush is RGBAGouraudSpanGen spanGen))
             {
                 spanGen = new RGBAGouraudSpanGen();
                 polygonGrBrush.InnerBrush = spanGen;
@@ -321,22 +222,9 @@ namespace PixelFarm.CpuBlit
                 //modified
                 oy = this.Height - oy;
             }
-            //---------------------------------------------------------- 
-            //BitmapExt
-            if (_renderQuality == RenderQuality.Fast)
-            {
-                _bxt.FillEllipseCentered(
-                  (int)Math.Round(ox), (int)Math.Round(oy),
-                  (int)Math.Round(width / 2),
-                  (int)Math.Round(height / 2),
-                  _fillColor.ToARGB());
-                return;
-            }
-
-
+            
             //Agg
-            //---------------------------------------------------------- 
-
+            //----------------------------------------------------------  
             using (Tools.BorrowEllipse(out var ellipseTool))
             using (Tools.BorrowVxs(out var v1))
             {
@@ -364,8 +252,7 @@ namespace PixelFarm.CpuBlit
         }
         static RadialGradientSpanGen ResolveRadialGrBrush(RadialGradientBrush radialGr)
         {
-            RadialGradientSpanGen radialSpanGen = radialGr.InnerBrush as RadialGradientSpanGen;
-            if (radialSpanGen == null)
+            if (!(radialGr.InnerBrush is RadialGradientSpanGen radialSpanGen))
             {
                 radialSpanGen = new RadialGradientSpanGen();
                 radialSpanGen.ResolveBrush(radialGr);
@@ -375,21 +262,7 @@ namespace PixelFarm.CpuBlit
         }
         public override void FillRect(double left, double top, double width, double height)
         {
-
-
-            //---------------------------------------------------------- 
-            //BitmapExt
-            if (_useDefaultBrush && _renderQuality == RenderQuality.Fast)
-            {
-                _bxt.FillRectangle(
-                      (int)Math.Round(left),
-                      (int)Math.Round(top),
-                      (int)Math.Round(left + width),
-                      (int)Math.Round(top + height),
-                      ColorInt.FromArgb(_fillColor.ToARGB()));
-                return;
-            }
-
+           
             //Agg 
             //---------------------------------------------------------- 
 

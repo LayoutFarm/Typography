@@ -24,7 +24,7 @@
 //----------------------------------------------------------------------------
 
 using System;
-namespace PixelFarm.CpuBlit.FragmentProcessing
+namespace PixelFarm.CpuBlit.PixelProcessing
 {
     public interface ICpuBlitImgFilter
     {
