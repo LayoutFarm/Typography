@@ -57,14 +57,14 @@ namespace Typography.OpenFont
         static Dictionary<string, int> s_glyphNameToUnicodeScalarValueDic = new Dictionary<string, int>();
         static Dictionary<int, string> s_unicodeScalarValueToGlyphNameDic = new Dictionary<int, string>();
         static bool s_init = false;
-        public static string GetGlyphNameByUnicodeValue(int unicodeValue)
+        public static string? GetGlyphNameByUnicodeValue(int unicodeValue)
         {
             if (!s_init)
             {
                 InitData();
             }
             //
-            s_unicodeScalarValueToGlyphNameDic.TryGetValue(unicodeValue, out string glyphName);
+            s_unicodeScalarValueToGlyphNameDic.TryGetValue(unicodeValue, out string? glyphName);
             return glyphName;
         }
         public static int GetUnicodeValueByGlyphName(string glyphName)
@@ -81,7 +81,7 @@ namespace Typography.OpenFont
         {
             using (StringReader strReader = new StringReader(glyphListTxt))
             {
-                string line = strReader.ReadLine();
+                string? line = strReader.ReadLine();
                 while (line != null)
                 {
                     //parse each line

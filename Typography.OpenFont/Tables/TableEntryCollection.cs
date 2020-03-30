@@ -13,7 +13,7 @@ namespace Typography.OpenFont.Tables
             _tables.Add(tableName, en);
         }
 
-        public bool TryGetTable(string tableName, out TableEntry entry)
+        public bool TryGetTable(string tableName, [System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out TableEntry? entry)
         {
             return _tables.TryGetValue(tableName, out entry);
         }

@@ -671,7 +671,7 @@ namespace Typography.TextBreak
             //parse
             using (StringReader reader = new StringReader(LangsCode))
             {
-                string line = reader.ReadLine();
+                string? line = reader.ReadLine();
                 while (line != null)
                 {
 

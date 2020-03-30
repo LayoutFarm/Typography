@@ -36,9 +36,11 @@
     <Reference Include="System" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
-	<ProjectReference Include="..\..\..\Build\Typography.OpenFont\Typography.OpenFont.csproj"/>
-	<ProjectReference Include="..\..\..\Build\Typography.GlyphLayout\Typography.GlyphLayout.csproj"/>
-	<ProjectReference Include="..\..\..\Build\Typography.TextFlow\Typography.TextFlow.csproj"/>
+    <ProjectReference Include="..\..\..\Build\Typography.OpenFont\Typography.OpenFont.csproj" />
+    <ProjectReference Include="..\..\..\Build\Typography.GlyphLayout\Typography.GlyphLayout.csproj" />
+    <ProjectReference Include="..\..\..\Build\Typography.TextFlow\Typography.TextFlow.csproj" />
+    <ProjectReference Include="..\..\..\Build\Typography.TextBreak\Typography.TextBreak.csproj" />
+    <ProjectReference Include="..\..\..\Build\Typography.TextServices\Typography.TextServices.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\..\..\PixelFarm.Typography\3_Typography_Contours\GlyphMeshCollection.cs">
@@ -52,9 +54,6 @@
     </Compile>
     <Compile Include="..\..\..\PixelFarm\PixelFarm.Painter\2_General\TextBaseline.cs">
       <Link>DevTextPrinter\TextBaseline.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\Typography.TextServices\FontStoreAndManagment\FontManagement.cs">
-      <Link>DevTextPrinter\FontManagement.cs</Link>
     </Compile>
     <Compile Include="..\..\Shared\GlyphOutlineBuilder\GlyphOutlineBuilder.cs">
       <Link>GlyphOutlineBuilder\GlyphOutlineBuilder.cs</Link>

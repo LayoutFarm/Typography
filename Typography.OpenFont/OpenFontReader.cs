@@ -565,7 +565,7 @@ namespace Typography.OpenFont
         static T? ReadTableIfExists<T>(TableEntryCollection tables, BinaryReader reader, string name, TableReader<T> tableReader)
             where T : notnull, TableEntry
         {
-            if (tables.TryGetTable(name, out TableEntry found))
+            if (tables.TryGetTable(name, out TableEntry? found))
             {
                 //found table name
                 //check if we have read this table or not

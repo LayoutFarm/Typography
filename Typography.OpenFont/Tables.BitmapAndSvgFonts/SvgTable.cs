@@ -122,7 +122,7 @@ namespace Typography.OpenFont.Tables
                     _dicSvgEntries.Add(en.startGlyphID, en.svgBuffer);
                 }
             }
-            if (_dicSvgEntries.TryGetValue(glyphIndex, out byte[] svgData))
+            if (_dicSvgEntries.TryGetValue(glyphIndex, out byte[]? svgData))
             {
                 outputStBuilder.Append(System.Text.Encoding.UTF8.GetString(svgData));
                 return true;

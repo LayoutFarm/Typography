@@ -40,11 +40,11 @@
     <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Build\Typography.OpenFont\Typography.OpenFont.csproj"/>
-    <ProjectReference Include="..\Build\Typography.GlyphLayout\Typography.GlyphLayout.csproj"/>
-    <ProjectReference Include="..\Build\Typography.TextFlow\Typography.TextFlow.csproj"/>
-    <ProjectReference Include="..\Build\Typography.TextServices\Typography.TextServices.csproj"/>
-    <ProjectReference Include="..\Build\PixelFarm.MiniAgg.One\PixelFarm.MiniAgg.One.csproj"/>
+    <ProjectReference Include="..\Build\Typography.OpenFont\Typography.OpenFont.csproj" />
+    <ProjectReference Include="..\Build\Typography.GlyphLayout\Typography.GlyphLayout.csproj" />
+    <ProjectReference Include="..\Build\Typography.TextFlow\Typography.TextFlow.csproj" />
+    <ProjectReference Include="..\Build\Typography.TextServices\Typography.TextServices.csproj" />
+    <ProjectReference Include="..\Build\PixelFarm.MiniAgg.One\PixelFarm.MiniAgg.One.csproj" />
     <Compile Include="2_CpuBlit_BitmapAtlas\FontAtlasTextPrinter.cs" />
     <Compile Include="2_CpuBlit_BitmapAtlas\GlyphBitmapStore.cs" />
     <Compile Include="3_Typography_Contours\GlyphPathBuilder.cs" />

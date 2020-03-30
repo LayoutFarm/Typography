@@ -1,4 +1,4 @@
-﻿//MIT, 2014-present, WinterDev    
+//MIT, 2014-present, WinterDev    
 using System;
 using System.Collections.Generic;
 using Typography.OpenFont;
@@ -44,9 +44,10 @@ namespace Typography.TextServices
         {
             using var enumerator = installedCollection.GetInstalledFontIter().GetEnumerator();
             enumerator.MoveNext();
+            var first = enumerator.Current ?? throw new ArgumentException("Empty collection!", nameof(installedCollection));
             _typefaceStore = ActiveTypefaceCache.GetTypefaceStoreOrCreateNewIfNotExist();
+            SetCurrentFont(_typefaceStore.GetTypeface(first), 0);
             _installedTypefaceCollection = installedCollection;
-            SetCurrentFont(_typefaceStore.GetTypeface(enumerator.Current), 0);
             // https://github.com/dotnet/roslyn/issues/39740
             if (_currentTypeface is { } t) _currentTypeface = t; else throw new NotImplementedException();
             if (_glyphLayout is { } g) _glyphLayout = g; else throw new NotImplementedException();
@@ -74,16 +75,16 @@ namespace Typography.TextServices
             _glyphLayout ??= new GlyphLayout(typeface);
             //check if we have the cache-key or create a new one.
             var key = new TextShapingContextKey(typeface, _glyphLayout.ScriptLang);
-            if (!_registerShapingContexts.TryGetValue(key, out _currentGlyphPlanSeqCache))
+            if (!_registerShapingContexts.TryGetValue(key, out var currentGlyphPlanSeqCache))
             {
                 //not found
                 //the create the new one 
                 var shapingContext = new GlyphPlanCacheForTypefaceAndScriptLang(typeface, _glyphLayout.ScriptLang);
                 //shaping context setup ...
                 _registerShapingContexts.Add(key, shapingContext);
-                _currentGlyphPlanSeqCache = shapingContext;
+                currentGlyphPlanSeqCache = shapingContext;
             }
-
+            _currentGlyphPlanSeqCache = currentGlyphPlanSeqCache;
             _currentTypeface = typeface;
             _fontSizeInPts = fontSizeInPts;
 
@@ -316,7 +317,7 @@ namespace Typography.TextServices
                 {
                     _cacheSeqCollection2 = new Dictionary<int, GlyphPlanSeqCollection>();
                 }
-                GlyphPlanSeqCollection seqCol;
+                GlyphPlanSeqCollection? seqCol;
                 if (!_cacheSeqCollection2.TryGetValue(len, out seqCol))
                 {
                     //new one if not exist
@@ -467,13 +468,13 @@ namespace Typography.TextServices
         public Typeface GetTypeface(InstalledTypeface installedFont)
         {
             return GetTypefaceOrCreateNew(installedFont);
-        } 
+        }
 
         Typeface GetTypefaceOrCreateNew(InstalledTypeface installedFont)
         {
             //load 
             //check if we have create this typeface or not 
-            if (!_loadedTypefaces.TryGetValue(installedFont, out Typeface typeface))
+            if (!_loadedTypefaces.TryGetValue(installedFont, out Typeface? typeface))
             {
                 //TODO: review how to load font here 
                 if (Typography.FontManagement.InstalledTypefaceCollectionExtensions.CustomFontStreamLoader != null)

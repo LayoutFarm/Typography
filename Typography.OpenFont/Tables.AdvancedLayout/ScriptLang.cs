@@ -689,7 +689,7 @@ namespace Typography.OpenFont
                 return scriptLang;
             }
         }
-        public static bool TryGetUnicodeLangBitsArray(string langShortName, out UnicodeLangBits[] unicodeLangBits)
+        public static bool TryGetUnicodeLangBitsArray(string langShortName, [System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out UnicodeLangBits[]? unicodeLangBits)
         {
             return s_registeredScriptTagsToUnicodeLangBits.TryGetValue(langShortName, out unicodeLangBits);
         }
@@ -717,14 +717,14 @@ namespace Typography.OpenFont
             return false;
         }
 
-        public static ScriptLang GetRegisteredScriptLang(string shortname)
+        public static ScriptLang? GetRegisteredScriptLang(string shortname)
         {
-            s_registeredScriptTags.TryGetValue(shortname, out ScriptLang found);
+            s_registeredScriptTags.TryGetValue(shortname, out ScriptLang? found);
             return found;
         }
-        public static ScriptLang GetRegisteredScriptLangFromLanguageName(string languageName)
+        public static ScriptLang? GetRegisteredScriptLangFromLanguageName(string languageName)
         {
-            s_registerScriptFromFullNames.TryGetValue(languageName, out ScriptLang found);
+            s_registerScriptFromFullNames.TryGetValue(languageName, out ScriptLang? found);
             return found;
         }
         public static IEnumerable<ScriptLang> GetRegiteredScriptLangIter()

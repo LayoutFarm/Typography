@@ -144,13 +144,13 @@
       <Project>{540a2ea6-dae3-4625-8951-b2c3118603a4}</Project>
       <Name>PixelFarm.Typography</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\Build\Typography.OpenFont\Typography.OpenFont.csproj"/>
-    <ProjectReference Include="..\..\..\Build\Typography.GlyphLayout\Typography.GlyphLayout.csproj"/>
-    <ProjectReference Include="..\..\..\Build\Typography.TextBreak\Typography.TextBreak.csproj"/>
-    <ProjectReference Include="..\..\..\Build\Typography.TextFlow\Typography.TextFlow.csproj"/>
-    <ProjectReference Include="..\..\..\Build\Typography.TextServices\Typography.TextServices.csproj"/>
-    <ProjectReference Include="..\..\..\Build\Unpack\Unpack.csproj"/>
-    <ProjectReference Include="..\..\..\Build\PixelFarm.MiniAgg.One\PixelFarm.MiniAgg.One.csproj"/>
+    <ProjectReference Include="..\..\..\Build\Typography.OpenFont\Typography.OpenFont.csproj" />
+    <ProjectReference Include="..\..\..\Build\Typography.GlyphLayout\Typography.GlyphLayout.csproj" />
+    <ProjectReference Include="..\..\..\Build\Typography.TextBreak\Typography.TextBreak.csproj" />
+    <ProjectReference Include="..\..\..\Build\Typography.TextFlow\Typography.TextFlow.csproj" />
+    <ProjectReference Include="..\..\..\Build\Typography.TextServices\Typography.TextServices.csproj" />
+    <ProjectReference Include="..\..\..\Build\Unpack\Unpack.csproj" />
+    <ProjectReference Include="..\..\..\Build\PixelFarm.MiniAgg.One\PixelFarm.MiniAgg.One.csproj" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

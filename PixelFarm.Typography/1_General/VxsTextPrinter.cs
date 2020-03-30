@@ -37,6 +37,7 @@ namespace PixelFarm.Drawing
             this.PositionTechnique = PositionTechnique.OpenFont;
             //
             _textServices = textService;
+            textService.LoadFontsFromFolder("../../../TestFonts");
             ChangeFont(new RequestFont("Source Sans Pro", 10));
 
             _glyphBitmapStore = new GlyphBitmapStore();

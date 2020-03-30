@@ -1,4 +1,4 @@
-﻿//MIT, 2017-present, WinterDev
+//MIT, 2017-present, WinterDev
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -35,10 +35,6 @@ namespace TypographyTest
             SelectedTypefaceStyle = TypefaceStyle.Regular;
             FontSizeInPoints = 10;
             this.RenderChoice = RenderChoice.RenderWithTextPrinterAndMiniAgg;
-            _textServices = new TextServices(new InstalledTypefaceCollection(), ScriptLangs.Latin);
-
-            _textServices.InstalledFontCollection.SetFontNameDuplicatedHandler(
-                (f0, f1) => FontNameDuplicatedDecision.Skip);
 
         }
         public RenderChoice RenderChoice
@@ -48,6 +44,8 @@ namespace TypographyTest
         }
         public void LoadFontList()
         {
+            var collection = new InstalledTypefaceCollection();
+            collection.SetFontNameDuplicatedHandler((f0, f1) => FontNameDuplicatedDecision.Skip);
             PositionTech = PositionTechnique.OpenFont;
             ////---------- 
             ////1. create font collection        
@@ -77,7 +75,7 @@ namespace TypographyTest
                         case ".otc":
                         case ".ttf":
                         case ".otf":
-                            _textServices.InstalledFontCollection.AddFontStreamSource(new Typography.FontManagement.FontFileStreamProvider(file));
+                            collection.AddFontStreamSource(new Typography.FontManagement.FontFileStreamProvider(file));
                             break;
                     }
 
@@ -89,7 +87,7 @@ namespace TypographyTest
                 index++;
 
             }
-
+            _textServices = new TextServices(collection, ScriptLangs.Latin);
         }
         public PositionTechnique PositionTech { get; set; }
 

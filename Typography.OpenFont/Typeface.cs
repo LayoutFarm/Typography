@@ -129,7 +129,7 @@ namespace Typography.OpenFont
                 //early preview ...
                 foreach (var font in fonts)
                 {
-                    Glyph glyph = font.GetGlyphByName(glyphName);
+                    Glyph? glyph = font.GetGlyphByName(glyphName);
                     if (glyph != null) return glyph;
                 }
                 return null;
