@@ -85,7 +85,6 @@ namespace PixelFarm.CpuBlit.Rasterization
         }
         private PrebuiltGammaTable() { }
 
-
         public static PrebuiltGammaTable CreateSameValuesGammaTable(int value)
         {
             //TODO: review the name,

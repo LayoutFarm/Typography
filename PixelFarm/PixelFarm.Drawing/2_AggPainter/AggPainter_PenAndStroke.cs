@@ -5,7 +5,7 @@ using PixelFarm.Drawing;
 using PixelFarm.CpuBlit.VertexProcessing;
 using PixelFarm.CpuBlit.FragmentProcessing;
 using PixelFarm.CpuBlit.PixelProcessing;
- 
+
 namespace PixelFarm.CpuBlit
 {
 
@@ -30,35 +30,57 @@ namespace PixelFarm.CpuBlit
         LineRenderingTechnique _lineRenderingTech;
         Rasterization.Lines.LineProfileAnitAlias _lineProfileAA;
         Rasterization.Lines.OutlineAARasterizer _outlineRas; //low-level outline aa
-
+        Rasterization.Lines.PreBuiltLineAAGammaTable _lineAAGamma = Rasterization.Lines.PreBuiltLineAAGammaTable.None;//default
         public override Pen CurrentPen
         {
             get => _curPen;
             set => _curPen = value;
+        }
+        public Rasterization.Lines.PreBuiltLineAAGammaTable LineAAGammaTable
+        {
+            get => _lineAAGamma;
+            set
+            {
+                _lineAAGamma = value;
+                if (_lineProfileAA != null)
+                {
+                    _lineProfileAA.SetGamma(value);
+                }
+            }
         }
         public LineRenderingTechnique LineRenderingTech
         {
             get => _lineRenderingTech;
             set
             {
-                if (value == LineRenderingTechnique.OutlineAARenderer && _outlineRas == null)
+                if (value == LineRenderingTechnique.OutlineAARenderer)
                 {
-                    _lineProfileAA = new Rasterization.Lines.LineProfileAnitAlias(this.StrokeWidth, null);
+                    if (_lineProfileAA == null)
+                    {
+                        _lineProfileAA = new Rasterization.Lines.LineProfileAnitAlias(this.StrokeWidth, _lineAAGamma);
 
-                    var blender = new PixelBlenderBGRA();
+                        var blender = new PixelBlenderBGRA();
 
-                    var outlineRenderer = new Rasterization.Lines.OutlineRenderer(
-                        new ClipProxyImage(new SubBitmapBlender(_aggsx.DestBitmap, blender)), //Need ClipProxyImage
-                        blender,
-                        _lineProfileAA);
-                    outlineRenderer.SetClipBox(0, 0, this.Width, this.Height);
+                        var outlineRenderer = new Rasterization.Lines.OutlineRenderer(
+                            new ClipProxyImage(new SubBitmapBlender(_aggsx.DestBitmap, blender)), //Need ClipProxyImage
+                            blender,
+                            _lineProfileAA);
+                        outlineRenderer.SetClipBox(0, 0, this.Width, this.Height);
 
-                    //TODO: impl 'Pen'
+                        //TODO: impl 'Pen'
 
-                    _outlineRas = new Rasterization.Lines.OutlineAARasterizer(outlineRenderer);
-                    _outlineRas.LineJoin = Rasterization.Lines.OutlineAARasterizer.OutlineJoin.Round;
-                    _outlineRas.RoundCap = true;
-
+                        _outlineRas = new Rasterization.Lines.OutlineAARasterizer(outlineRenderer);
+                        _outlineRas.LineJoin = Rasterization.Lines.OutlineAARasterizer.OutlineJoin.Round;
+                        _outlineRas.RoundCap = true;
+                    }
+                    else
+                    {
+                        if (_lineProfileAA.SubPixelWidth != StrokeWidth)
+                        {
+                            //update 
+                            _lineProfileAA.SubPixelWidth = (float)StrokeWidth;
+                        }
+                    }
                 }
                 _lineRenderingTech = value;
             }
@@ -358,7 +380,7 @@ namespace PixelFarm.CpuBlit
                 oy = this.Height - oy;
             }
 
-           
+
             using (Tools.BorrowEllipse(out var ellipseTool))
             {
                 ellipseTool.Set(ox,

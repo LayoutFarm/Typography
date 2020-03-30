@@ -26,7 +26,7 @@ namespace PixelFarm.CpuBlit.PixelProcessing
     {
         public float GetGamma(float x) => x;
     }
-     
+
     //==============================================================gamma_power
     public class GammaPower : IGammaFunction
     {
@@ -76,11 +76,10 @@ namespace PixelFarm.CpuBlit.PixelProcessing
         {
             if (x < _start) return 0.0f;
             if (x > _end) return 1.0f;
-            double EndMinusStart = _end - _start;
-            if (EndMinusStart != 0)
-                return (float)((x - _start) / EndMinusStart);
-            else
-                return 0.0f;
+
+            double endMinusStart = _end - _start;
+
+            return (endMinusStart != 0) ? (float)((x - _start) / endMinusStart) : 0f;
         }
     }
 
@@ -89,7 +88,7 @@ namespace PixelFarm.CpuBlit.PixelProcessing
     {
         float _mul;
         public GammaMultiply() => _mul = 1.0f;
-        public GammaMultiply(float v) => _mul = v; 
+        public GammaMultiply(float v) => _mul = v;
 
         public float GetGamma(float x)
         {
