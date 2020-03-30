@@ -341,18 +341,7 @@ namespace PixelFarm.CpuBlit
             outputColors[len - 1] = Color.Transparent;
         }
     }
-    public static class GradientSpanGenExtensions
-    {
-        public static void GenerateSampleGradientLine(RadialGradientBrush circularGradient, out Color[] output)
-        {
-            RadialGradientSpanGen spanGen = new RadialGradientSpanGen();
-            spanGen.ResolveBrush(circularGradient);
-            int len = (int)Math.Round(circularGradient.Length);
-            output = new Color[len + 2];
-            spanGen.GenerateColorsForReference(output, true);
-        }
-    }
-
+  
     class PolygonGradientBrush
     {
 
@@ -447,4 +436,17 @@ namespace PixelFarm.CpuBlit
                 _cacheColorAndVertexList[(partNo * 3) + 2]);
         }
     }
+
+    public static class GradientSpanGenExtensions
+    {
+        public static void GenerateSampleGradientLine(RadialGradientBrush circularGradient, out Color[] output)
+        {
+            RadialGradientSpanGen spanGen = new RadialGradientSpanGen();
+            spanGen.ResolveBrush(circularGradient);
+            int len = (int)Math.Round(circularGradient.Length);
+            output = new Color[len + 2];
+            spanGen.GenerateColorsForReference(output, true);
+        }
+    }
+
 }

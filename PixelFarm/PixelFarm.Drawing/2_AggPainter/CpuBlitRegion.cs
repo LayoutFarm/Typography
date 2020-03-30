@@ -4,7 +4,6 @@ using PixelFarm.Drawing;
 
 namespace PixelFarm.CpuBlit
 {
-
     public abstract class CpuBlitRegion : Region
     {
         public enum CpuBlitRegionKind
@@ -19,10 +18,7 @@ namespace PixelFarm.CpuBlit
 
         public override void Dispose()
         {
-        } 
+        }
         public abstract CpuBlitRegionKind Kind { get; }
     }
-
-
-
 }

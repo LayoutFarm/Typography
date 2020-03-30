@@ -1,12 +1,10 @@
 ﻿//MIT, 2016-present, WinterDev
 
 using System;
-using System.Collections.Generic;
 using PixelFarm.Drawing;
 using PixelFarm.CpuBlit.VertexProcessing;
 using PixelFarm.CpuBlit.PixelProcessing;
 
- 
 namespace PixelFarm.CpuBlit
 {
 
@@ -18,7 +16,7 @@ namespace PixelFarm.CpuBlit
 
         //--------------------  
         SmoothingMode _smoothingMode;
-        
+
         RenderSurfaceOriginKind _orientation;
         TargetBuffer _targetBuffer;
         float _fillOpacity = 1;
@@ -83,7 +81,7 @@ namespace PixelFarm.CpuBlit
             }
         }
 
-        
+
         public override TargetBuffer TargetBuffer
         {
             get => _targetBuffer;
@@ -114,7 +112,7 @@ namespace PixelFarm.CpuBlit
             get => _aggsx.CurrentTransformMatrix;
             set => _aggsx.CurrentTransformMatrix = value;
         }
-         
+
         public DrawBoard DrawBoard { get; set; }
         public AggRenderSurface RenderSurface => _aggsx;
         public BitmapBlenderBase DestBitmapBlender => _aggsx.DestBitmapBlender;

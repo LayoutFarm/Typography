@@ -3,7 +3,7 @@
 using PixelFarm.Drawing;
 namespace PixelFarm.CpuBlit
 {
-    class AggRenderVx : PixelFarm.Drawing.RenderVx
+    class AggRenderVx : RenderVx
     {
         internal VertexStore _vxs;
         public AggRenderVx(VertexStore vxs)
@@ -11,7 +11,7 @@ namespace PixelFarm.CpuBlit
             _vxs = vxs;
         }
     }
-    class AggRenderVxFormattedString : PixelFarm.Drawing.RenderVxFormattedString
+    class AggRenderVxFormattedString : RenderVxFormattedString
     {
         public AggRenderVxFormattedString()
         {

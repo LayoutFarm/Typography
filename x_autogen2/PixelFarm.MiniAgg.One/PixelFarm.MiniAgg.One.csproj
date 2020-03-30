@@ -566,50 +566,47 @@
     <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\1_IO\StorageService.cs">
       <Link>PixelFarm\PixelFarm.Drawing\1_IO\StorageService.cs</Link>
     </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\2_CpuBlit\AggPainter.cs">
-      <Link>PixelFarm\PixelFarm.Drawing\2_CpuBlit\AggPainter.cs</Link>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\2_AggPainter\AggPainter.cs">
+      <Link>PixelFarm\PixelFarm.Drawing\2_AggPainter\AggPainter.cs</Link>
     </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\2_CpuBlit\AggPainter_BrushAndFill.cs">
-      <Link>PixelFarm\PixelFarm.Drawing\2_CpuBlit\AggPainter_BrushAndFill.cs</Link>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\2_AggPainter\AggPainter_BrushAndFill.cs">
+      <Link>PixelFarm\PixelFarm.Drawing\2_AggPainter\AggPainter_BrushAndFill.cs</Link>
     </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\2_CpuBlit\AggPainter_FontAndText.cs">
-      <Link>PixelFarm\PixelFarm.Drawing\2_CpuBlit\AggPainter_FontAndText.cs</Link>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\2_AggPainter\AggPainter_FontAndText.cs">
+      <Link>PixelFarm\PixelFarm.Drawing\2_AggPainter\AggPainter_FontAndText.cs</Link>
     </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\2_CpuBlit\AggPainter_Imgs.cs">
-      <Link>PixelFarm\PixelFarm.Drawing\2_CpuBlit\AggPainter_Imgs.cs</Link>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\2_AggPainter\AggPainter_Imgs.cs">
+      <Link>PixelFarm\PixelFarm.Drawing\2_AggPainter\AggPainter_Imgs.cs</Link>
     </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\2_CpuBlit\AggPainter_MaskAndClipping.cs">
-      <Link>PixelFarm\PixelFarm.Drawing\2_CpuBlit\AggPainter_MaskAndClipping.cs</Link>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\2_AggPainter\AggPainter_MaskAndClipping.cs">
+      <Link>PixelFarm\PixelFarm.Drawing\2_AggPainter\AggPainter_MaskAndClipping.cs</Link>
     </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\2_CpuBlit\AggPainter_PenAndStroke.cs">
-      <Link>PixelFarm\PixelFarm.Drawing\2_CpuBlit\AggPainter_PenAndStroke.cs</Link>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\2_AggPainter\AggPainter_PenAndStroke.cs">
+      <Link>PixelFarm\PixelFarm.Drawing\2_AggPainter\AggPainter_PenAndStroke.cs</Link>
     </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\2_CpuBlit\AggRenderSurface.cs">
-      <Link>PixelFarm\PixelFarm.Drawing\2_CpuBlit\AggRenderSurface.cs</Link>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\2_AggPainter\AggRenderSurface.cs">
+      <Link>PixelFarm\PixelFarm.Drawing\2_AggPainter\AggRenderSurface.cs</Link>
     </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\2_CpuBlit\AggRenderSurface_RenderImages.cs">
-      <Link>PixelFarm\PixelFarm.Drawing\2_CpuBlit\AggRenderSurface_RenderImages.cs</Link>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\2_AggPainter\AggRenderSurface_RenderImages.cs">
+      <Link>PixelFarm\PixelFarm.Drawing\2_AggPainter\AggRenderSurface_RenderImages.cs</Link>
     </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\2_CpuBlit\AggRenderVx.cs">
-      <Link>PixelFarm\PixelFarm.Drawing\2_CpuBlit\AggRenderVx.cs</Link>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\2_AggPainter\AggRenderVx.cs">
+      <Link>PixelFarm\PixelFarm.Drawing\2_AggPainter\AggRenderVx.cs</Link>
     </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\2_CpuBlit\Canvas2dExtension.cs">
-      <Link>PixelFarm\PixelFarm.Drawing\2_CpuBlit\Canvas2dExtension.cs</Link>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\2_AggPainter\CpuBlitRegion.cs">
+      <Link>PixelFarm\PixelFarm.Drawing\2_AggPainter\CpuBlitRegion.cs</Link>
     </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\2_CpuBlit\CpuBlitRegion.cs">
-      <Link>PixelFarm\PixelFarm.Drawing\2_CpuBlit\CpuBlitRegion.cs</Link>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\2_AggPainter\GradientBrushes.cs">
+      <Link>PixelFarm\PixelFarm.Drawing\2_AggPainter\GradientBrushes.cs</Link>
     </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\2_CpuBlit\GradientBrushes.cs">
-      <Link>PixelFarm\PixelFarm.Drawing\2_CpuBlit\GradientBrushes.cs</Link>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\2_AggPainter\Tools.cs">
+      <Link>PixelFarm\PixelFarm.Drawing\2_AggPainter\Tools.cs</Link>
     </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\2_CpuBlit\SvgRenderVx.cs">
-      <Link>PixelFarm\PixelFarm.Drawing\2_CpuBlit\SvgRenderVx.cs</Link>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\2_AggPainter\VertexStoreExtensions2.cs">
+      <Link>PixelFarm\PixelFarm.Drawing\2_AggPainter\VertexStoreExtensions2.cs</Link>
     </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\2_CpuBlit\Tools.cs">
-      <Link>PixelFarm\PixelFarm.Drawing\2_CpuBlit\Tools.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\2_CpuBlit\VertexStoreExtensions2.cs">
-      <Link>PixelFarm\PixelFarm.Drawing\2_CpuBlit\VertexStoreExtensions2.cs</Link>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\2_AggPainter\VxsRenderVx.cs">
+      <Link>PixelFarm\PixelFarm.Drawing\2_AggPainter\VxsRenderVx.cs</Link>
     </Compile>
     <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\3_VertexProcessoring\BorderDouble.cs">
       <Link>PixelFarm\PixelFarm.Drawing\3_VertexProcessoring\BorderDouble.cs</Link>

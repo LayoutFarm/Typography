@@ -568,19 +568,18 @@
     </Compile>
     <Compile Include="1_IO\StorageService.cs" />
     <Compile Include="3_VertexProcessoring\Figures.cs" />
-    <Compile Include="2_CpuBlit\AggPainter.cs" />
-    <Compile Include="2_CpuBlit\AggPainter_MaskAndClipping.cs" />
-    <Compile Include="2_CpuBlit\AggPainter_BrushAndFill.cs" />
-    <Compile Include="2_CpuBlit\AggPainter_PenAndStroke.cs" />
-    <Compile Include="2_CpuBlit\AggPainter_FontAndText.cs" />
-    <Compile Include="2_CpuBlit\GradientBrushes.cs" />
-    <Compile Include="2_CpuBlit\AggRenderVx.cs" />
-    <Compile Include="2_CpuBlit\Canvas2dExtension.cs" />
+    <Compile Include="2_AggPainter\AggPainter.cs" />
+    <Compile Include="2_AggPainter\AggPainter_MaskAndClipping.cs" />
+    <Compile Include="2_AggPainter\AggPainter_BrushAndFill.cs" />
+    <Compile Include="2_AggPainter\AggPainter_PenAndStroke.cs" />
+    <Compile Include="2_AggPainter\AggPainter_FontAndText.cs" />
+    <Compile Include="2_AggPainter\GradientBrushes.cs" />
+    <Compile Include="2_AggPainter\AggRenderVx.cs" />
     <Compile Include="3_VertexProcessoring\dbugVertexSourceIO.cs" />
     <Compile Include="3_VertexProcessoring\LineDashGenerator.cs" />
     <Compile Include="3_VertexProcessoring\RectBorderHelper.cs" />
-    <Compile Include="2_CpuBlit\SvgRenderVx.cs" />
-    <Compile Include="2_CpuBlit\VertexStoreExtensions2.cs" />
+    <Compile Include="2_AggPainter\VxsRenderVx.cs" />
+    <Compile Include="2_AggPainter\VertexStoreExtensions2.cs" />
     <Compile Include="6_Msdf\BasicElements.cs" />
     <Compile Include="6_Msdf\Msdf3\EdgeBmpLut.cs" />
     <Compile Include="6_Msdf\EdgeColor.cs" />
@@ -596,7 +595,7 @@
     <Compile Include="4_PixelProcessing\ProxyImage.cs" />
     <Compile Include="5_PathReconstruction\BezierCurveReconstruction.cs" />
     <Compile Include="5_PathReconstruction\BitmapBasedRegion.cs" />
-    <Compile Include="2_CpuBlit\CpuBlitRegion.cs" />
+    <Compile Include="2_AggPainter\CpuBlitRegion.cs" />
     <Compile Include="5_PathReconstruction\FloodFillTools.cs" />
     <Compile Include="5_PathReconstruction\MixedRegion.cs" />
     <Compile Include="5_PathReconstruction\PixelEvaluators.cs" />
@@ -604,9 +603,9 @@
     <Compile Include="5_PathReconstruction\OutlineTracer.cs" />
     <Compile Include="5_PathReconstruction\ReconstructedRegionData.cs" />
     <Compile Include="5_PathReconstruction\VxsRegion.cs" />
-    <Compile Include="2_CpuBlit\Tools.cs" />
-    <Compile Include="2_CpuBlit\AggRenderSurface.cs" />
-    <Compile Include="2_CpuBlit\AggRenderSurface_RenderImages.cs" />
+    <Compile Include="2_AggPainter\Tools.cs" />
+    <Compile Include="2_AggPainter\AggRenderSurface.cs" />
+    <Compile Include="2_AggPainter\AggRenderSurface_RenderImages.cs" />
     <Compile Include="1_IO\ImageReaders.cs" />
     <Compile Include="6_Msdf\Msdf3\ContourCornerAndAnalyzingElems.cs" />
     <Compile Include="6_Msdf\Msdf3\MsdfGen3.cs" />
@@ -626,7 +625,7 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="2_CpuBlit\AggPainter_Imgs.cs" />
+    <Compile Include="2_AggPainter\AggPainter_Imgs.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
