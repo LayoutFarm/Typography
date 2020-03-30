@@ -1,4 +1,5 @@
 //BSD, 2014-present, WinterDev
+//MatterHackers
 //----------------------------------------------------------------------------
 // Anti-Grain Geometry - Version 2.4
 // Copyright (C) 2002-2005 Maxim Shemanarev (http://www.antigrain.com)
@@ -15,6 +16,9 @@
 //----------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
+using PixelFarm.CpuBlit.FragmentProcessing;
+
 namespace PixelFarm.CpuBlit.Rasterization.Lines
 {
     public static class LineAA
@@ -48,8 +52,8 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
         public static int DblHr(int x) => x << SUBPIXEL_SHIFT;
 
 
-        public static void Bisectrix(LineParameters l1,
-                   LineParameters l2,
+        public static void Bisectrix(in LineParameters l1,
+                   in LineParameters l2,
                    out int x, out int y)
         {
             double k = (double)(l2.len) / (double)(l1.len);
@@ -84,7 +88,7 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
         /// <param name="lp"></param>
         /// <param name="x"></param>
         /// <param name="y"></param>
-        public static void FixDegenBisectrixStart(LineParameters lp,
+        public static void FixDegenBisectrixStart(in LineParameters lp,
                                                ref int x, ref int y)
         {
             int d = AggMath.iround(((double)(x - lp.x2) * (double)(lp.y2 - lp.y1) -
@@ -101,7 +105,7 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
         /// <param name="lp"></param>
         /// <param name="x"></param>
         /// <param name="y"></param>
-        public static void FixDegenBisectrixEnd(LineParameters lp,
+        public static void FixDegenBisectrixEnd(in LineParameters lp,
                                              ref int x, ref int y)
         {
             int d = AggMath.iround(((double)(x - lp.x2) * (double)(lp.y2 - lp.y1) -
@@ -113,4 +117,84 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
             }
         }
     }
+
+
+    static class LineAADataPool
+    {
+        [ThreadStatic]
+        static Stack<int[]> s_freeDistPool;
+        [ThreadStatic]
+        static Stack<byte[]> s_freeConvPool;
+
+        /// <summary>
+        /// get reusable distance array
+        /// </summary>
+        /// <returns></returns>
+        internal static int[] GetFreeDistArray()
+        {
+            if (s_freeDistPool == null) s_freeDistPool = new Stack<int[]>();
+
+            if (s_freeDistPool.Count > 0)
+            {
+                return s_freeDistPool.Pop();
+            }
+            else
+            {
+                //m_dist = new int[MAX_HALF_WIDTH + 1];
+                //m_covers = new byte[MAX_HALF_WIDTH * 2 + 4];
+                return new int[LineInterpolatorAAData.MAX_HALF_WIDTH + 1];
+            }
+        }
+        internal static void ReleaseDistArray(int[] distArray)
+        {
+            //clear and add to list
+            Array.Clear(distArray, 0, distArray.Length);
+            s_freeDistPool.Push(distArray);
+        }
+        /// <summary>
+        /// get reuseable converate-area array
+        /// </summary>
+        /// <returns></returns>
+        internal static byte[] GetFreeConvArray()
+        {
+            if (s_freeConvPool == null) s_freeConvPool = new Stack<byte[]>();
+            if (s_freeConvPool.Count > 0)
+            {
+                return s_freeConvPool.Pop();
+            }
+            else
+            {   
+                return new byte[(OutlineRenderer.MAX_HALF_WIDTH + 1) * 2];
+            }
+        }
+        internal static void ReleaseConvArray(byte[] convArray)
+        {
+            //clear and add to list
+            Array.Clear(convArray, 0, convArray.Length);
+            s_freeConvPool.Push(convArray);
+        }
+
+        [ThreadStatic]
+        static Stack<LineInterpolatorDDA2> s_freeInterpolatorDDA2Pool;
+        internal static LineInterpolatorDDA2 GetFreeInterpolatorDDA2()
+        {
+            if (s_freeInterpolatorDDA2Pool == null) s_freeInterpolatorDDA2Pool = new Stack<LineInterpolatorDDA2>();
+
+            if (s_freeInterpolatorDDA2Pool.Count > 0)
+            {
+                return s_freeInterpolatorDDA2Pool.Pop();
+            }
+            else
+            {
+                return new LineInterpolatorDDA2();
+            }
+        }
+        internal static void ReleaseInterpolatorDDA2(LineInterpolatorDDA2 dda2)
+        {
+            s_freeInterpolatorDDA2Pool.Push(dda2);
+        }
+
+       
+    }
+
 }

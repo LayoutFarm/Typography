@@ -1,5 +1,4 @@
 ﻿//BSD, 2014-present, WinterDev
-//MatterHackers
 //----------------------------------------------------------------------------
 // Anti-Grain Geometry - Version 2.4
 // Copyright (C) 2002-2005 Maxim Shemanarev (http://www.antigrain.com)
@@ -18,15 +17,18 @@
 //          mcseemagg@yahoo.com
 //          http://www.antigrain.com
 //----------------------------------------------------------------------------
-using PixelFarm.CpuBlit.PixelProcessing;
-namespace PixelFarm.CpuBlit.Rasterization.Lines
+//
+// Image transformation filters,
+// Filtering classes (ImageFilterLookUpTable, image_filter),
+// Basic filter shape classes
+//----------------------------------------------------------------------------
+
+using System;
+namespace PixelFarm.CpuBlit.PixelProcessing
 {
-    public interface IPatternFilter
+    public interface ICpuBlitImgFilter
     {
-        int Dilation { get; }
-        void SetPixelHighRes(BitmapBlenderBase sourceImage,
-            Drawing.Color[] destBuffer,
-            int destBufferOffset,
-            int x, int y);
+        void SetTarget(PixelFarm.CpuBlit.PixelProcessing.BitmapBlenderBase targt);
     }
+
 }

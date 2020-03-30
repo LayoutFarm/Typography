@@ -4,54 +4,59 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{9A3B8B84-56BE-4AA1-8D90-1B3B3FEF1F71}</ProjectGuid>
+    <ProjectGuid>{A533E1C7-AB74-4BCF-BC7A-12D4DBBFA918}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Typography.MsdfGen</RootNamespace>
-    <AssemblyName>Typography.MsdfGen</AssemblyName>
+    <RootNamespace>PaintLab.PaintFx</RootNamespace>
+    <AssemblyName>PaintLab.PaintFx</AssemblyName>
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;NET20</DefineConstants>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE;NET20</DefineConstants>
+    <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\..\..\PixelFarm\PixelFarm.Drawing\6_Msdf\BasicElements.cs">
-      <Link>BasicElements.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\PixelFarm\PixelFarm.Drawing\6_Msdf\EdgeColor.cs">
-      <Link>EdgeColor.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\PixelFarm\PixelFarm.Drawing\6_Msdf\EdgeColoring.cs">
-      <Link>EdgeColoring.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\PixelFarm\PixelFarm.Drawing\6_Msdf\EdgeSegment.cs">
-      <Link>EdgeSegment.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\PixelFarm\PixelFarm.Drawing\6_Msdf\EquationSolver.cs">
-      <Link>EquationSolver.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\PixelFarm\PixelFarm.Drawing\6_Msdf\MsdfGen.cs">
-      <Link>MsdfGen.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\PixelFarm\PixelFarm.Drawing\6_Msdf\SignedDistance.cs">
-      <Link>SignedDistance.cs</Link>
-    </Compile>
-    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
+  <ItemGroup>
+    <Compile Include="BrightnesssAndContrast.cs" />
+    <Compile Include="InternalBrightnessAndContrastAdjustment.cs" />
+    <Compile Include="PatternFilterBilnearColorRGBA.cs" />
+    <Compile Include="RecursiveBlur.cs" />
+    <Compile Include="StackBlur.cs" />
+    <Compile Include="Transposer.cs" />
+    <Compile Include="ImgFilters.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SharpenFilter.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="IImageFilterFunc.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\PixelFarm.Drawing\PixelFarm.Drawing.csproj">
+      <Project>{51d63482-5697-4b16-8401-506965624657}</Project>
+      <Name>PixelFarm.Drawing</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="..\BackEnd.PaintFx\PdnSharedProject\PdnSharedProject.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

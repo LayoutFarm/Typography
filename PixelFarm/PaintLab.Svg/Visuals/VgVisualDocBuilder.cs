@@ -653,6 +653,7 @@ namespace PaintLab.Svg
         VgVisualElement CreateFeColorMatrix(VgVisualElement parentNode, SvgElement elem, SvgFeColorMatrixSpec spec)
         {
             VgVisualElement feColorMatrixElem = new VgVisualElement(WellknownSvgElementName.FeColorMatrix, spec, _vgVisualDoc);
+            
             PaintFx.Effects.ImgFilterSvgFeColorMatrix colorMat = new PaintFx.Effects.ImgFilterSvgFeColorMatrix();
             spec.ResolvedFilter = colorMat;
             //TODO: check if matrix is identify matrix or not            //
