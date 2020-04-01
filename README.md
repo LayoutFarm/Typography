@@ -4,36 +4,57 @@
 Pure C# Font Reader, Glyph Layout and Rendering.
 ---
 
-
 While developing the [PixelFarm Rendering library](https://github.com/PaintLab/PixelFarm),
+
 I figured that the way to render a glyph from a font may be useful for other libraries.
 
 So, I spinned off the way to render a glyph from a font to here, the **Typography** library.
 
-The Typography library does NOT need the PixelFarm Rendering library.
 
-![gdiplus_sample1](https://cloud.githubusercontent.com/assets/7447159/24084514/1969489e-0d1e-11e7-8748-965e9e84693b.png)
 
-_Typography project's Solution Explorer View_
+![typography_thanamas](https://user-images.githubusercontent.com/7447159/44314099-d4357180-a43e-11e8-95c3-56894bfea1e4.png)
 
-As shown in the above screenshot, an example (marked with `(1)`) that uses Typography with WinGdiPlus is provided,
-
-and an example (marked with `(2)`) the uses Typography with a 'mini' snapshot of PixelFarm Rendering library (marked with `(3)`). 
-
+_Sov_Thanamas font from https://www.f0nt.com/release/sov_thanamas/_
  
-
-Concept
 ---
 
- * 1.Load .ttf, .otf, .ttc, .otc, .woff, .woff2 files, with OpenFontReader.
- 
- * 2.Rasterize a character to a bitmap with a pure software renderer which has Agg(anti grain geometry) Quality! with 
-      our PixelFarm's MiniAgg :) (https://github.com/PaintLab/PixelFarm)
-	  
- * Supported platforms: .Net Framework >= 2.0 or .Net Standard >= 1.3
+Cross Platform
+---
+The Typography library is **cross-platforms library** and does **NOT** need the PixelFarm Rendering library.
 
-[Showcase](Docs/Showcase.md)
------------
+You can use the library to reads font files( .ttf, .otf, .ttc, .otc, .woff, .woff2) and
+
+1) Access all information inside the font. 
+2) Layout the font glyphs according to the OpenFont specification.
+
+_The core library does **NOT** provide a glyph rendering implementation_. 
+But when you are able to read/access all glyphs and you are able to know
+exact position of each glyph=> It is easy to you to render it by your own.
+
+I take some screen snapshots (below) of some projects that use Typography to read each glyph
+from a font file then render it by their rendering engine.
+
+![sum2](https://user-images.githubusercontent.com/7447159/78152244-bc6bff00-7463-11ea-847f-138e4ee3c7ff.png) 
+
+_1. [MatterHackers](https://github.com/MatterHackers/MatterControl)/[agg-sharp](https://github.com/MatterHackers/agg-sharp), 2. [CShapMath/Skia-Xamarin Form](https://github.com/verybadcat/CSharpMath), 3. [emoji.wpf/wpf](https://github.com/samhocevar/emoji.wpf),
+4. [zwcloud's ImGui/GL,GLES](https://github.com/zwcloud/ImGui)_
+
+---
+PixelFarm's Typography
+---
+
+Since the core library does not provide glyph rendering implementation, You can learn
+how to do it from the example repositories above, or You may learn it from my 
+implementation => **PixelFarm.Typography**.
+
+PixelFarm.Typography links the core Typography library to the _PixelFarm_ Rendering library.
+You can see , for example, How to implement string drawing, how to implement text-layout services, how to cache glyph shapes. So you can apply this with your own library.
+
+
+![sum3](https://user-images.githubusercontent.com/7447159/78159669-10c7ac80-746d-11ea-9f22-4aee4d7f3807.png)
+
+_HtmlRenderer on GLES2 surface, text are rendered with the PixelFarm.Typography_
+
 
 What are each project used for?
 -----------
@@ -42,16 +63,14 @@ See => https://github.com/LayoutFarm/Typography/issues/99
 License
 -----------
 
-[**MIT**](https://opensource.org/licenses/MIT).
+The project is based on multiple open-sourced projects (listed below) **all using permissive licenses**.
+
+A license for a whole project is [**MIT**](https://opensource.org/licenses/MIT).
 
 But if you use some part of the codebase,
 please check each source file's header for the licensing info if available.
 
-Credits
------------
-
-The project is based on multiple open-sourced projects (listed below) **all using permissive licenses**.
-
+ 
 **Font** 
 
 Apache2, 2014-2016, Samuel Carlsson, Big thanks for https://github.com/vidstige/NRasterizer
@@ -86,7 +105,7 @@ MIT, 2013, Antonie Blom, https://github.com/andykorth/Pencil.Gaming
 
 MIT, 2004, 2007, Novell Inc., for System.Drawing 
 
-**Unpack, Zlib, Brotli**
+**Unpack, Zlib,Brotli**
 
 MIT, 2018, SharpZipLib, https://github.com/icsharpcode/SharpZipLib 
 
