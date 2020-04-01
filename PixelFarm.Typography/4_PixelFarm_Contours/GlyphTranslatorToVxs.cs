@@ -79,7 +79,7 @@ namespace Typography.Contours
             }
         }
         /// <summary>
-        /// write output to vxs
+        /// write output to vxs, use default curve flattener
         /// </summary>
         /// <param name="output"></param> 
         /// <param name="scale"></param>
@@ -91,7 +91,7 @@ namespace Typography.Contours
             }
         }
         /// <summary>
-        /// write output to vxs
+        /// write output to vxs, use user's curve flattener
         /// </summary>
         /// <param name="output"></param> 
         /// <param name="scale"></param>
