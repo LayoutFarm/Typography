@@ -148,7 +148,7 @@
     <Compile Include="..\..\PixelFarm\PixelFarm.Painter\4_CpuBlit_VertexProcessing\VertexStoreExtensions.cs" Link="PixelFarm\PixelFarm.Painter\4_CpuBlit_VertexProcessing\VertexStoreExtensions.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.Painter\4_CpuBlit_VertexProcessing\VertexStoreTransformExtensions.cs" Link="PixelFarm\PixelFarm.Painter\4_CpuBlit_VertexProcessing\VertexStoreTransformExtensions.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.Painter\4_CpuBlit_VertexProcessing\VxsClipping.cs" Link="PixelFarm\PixelFarm.Painter\4_CpuBlit_VertexProcessing\VxsClipping.cs" />
-    <Compile Include="..\..\PixelFarm\PixelFarm.PrimitiveGeo\AffinePlan.cs" Link="PixelFarm\PixelFarm.PrimitiveGeo\AffinePlan.cs" />
+    <Compile Include="..\..\PixelFarm\PixelFarm.PrimitiveGeo\AffineMat.cs" Link="PixelFarm\PixelFarm.PrimitiveGeo\AffineMat.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.PrimitiveGeo\BasicGeometries.cs" Link="PixelFarm\PixelFarm.PrimitiveGeo\BasicGeometries.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.PrimitiveGeo\Color.cs" Link="PixelFarm\PixelFarm.PrimitiveGeo\Color.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.PrimitiveGeo\ICoordTransformer.cs" Link="PixelFarm\PixelFarm.PrimitiveGeo\ICoordTransformer.cs" />

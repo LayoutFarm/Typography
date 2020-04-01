@@ -70,48 +70,39 @@ namespace PixelFarm.CpuBlit
             output.AddCloseFigure();
         }
 
-        static Affine CreateAffine(double destX, double destY,
-            double hotspotOffsetX, double hotSpotOffsetY,
-            double scaleX, double scaleY,
-            double angleRad)
-        {
+        //static Affine CreateAffine(double destX, double destY,
+        //    double hotspotOffsetX, double hotSpotOffsetY,
+        //    double scaleX, double scaleY,
+        //    double angleRad)
+        //{
 
-            AffinePlan[] plans = new AffinePlan[4];
-            int i = 0;
-            if (hotspotOffsetX != 0.0f || hotSpotOffsetY != 0.0f)
-            {
-                plans[i] = AffinePlan.Translate(-hotspotOffsetX, -hotSpotOffsetY);
-                i++;
-            }
+        //    AffinePlan[] plans = new AffinePlan[4];
+        //    int i = 0;
+        //    if (hotspotOffsetX != 0.0f || hotSpotOffsetY != 0.0f)
+        //    {
+        //        plans[i] = AffinePlan.Translate(-hotspotOffsetX, -hotSpotOffsetY);
+        //        i++;
+        //    }
 
-            if (scaleX != 1 || scaleY != 1)
-            {
-                plans[i] = AffinePlan.Scale(scaleX, scaleY);
-                i++;
-            }
+        //    if (scaleX != 1 || scaleY != 1)
+        //    {
+        //        plans[i] = AffinePlan.Scale(scaleX, scaleY);
+        //        i++;
+        //    }
 
-            if (angleRad != 0)
-            {
-                plans[i] = AffinePlan.Rotate(angleRad);
-                i++;
-            }
+        //    if (angleRad != 0)
+        //    {
+        //        plans[i] = AffinePlan.Rotate(angleRad);
+        //        i++;
+        //    }
 
-            if (destX != 0 || destY != 0)
-            {
-                plans[i] = AffinePlan.Translate(destX, destY);
-                i++;
-            }
-            return Affine.New(plans);
-        }
-        static Affine CreateAffine(double destX, double destY)
-        {
-            AffinePlan plan = new AffinePlan();
-            if (destX != 0 || destY != 0)
-            {
-                plan = AffinePlan.Translate(destX, destY);
-            }
-            return Affine.New(plan);
-        }
+        //    if (destX != 0 || destY != 0)
+        //    {
+        //        plans[i] = AffinePlan.Translate(destX, destY);
+        //        i++;
+        //    }
+        //    return Affine.New(plans);
+        //}
 
         /// <summary>
         /// we do NOT store vxs
@@ -225,17 +216,24 @@ namespace PixelFarm.CpuBlit
                     //1. 
                     BuildOrgImgRectVxs(source.Width, source.Height, imgBoundsPath);
                     //2. 
-                    Affine destRectTransform = CreateAffine(destX, destY, _ox, _oy, scaleX, scaleY, angleRadians);
-                    //TODO: review reusable span generator an interpolator ***
 
+                    AffineMat destRectTransform = AffineMat.Iden;
+                    destRectTransform.Translate(-_ox, -_oy);
+                    destRectTransform.Scale(scaleX, scaleY);
+                    destRectTransform.Rotate(angleRadians);
+
+
+                    //TODO: review reusable span generator an interpolator ***                     
 
                     // We invert it because it is the transform to make the image go to the same position as the polygon. LBB [2/24/2004]
-                    _spanInterpolator.Transformer = destRectTransform.CreateInvert();
+                    _reuseableAffine.SetElements(destRectTransform.CreateInvert());
+
+                    _spanInterpolator.Transformer = _reuseableAffine;
                     _currentImgSpanGen.BackgroundColor = Drawing.Color.Black;
                     _currentImgSpanGen.SetInterpolator(_spanInterpolator);
                     _currentImgSpanGen.SetSrcBitmap(source);
 
-                    destRectTransform.TransformToVxs(imgBoundsPath, v1);
+                    destRectTransform.TransformToVxs(imgBoundsPath, v1); //not inverted version
                     Render(v1, _currentImgSpanGen);
                     _currentImgSpanGen.ReleaseSrcBitmap();
 
@@ -290,7 +288,8 @@ namespace PixelFarm.CpuBlit
                         default:
                             throw new NotImplementedException();
                     }
-                    TransformToVxs(ref destRectTransform, imgBoundsPath, v1);
+
+                    TransformToVxs(destRectTransform, imgBoundsPath, v1);
                     Render(v1, imgSpanGen);
                     unchecked { _destImageChanged++; };
                 }
@@ -304,7 +303,7 @@ namespace PixelFarm.CpuBlit
         /// </summary>
         /// <param name="src"></param>
         /// <param name="outputVxs"></param>
-        static void TransformToVxs(ref AffineMat aff, VertexStore src, VertexStore outputVxs)
+        static void TransformToVxs(in AffineMat aff, VertexStore src, VertexStore outputVxs)
         {
             int count = src.Count;
             VertexCmd cmd;
@@ -329,9 +328,7 @@ namespace PixelFarm.CpuBlit
             }
         }
 
-
-
-        public void Render(IBitmapSrc source, AffinePlan[] affinePlans)
+        public void Render(IBitmapSrc source)
         {
             using (Tools.BorrowVxs(out var v1, out var v2))
             {
@@ -339,17 +336,9 @@ namespace PixelFarm.CpuBlit
                 BuildOrgImgRectVxs(source.Width, source.Height, v1);
 
                 AffineMat destRectTransform;
-                if (affinePlans == null)
-                {
-                    destRectTransform = AffineMat.Iden;
-                    _reuseableAffine.SetElements(destRectTransform);
-                }
-                else
-                {
-                    destRectTransform = new AffineMat();
-                    destRectTransform.BuildFromAffinePlans(affinePlans);
-                    _reuseableAffine.SetElements(destRectTransform.CreateInvert());
-                }
+                destRectTransform = AffineMat.Iden;
+                _reuseableAffine.SetElements(AffineMat.Iden);
+
                 //TODO: review reusable span generator an interpolator *** 
                 //We invert it because it is the transform to make the image go to the same position as the polygon. LBB [2/24/2004]
 
@@ -358,7 +347,31 @@ namespace PixelFarm.CpuBlit
                 _currentImgSpanGen.BackgroundColor = Drawing.Color.Transparent;
                 _currentImgSpanGen.SetInterpolator(_spanInterpolator);
                 _currentImgSpanGen.SetSrcBitmap(source);
-                TransformToVxs(ref destRectTransform, v1, v2);
+                TransformToVxs(destRectTransform, v1, v2);
+                Render(v2, _currentImgSpanGen);
+                _currentImgSpanGen.ReleaseSrcBitmap();
+            }
+        }
+
+        public void Render(IBitmapSrc source, AffineMat aff)
+        {
+            using (Tools.BorrowVxs(out var v1, out var v2))
+            {
+
+                BuildOrgImgRectVxs(source.Width, source.Height, v1);
+
+                AffineMat destRectTransform = aff;
+                _reuseableAffine.SetElements(destRectTransform.CreateInvert());
+
+                //TODO: review reusable span generator an interpolator *** 
+                //We invert it because it is the transform to make the image go to the same position as the polygon. LBB [2/24/2004]
+
+                _spanInterpolator.Transformer = _reuseableAffine;
+
+                _currentImgSpanGen.BackgroundColor = Drawing.Color.Transparent;
+                _currentImgSpanGen.SetInterpolator(_spanInterpolator);
+                _currentImgSpanGen.SetSrcBitmap(source);
+                TransformToVxs(destRectTransform, v1, v2);
                 Render(v2, _currentImgSpanGen);
                 _currentImgSpanGen.ReleaseSrcBitmap();
             }
@@ -491,7 +504,16 @@ namespace PixelFarm.CpuBlit
                 using (Tools.BorrowVxs(out var imgBoundsPath, out var v1))
                 {
                     BuildOrgImgRectVxs(source.Width, source.Height, imgBoundsPath);
-                    Affine destRectTransform = CreateAffine(destX, destY, _ox, _oy, scaleX, scaleY, angleRadians);
+
+                    AffineMat destRectTransform = AffineMat.Iden;
+                    destRectTransform.Translate(-_ox, -_oy);
+                    destRectTransform.Scale(scaleX, scaleY);
+                    destRectTransform.Rotate(angleRadians);
+
+                    //TODO: review reusable span generator an interpolator ***                     
+
+                    // We invert it because it is the transform to make the image go to the same position as the polygon. LBB [2/24/2004]
+                    _reuseableAffine.SetElements(destRectTransform.CreateInvert());
 
                     //TODO: review reusable span generator an interpolator ***
 
@@ -501,7 +523,7 @@ namespace PixelFarm.CpuBlit
                     //var imgSpanGen = new ImgSpanGenRGBA_BilinearClip(
                     //    Drawing.Color.Black,
                     //    spanInterpolator);
-                    _spanInterpolator.Transformer = destRectTransform.CreateInvert();
+                    _spanInterpolator.Transformer = _reuseableAffine;
                     _currentImgSpanGen.SetInterpolator(_spanInterpolator);
                     _currentImgSpanGen.SetSrcBitmap(source);
                     destRectTransform.TransformToVxs(imgBoundsPath, v1);
@@ -546,16 +568,16 @@ namespace PixelFarm.CpuBlit
                 using (Tools.BorrowVxs(out var imgBoundsPath, out var v1))
                 {
                     BuildOrgImgRectVxs(source.Width, source.Height, imgBoundsPath);
-                    //...
-                    Affine destRectTransform = CreateAffine(destX, destY);
-
-                    //TODO: review reusable span generator an interpolator ***
-
+                    //... 
+                    AffineMat destRectTransform = AffineMat.Iden;
+                    destRectTransform.Translate(destX, destY);
 
                     // We invert it because it is the transform to make the image go to the same position as the polygon. LBB [2/24/2004]
+                    _reuseableAffine.SetElements(destRectTransform.CreateInvert());
 
-                    _spanInterpolator.Transformer = destRectTransform.CreateInvert();
                     //we generate image by this imagespan generator
+                    _spanInterpolator.Transformer = _reuseableAffine;
+
 
                     ImgSpanGen imgSpanGen = null;
                     switch (source.BitDepth)

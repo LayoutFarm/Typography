@@ -417,10 +417,14 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             //------------------------
             m_arc.init(0.0, 0.0, rx, ry, start_angle, sweep_angle);
 
-            Affine mtx = Affine.New(
-                AffinePlan.Rotate(angle),
-                AffinePlan.Translate(cx, cy)
-                );
+            AffineMat mtx = AffineMat.Iden;
+            mtx.Rotate(angle);
+            mtx.Translate(cx, cy);
+
+            //Affine mtx = Affine.New(
+            //    AffinePlan.Rotate(angle),
+            //    AffinePlan.Translate(cx, cy)
+            //    );
 
             for (int i = 2; i < m_arc.m_num_vertices - 2; i += 2)
             {

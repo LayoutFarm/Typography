@@ -64,6 +64,19 @@ namespace Typography.Contours
 
         GlyphTranslatorToVxs _tovxs = new GlyphTranslatorToVxs();
 
+        static readonly PixelFarm.CpuBlit.VertexProcessing.AffineMat s_flipY;
+
+        //shearing horizontal axis to right side, 20 degree, TODO: user can configure this value
+        static readonly PixelFarm.CpuBlit.VertexProcessing.AffineMat s_slantHorizontal;
+         
+        static GlyphMeshStore()
+        {
+            s_flipY = PixelFarm.CpuBlit.VertexProcessing.AffineMat.Iden;
+            s_flipY.Scale(1, -1);
+            //
+            s_slantHorizontal = PixelFarm.CpuBlit.VertexProcessing.AffineMat.Iden;
+            s_slantHorizontal.Skew(PixelFarm.CpuBlit.AggMath.deg2rad(-15), 0);
+        }
         public GlyphMeshStore()
         {
 
@@ -71,7 +84,6 @@ namespace Typography.Contours
         public void SetHintTechnique(HintTechnique hintTech)
         {
             _currentHintTech = hintTech;
-
         }
 
         /// <summary>
@@ -141,7 +153,7 @@ namespace Typography.Contours
                     using (Tools.BorrowVxs(out var v1))
                     {
                         _tovxs.WriteUnFlattenOutput(v1, 1);
-                        return v1.CreateTrim(s_invertY);
+                        return v1.CreateTrim(s_flipY);
                     }
 
                 }
@@ -165,7 +177,7 @@ namespace Typography.Contours
                         _tovxs.WriteUnFlattenOutput(v1, 1); //write to temp buffer first 
 
                         //then
-                        return v1.CreateTrim(s_invertY);
+                        return v1.CreateTrim(s_flipY);
                     }
                 }
                 else
@@ -226,11 +238,6 @@ namespace Typography.Contours
         }
 
 
-        static readonly PixelFarm.CpuBlit.VertexProcessing.Affine s_invertY = PixelFarm.CpuBlit.VertexProcessing.Affine.NewScaling(1, -1);
-
-        //shearing horizontal axis to right side, 20 degree, TODO: user can configure this value
-        static PixelFarm.CpuBlit.VertexProcessing.Affine s_slantHorizontal = PixelFarm.CpuBlit.VertexProcessing.Affine.NewSkewing(PixelFarm.CpuBlit.AggMath.deg2rad(-15), 0);
-
         /// <summary>
         /// get glyph mesh from current font setting
         /// </summary>
@@ -257,7 +264,7 @@ namespace Typography.Contours
                             _tovxs.WriteOutput(v1);
                             //write to temp buffer first  
                             //then
-                            glyphMeshData.vxsStore = v1.CreateTrim(s_invertY);// _temp2.CreateTrim(); 
+                            glyphMeshData.vxsStore = v1.CreateTrim(s_flipY);// _temp2.CreateTrim(); 
                         }
 
                     }
@@ -281,7 +288,7 @@ namespace Typography.Contours
                             _tovxs.WriteOutput(v1); //write to temp buffer first 
 
                             //then
-                            glyphMeshData.vxsStore = v1.CreateTrim(s_invertY);
+                            glyphMeshData.vxsStore = v1.CreateTrim(s_flipY);
                         }
                     }
                     else

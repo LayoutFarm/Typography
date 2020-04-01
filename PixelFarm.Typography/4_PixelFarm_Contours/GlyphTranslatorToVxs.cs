@@ -73,9 +73,8 @@ namespace Typography.Contours
             }
             else
             {
-                var mat = PixelFarm.CpuBlit.VertexProcessing.Affine.New(
-                    new PixelFarm.CpuBlit.VertexProcessing.AffinePlan(
-                        PixelFarm.CpuBlit.VertexProcessing.AffineMatrixCommand.Scale, scale, scale));
+                AffineMat mat = AffineMat.Iden;
+                mat.Scale(scale, scale);
                 mat.TransformToVxs(_vxs, output);
             }
         }
@@ -103,18 +102,11 @@ namespace Typography.Contours
                 curveFlattener.MakeVxs(_vxs, output);
             }
             else
-            {   
-                //TODO-use struct, AffineMat
-                var mat = PixelFarm.CpuBlit.VertexProcessing.Affine.New(
-                    new PixelFarm.CpuBlit.VertexProcessing.AffinePlan(
-                        PixelFarm.CpuBlit.VertexProcessing.AffineMatrixCommand.Scale, scale, scale));
+            {
 
-                //transform -> flatten ->output
-                //TODO: review here again***
-                using (Tools.BorrowVxs(out var v1))
-                {
-                    curveFlattener.MakeVxs(_vxs, mat, output);
-                }
+                AffineMat mat = AffineMat.Iden;
+                mat.Scale(scale, scale);
+                curveFlattener.MakeVxs(_vxs, mat, output);
             }
         }
     }
