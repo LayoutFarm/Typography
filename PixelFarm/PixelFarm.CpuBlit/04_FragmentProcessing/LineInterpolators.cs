@@ -26,7 +26,7 @@ using System;
 namespace PixelFarm.CpuBlit.FragmentProcessing
 {
     //===================================================dda_line_interpolator
-    public struct LineInterpolatorDDA
+    struct LineInterpolatorDDA
     {
         int _y;
         int _dy;
