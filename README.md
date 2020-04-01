@@ -4,15 +4,13 @@
 Pure C# Font Reader, Glyph Layout and Rendering.
 ---
 
-<details>
-<summary>Origin of the idea</summary>
 
-During developing the [PixelFarm Rendering library](https://github.com/PaintLab/PixelFarm),
-I think _'How-to-render-a-font-glyph'_ may be useful for other libraries.
+While developing the [PixelFarm Rendering library](https://github.com/PaintLab/PixelFarm),
+I figured that the way to render a glyph from a font may be useful for other libraries.
 
-So, I spinned off the _'How-to-render-a-font-glyph'_ part to here, the **Typography** library.
+So, I spinned off the way to render a glyph from a font to here, the **Typography** library.
 
-The Typography lib does NOT need the PixelFarm Rendering library.
+The Typography library does NOT need the PixelFarm Rendering library.
 
 ![gdiplus_sample1](https://cloud.githubusercontent.com/assets/7447159/24084514/1969489e-0d1e-11e7-8748-965e9e84693b.png)
 
@@ -22,7 +20,7 @@ As shown in the above screenshot, an example (marked with `(1)`) that uses Typog
 
 and an example (marked with `(2)`) the uses Typography with a 'mini' snapshot of PixelFarm Rendering library (marked with `(3)`). 
 
-</details>
+ 
 
 Concept
 ---
