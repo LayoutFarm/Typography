@@ -165,24 +165,20 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                 {
                     return _isIdentity;
                 }
-
-
             }
         }
         ICoordTransformer ICoordTransformer.MultiplyWith(ICoordTransformer another)
         {
-            if (another is Affine)
+            if (another is Affine aff)
             {
-                return this * (Affine)another;
+                return this * aff;
             }
-            else if (another is Perspective)
+            else if (another is Perspective p2)
             {
-                Perspective p = new Perspective(this);
-                return p * (Perspective)another;
+                return new Perspective(this) * p2;
             }
             else
             {
-
                 return null;
             }
         }

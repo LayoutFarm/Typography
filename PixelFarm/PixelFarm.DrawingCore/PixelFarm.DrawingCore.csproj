@@ -38,8 +38,8 @@
     <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\PixelFarm.PrimitiveGeo\AffinePlan.cs">
-      <Link>0_REF_PrimitiveGeo\AffinePlan.cs</Link>
+    <Compile Include="..\PixelFarm.PrimitiveGeo\AffineMat.cs">
+      <Link>0_REF_PrimitiveGeo\AffineMat.cs</Link>
     </Compile>
     <Compile Include="..\PixelFarm.PrimitiveGeo\BasicGeometries.cs">
       <Link>0_REF_PrimitiveGeo\BasicGeometries.cs</Link>

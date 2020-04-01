@@ -386,8 +386,8 @@
     <Compile Include="..\..\PixelFarm\PixelFarm.Painter\4_CpuBlit_VertexProcessing\VxsClipping.cs">
       <Link>PixelFarm\PixelFarm.Painter\4_CpuBlit_VertexProcessing\VxsClipping.cs</Link>
     </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.PrimitiveGeo\AffinePlan.cs">
-      <Link>PixelFarm\PixelFarm.PrimitiveGeo\AffinePlan.cs</Link>
+    <Compile Include="..\..\PixelFarm\PixelFarm.PrimitiveGeo\AffineMat.cs">
+      <Link>PixelFarm\PixelFarm.PrimitiveGeo\AffineMat.cs</Link>
     </Compile>
     <Compile Include="..\..\PixelFarm\PixelFarm.PrimitiveGeo\BasicGeometries.cs">
       <Link>PixelFarm\PixelFarm.PrimitiveGeo\BasicGeometries.cs</Link>

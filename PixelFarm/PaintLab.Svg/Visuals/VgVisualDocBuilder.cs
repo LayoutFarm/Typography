@@ -516,10 +516,12 @@ namespace PaintLab.Svg
 
                         //create local-transformation matrix
                         pathMarkers.StartMarkerPos = new PointF(p0.X, p0.Y);
-                        pathMarkers.StartMarkerAffine = Affine.New(
-                            AffinePlan.Translate(-markerSpec.RefX.Number, -markerSpec.RefY.Number), //move to the ref point
-                            AffinePlan.Rotate(rotateRad) //rotate                            
-                        );
+
+                        AffineMat mat = AffineMat.Iden;
+                        mat.Translate(-markerSpec.RefX.Number, -markerSpec.RefY.Number); //move to the ref point
+                        mat.Rotate(rotateRad);
+
+                        pathMarkers.StartMarkerAffine = new Affine(mat);
                     }
                     //-------------------------------
                     if (pathMarkers.MidMarker != null)
@@ -540,10 +542,11 @@ namespace PaintLab.Svg
 
                         //create local-transformation matrix
                         pathMarkers.EndMarkerPos = new PointF(p1.X, p1.Y);
-                        pathMarkers.EndMarkerAffine = Affine.New(
-                            AffinePlan.Translate(-markerSpec.RefX.Number, -markerSpec.RefY.Number), //move to the ref point
-                            AffinePlan.Rotate(rotateRad) //rotate                            
-                        );
+
+                        AffineMat mat = AffineMat.Iden;
+                        mat.Translate(-markerSpec.RefX.Number, -markerSpec.RefY.Number); //move to the ref point
+                        mat.Rotate(rotateRad); 
+                        pathMarkers.EndMarkerAffine = new Affine(mat);
                     }
                 }
 
@@ -653,7 +656,7 @@ namespace PaintLab.Svg
         VgVisualElement CreateFeColorMatrix(VgVisualElement parentNode, SvgElement elem, SvgFeColorMatrixSpec spec)
         {
             VgVisualElement feColorMatrixElem = new VgVisualElement(WellknownSvgElementName.FeColorMatrix, spec, _vgVisualDoc);
-            
+
             PaintFx.Effects.ImgFilterSvgFeColorMatrix colorMat = new PaintFx.Effects.ImgFilterSvgFeColorMatrix();
             spec.ResolvedFilter = colorMat;
             //TODO: check if matrix is identify matrix or not            //
