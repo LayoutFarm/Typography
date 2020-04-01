@@ -27,7 +27,7 @@ You can use the library to reads font files( .ttf, .otf, .ttc, .otc, .woff, .wof
 1) Access all information inside the font. 
 2) Layout the font glyphs according to the OpenFont specification.
 
-_The core library does **NOT** provide a glyph rendering implementation_. 
+_The core modules (Typography.OpenFont, Typography. GlyphLayout) does **NOT** provide a glyph rendering implementation_. 
 But when you are able to read/access all glyphs and you are able to know
 exact position of each glyph=> It is easy to you to render it by your own.
 
@@ -38,6 +38,41 @@ from a font file then render it by their rendering engine.
 
 _1. [MatterHackers](https://github.com/MatterHackers/MatterControl)/[agg-sharp](https://github.com/MatterHackers/agg-sharp), 2. [CShapMath/Skia-Xamarin Form](https://github.com/verybadcat/CSharpMath), 3. [emoji.wpf/wpf](https://github.com/samhocevar/emoji.wpf),
 4. [zwcloud's ImGui/GL,GLES](https://github.com/zwcloud/ImGui)_
+
+---
+Project Arrangement, What are each project used for?
+---
+Core Modules are Typography.OpenFont  and Typography.GlyphLayout
+ 
+**Typography.OpenFont**
+
+- This project is a core project, no dependency on others.
+- This project contains a font reader that implements Open Font Format,
+  (ISO/IEC 14496-22:2015 , and Microsoft OpenType Specification)
+  and Web Open Font Format (both WOFF 1.0, 2.0)
+- OpenType GSUB, GPOS layout mechanism are 'sleep' in here.
+- No Visual/Graphics Rendering Here
+
+
+**Typography.GlyphLayout**
+
+_since GlyphLayout engine is not stable and quite complex, 
+I separated this from the OpenFont core project_
+
+- This project invokes OpenType Layout Engine/Mechanism (esp. GSUB, GPOS) inside the 
+Typography.OpenFont
+- The engine converts a string to a glyph-index List and substitutes some glyph,
+   and place them  into a proper position  by the request 'settings' 
+      eg  see https://github.com/LayoutFarm/Typography/issues/82, 
+           or https://github.com/LayoutFarm/Typography/issues/18
+- No Visual/Graphics Rendering Here
+
+![sum4](https://user-images.githubusercontent.com/7447159/78161684-09ee6900-7470-11ea-9649-285c38a19079.png)
+
+_1) CoreModules, 2) Typography.One: a more easy-to-use than core module_
+
+see more detail about the 2 modules and others here : https://github.com/LayoutFarm/Typography/issues/99
+
 
 ---
 PixelFarm's Typography
@@ -56,9 +91,8 @@ You can see , for example, How to implement string drawing, how to implement tex
 _HtmlRenderer on GLES2 surface, text are rendered with the PixelFarm.Typography_
 
 
-What are each project used for?
+
 -----------
-See => https://github.com/LayoutFarm/Typography/issues/99
 
 License
 -----------
