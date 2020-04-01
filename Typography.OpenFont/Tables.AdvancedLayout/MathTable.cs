@@ -660,11 +660,10 @@ namespace Typography.OpenFont.Tables
 
             //-------
             //fill to original glyph?
-            for (int n = allGlyphs.Length - 1; n >= 0; --n)
+            for (int n = 0; n < allGlyphs.Length; ++n)
             {
                 allGlyphs[n].MathGlyphInfo = mathGlyphInfos[n];
             }
-
         }
 
     }

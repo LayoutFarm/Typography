@@ -16,12 +16,11 @@ namespace Typography.Contours
     /// </summary>
     public class GlyphTranslatorToVxs : IGlyphTranslator
     {
-
         PathWriter _pw = new PathWriter();
         VertexStore _vxs = new VertexStore();
         public GlyphTranslatorToVxs()
         {
-            _pw.BindVxs(_vxs);
+            _pw.BindVxs(_vxs);            
         }
 
 #if DEBUG
@@ -31,8 +30,9 @@ namespace Typography.Contours
             return _pw;
         }
 #endif
-        public void BeginRead(int countourCount)
+        public void BeginRead(int contourCount)
         {
+            
             _pw.Clear();
         }
         public void EndRead()
@@ -79,7 +79,7 @@ namespace Typography.Contours
             }
         }
         /// <summary>
-        /// write output to vxs
+        /// write output to vxs, use default curve flattener
         /// </summary>
         /// <param name="output"></param> 
         /// <param name="scale"></param>
@@ -91,7 +91,7 @@ namespace Typography.Contours
             }
         }
         /// <summary>
-        /// write output to vxs
+        /// write output to vxs, use user's curve flattener
         /// </summary>
         /// <param name="output"></param> 
         /// <param name="scale"></param>
