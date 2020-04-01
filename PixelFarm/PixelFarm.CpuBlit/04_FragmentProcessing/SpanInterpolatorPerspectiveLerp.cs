@@ -24,7 +24,7 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
 {
     //============================================span_interpolator_persp_lerp
 
-    public sealed class SpanInterpolatorPerspectiveLerp : FragmentProcessing.ISpanInterpolator
+    sealed class SpanInterpolatorPerspectiveLerp : FragmentProcessing.ISpanInterpolator
     {
         Perspective _trans_dir;
         Perspective _trans_inv;

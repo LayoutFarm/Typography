@@ -34,10 +34,13 @@ namespace PixelFarm.Drawing
             double centerX = (bounds.Left + bounds.Width) / 2;
             double centerY = (bounds.Top + bounds.Height) / 2;
 
-            Affine aff = Affine.New(AffinePlan.Translate(-centerX, -centerY),
-                 AffinePlan.Scale(1, -1),//flipY,
-                 AffinePlan.Translate(centerX, centerY));
-
+            //Affine aff = Affine.New(AffinePlan.Translate(-centerX, -centerY),
+            //     AffinePlan.Scale(1, -1),//flipY,
+            //     AffinePlan.Translate(centerX, centerY));
+            AffineMat aff = AffineMat.Iden;
+            aff.Translate(-centerX, -centerY);
+            aff.Translate(1, -1);//flipY
+            aff.Translate(centerX, centerY);
             aff.TransformToVxs(src, outputVxs);
 
         }
@@ -65,8 +68,8 @@ namespace PixelFarm.Drawing
             return outputVxs;
         }
         public static VertexStore ScaleToNewVxs(this VertexStore src, double s, VertexStore outputVxs)
-        {   
-           
+        {
+
             AffineMat mat = AffineMat.Iden;
             mat.Scale(s, s);
             return mat.TransformToVxs(src, outputVxs);

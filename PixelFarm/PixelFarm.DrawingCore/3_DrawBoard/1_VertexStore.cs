@@ -47,7 +47,7 @@ namespace PixelFarm.Drawing
             System.Diagnostics.Debug.WriteLine("vxs_1_dbugId=" + dbugId);
 #endif
             AllocIfRequired(2);
-        } 
+        }
         public static void SetSharedState(VertexStore vxs, bool isShared)
         {
             vxs.IsShared = isShared;
@@ -430,6 +430,48 @@ namespace PixelFarm.Drawing
                 tx.Transform(ref _coord_xy[a++], ref _coord_xy[a++]);
             }
         }
+        private VertexStore(VertexStore src, in PixelFarm.CpuBlit.VertexProcessing.AffineMat tx)
+        {
+            //for copy from src to this instance
+ 
+            _allocated_vertices_count = src._allocated_vertices_count;
+            _vertices_count = src._vertices_count;
+            //
+            //
+#if DEBUG
+            dbugIsTrim = true;
+#endif
+            //
+            int coord_len = _vertices_count; //+1 for no more cmd
+            int cmds_len = _vertices_count; //+1 for no more cmd
+
+            _coord_xy = new double[(coord_len + 1) << 1];//*2
+            _cmds = new byte[(cmds_len + 1)];
+
+
+            System.Array.Copy(
+                 src._coord_xy,
+                 0,
+                 _coord_xy,
+                 0,
+                 coord_len << 1); //*2
+
+            System.Array.Copy(
+                 src._cmds,
+                 0,
+                 _cmds,
+                 0,
+                 cmds_len);
+
+            //-------------------------
+            int coord_count = coord_len;
+            int a = 0;
+            for (int n = 0; n < coord_count; ++n)
+            {
+                tx.Transform(ref _coord_xy[a++], ref _coord_xy[a++]);
+            }
+        }
+
         /// <summary>
         /// copy from src to the new one
         /// </summary>
@@ -448,6 +490,10 @@ namespace PixelFarm.Drawing
             return new VertexStore(this, true);
         }
         public VertexStore CreateTrim(PixelFarm.CpuBlit.VertexProcessing.ICoordTransformer tx)
+        {
+            return new VertexStore(this, tx);
+        }
+        public VertexStore CreateTrim(in PixelFarm.CpuBlit.VertexProcessing.AffineMat tx)
         {
             return new VertexStore(this, tx);
         }

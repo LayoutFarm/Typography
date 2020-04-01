@@ -282,5 +282,122 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             }
             return output;
         }
+
+        public VertexStore MakeVxs(VertexStore vxs, in AffineMat tx, VertexStore output)
+        {
+            double x, y;
+            VertexCmd cmd;
+            double lastX = 0;
+            double lastY = 0;
+            double lastMoveX = 0;
+            double lastMoveY = 0;
+
+            int index = 0;
+
+            _curveFlattenerOutput.SetVxs(output);
+
+            while ((cmd = vxs.GetVertex(index++, out x, out y)) != VertexCmd.NoMore)
+            {
+#if DEBUG
+                if (VertexStore.dbugCheckNANs(x, y))
+                {
+
+                }
+#endif
+
+
+                tx.Transform(ref x, ref y); 
+                //-----------------
+                switch (cmd)
+                {
+                    case VertexCmd.C3:
+                        {
+                            //for curve3, it contains (x0,y0), (x1,y1), (x2,y2)
+                            //this is (x1,y1) so next point must be (x2,y2)
+
+                            //read next
+                            cmd = vxs.GetVertex(index++, out double x2, out double y2);
+                            if (cmd != VertexCmd.LineTo) { throw new System.NotSupportedException(); }
+
+                            if (_selectedApproximationMethod == CurveApproximationMethod.Inc)
+                            {
+                                _inc_curveFlattener.Flatten(
+                                   lastX, lastY,
+                                   x, y,
+                                   lastX = x2, lastY = y2,
+                                   _curveFlattenerOutput, true);
+
+                            }
+                            else
+                            {
+                                _div_curveFlattener.Flatten(
+                                    lastX, lastY,
+                                    x, y,
+                                   lastX = x2, lastY = y2,
+                                    _curveFlattenerOutput,
+                                    true
+                                    );
+                            }
+                        }
+                        break;
+                    case VertexCmd.C4:
+                        {
+                            //for curve4, it contains (x0,y0), (x1,y1), (x2,y2), (x3,y3)                            
+                            //this is (x1,y1) so next point must be (x2,y2) and (x3,y3)
+
+                            cmd = vxs.GetVertex(index++, out double x2, out double y2);
+                            if (cmd != VertexCmd.C4)
+                            {
+                                throw new System.NotSupportedException();
+                            }
+                            cmd = vxs.GetVertex(index++, out double x3, out double y3);
+                            if (cmd != VertexCmd.LineTo)
+                            {
+                                throw new System.NotSupportedException();
+                            }
+
+                            if (_selectedApproximationMethod == CurveApproximationMethod.Inc)
+                            {
+                                _inc_curveFlattener.Flatten(
+                                    lastX, lastY,
+                                    x, y,
+                                    x2, y2,
+                                   lastX = x3, lastY = y3,
+                                    _curveFlattenerOutput, true
+                                    );
+                            }
+                            else
+                            {
+                                _div_curveFlattener.Flatten(
+                                     lastX, lastY,
+                                     x, y,
+                                     x2, y2,
+                                     lastX = x3, lastY = y3,
+                                     _curveFlattenerOutput, true
+                                    );
+                            }
+                        }
+                        break;
+                    case VertexCmd.LineTo:
+                        output.AddLineTo(lastX = x, lastY = y);
+
+                        break;
+                    case VertexCmd.MoveTo:
+                        //move to, and end command
+                        output.AddVertex(lastMoveX = lastX = x, lastMoveY = lastY = y, cmd);
+                        break;
+                    case VertexCmd.Close:
+                        //we need only command
+                        //move to begin 
+                        output.AddVertex(lastX = lastMoveX, lastY = lastMoveY, cmd);
+                        break;
+                    default:
+                        //move to, and end command
+                        output.AddVertex(lastX = x, lastY = y, cmd);
+                        break;
+                }
+            }
+            return output;
+        }
     }
 }

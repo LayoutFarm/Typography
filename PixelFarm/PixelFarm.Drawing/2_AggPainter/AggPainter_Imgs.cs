@@ -3,7 +3,7 @@
 using System;
 using PixelFarm.Drawing;
 using PixelFarm.CpuBlit.VertexProcessing;
-using PixelFarm.CpuBlit.Imaging;
+
 
 
 namespace PixelFarm.CpuBlit
@@ -100,11 +100,11 @@ namespace PixelFarm.CpuBlit
                                                    //before render an image we turn off vxs subpixel rendering
             this.UseSubPixelLcdEffect = false;
 
-            _aggsx.Render(memBmp, null as AffinePlan[]);
+            _aggsx.Render(memBmp);
             //restore...
             this.UseSubPixelLcdEffect = useSubPix;
         }
-        public override void DrawImage(Image img, params AffinePlan[] affinePlans)
+        public override void DrawImage(Image img, in AffineMat aff)
         {
             if (!(img is MemBitmap memBmp))
             {
@@ -116,7 +116,7 @@ namespace PixelFarm.CpuBlit
                                                    //before render an image we turn off vxs subpixel rendering
             this.UseSubPixelLcdEffect = false;
 
-            _aggsx.Render(memBmp, affinePlans);
+            _aggsx.Render(memBmp, aff);
             //restore...
             this.UseSubPixelLcdEffect = useSubPix;
 
