@@ -25,7 +25,7 @@ The Typography library is **cross-platforms library** and does **NOT** need the 
 You can use the library to reads font files( .ttf, .otf, .ttc, .otc, .woff, .woff2) and
 
 1) Access all information inside the font. 
-2) Layout the font glyphs according to the OpenFont specification.
+2) Layout the font glyphs according to the [OpenFont specification](http://www.iso.org/iso/home/store/catalogue_ics/catalogue_detail_ics.htm?csnumber=66391).
 
 _The core modules (Typography.OpenFont, Typography. GlyphLayout) does **NOT** provide a glyph rendering implementation_. 
 But when you are able to read/access all glyphs and you are able to know
@@ -48,8 +48,8 @@ Core Modules are Typography.OpenFont  and Typography.GlyphLayout
 
 - This project is a core project, no dependency on others.
 - This project contains a font reader that implements Open Font Format,
-  (ISO/IEC 14496-22:2015 , and Microsoft OpenType Specification)
-  and Web Open Font Format (both WOFF 1.0, 2.0)
+  ([ISO/IEC 14496-22:2015](http://www.iso.org/iso/home/store/catalogue_ics/catalogue_detail_ics.htm?csnumber=66391) , and [Microsoft OpenType Specification]( https://www.microsoft.com/en-us/Typography/OpenTypeSpecification.aspx))
+  and Web Open Font Format (both WOFF [1.0](https://www.w3.org/TR/2012/REC-WOFF-20121213/), [2.0](https://www.w3.org/TR/WOFF2/))
 - OpenType GSUB, GPOS layout mechanism are 'sleep' in here.
 - No Visual/Graphics Rendering Here
 
@@ -63,8 +63,8 @@ I separated this from the OpenFont core project_
 Typography.OpenFont
 - The engine converts a string to a glyph-index List and substitutes some glyph,
    and place them  into a proper position  by the request 'settings' 
-      eg  see https://github.com/LayoutFarm/Typography/issues/82, 
-           or https://github.com/LayoutFarm/Typography/issues/18
+      eg [Script/Languague Setup](https://github.com/LayoutFarm/Typography/issues/82), 
+           or [Advanced GSUB/GPOS on Emoji](https://github.com/LayoutFarm/Typography/issues/18)
 - No Visual/Graphics Rendering Here
 
 ![sum4](https://user-images.githubusercontent.com/7447159/78161684-09ee6900-7470-11ea-9649-285c38a19079.png)
