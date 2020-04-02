@@ -314,8 +314,7 @@ namespace PixelFarm.Drawing
         Hardware,
         HardwareWithSoftwareFallback
     }
-    public delegate void CanvasInvalidateDelegate(Rectangle paintArea);
-
+     
     public static class DrawBoardExtensionMethods
     {
 

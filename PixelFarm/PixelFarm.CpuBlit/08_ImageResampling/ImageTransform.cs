@@ -43,7 +43,9 @@ namespace PixelFarm.CpuBlit.Imaging
         public static void GetInterpolatedColor(Color[] colors, double x, double y,
             out PixelFarm.Drawing.Color outputColor)
         {
-            //interpolate by channel        
+            //interpolate by channel 
+            //TODO: review arr access again
+
             double v1, v2, v3, v4, v;
             byte a;
             {

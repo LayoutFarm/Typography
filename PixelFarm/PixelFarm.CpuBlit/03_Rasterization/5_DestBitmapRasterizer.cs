@@ -107,7 +107,7 @@ namespace PixelFarm.CpuBlit.Rasterization
                     int dest_stride = _destImgStride = dest.Stride;
                     //*** set color before call Blend()
                     _color = color;
-                    byte color_alpha = color.alpha;
+                    byte color_alpha = color.A;
                     //---------------------------
                     //3. loop, render single scanline with subpixel rendering 
 
@@ -400,10 +400,10 @@ namespace PixelFarm.CpuBlit.Rasterization
             //-----------------
             //TODO: review color order here
             //B-G-R-A?   
-            byte color_c0 = _color.blue;
-            byte color_c1 = _color.green;
-            byte color_c2 = _color.red;
-            byte color_alpha = _color.alpha;
+            byte color_c0 = _color.B;
+            byte color_c1 = _color.G;
+            byte color_c2 = _color.R;
+            byte color_alpha = _color.A;
             //-----------------
             //single line 
             //from tripple width (x3) grayScaleLineBuffer

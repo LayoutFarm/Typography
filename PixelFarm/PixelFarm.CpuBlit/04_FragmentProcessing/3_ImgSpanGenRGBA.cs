@@ -248,10 +248,10 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
                         int acc_r, acc_g, acc_b, acc_a;
 
                         Color bgColor = this.BackgroundColor;
-                        int back_r = bgColor.red;
-                        int back_g = bgColor.green;
-                        int back_b = bgColor.blue;
-                        int back_a = bgColor.alpha;
+                        int back_r = bgColor.R;
+                        int back_g = bgColor.G;
+                        int back_b = bgColor.B;
+                        int back_a = bgColor.A;
                         int maxx = _bmpSrc.Width - 1;
                         int maxy = _bmpSrc.Height - 1;
                         int srcColor = 0;

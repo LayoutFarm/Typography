@@ -82,7 +82,9 @@ namespace PixelFarm.CpuBlit.Rasterization
         }
         public override void AddSpan(int x, int len, int cover)
         {
+#if DEBUG
             int backupCover = cover;
+#endif
             if (x == _last_x + 1
                 && _spans[_last_span_index].len < 0
                 && cover == _spans[_last_span_index].cover_index)

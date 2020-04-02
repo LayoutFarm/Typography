@@ -53,9 +53,10 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
         public int y() => _y + (_dy >> (_fractionShift));  // - m_YShift)); }
         //
         public int dy() => _dy;
-        //
     }
 
+
+   
     //=================================================dda2_line_interpolator
 
     class LineInterpolatorDDA2

@@ -45,37 +45,13 @@ namespace PixelFarm.VectorMath
             this.maxXYZ = maxXYZ;
         }
 
-        public Vector3 Size
-        {
-            get
-            {
-                return maxXYZ - minXYZ;
-            }
-        }
+        public Vector3 Size => maxXYZ - minXYZ;
 
-        public double XSize
-        {
-            get
-            {
-                return maxXYZ.x - minXYZ.x;
-            }
-        }
+        public double XSize => maxXYZ.x - minXYZ.x;
 
-        public double YSize
-        {
-            get
-            {
-                return maxXYZ.y - minXYZ.y;
-            }
-        }
+        public double YSize => maxXYZ.y - minXYZ.y;
 
-        public double ZSize
-        {
-            get
-            {
-                return maxXYZ.z - minXYZ.z;
-            }
-        }
+        public double ZSize => maxXYZ.z - minXYZ.z;
 
         public AxisAlignedBoundingBox NewTransformed(Matrix4X4 transform)
         {
@@ -104,58 +80,41 @@ namespace PixelFarm.VectorMath
             return new AxisAlignedBoundingBox(newMin, newMax);
         }
 
-        public Vector3 Center
-        {
-            get
-            {
-                return (minXYZ + maxXYZ) / 2;
-            }
-        }
+        public Vector3 Center => (minXYZ + maxXYZ) / 2;
 
         /// <summary>
         /// This is the computation cost of doing an intersection with the given type.
         /// Attempt to give it in average CPU cycles for the intersecton.
         /// </summary>
         /// <returns></returns>
-        public static double GetIntersectCost()
-        {
-            // it would be great to try and measure this more accurately.  This is a guess from looking at the intersect function.
-            return 132;
-        }
+        public static double GetIntersectCost() => 132;   // it would be great to try and measure this more accurately.  This is a guess from looking at the intersect function.
 
-        public Vector3 GetCenter()
-        {
-            return (minXYZ + maxXYZ) * .5;
-        }
+        public Vector3 GetCenter() => (minXYZ + maxXYZ) * .5;
 
-        public double GetCenterX()
-        {
-            return (minXYZ.x + maxXYZ.x) * .5;
-        }
+        public double GetCenterX() => (minXYZ.x + maxXYZ.x) * .5;
 
-        double volumeCache = 0;
+        double _volumeCache = 0;
         public double GetVolume()
         {
-            if (volumeCache == 0)
+            if (_volumeCache == 0)
             {
-                volumeCache = (maxXYZ.x - minXYZ.x) * (maxXYZ.y - minXYZ.y) * (maxXYZ.z - minXYZ.z);
+                _volumeCache = (maxXYZ.x - minXYZ.x) * (maxXYZ.y - minXYZ.y) * (maxXYZ.z - minXYZ.z);
             }
-
-            return volumeCache;
+            return _volumeCache;
         }
 
-        double surfaceAreaCache = 0;
+        double _surfaceAreaCache = 0;
         public double GetSurfaceArea()
         {
-            if (surfaceAreaCache == 0)
+            if (_surfaceAreaCache == 0)
             {
                 double frontAndBack = (maxXYZ.x - minXYZ.x) * (maxXYZ.z - minXYZ.z) * 2;
                 double leftAndRight = (maxXYZ.y - minXYZ.y) * (maxXYZ.z - minXYZ.z) * 2;
                 double topAndBottom = (maxXYZ.x - minXYZ.x) * (maxXYZ.y - minXYZ.y) * 2;
-                surfaceAreaCache = frontAndBack + leftAndRight + topAndBottom;
+                _surfaceAreaCache = frontAndBack + leftAndRight + topAndBottom;
             }
 
-            return surfaceAreaCache;
+            return _surfaceAreaCache;
         }
 
         public Vector3 this[int index]

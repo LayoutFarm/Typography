@@ -17,7 +17,7 @@ namespace PixelFarm.VectorMath
     public struct BezierCurve
     {
 
-        private List<Vector2> points;
+        List<Vector2> _points;
         /// <summary>
         /// The parallel value.
         /// </summary>
@@ -27,20 +27,11 @@ namespace PixelFarm.VectorMath
         /// of 5.0f to the orignal curve at any point.</remarks>
         public float Parallel;
 
-
         /// <summary>
         /// Gets the points of this curve.
         /// </summary>
         /// <remarks>The first point and the last points represent the anchor points.</remarks>
-        public IList<Vector2> Points
-        {
-            get
-            {
-                return points;
-            }
-        }
-
-
+        public IList<Vector2> Points => _points;
 
         /// <summary>
         /// Constructs a new <see cref="BezierCurve"/>.
@@ -50,7 +41,7 @@ namespace PixelFarm.VectorMath
         {
             if (points == null)
                 throw new ArgumentNullException("points", "Must point to a valid list of Vector2 structures.");
-            this.points = new List<Vector2>(points);
+            _points = new List<Vector2>(points);
             this.Parallel = 0.0f;
         }
 
@@ -62,7 +53,7 @@ namespace PixelFarm.VectorMath
         {
             if (points == null)
                 throw new ArgumentNullException("points", "Must point to a valid list of Vector2 structures.");
-            this.points = new List<Vector2>(points);
+            _points = new List<Vector2>(points);
             this.Parallel = 0.0f;
         }
 
@@ -76,7 +67,7 @@ namespace PixelFarm.VectorMath
             if (points == null)
                 throw new ArgumentNullException("points", "Must point to a valid list of Vector2 structures.");
             this.Parallel = parallel;
-            this.points = new List<Vector2>(points);
+            _points = new List<Vector2>(points);
         }
 
         /// <summary>
@@ -89,7 +80,7 @@ namespace PixelFarm.VectorMath
             if (points == null)
                 throw new ArgumentNullException("points", "Must point to a valid list of Vector2 structures.");
             this.Parallel = parallel;
-            this.points = new List<Vector2>(points);
+            _points = new List<Vector2>(points);
         }
 
 
@@ -102,7 +93,7 @@ namespace PixelFarm.VectorMath
         /// <returns>Resulting point.</returns>
         public Vector2 CalculatePoint(float t)
         {
-            return BezierCurve.CalculatePoint(points, t, Parallel);
+            return BezierCurve.CalculatePoint(_points, t, Parallel);
         }
 
         /// <summary>
@@ -114,7 +105,7 @@ namespace PixelFarm.VectorMath
         /// value gets smaller.</remarks>
         public float CalculateLength(float precision)
         {
-            return BezierCurve.CalculateLength(points, precision, Parallel);
+            return BezierCurve.CalculateLength(_points, precision, Parallel);
         }
 
 

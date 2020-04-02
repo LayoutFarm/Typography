@@ -71,7 +71,7 @@ namespace PixelFarm.Drawing
         //
         public abstract double StrokeWidth { get; set; }
         public abstract SmoothingMode SmoothingMode { get; set; }
-        public abstract bool UseSubPixelLcdEffect { get; set; }
+        public abstract bool UseLcdEffectSubPixelRendering { get; set; }
         public abstract float FillOpacity { get; set; }
         public abstract Color FillColor { get; set; }
         public abstract Color StrokeColor { get; set; }
@@ -87,7 +87,7 @@ namespace PixelFarm.Drawing
         //
         public abstract void Clear(Color color);
         public abstract RenderSurfaceOriginKind Orientation { get; set; }
-        public abstract void DrawLine(double x1, double y1, double x2, double y2);
+        public abstract void DrawLine(double x0, double y0, double x1, double y1);
         // 
         public abstract void DrawRect(double left, double top, double width, double height);
         public abstract void FillRect(double left, double top, double width, double height);
@@ -99,14 +99,14 @@ namespace PixelFarm.Drawing
         /// <summary>
         /// draw image, not scale
         /// </summary>
-        /// <param name="actualImage"></param>
+        /// <param name="img"></param>
         /// <param name="left"></param>
         /// <param name="top"></param>
-        public abstract void DrawImage(Image actualImage, double left, double top);
-        public abstract void DrawImage(Image actualImage, double left, double top, int srcX, int srcY, int srcW, int srcH);
-        public abstract void DrawImage(Image actualImage);
-        public abstract void DrawImage(Image actualImage, in CpuBlit.VertexProcessing.AffineMat mat);
-        public abstract void DrawImage(Image actualImage, double left, double top, CpuBlit.VertexProcessing.ICoordTransformer coordTx);
+        public abstract void DrawImage(Image img, double left, double top);
+        public abstract void DrawImage(Image img, double left, double top, int srcLeft, int srcTop, int srcW, int srcH);
+        public abstract void DrawImage(Image img);
+        public abstract void DrawImage(Image img, in CpuBlit.VertexProcessing.AffineMat mat);
+        public abstract void DrawImage(Image img, double left, double top, CpuBlit.VertexProcessing.ICoordTransformer coordTx);
 
         public abstract void ApplyFilter(IImageFilter imgFilter);
         ////////////////////////////////////////////////////////////////////////////

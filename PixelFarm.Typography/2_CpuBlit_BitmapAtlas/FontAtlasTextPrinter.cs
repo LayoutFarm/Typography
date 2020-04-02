@@ -116,7 +116,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             }
         }
 
-        public TextBaseline TextBaseline { get; set; }
+        //public TextBaseline TextBaseline { get; set; }
 
         void SetupMaskPixelBlender(int width, int height)
         {
@@ -216,7 +216,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             _painter.DestBitmapBlender.OutputPixelBlender = _maskPixelBlenderPerCompo; //change to new blender  
 
             //bool fillGlyphByGlyph = true;
-            bool painterUseSubPixelLcdEffect = _painter.UseSubPixelLcdEffect;
+            bool painterUseSubPixelLcdEffect = _painter.UseLcdEffectSubPixelRendering;
 
 
             //since glyphs may overlap each other
@@ -268,7 +268,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                 //_alphaBmp.SaveImage("alpha_0.png");
 #endif
 
-                _painter.UseSubPixelLcdEffect = false; //***
+                _painter.UseLcdEffectSubPixelRendering = false; //***
 
                 switch (aaTech)
                 {
@@ -307,7 +307,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             }
 
 
-            _painter.UseSubPixelLcdEffect = painterUseSubPixelLcdEffect; //restore
+            _painter.UseLcdEffectSubPixelRendering = painterUseSubPixelLcdEffect; //restore
             //
             _painter.DestBitmapBlender.OutputPixelBlender = prevPxBlender;//restore back
 

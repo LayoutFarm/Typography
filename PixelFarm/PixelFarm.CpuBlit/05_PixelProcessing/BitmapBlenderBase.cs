@@ -542,7 +542,7 @@ namespace PixelFarm.CpuBlit.PixelProcessing
         
         public void BlendSolidHSpan(int x, int y, int len, Color sourceColor, byte[] covers, int coversIndex)
         {
-            int colorAlpha = sourceColor.alpha;
+            int colorAlpha = sourceColor.A;
             if (colorAlpha != 0)
             {
                 Imaging.TempMemPtr buffer = this.GetBufferPtr();
@@ -581,7 +581,7 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                     {
                         //TODO: review here again
                         Color newcolor = sourceColor.NewFromChangeCoverage(covers[coversIndex++]);
-                        if (newcolor.alpha == BASE_MASK)
+                        if (newcolor.A == BASE_MASK)
                         {
                             _outputPxBlender.CopyPixel(dst, bufferOffset32, newcolor);
                         }
