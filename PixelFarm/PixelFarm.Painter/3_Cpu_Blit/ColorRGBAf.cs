@@ -47,22 +47,14 @@ namespace PixelFarm.CpuBlit
         public float green;
         public float blue;
         public float alpha;
-        public int Red0To255
-        {
-            get { return AggMath.uround_f(red * (float)BASE_MASK); }
-        }
-        public int Green0To255
-        {
-            get { return AggMath.uround_f(green * (float)BASE_MASK); }
-        }
-        public int Blue0To255
-        {
-            get { return AggMath.uround_f(blue * (float)BASE_MASK); }
-        }
-        public int Alpha0To255
-        {
-            get { return AggMath.uround_f(alpha * (float)BASE_MASK); }
-        }
+
+        public int Red0To255 => AggMath.uround_f(red * BASE_MASK);
+
+        public int Green0To255 => AggMath.uround_f(green * BASE_MASK);
+
+        public int Blue0To255 => AggMath.uround_f(blue * BASE_MASK);
+
+        public int Alpha0To255 => AggMath.uround_f(alpha * BASE_MASK);
 
         public float Red0To1 => red;
         public float Green0To1 => green;

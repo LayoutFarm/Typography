@@ -88,7 +88,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                         w = (int)Math.Ceiling(bounds2.Right);
                     }
                     // 
-                    painter.UseSubPixelLcdEffect = true;
+                    painter.UseLcdEffectSubPixelRendering = true;
                     //we use white glyph on black bg for this texture                
 
 
@@ -118,7 +118,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                     glyphVxs.TranslateToNewVxs(dx, dy, vxs2);
                     glyphVxs = vxs2;
 
-                    painter.UseSubPixelLcdEffect = false;
+                    painter.UseLcdEffectSubPixelRendering = false;
 
                     if (TextureKind == TextureKind.StencilGreyScale)
                     {

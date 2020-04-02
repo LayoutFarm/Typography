@@ -69,7 +69,7 @@ namespace PixelFarm.CpuBlit
             }
         }
 
-        public override bool UseSubPixelLcdEffect
+        public override bool UseLcdEffectSubPixelRendering
         {
             get => _aggsx.UseSubPixelLcdEffect;
             set => _aggsx.UseSubPixelLcdEffect = value;

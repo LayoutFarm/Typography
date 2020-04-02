@@ -211,15 +211,16 @@ namespace PixelFarm.CpuBlit
     public sealed class MemBitmap : Image, IBitmapSrc
     {
 
-        int _width;
-        int _height;
+        readonly int _width;
+        readonly int _height;
 
-        int _strideBytes;
-        int _bitDepth;
-        CpuBlit.Imaging.PixelFormat _pixelFormat;
+        readonly int _strideBytes;
+        readonly int _bitDepth;
+        readonly CpuBlit.Imaging.PixelFormat _pixelFormat;
+        readonly bool _pixelBufferFromExternalSrc;
+
         IntPtr _pixelBuffer;
         int _pixelBufferInBytes;
-        bool _pixelBufferFromExternalSrc;
         bool _isDisposed;
 
 #if DEBUG
@@ -546,10 +547,16 @@ namespace PixelFarm.CpuBlit
         public static MemBitmap CopyImgBuffer(this MemBitmap src, int srcX, int srcY, int srcW, int srcH)
         {
             //simple copy
+
+#if DEBUG
             Rectangle orgSourceRect = new Rectangle(0, 0, src.Width, src.Height);
             Rectangle requestRect = new Rectangle(srcX, srcY, srcW, srcH);
-            Rectangle toCopyRect = Rectangle.Intersect(new Rectangle(0, 0, src.Width, src.Height),
-                                   new Rectangle(srcX, srcY, srcW, srcH));
+#endif
+
+            Rectangle toCopyRect = Rectangle.Intersect(
+                                   new Rectangle(0, 0, src.Width, src.Height),//orgSourceRect
+                                   new Rectangle(srcX, srcY, srcW, srcH));//reqstRect
+
             if (toCopyRect.Width == 0 || toCopyRect.Height == 0)
             {
                 return null;
@@ -684,7 +691,7 @@ namespace PixelFarm.CpuBlit
                     //#endif
 
                     //ARGB
-                    uint colorARGB = (uint)((color.alpha << CO.A_SHIFT) | ((color.red << CO.R_SHIFT) | (color.green << CO.G_SHIFT) | color.blue << CO.B_SHIFT));
+                    uint colorARGB = (uint)((color.A << CO.A_SHIFT) | ((color.R << CO.R_SHIFT) | (color.B << CO.G_SHIFT) | color.B << CO.B_SHIFT));
                     int n = len32;
                     unsafe
                     {
@@ -1017,7 +1024,7 @@ namespace PixelFarm.CpuBlit
         {
             return DefaultMemBitmapIO.ScaleImage(bmp, x_scale, y_scale);
         }
-       
+
 
         public static void SaveImage(this MemBitmap source, string filename, MemBitmapIO.OutputImageFormat outputFormat = MemBitmapIO.OutputImageFormat.Default, object saveParameters = null)
         {

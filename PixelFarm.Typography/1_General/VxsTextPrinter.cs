@@ -282,10 +282,10 @@ namespace PixelFarm.Drawing
             {
                 if (!hasColorGlyphs)
                 {
-                    bool savedUseLcdMode = _painter.UseSubPixelLcdEffect; //save,restore later
+                    bool savedUseLcdMode = _painter.UseLcdEffectSubPixelRendering; //save,restore later
                     RenderQuality savedRederQuality = _painter.RenderQuality;
                     _painter.RenderQuality = RenderQuality.HighQuality;
-                    _painter.UseSubPixelLcdEffect = true;
+                    _painter.UseLcdEffectSubPixelRendering = true;
 
                     int seqLen = seq.Count;
 
@@ -303,7 +303,7 @@ namespace PixelFarm.Drawing
 
                     //restore
                     _painter.RenderQuality = savedRederQuality;
-                    _painter.UseSubPixelLcdEffect = savedUseLcdMode;
+                    _painter.UseLcdEffectSubPixelRendering = savedUseLcdMode;
 
                 }
                 else
