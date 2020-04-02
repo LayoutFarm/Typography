@@ -112,12 +112,12 @@ namespace PixelFarm.CpuBlit
         /// <summary>
         /// draw line
         /// </summary>
+        /// <param name="x0"></param>
+        /// <param name="y0"></param>
         /// <param name="x1"></param>
         /// <param name="y1"></param>
-        /// <param name="x2"></param>
-        /// <param name="y2"></param>
         /// <param name="color"></param>
-        public override void DrawLine(double x1, double y1, double x2, double y2)
+        public override void DrawLine(double x0, double y0, double x1, double y1)
         {
             //BitmapExt
             if (this.RenderQuality == RenderQuality.Fast)
@@ -142,15 +142,15 @@ namespace PixelFarm.CpuBlit
                 if (_orientation == RenderSurfaceOriginKind.LeftBottom)
                 {
                     //as original 
-                    pw.MoveTo(x1, y1);
-                    pw.LineTo(x2, y2);
+                    pw.MoveTo(x0, y0);
+                    pw.LineTo(x1, y1);
                 }
                 else
                 {
                     //left-top
                     int h = this.Height;
-                    pw.MoveTo(x1, h - y1);
-                    pw.LineTo(x2, h - y2);
+                    pw.MoveTo(x0, h - y0);
+                    pw.LineTo(x1, h - y1);
                 }
                 //----------------------------------------------------------
                 if (_lineRenderingTech == LineRenderingTechnique.StrokeVxsGenerator)

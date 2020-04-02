@@ -879,7 +879,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
 
         static bool is_equal_eps(double v1, double v2) => Math.Abs(v1 - v2) <= (EPSILON);
 
-
+      
         // Check to see if two matrices are equal
         //public bool is_equal(Affine m, double epsilon)
         //{

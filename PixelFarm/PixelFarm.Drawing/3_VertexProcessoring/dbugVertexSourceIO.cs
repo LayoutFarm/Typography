@@ -72,10 +72,10 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             for (int i = 0; i < len; ++i)
             {
                 Color color = colors[i];
-                writer.Write(color.red);
-                writer.Write(color.green);
-                writer.Write(color.blue);
-                writer.Write(color.alpha);
+                writer.Write((byte)color.R);
+                writer.Write((byte)color.G);
+                writer.Write((byte)color.B);
+                writer.Write((byte)color.A);
             }
             writer.Write((int)0);
             writer.Flush();

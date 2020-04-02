@@ -125,10 +125,10 @@ namespace PixelFarm.PathReconstruction
             _fillColor = fillColor;
 
             _fillColorInt32 =
-                (_fillColor.red << CO.R_SHIFT) |
-                (_fillColor.green << CO.G_SHIFT) |
-                (_fillColor.blue << CO.B_SHIFT) |
-                (_fillColor.alpha << CO.A_SHIFT);
+                (_fillColor.R << CO.R_SHIFT) |
+                (_fillColor.G << CO.G_SHIFT) |
+                (_fillColor.B << CO.B_SHIFT) |
+                (_fillColor.A << CO.A_SHIFT);
 
             _pixEval = new FillBmp32PixelEvaluatorWithTolerance(_fillColorInt32, tolerance);
 

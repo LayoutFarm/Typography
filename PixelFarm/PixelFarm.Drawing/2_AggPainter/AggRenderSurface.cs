@@ -31,9 +31,11 @@ namespace PixelFarm.CpuBlit
     public sealed partial class AggRenderSurface
     {
         MemBitmap _destBmp;
-        ScanlineRasterizer _sclineRas;
-        MyBitmapBlender _destBitmapBlender;
-        ScanlinePacked8 _sclinePack8;
+      
+        readonly ScanlinePacked8 _sclinePack8;
+        readonly ScanlineRasterizer _sclineRas;
+
+        MyBitmapBlender _destBitmapBlender; 
         PixelBlenderBGRA _pixelBlenderBGRA;
         DestBitmapRasterizer _bmpRasterizer;
 
