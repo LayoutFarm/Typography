@@ -113,7 +113,7 @@ namespace SampleWinForms.UI
 
             PixelFarm.Drawing.VertexStore vxs = new PixelFarm.Drawing.VertexStore();
             txToVxs1.WriteOutput(vxs);
-            _painter.UseSubPixelLcdEffect = this.UseLcdTechnique;
+            _painter.UseLcdEffectSubPixelRendering = this.UseLcdTechnique;
             //5. use PixelFarm's Agg to render to bitmap...
             //5.1 clear background
             _painter.Clear(PixelFarm.Drawing.Color.White);

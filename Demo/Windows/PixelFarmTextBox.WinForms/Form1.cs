@@ -119,7 +119,7 @@ namespace PixelFarmTextBox.WinForms
                     {
                         //clear previous draw
                         painter.Clear(PixelFarm.Drawing.Color.White);
-                        painter.UseSubPixelLcdEffect = false;
+                        painter.UseLcdEffectSubPixelRendering = false;
                         painter.FillColor = PixelFarm.Drawing.Color.Black;
 
                         selectedTextPrinter = _devVxsTextPrinter;
@@ -176,9 +176,9 @@ namespace PixelFarmTextBox.WinForms
             //-------------
             //pre-render
             painter.Clear(PixelFarm.Drawing.Color.White);
-            painter.UseSubPixelLcdEffect = false;
+            painter.UseLcdEffectSubPixelRendering = false;
             painter.FillColor = PixelFarm.Drawing.Color.Black;
-
+            
             //
             //render eachline with painter
             List<EditableTextLine> textlines = editableTextBlockLayoutEngine.UnsafeGetEditableTextLine();

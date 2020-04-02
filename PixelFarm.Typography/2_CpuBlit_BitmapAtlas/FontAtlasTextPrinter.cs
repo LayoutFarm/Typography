@@ -116,7 +116,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             }
         }
 
-        public TextBaseline TextBaseline { get; set; }
+        //public TextBaseline TextBaseline { get; set; }
 
         void SetupMaskPixelBlender(int width, int height)
         {
