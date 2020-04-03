@@ -231,11 +231,11 @@ namespace PixelFarm.CpuBlit
             _orgList = new LinearGradientPair[pairCount];
             _pairList = new LinearGradientPair[_orgList.Length];
 
-            ColorStop c0 = ColorStop.Empty;
+
             ColorStop c1 = ColorStop.Empty;
             for (int i = 0; i < pairCount; ++i)
             {
-                c0 = colorStops[i];
+                ColorStop c0 = colorStops[i];
                 c1 = colorStops[i + 1];
 
                 var pairN = new LinearGradientPair(
@@ -341,7 +341,7 @@ namespace PixelFarm.CpuBlit
             outputColors[len - 1] = Color.Transparent;
         }
     }
-  
+
     class PolygonGradientBrush
     {
 
@@ -355,11 +355,14 @@ namespace PixelFarm.CpuBlit
         List<VertexStore> _cacheVxsList = new List<VertexStore>();
         List<GouraudVerticeBuilder.CoordAndColor> _cacheColorAndVertexList = new List<GouraudVerticeBuilder.CoordAndColor>();
 
+    
+
         public PolygonGradientBrush()
         {
             this.DilationValue = 0.175f;
             this.LinearGamma = 0.809f;
         }
+        
         public float[] GetXYCoords() => _xyCoords;
         public Color[] GetColors() => _colors;
         public void BuildFrom(Drawing.PolygonGradientBrush polygonGrBrush)

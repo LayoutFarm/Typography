@@ -105,7 +105,7 @@ namespace PixelFarm.Drawing
         public abstract void DrawImage(Image img, double left, double top);
         public abstract void DrawImage(Image img, double left, double top, int srcLeft, int srcTop, int srcW, int srcH);
         public abstract void DrawImage(Image img);
-        public abstract void DrawImage(Image img, in CpuBlit.VertexProcessing.AffineMat mat);
+        public abstract void DrawImage(Image img, in AffineMat mat);
         public abstract void DrawImage(Image img, double left, double top, CpuBlit.VertexProcessing.ICoordTransformer coordTx);
 
         public abstract void ApplyFilter(IImageFilter imgFilter);

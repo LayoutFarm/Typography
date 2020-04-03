@@ -37,7 +37,7 @@ namespace PixelFarm.Drawing
             //Affine aff = Affine.New(AffinePlan.Translate(-centerX, -centerY),
             //     AffinePlan.Scale(1, -1),//flipY,
             //     AffinePlan.Translate(centerX, centerY));
-            AffineMat aff = AffineMat.Iden;
+            AffineMat aff = AffineMat.Iden();
             aff.Translate(-centerX, -centerY);
             aff.Translate(1, -1);//flipY
             aff.Translate(centerX, centerY);
@@ -70,9 +70,7 @@ namespace PixelFarm.Drawing
         public static VertexStore ScaleToNewVxs(this VertexStore src, double s, VertexStore outputVxs)
         {
 
-            AffineMat mat = AffineMat.Iden;
-            mat.Scale(s, s);
-            return mat.TransformToVxs(src, outputVxs);
+            return AffineMat.GetScaleMat(s, s).TransformToVxs(src, outputVxs);
 
             //TODO: review here
             //use struct
@@ -81,10 +79,7 @@ namespace PixelFarm.Drawing
         }
         public static VertexStore ScaleToNewVxs(this VertexStore src, double sx, double sy, VertexStore outputVxs)
         {
-            AffineMat mat = AffineMat.Iden;
-            mat.Scale(sx, sy);
-            return mat.TransformToVxs(src, outputVxs);
-
+            return AffineMat.GetScaleMat(sx, sy).TransformToVxs(src, outputVxs);
             ////TODO: review here, use struct mat
             //Affine aff = Affine.NewScaling(sx, sy);
             //return aff.TransformToVxs(src, outputVxs);
@@ -92,20 +87,15 @@ namespace PixelFarm.Drawing
 
         public static VertexStore RotateDegToNewVxs(this VertexStore src, double deg, VertexStore outputVxs)
         {
-            AffineMat mat = AffineMat.Iden;
-            mat.RotateDeg(deg);
-            return mat.TransformToVxs(src, outputVxs);
+            return AffineMat.GetRotateDegMat(deg).TransformToVxs(src, outputVxs);
 
             //TODO: review here, use struct mat
             //Affine aff = Affine.NewRotationDeg(deg);
             //return aff.TransformToVxs(src, outputVxs);
         }
         public static VertexStore RotateRadToNewVxs(this VertexStore src, double rad, VertexStore outputVxs)
-        {
-
-            AffineMat mat = AffineMat.Iden;
-            mat.Rotate(rad);
-            return mat.TransformToVxs(src, outputVxs);
+        {             
+            return AffineMat.GetRotateMat(rad).TransformToVxs(src, outputVxs);
             //Affine aff = Affine.NewRotation(rad);
             //return aff.TransformToVxs(src, outputVxs);
         }

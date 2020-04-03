@@ -281,7 +281,6 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         public Affine() { }
 
 
-
         public float[] Get3x3MatrixElements() => _elems.Get3x3MatrixElements();
         ICoordTransformer ICoordTransformer.CreateInvert() => CreateInvert();
         public ICoordTransformer MultiplyWith(ICoordTransformer another)
@@ -301,17 +300,23 @@ namespace PixelFarm.CpuBlit.VertexProcessing
 
             }
         }
-        public double m11 => _elems.sx;
-        public double m12 => _elems.shy;
-        public double m21 => _elems.shx;
-        public double m22 => _elems.sy;
-        public double dx => _elems.tx;
-        public double dy => _elems.ty;
 
         //-----------------------------------------
+        /// <summary>
+        /// m11
+        /// </summary>
         public double sx => _elems.sx;
+        /// <summary>
+        /// m12
+        /// </summary>
         public double shy => _elems.shy;
+        /// <summary>
+        /// m21
+        /// </summary>
         public double shx => _elems.shx;
+        /// <summary>
+        /// m22
+        /// </summary>
         public double sy => _elems.sy;
         public double tx => _elems.tx;
         public double ty => _elems.ty;
@@ -382,19 +387,15 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         }
         public static Affine NewRotation(double angRad, double rotationCenterX, double rotationCenterY)
         {
-            AffineMat mat = AffineMat.Iden;
-            mat.Rotate(angRad, rotationCenterX, rotationCenterY);
-            return new Affine(mat);
+            return new Affine(AffineMat.GetRotateMat(angRad, rotationCenterX, rotationCenterY));
         }
         public static Affine NewRotationDeg(double degree)
         {
             return NewRotation(degree * (Math.PI / 180d));
         }
         public static Affine NewRotationDeg(double degree, double rotationCenterX, double rotationCenterY)
-        {
-            AffineMat mat = AffineMat.Iden;
-            mat.RotateDeg(degree, rotationCenterX, rotationCenterY);
-            return new Affine(mat);
+        { 
+            return new Affine(AffineMat.GetRotateDegMat(degree, rotationCenterX, rotationCenterY));
         }
         //====================================================trans_affine_scaling
         // Scaling matrix. x, y - scale coefficients by X and Y respectively
@@ -879,7 +880,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
 
         static bool is_equal_eps(double v1, double v2) => Math.Abs(v1 - v2) <= (EPSILON);
 
-      
+
         // Check to see if two matrices are equal
         //public bool is_equal(Affine m, double epsilon)
         //{

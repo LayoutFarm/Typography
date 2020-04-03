@@ -71,7 +71,8 @@ namespace Typography.Contours
 
         static GlyphMeshStore()
         {
-            s_flipY =AffineMat.Iden();
+            
+            s_flipY = AffineMat.Iden();
             s_flipY.Scale(1, -1);
             //
             s_slantHorizontal = AffineMat.Iden();

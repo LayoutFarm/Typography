@@ -517,7 +517,7 @@ namespace PaintLab.Svg
                         //create local-transformation matrix
                         pathMarkers.StartMarkerPos = new PointF(p0.X, p0.Y);
 
-                        AffineMat mat = AffineMat.Iden;
+                        AffineMat mat = AffineMat.Iden();
                         mat.Translate(-markerSpec.RefX.Number, -markerSpec.RefY.Number); //move to the ref point
                         mat.Rotate(rotateRad);
 
@@ -543,7 +543,7 @@ namespace PaintLab.Svg
                         //create local-transformation matrix
                         pathMarkers.EndMarkerPos = new PointF(p1.X, p1.Y);
 
-                        AffineMat mat = AffineMat.Iden;
+                        AffineMat mat = AffineMat.Iden();
                         mat.Translate(-markerSpec.RefX.Number, -markerSpec.RefY.Number); //move to the ref point
                         mat.Rotate(rotateRad); 
                         pathMarkers.EndMarkerAffine = new Affine(mat);
