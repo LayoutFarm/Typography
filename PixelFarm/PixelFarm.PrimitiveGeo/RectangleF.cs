@@ -33,7 +33,7 @@ namespace PixelFarm.Drawing
 {
     public struct RectangleF
     {
-        float _x, _y, _width, _height;
+        float _left, _top, _width, _height;
         /// <summary>
         ///	Empty Shared Field
         /// </summary>
@@ -68,7 +68,7 @@ namespace PixelFarm.Drawing
 
         public static RectangleF Inflate(in RectangleF rect, float x, float y)
         {
-            RectangleF ir = new RectangleF(rect.X, rect.Y, rect.Width, rect.Height);
+            RectangleF ir = new RectangleF(rect._left, rect.Top, rect.Width, rect.Height);
             ir.Inflate(x, y);
             return ir;
         }
@@ -84,7 +84,7 @@ namespace PixelFarm.Drawing
         public void Inflate(float x, float y)
         {
             Inflate(new SizeF(x, y));
-        }        
+        }
 
         /// <summary>
         ///	Inflate Method
@@ -96,8 +96,8 @@ namespace PixelFarm.Drawing
 
         public void Inflate(SizeF size)
         {
-            _x -= size.Width;
-            _y -= size.Height;
+            _left -= size.Width;
+            _top -= size.Height;
             _width += size.Width * 2;
             _height += size.Height * 2;
         }
@@ -167,7 +167,7 @@ namespace PixelFarm.Drawing
 
         public static bool operator ==(in RectangleF left, in RectangleF right)
         {
-            return (left.X == right.X) && (left.Y == right.Y) &&
+            return (left.Left == right.Left) && (left.Top == right.Top) &&
                                 (left.Width == right.Width) && (left.Height == right.Height);
         }
 
@@ -183,7 +183,7 @@ namespace PixelFarm.Drawing
 
         public static bool operator !=(in RectangleF left, in RectangleF right)
         {
-            return (left.X != right.X) || (left.Y != right.Y) ||
+            return (left.Left != right.Left) || (left.Top != right.Top) ||
                                 (left.Width != right.Width) || (left.Height != right.Height);
         }
 
@@ -215,8 +215,8 @@ namespace PixelFarm.Drawing
 
         public RectangleF(PointF location, SizeF size)
         {
-            _x = location.X;
-            _y = location.Y;
+            _left = location.X;
+            _top = location.Y;
             _width = size.Width;
             _height = size.Height;
         }
@@ -232,8 +232,8 @@ namespace PixelFarm.Drawing
 
         public RectangleF(float x, float y, float width, float height)
         {
-            _x = x;
-            _y = y;
+            _left = x;
+            _top = y;
             _width = width;
             _height = height;
         }
@@ -246,7 +246,7 @@ namespace PixelFarm.Drawing
         ///	Read only.
         /// </remarks> 
 
-        public float Bottom => Y + Height;
+        public float Bottom => _top + Height;
 
 
 
@@ -287,7 +287,7 @@ namespace PixelFarm.Drawing
         /// </remarks>
 
 
-        public float Left => X;
+        public float Left => _left;
 
         /// <summary>
         ///	Location Property
@@ -299,12 +299,12 @@ namespace PixelFarm.Drawing
 
         public PointF Location
         {
-            get => new PointF(_x, _y);
+            get => new PointF(_left, _top);
 
             set
             {
-                _x = value.X;
-                _y = value.Y;
+                _left = value.X;
+                _top = value.Y;
             }
         }
 
@@ -316,7 +316,7 @@ namespace PixelFarm.Drawing
         ///	The X coordinate of the right edge of the RectangleF.
         ///	Read only.
         /// </remarks>
-        public float Right => X + Width;
+        public float Right => _left + Width;
 
         /// <summary>
         ///	Size Property
@@ -344,7 +344,7 @@ namespace PixelFarm.Drawing
         ///	The Y coordinate of the top edge of the RectangleF.
         ///	Read only.
         /// </remarks>
-        public float Top => Y;
+        public float Top => _top;
 
 
 
@@ -364,37 +364,37 @@ namespace PixelFarm.Drawing
 
         }
 
-        /// <summary>
-        ///	X Property
-        /// </summary>
-        ///
-        /// <remarks>
-        ///	The X coordinate of the RectangleF.
-        /// </remarks>
+        ///// <summary>
+        /////	X Property
+        ///// </summary>
+        /////
+        ///// <remarks>
+        /////	The X coordinate of the RectangleF.
+        ///// </remarks>
 
-        public float X
-        {
-            get => _x;
+        //public float X
+        //{
+        //    get => _left;
 
-            set => _x = value;
+        //    set => _left = value;
 
-        }
+        //}
 
-        /// <summary>
-        ///	Y Property
-        /// </summary>
-        ///
-        /// <remarks>
-        ///	The Y coordinate of the RectangleF.
-        /// </remarks>
+        ///// <summary>
+        /////	Y Property
+        ///// </summary>
+        /////
+        ///// <remarks>
+        /////	The Y coordinate of the RectangleF.
+        ///// </remarks>
 
-        public float Y
-        {
-            get => _y;
+        //public float Y
+        //{
+        //    get => _top;
 
-            set => _y = value;
+        //    set => _top = value;
 
-        }
+        //}
 
         /// <summary>
         ///	Contains Method
@@ -434,7 +434,7 @@ namespace PixelFarm.Drawing
 
         public bool Contains(in RectangleF rect)
         {
-            return X <= rect.X && Right >= rect.Right && Y <= rect.Y && Bottom >= rect.Bottom;
+            return _left <= rect._left && Right >= rect.Right && _top <= rect._top && Bottom >= rect.Bottom;
         }
 
         /// <summary>
@@ -459,7 +459,7 @@ namespace PixelFarm.Drawing
         {
             //TODO: review here !!!!
             //return (int)(_x + _y + _width + _height);
-            return (int)(_height + _width) ^ (int)(_x + _y);
+            return (int)(_height + _width) ^ (int)(_left + _top);
         }
 
         /// <summary>
@@ -490,10 +490,10 @@ namespace PixelFarm.Drawing
         ///	Moves the RectangleF a specified distance.
         /// </remarks>
 
-        public void Offset(float x, float y)
+        public void Offset(float dx, float dy)
         {
-            X += x;
-            Y += y;
+            _left += dx;
+            _top += dy;
         }
 
         /// <summary>
@@ -520,9 +520,9 @@ namespace PixelFarm.Drawing
         public override string ToString()
         {
             return String.Format("{{X={0},Y={1},Width={2},Height={3}}}",
-                         _x, _y, _width, _height);
+                         _left, _top, _width, _height);
         }
 
-        public RectangleF CreateNormalizedRect(float totalW, float totalH) => new RectangleF(_x / totalW, _y / totalH, _width / totalW, _height / totalH);
+        public RectangleF CreateNormalizedRect(float totalW, float totalH) => new RectangleF(_left / totalW, _top / totalH, _width / totalW, _height / totalH);
     }
 }
