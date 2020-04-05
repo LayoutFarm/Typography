@@ -64,18 +64,19 @@ namespace Typography.Contours
 
         GlyphTranslatorToVxs _tovxs = new GlyphTranslatorToVxs();
 
-        static readonly PixelFarm.CpuBlit.VertexProcessing.AffineMat s_flipY;
+        static readonly AffineMat s_flipY;
 
         //shearing horizontal axis to right side, 20 degree, TODO: user can configure this value
-        static readonly PixelFarm.CpuBlit.VertexProcessing.AffineMat s_slantHorizontal;
+        static readonly AffineMat s_slantHorizontal;
 
         static GlyphMeshStore()
         {
-            s_flipY = PixelFarm.CpuBlit.VertexProcessing.AffineMat.Iden;
+            
+            s_flipY = AffineMat.Iden();
             s_flipY.Scale(1, -1);
             //
-            s_slantHorizontal = PixelFarm.CpuBlit.VertexProcessing.AffineMat.Iden;
-            s_slantHorizontal.Skew(PixelFarm.CpuBlit.AggMath.deg2rad(-15), 0);
+            s_slantHorizontal = AffineMat.Iden();
+            s_slantHorizontal.Skew(AggMath.deg2rad(-15), 0);
         }
         public GlyphMeshStore()
         {

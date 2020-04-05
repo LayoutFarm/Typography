@@ -560,9 +560,6 @@
     <Compile Include="..\PixelFarm.Vectors\6_Contours\PartFlattener.cs">
       <Link>0_REF_Painter\1_Vectors\6_Contours\PartFlattener.cs</Link>
     </Compile>
-    <Compile Include="..\PixelFarm.Vectors\6_Contours\Rect.cs">
-      <Link>0_REF_Painter\1_Vectors\6_Contours\Rect.cs</Link>
-    </Compile>
     <Compile Include="..\PixelFarm.Vectors\6_Contours\Vertex.cs">
       <Link>0_REF_Painter\1_Vectors\6_Contours\Vertex.cs</Link>
     </Compile>

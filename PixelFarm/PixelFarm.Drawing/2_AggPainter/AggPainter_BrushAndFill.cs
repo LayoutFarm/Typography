@@ -147,8 +147,14 @@ namespace PixelFarm.CpuBlit
                             FillWithPolygonGraidentBrush(vxs, (Drawing.PolygonGradientBrush)br);
                         }
                         break;
+                    case BrushKind.Solid:
+                        {
+                            _aggsx.Render(vxs, ((SolidBrush)_curBrush).Color);
+                        }
+                        break;
                     default:
                         {
+
                             _aggsx.Render(vxs, _fillColor);
                         }
                         break;
@@ -167,13 +173,6 @@ namespace PixelFarm.CpuBlit
             if (_tessTool == null) { _tessTool = new TessTool(); }
             if (_gouraudVertBuilder == null) { _gouraudVertBuilder = new GouraudVerticeBuilder(); }
 
-            if (!(polygonGrBrush.InnerBrush is RGBAGouraudSpanGen))
-            {
-                polygonGrBrush.InnerBrush = new RGBAGouraudSpanGen();
-            }
-
-
-            //
             brush = new PolygonGradientBrush();
             brush.BuildFrom(polygonGrBrush);
 
@@ -190,6 +189,7 @@ namespace PixelFarm.CpuBlit
             return brush;
         }
 
+        RGBAGouraudSpanGen _rgbaGourandSpanGen = new RGBAGouraudSpanGen();
         void FillWithPolygonGraidentBrush(VertexStore vxs, Drawing.PolygonGradientBrush polygonGrBrush)
         {
             //we use mask technique (simlar to texture brush) 
@@ -198,16 +198,15 @@ namespace PixelFarm.CpuBlit
             SetClipRgn(vxs);
 
             PolygonGradientBrush brush = ResolvePolygonGradientBrush(polygonGrBrush);
-            RGBAGouraudSpanGen spanGen = polygonGrBrush.InnerBrush as RGBAGouraudSpanGen;
-
+          
             //TODO: add gamma here...
             //aggsx.ScanlineRasterizer.ResetGamma(new GammaLinear(0.0f, this.LinearGamma)); //*** 
 
             int partCount = brush.CachePartCount;
             for (int i = 0; i < partCount; i++)
             {
-                brush.SetSpanGenWithCurrentValues(i, spanGen); //*** this affects assoc gouraudSpanGen
-                this.Fill(brush.CurrentVxs, spanGen);
+                brush.SetSpanGenWithCurrentValues(i, _rgbaGourandSpanGen); //*** this affects assoc gouraudSpanGen
+                this.Fill(brush.CurrentVxs, _rgbaGourandSpanGen);
             }
 
             SetClipRgn(null);
@@ -237,10 +236,8 @@ namespace PixelFarm.CpuBlit
         }
         static LinearGradientSpanGen ResolveLinearGrBrush(LinearGradientBrush linearGr)
         {
-
             //check inner object
-            LinearGradientSpanGen linearGradientSpanGen = linearGr.InnerBrush as LinearGradientSpanGen;
-            if (linearGr == null)
+            if (!(linearGr.InnerBrush is LinearGradientSpanGen linearGradientSpanGen))
             {
                 //create a new one
                 linearGradientSpanGen = new LinearGradientSpanGen();
