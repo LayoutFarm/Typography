@@ -198,10 +198,10 @@ namespace Typography.OpenFont.Tables
             //that is, a glyph is not a composite.
 
             //Type 	    Name 	                                Description
-            //uint16 	endPtsOfContours[numberOfContours] 	    Array of last points of each contour; n is the number of contours.
+            //uint16 	endPtsOfContours[numberOfContours] 	    Array of last points of each contour; 
             //uint16 	instructionLength 	                    Total number of bytes for instructions.
-            //uint8 	instructions[instructionLength] 	    Array of instructions for each glyph; n is the number of instructions.
-            //uint8 	flags[variable] 	                    Array of flags for each coordinate in outline; n is the number of flags.
+            //uint8 	instructions[instructionLength] 	    Array of instructions for each glyph;
+            //uint8 	flags[variable] 	                    Array of flags for each coordinate in outline; variable is the number of flags.
             //uint8 or int16 	xCoordinates[variable] 	        First coordinates relative to (0,0); others are relative to previous point.
             //uint8 or int16 	yCoordinates[variable] 	        First coordinates relative to (0,0); others are relative to previous point.
 
