@@ -430,10 +430,10 @@ namespace PixelFarm.Drawing
                 tx.Transform(ref _coord_xy[a++], ref _coord_xy[a++]);
             }
         }
-        private VertexStore(VertexStore src, in PixelFarm.CpuBlit.VertexProcessing.AffineMat tx)
+        private VertexStore(VertexStore src, in AffineMat tx)
         {
             //for copy from src to this instance
- 
+
             _allocated_vertices_count = src._allocated_vertices_count;
             _vertices_count = src._vertices_count;
             //
@@ -485,18 +485,12 @@ namespace PixelFarm.Drawing
         /// trim to new vertex store
         /// </summary>
         /// <returns></returns>
-        public VertexStore CreateTrim()
-        {
-            return new VertexStore(this, true);
-        }
-        public VertexStore CreateTrim(PixelFarm.CpuBlit.VertexProcessing.ICoordTransformer tx)
-        {
-            return new VertexStore(this, tx);
-        }
-        public VertexStore CreateTrim(in PixelFarm.CpuBlit.VertexProcessing.AffineMat tx)
-        {
-            return new VertexStore(this, tx);
-        }
+        public VertexStore CreateTrim() => new VertexStore(this, true);
+
+        public VertexStore CreateTrim(PixelFarm.CpuBlit.VertexProcessing.ICoordTransformer tx) => new VertexStore(this, tx);
+
+        public VertexStore CreateTrim(in AffineMat tx) => new VertexStore(this, tx);
+
     }
 
 

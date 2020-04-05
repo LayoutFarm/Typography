@@ -26,6 +26,7 @@ using PixelFarm.Drawing;
 
 namespace PixelFarm.CpuBlit.VertexProcessing
 {
+    
     public static class BoundingRect
     {
 
@@ -62,16 +63,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
 
             return rValue;
         }
-
-        public static void GetBoundingRect(double x, double y, ref RectD rect)
-        {
-            if (x < rect.Left) rect.Left = x;
-            if (y < rect.Bottom) rect.Bottom = y;
-            if (x > rect.Right) rect.Right = x;
-            if (y > rect.Top) rect.Top = y;
-        }
-
-
+         
         //-----------------------------------------------------bounding_rect_single
         //template<class VertexSource, class CoordT> 
         static bool GetBoundingRectSingle(
@@ -79,8 +71,6 @@ namespace PixelFarm.CpuBlit.VertexProcessing
           out double x1, out double y1,
           out double x2, out double y2)
         {
-            double x = 0;
-            double y = 0;
 
             x1 = double.MaxValue;
             y1 = double.MaxValue;
@@ -92,7 +82,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
 
             for (; ; )
             {
-                cmd = vxs.GetVertex(index++, out x, out y);
+                cmd = vxs.GetVertex(index++, out double x, out double y);
                 switch (cmd)
                 {
                     case VertexCmd.Close:

@@ -20,7 +20,7 @@ namespace Typography.Contours
         VertexStore _vxs = new VertexStore();
         public GlyphTranslatorToVxs()
         {
-            _pw.BindVxs(_vxs);            
+            _pw.BindVxs(_vxs);
         }
 
 #if DEBUG
@@ -32,7 +32,7 @@ namespace Typography.Contours
 #endif
         public void BeginRead(int contourCount)
         {
-            
+
             _pw.Clear();
         }
         public void EndRead()
@@ -72,10 +72,8 @@ namespace Typography.Contours
                 output.AppendVertexStore(_vxs);
             }
             else
-            {
-                AffineMat mat = AffineMat.Iden;
-                mat.Scale(scale, scale);
-                mat.TransformToVxs(_vxs, output);
+            { 
+                AffineMat.GetScaleMat(scale).TransformToVxs(_vxs, output);
             }
         }
         /// <summary>
@@ -104,8 +102,7 @@ namespace Typography.Contours
             else
             {
 
-                AffineMat mat = AffineMat.Iden;
-                mat.Scale(scale, scale);
+                AffineMat mat = AffineMat.GetScaleMat(scale);
                 curveFlattener.MakeVxs(_vxs, mat, output);
             }
         }

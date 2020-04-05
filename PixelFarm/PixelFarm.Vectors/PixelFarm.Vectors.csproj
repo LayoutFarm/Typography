@@ -199,7 +199,6 @@
     <Compile Include="6_Contours\MyMath.cs" />
     <Compile Include="6_Contours\OutlineWalker.cs" />
     <Compile Include="6_Contours\PartFlattener.cs" />
-    <Compile Include="6_Contours\Rect.cs" />
     <Compile Include="6_Contours\Vertex.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

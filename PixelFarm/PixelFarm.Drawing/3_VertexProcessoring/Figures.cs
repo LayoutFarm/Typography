@@ -145,9 +145,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         //}
 
 
-        public List<Poly2Tri.Polygon> Poly2TriPolygons { get; set; }
-
-
+        public List<Poly2Tri.Polygon> Poly2TriPolygons { get; set; } 
 
 #if DEBUG
         public override string ToString()
@@ -183,10 +181,38 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         //---------
         ushort[] _indexListArray;
 
+        PixelFarm.Drawing.RectangleF _bounds;
+        bool _hasBounds;
 
         public Figure(float[] coordXYs)
         {
             this.coordXYs = coordXYs;
+        }
+        public Figure(float[] coordXYs, PixelFarm.Drawing.RectangleF bounds)
+        {
+            this.coordXYs = coordXYs;
+            _bounds = bounds;
+            _hasBounds = true;
+        }
+        public PixelFarm.Drawing.RectangleF GetBounds()
+        {
+            if (_hasBounds)
+            {
+                return _bounds;
+            }
+            else
+            {
+                //calculate here
+                RectBoundsAccum boundsAccum = new RectBoundsAccum();
+                boundsAccum.Init(); //Must
+                for (int i = 0; i < coordXYs.Length;)
+                {
+                    boundsAccum.Update(coordXYs[i], coordXYs[i + 1]);
+                    i += 2;
+                }
+                _hasBounds = true;
+                return boundsAccum.ToRectF();
+            }
         }
         public TessTriangleTechnique TessTriangleTech { get; private set; }
         public bool IsClosedFigure { get; set; }
@@ -975,11 +1001,38 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         }
     }
 
+    public struct RectBoundsAccum
+    {
+        public double x1;
+        public double y1;
+        public double x2;
+        public double y2;
+        public void Init()
+        {
+            x1 = double.MaxValue;
+            y1 = double.MaxValue;
+            x2 = double.MinValue;
+            y2 = double.MinValue;
+        }
+        public void Update(double x, double y)
+        {
+            if (x < x1) x1 = x;
+            if (y < y1) y1 = y;
+            if (x > x2) x2 = x;
+            if (y > y2) y2 = y;
+        }
+
+        public RectangleF ToRectF()
+        {
+            return RectangleF.FromLTRB((float)x1, (float)y1, (float)x2, (float)y2);
+        }
+    }
+
     public class FigureBuilder
     {
         //helper struct
-        List<float> _xylist = new List<float>();
-        List<Figure> _figs = new List<Figure>();
+        readonly List<float> _xylist = new List<float>();
+        readonly List<Figure> _figs = new List<Figure>();
         public FigureBuilder()
         {
         }
@@ -988,8 +1041,10 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         {
             //vxs must be flatten vxs.       
 
+#if DEBUG
             double prevX = 0;
             double prevY = 0;
+#endif
             double prevMoveToX = 0;
             double prevMoveToY = 0;
 
@@ -1000,42 +1055,60 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             //result...
 
 
+            RectBoundsAccum rectBoundsAccum = new RectBoundsAccum();
+            rectBoundsAccum.Init();
+
             int index = 0;
             VertexCmd cmd;
 
-            double x, y;
-            while ((cmd = vxs.GetVertex(index++, out x, out y)) != VertexCmd.NoMore)
+            while ((cmd = vxs.GetVertex(index++, out double x, out double y)) != VertexCmd.NoMore)
             {
                 switch (cmd)
                 {
                     case PixelFarm.CpuBlit.VertexCmd.MoveTo:
+#if DEBUG
+                        prevX = x;
+                        prevY = y;
+#endif
 
-                        prevMoveToX = prevX = x;
-                        prevMoveToY = prevY = y;
+                        prevMoveToX = x;
+                        prevMoveToY = y;
                         _xylist.Add((float)x);
                         _xylist.Add((float)y);
+
+                        rectBoundsAccum.Update(x, y);
+
                         break;
                     case PixelFarm.CpuBlit.VertexCmd.LineTo:
                         _xylist.Add((float)x);
                         _xylist.Add((float)y);
+#if DEBUG
                         prevX = x;
                         prevY = y;
+#endif
+
+                        rectBoundsAccum.Update(x, y);
                         break;
                     case PixelFarm.CpuBlit.VertexCmd.Close:
                         {
                             //don't add            
                             //_xylist.Add((float)prevMoveToX);
                             //_xylist.Add((float)prevMoveToY);
-
+#if DEBUG
                             prevX = prevMoveToX;
                             prevY = prevMoveToY;
+#endif
                             //-----------
-                            Figure newfig = new Figure(_xylist.ToArray());
+
+
+                            Figure newfig = new Figure(_xylist.ToArray(), rectBoundsAccum.ToRectF());
                             newfig.IsClosedFigure = true;
 
                             _figs.Add(newfig);
                             //-----------
                             _xylist.Clear(); //clear temp list 
+
+                            rectBoundsAccum.Init();
                         }
                         break;
                     case PixelFarm.CpuBlit.VertexCmd.NoMore:
@@ -1048,17 +1121,19 @@ namespace PixelFarm.CpuBlit.VertexProcessing
 
             if (_figs.Count == 0)
             {
-                Figure newfig = new Figure(_xylist.ToArray());
+                Figure newfig = new Figure(_xylist.ToArray(), rectBoundsAccum.ToRectF());
                 newfig.IsClosedFigure = false;
                 return new FigureContainer(newfig);
             }
             //
             if (_xylist.Count > 1)
             {
+#if DEBUG
                 prevX = prevMoveToX;
                 prevY = prevMoveToY;
+#endif
                 //
-                Figure newfig = new Figure(_xylist.ToArray());
+                Figure newfig = new Figure(_xylist.ToArray(), rectBoundsAccum.ToRectF());
                 newfig.IsClosedFigure = true; //? 
                 _figs.Add(newfig);
             }

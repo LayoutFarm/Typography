@@ -554,9 +554,6 @@
     <Compile Include="..\..\PixelFarm\PixelFarm.Vectors\6_Contours\PartFlattener.cs">
       <Link>PixelFarm\PixelFarm.Vectors\6_Contours\PartFlattener.cs</Link>
     </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Vectors\6_Contours\Rect.cs">
-      <Link>PixelFarm\PixelFarm.Vectors\6_Contours\Rect.cs</Link>
-    </Compile>
     <Compile Include="..\..\PixelFarm\PixelFarm.Vectors\6_Contours\Vertex.cs">
       <Link>PixelFarm\PixelFarm.Vectors\6_Contours\Vertex.cs</Link>
     </Compile>

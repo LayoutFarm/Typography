@@ -30,9 +30,9 @@
 using System;
 
 
-namespace PixelFarm.CpuBlit.VertexProcessing
+namespace PixelFarm.CpuBlit
 {
-     
+
     /// <summary>
     /// struct version of Affine (Matrix)
     /// </summary>
@@ -209,7 +209,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
 
 
 
-        public static readonly AffineMat Iden = new AffineMat() {
+        static readonly AffineMat s_Iden = new AffineMat() {
             sx = 1,
             shy = 0,
             shx = 0,
@@ -265,7 +265,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             }
         }
 
-      
+
         static double DegToRad(double degree)
         {
             return degree * (Math.PI / 180d);
@@ -274,5 +274,55 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         {
             return degree * (180d / Math.PI);
         }
+
+        public static AffineMat Iden() => s_Iden;
+
+        //-----------------------------------------
+        //helpers
+
+        public static AffineMat GetRotateMat(double rad)
+        {
+            AffineMat mat = s_Iden;//copy
+            mat.Rotate(rad);
+            return mat;
+        }
+        public static AffineMat GetRotateDegMat(double deg)
+        {
+            AffineMat mat = s_Iden;//copy
+            mat.RotateDeg(deg);
+            return mat;
+        }
+        public static AffineMat GetRotateMat(double rad, double center_x, double center_y)
+        {
+            AffineMat mat = s_Iden;//copy
+            mat.Rotate(rad, center_x, center_y);
+            return mat;
+        }
+        public static AffineMat GetRotateDegMat(double deg, double center_x, double center_y)
+        {
+            AffineMat mat = s_Iden;//copy
+            mat.RotateDeg(deg, center_x, center_y);
+            return mat;
+        }
+        public static AffineMat GetTranslateMat(double dx, double dy)
+        {
+            AffineMat mat = s_Iden;//copy
+            mat.Translate(dx, dy);
+            return mat;
+        }
+        public static AffineMat GetScaleMat(double sx, double sy)
+        {
+            AffineMat mat = s_Iden;//copy
+            mat.Scale(sx, sy);
+            return mat;
+        }
+        public static AffineMat GetScaleMat(double s)
+        {
+            AffineMat mat = s_Iden;//copy
+            mat.Scale(s, s);
+            return mat;
+        }
+
+
     }
 }

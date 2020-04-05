@@ -61,8 +61,8 @@ namespace PixelFarm.Drawing
             int x, y, w, h;
             checked
             {
-                x = (int)Math.Ceiling(value.X);
-                y = (int)Math.Ceiling(value.Y);
+                x = (int)Math.Ceiling(value.Left);
+                y = (int)Math.Ceiling(value.Top);
                 w = (int)Math.Ceiling(value.Width);
                 h = (int)Math.Ceiling(value.Height);
             }
@@ -181,8 +181,8 @@ namespace PixelFarm.Drawing
             int x, y, w, h;
             checked
             {
-                x = (int)Math.Round(value.X);
-                y = (int)Math.Round(value.Y);
+                x = (int)Math.Round(value.Left);
+                y = (int)Math.Round(value.Top);
                 w = (int)Math.Round(value.Width);
                 h = (int)Math.Round(value.Height);
             }
@@ -206,8 +206,8 @@ namespace PixelFarm.Drawing
             int x, y, w, h;
             checked
             {
-                x = (int)value.X;
-                y = (int)value.Y;
+                x = (int)value.Left;
+                y = (int)value.Top;
                 w = (int)value.Width;
                 h = (int)value.Height;
             }

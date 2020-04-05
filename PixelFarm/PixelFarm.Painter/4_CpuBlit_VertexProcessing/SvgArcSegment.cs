@@ -417,7 +417,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             //------------------------
             m_arc.init(0.0, 0.0, rx, ry, start_angle, sweep_angle);
 
-            AffineMat mtx = AffineMat.Iden;
+            AffineMat mtx = AffineMat.Iden();
             mtx.Rotate(angle);
             mtx.Translate(cx, cy);
 
@@ -526,7 +526,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                         //mat1.TransformToVxs(v1, v2);
                         //v1 = v2;
 
-                        AffineMat mat = AffineMat.Iden;
+                        AffineMat mat = AffineMat.Iden();
                         mat.Translate(-centerFormArc.cx, -centerFormArc.cy);
                         mat.Scale(scaleRatio);
                         mat.RotateDeg(xaxisRotationAngleDec);
@@ -544,7 +544,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                         //mat.TransformToVxs(v1, v2);
                         //v1 = v2;
 
-                        AffineMat mat = AffineMat.Iden;
+                        AffineMat mat = AffineMat.Iden();
                         mat.Translate(-centerFormArc.cx, -centerFormArc.cy);
                         mat.RotateDeg(xaxisRotationAngleDec);
                         mat.Translate(centerFormArc.cx, centerFormArc.cy);
@@ -564,7 +564,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
 
                         //mat.TransformToVxs(v1, v2);
                         //v1 = v2; 
-                        AffineMat mat = AffineMat.Iden;
+                        AffineMat mat = AffineMat.Iden();
                         mat.Translate(-centerFormArc.cx, -centerFormArc.cy);
                         mat.RotateDeg(scaleRatio);
                         mat.Translate(centerFormArc.cx, centerFormArc.cy);

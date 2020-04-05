@@ -217,7 +217,7 @@ namespace PixelFarm.CpuBlit
                     BuildOrgImgRectVxs(source.Width, source.Height, imgBoundsPath);
                     //2. 
 
-                    AffineMat destRectTransform = AffineMat.Iden;
+                    AffineMat destRectTransform = AffineMat.Iden();
                     destRectTransform.Translate(-_ox, -_oy);
                     destRectTransform.Scale(scaleX, scaleY);
                     destRectTransform.Rotate(angleRadians);
@@ -335,9 +335,9 @@ namespace PixelFarm.CpuBlit
 
                 BuildOrgImgRectVxs(source.Width, source.Height, v1);
 
-                AffineMat destRectTransform;
-                destRectTransform = AffineMat.Iden;
-                _reuseableAffine.SetElements(AffineMat.Iden);
+
+                AffineMat destRectTransform = AffineMat.Iden();
+                _reuseableAffine.SetElements(destRectTransform);
 
                 //TODO: review reusable span generator an interpolator *** 
                 //We invert it because it is the transform to make the image go to the same position as the polygon. LBB [2/24/2004]
@@ -505,7 +505,7 @@ namespace PixelFarm.CpuBlit
                 {
                     BuildOrgImgRectVxs(source.Width, source.Height, imgBoundsPath);
 
-                    AffineMat destRectTransform = AffineMat.Iden;
+                    AffineMat destRectTransform = AffineMat.Iden();
                     destRectTransform.Translate(-_ox, -_oy);
                     destRectTransform.Scale(scaleX, scaleY);
                     destRectTransform.Rotate(angleRadians);
@@ -569,7 +569,7 @@ namespace PixelFarm.CpuBlit
                 {
                     BuildOrgImgRectVxs(source.Width, source.Height, imgBoundsPath);
                     //... 
-                    AffineMat destRectTransform = AffineMat.Iden;
+                    AffineMat destRectTransform = AffineMat.Iden();
                     destRectTransform.Translate(destX, destY);
 
                     // We invert it because it is the transform to make the image go to the same position as the polygon. LBB [2/24/2004]
