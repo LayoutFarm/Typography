@@ -118,7 +118,7 @@ namespace SampleWinForms.UI
             //5.1 clear background
             _painter.Clear(PixelFarm.Drawing.Color.White);
 
-            RectD bounds = RectD.ZeroIntersection;
+            PixelFarm.CpuBlit.VertexProcessing.RectD bounds = PixelFarm.CpuBlit.VertexProcessing.RectD.ZeroIntersection();
             PixelFarm.CpuBlit.VertexProcessing.BoundingRect.GetBoundingRect(vxs, ref bounds);
             //----------------------------------------------------
             float scale = _typeface.CalculateScaleToPixelFromPointSize(_sizeInPoint);
