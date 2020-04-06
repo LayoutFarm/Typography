@@ -2,9 +2,10 @@
 
 using System;
 using PixelFarm.Drawing;
-using PixelFarm.CpuBlit.Imaging;
-using PixelFarm.CpuBlit.PixelProcessing;
  
+using PixelFarm.CpuBlit.VertexProcessing;
+using PixelFarm.CpuBlit.PixelProcessing;
+
 namespace PixelFarm.CpuBlit
 {
 

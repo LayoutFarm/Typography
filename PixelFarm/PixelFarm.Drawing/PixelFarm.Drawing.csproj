@@ -563,6 +563,7 @@
     <Compile Include="..\PixelFarm.Vectors\6_Contours\Vertex.cs">
       <Link>0_REF_Painter\1_Vectors\6_Contours\Vertex.cs</Link>
     </Compile>
+    <Compile Include="1_IO\ImageBinder.cs" />
     <Compile Include="1_IO\StorageService.cs" />
     <Compile Include="3_VertexProcessoring\Figures.cs" />
     <Compile Include="2_AggPainter\AggPainter.cs" />

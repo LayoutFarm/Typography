@@ -606,14 +606,14 @@ namespace PaintFx
             rect.Width = minWH;
             rect.Height = minWH;
 
-            if (rect.Y != a.Y)
+            if (rect.Top != a.Y)
             {
-                rect.Location = new PointF(rect.X, a.Y - minWH);
+                rect.Location = new PointF(rect.Left, a.Y - minWH);
             }
 
-            if (rect.X != a.X)
+            if (rect.Left != a.X)
             {
-                rect.Location = new PointF(a.X - minWH, rect.Y);
+                rect.Location = new PointF(a.X - minWH, rect.Top);
             }
 
             return rect;
@@ -1067,7 +1067,7 @@ namespace PaintFx
 
             foreach (RectangleF rectF in rectsF)
             {
-                retRectsF[i] = new RectangleF(rectF.X + offset.X, rectF.Y + offset.Y, rectF.Width, rectF.Height);
+                retRectsF[i] = new RectangleF(rectF.Left + offset.X, rectF.Top + offset.Y, rectF.Width, rectF.Height);
                 ++i;
             }
 

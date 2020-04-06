@@ -34,8 +34,8 @@
 
 using poly_subpix = PixelFarm.CpuBlit.Rasterization.PolySubPix;
 using PixelFarm.Drawing;
+using PixelFarm.CpuBlit.VertexProcessing;
 using PixelFarm.CpuBlit.FragmentProcessing;
-
 namespace PixelFarm.CpuBlit.Rasterization
 {
 

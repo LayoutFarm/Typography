@@ -22,7 +22,7 @@
 
 //#include "agg_clip_liang_barsky.h"
 
-
+using PixelFarm.CpuBlit.VertexProcessing;
 using PixelFarm.CpuBlit.PrimitiveProcessing;
 namespace PixelFarm.CpuBlit.Rasterization
 {

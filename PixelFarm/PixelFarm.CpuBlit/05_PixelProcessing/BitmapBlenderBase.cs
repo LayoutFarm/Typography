@@ -20,8 +20,7 @@
 
 using System;
 using PixelFarm.Drawing;
-
-
+using PixelFarm.CpuBlit.VertexProcessing;
 namespace PixelFarm.CpuBlit.PixelProcessing
 {
 

@@ -194,7 +194,7 @@ namespace PaintLab.Svg
         internal VgPathVisualMarkers _pathMarkers;
 
 
-        LayoutFarm.ImageBinder _imgBinder;
+        ImageBinder _imgBinder;
         VgVisualDoc _vgVisualDoc;
 
         Image _backimg;
@@ -272,12 +272,9 @@ namespace PaintLab.Svg
             ReleaseRenderVx();
         }
 
-        public LayoutFarm.ImageBinder ImageBinder
+        public PixelFarm.Drawing.ImageBinder ImageBinder
         {
-            get
-            {
-                return _imgBinder;
-            }
+            get => _imgBinder;
             set
             {
                 _imgBinder = value;
@@ -973,7 +970,7 @@ namespace PaintLab.Svg
                             if (imgSpec.ImageSrc != null)
                             {
                                 //create new 
-                                this.ImageBinder = new LayoutFarm.ImageBinder(imgSpec.ImageSrc);
+                                this.ImageBinder = new PixelFarm.Drawing.ImageBinder(imgSpec.ImageSrc);
                                 isOK = true;
                             }
                         }
@@ -987,7 +984,7 @@ namespace PaintLab.Svg
                     EVAL_STATE:
                         switch (this.ImageBinder.State)
                         {
-                            case LayoutFarm.BinderState.Unload:
+                            case BinderState.Unload:
                                 if (!tryLoadOnce)
                                 {
                                     tryLoadOnce = true;
@@ -996,10 +993,10 @@ namespace PaintLab.Svg
                                     goto EVAL_STATE;
                                 }
                                 break;
-                            case LayoutFarm.BinderState.Loading:
+                            case BinderState.Loading:
                                 break;
                             //
-                            case LayoutFarm.BinderState.Loaded:
+                            case BinderState.Loaded:
                                 {
                                     //check if we need scale or not
 
@@ -1425,8 +1422,6 @@ namespace PaintLab.Svg
                 p.EnableMask = false;
             }
         }
-
-
         public void AddChildElement(VgVisualElementBase vgVisElem)
         {
             if (vgVisElem == null) return;
@@ -1468,7 +1463,7 @@ namespace PaintLab.Svg
         public void InvalidateBounds()
         {
             _needBoundUpdate = true;
-            _boundRect = RectD.ZeroIntersection;// new RectD(this.X, this.Y, 2, 2);
+            _boundRect = RectD.ZeroIntersection();// new RectD(this.X, this.Y, 2, 2);
         }
 
 
@@ -1482,7 +1477,7 @@ namespace PaintLab.Svg
                 using (VgVistorArgsPool.Borrow(out VgVisitorArgs paintArgs))
                 {
                     //when we find bounds, lets start with  RectD.ZeroIntersectio
-                    RectD rectTotal = RectD.ZeroIntersection;
+                    RectD rectTotal = RectD.ZeroIntersection();
                     bool evaluated = false;
                     paintArgs._currentTx = this.CoordTx;
 

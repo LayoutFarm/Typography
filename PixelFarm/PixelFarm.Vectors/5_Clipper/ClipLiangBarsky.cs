@@ -21,9 +21,10 @@
 // Liang-Barsky clipping 
 //
 //----------------------------------------------------------------------------
-
+using PixelFarm.CpuBlit.VertexProcessing;
 namespace PixelFarm.CpuBlit.PrimitiveProcessing
 {
+   
     public static class ClipLiangBarsky
     {
         //------------------------------------------------------------------------

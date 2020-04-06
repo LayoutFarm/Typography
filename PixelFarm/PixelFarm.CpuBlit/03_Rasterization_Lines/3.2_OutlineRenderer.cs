@@ -15,7 +15,7 @@
 //----------------------------------------------------------------------------
 
 using System;
-using System.Collections.Generic;
+using System.Collections.Generic; 
 using PixelFarm.CpuBlit.PrimitiveProcessing;
 using PixelFarm.CpuBlit.FragmentProcessing;
 
@@ -281,7 +281,7 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
         internal const int MAX_HALF_WIDTH = 64;
         PixelProcessing.IBitmapBlender _destImageSurface;
         LineProfileAnitAlias _lineProfile;
-        RectInt _clippingRectangle;
+        PixelFarm.CpuBlit.VertexProcessing.RectInt _clippingRectangle;
         bool _doClipping;
         PixelProcessing.PixelBlender32 _destPixelBlender;
 
@@ -302,7 +302,7 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
         {
             _destImageSurface = destImage;
             _lineProfile = profile;
-            _clippingRectangle = new RectInt(0, 0, 0, 0);
+            _clippingRectangle = new PixelFarm.CpuBlit.VertexProcessing.RectInt(0, 0, 0, 0);
             _doClipping = false;
             _destPixelBlender = destPixelBlender;
         }

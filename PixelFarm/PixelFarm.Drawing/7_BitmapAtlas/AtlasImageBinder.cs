@@ -4,7 +4,7 @@
 using PixelFarm.CpuBlit.BitmapAtlas;
 namespace PixelFarm.Drawing
 {
-    public class AtlasImageBinder : LayoutFarm.ImageBinder
+    public class AtlasImageBinder : ImageBinder
     {
         public AtlasImageBinder(string atlasName, string imgName)
         {

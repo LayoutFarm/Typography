@@ -18,7 +18,8 @@
 //          http://www.antigrain.com
 //----------------------------------------------------------------------------
 
-using PixelFarm.Drawing; 
+using PixelFarm.Drawing;
+using PixelFarm.CpuBlit.VertexProcessing;
 using PixelFarm.CpuBlit.Imaging;
 namespace PixelFarm.CpuBlit.PixelProcessing
 {

@@ -18,10 +18,11 @@
 //          http://www.antigrain.com
 //----------------------------------------------------------------------------
 using System;
-namespace PixelFarm.CpuBlit
+namespace PixelFarm.CpuBlit.VertexProcessing
 {
     //TODO: merge with Rectangle
     //beware: the ctor!!=> left,bottom, right, top
+
     public struct RectInt
     {
         public int Left, Bottom, Right, Top;

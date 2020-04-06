@@ -1,5 +1,5 @@
 ﻿//MIT, 2016-present, WinterDev
-//-----------------------------------  
+
 using System;
 using System.Collections.Generic;
 using PixelFarm.Contours;

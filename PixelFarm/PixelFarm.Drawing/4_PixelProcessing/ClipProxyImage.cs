@@ -23,6 +23,7 @@
 //----------------------------------------------------------------------------
 
 using PixelFarm.Drawing;
+using PixelFarm.CpuBlit.VertexProcessing;
 namespace PixelFarm.CpuBlit.PixelProcessing
 {
     public sealed class ClipProxyImage : ProxyImage
@@ -321,8 +322,6 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                 base.CopyFrom(sourceImage, clippedSourceRect, destXOffset, destYOffset);
             }
         }
-
-
         public override void BlendColorVSpan(int x, int y, int len, Color[] colors, int colorsIndex, byte[] covers, int coversIndex, bool firstCoverForAll)
         {
             if (x > XMax) return;

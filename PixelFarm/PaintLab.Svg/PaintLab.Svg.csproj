@@ -146,10 +146,6 @@
     <Compile Include="Visuals\VgVisualDocHost.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\PixelFarm\src\PixelFarm\PaintLab.PaintFx\PaintLab.PaintFx.MiniAgg.csproj">
-      <Project>{a533e1c7-ab74-4bcf-bc7a-12d4dbbfa918}</Project>
-      <Name>PaintLab.PaintFx.MiniAgg</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\x_autogen2\PixelFarm.MiniAgg.One\PixelFarm.MiniAgg.One.csproj">
       <Project>{fb5f78f5-c921-405d-8f21-42f7c15c2ad9}</Project>
       <Name>PixelFarm.MiniAgg.One</Name>

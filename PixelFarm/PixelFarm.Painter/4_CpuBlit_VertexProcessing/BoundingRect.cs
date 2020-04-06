@@ -32,7 +32,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
 
         public static RectD GetBoundingRect(this VertexStore vxs)
         {
-            RectD bounds = RectD.ZeroIntersection;
+            RectD bounds = RectD.ZeroIntersection();
             return GetBoundingRect(vxs, ref bounds) ?
                         bounds :
                         new RectD();
