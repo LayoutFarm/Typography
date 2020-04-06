@@ -205,6 +205,7 @@
     <Compile Include="..\..\PixelFarm\PixelFarm.Vectors\6_Contours\OutlineWalker.cs" Link="PixelFarm\PixelFarm.Vectors\6_Contours\OutlineWalker.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.Vectors\6_Contours\PartFlattener.cs" Link="PixelFarm\PixelFarm.Vectors\6_Contours\PartFlattener.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.Vectors\6_Contours\Vertex.cs" Link="PixelFarm\PixelFarm.Vectors\6_Contours\Vertex.cs" />
+    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\1_IO\ImageBinder.cs" Link="PixelFarm\PixelFarm.Drawing\1_IO\ImageBinder.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\1_IO\ImageReaders.cs" Link="PixelFarm\PixelFarm.Drawing\1_IO\ImageReaders.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\1_IO\StorageService.cs" Link="PixelFarm\PixelFarm.Drawing\1_IO\StorageService.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\2_AggPainter\AggPainter.cs" Link="PixelFarm\PixelFarm.Drawing\2_AggPainter\AggPainter.cs" />
