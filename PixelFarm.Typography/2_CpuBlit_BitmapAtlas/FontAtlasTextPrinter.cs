@@ -1,6 +1,5 @@
 ﻿//MIT, 2016-present, WinterDev, Sam Hocevar
 using System;
-using System.Collections.Generic;
 
 using PixelFarm.Drawing;
 using PixelFarm.CpuBlit.PixelProcessing;

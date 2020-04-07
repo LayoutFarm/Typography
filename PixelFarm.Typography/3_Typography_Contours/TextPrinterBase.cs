@@ -1,5 +1,4 @@
-﻿//MIT, 2016-present, WinterDev
-using System.Collections.Generic;
+﻿//MIT, 2016-present, WinterDev 
 using Typography.OpenFont;
 using Typography.TextLayout;
 
