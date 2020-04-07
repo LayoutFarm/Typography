@@ -8,7 +8,6 @@ using System.Windows.Forms;
 
 
 using PixelFarm.CpuBlit;
-using PixelFarm.Drawing.Fonts;
 
 using Typography.OpenFont;
 using Typography.Contours;
@@ -178,7 +177,7 @@ namespace PixelFarmTextBox.WinForms
             painter.Clear(PixelFarm.Drawing.Color.White);
             painter.UseLcdEffectSubPixelRendering = false;
             painter.FillColor = PixelFarm.Drawing.Color.Black;
-            
+
             //
             //render eachline with painter
             List<EditableTextLine> textlines = editableTextBlockLayoutEngine.UnsafeGetEditableTextLine();
