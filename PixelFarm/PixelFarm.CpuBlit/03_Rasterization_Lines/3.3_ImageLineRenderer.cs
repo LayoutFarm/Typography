@@ -591,7 +591,7 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
         LineImagePattern _pattern;
         int _start;
         double _scale_x;
-        RectInt _clip_box;
+        Q1Rect _clip_box;
         bool _clipping;
         //---------------------------------------------------------------------
         //typedef renderer_outline_image<BaseRenderer, ImagePattern> self_type;
@@ -603,7 +603,7 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
             _pattern = patt;
             _start = (0);
             _scale_x = (1.0);
-            _clip_box = new RectInt(0, 0, 0, 0);
+            _clip_box = new Q1Rect(0, 0, 0, 0);
             _clipping = (false);
         }
 

@@ -76,7 +76,7 @@ namespace PixelFarm.CpuBlit
             _destBmp = dstBmp;
             _destBitmapBlender.Attach(dstBmp, _pixelBlenderBGRA);
             _sclineRas.SetClipBox(
-               new RectInt(0, 0,
+               new Q1Rect(0, 0,
                _destWidth = dstBmp.Width, //**
                _destHeight = dstBmp.Height) //**
             );
@@ -118,10 +118,10 @@ namespace PixelFarm.CpuBlit
         }
         public ICoordTransformer CurrentTransformMatrix { get; set; }
         //
-        public RectInt GetClippingRect() => ScanlineRasterizer.GetVectorClipBox();
-        public void SetClippingRect(RectInt rect)
+        public Q1Rect GetClippingRect() => ScanlineRasterizer.GetVectorClipBox();
+        public void SetClippingRect(Q1Rect rect)
         {
-            rect.IntersectWithRectangle(new RectInt(0, 0, this.Width, this.Height));
+            rect.IntersectWithRectangle(new Q1Rect(0, 0, this.Width, this.Height));
             ScanlineRasterizer.SetClipBox(rect);
         }
         public PixelFarm.CpuBlit.FragmentProcessing.ImgSpanGen CustomImgSpanGen

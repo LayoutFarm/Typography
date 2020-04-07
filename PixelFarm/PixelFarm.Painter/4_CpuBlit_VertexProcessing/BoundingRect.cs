@@ -30,14 +30,14 @@ namespace PixelFarm.CpuBlit.VertexProcessing
     public static class BoundingRect
     {
 
-        public static RectD GetBoundingRect(this VertexStore vxs)
+        public static Q1RectD GetBoundingRect(this VertexStore vxs)
         {
-            RectD bounds = RectD.ZeroIntersection();
+            Q1RectD bounds = Q1RectD.ZeroIntersection();
             return GetBoundingRect(vxs, ref bounds) ?
                         bounds :
-                        new RectD();
+                        new Q1RectD();
         }
-        public static bool GetBoundingRect(this VertexStore vxs, ref RectD rect)
+        public static bool GetBoundingRect(this VertexStore vxs, ref Q1RectD rect)
         {
             bool rValue = GetBoundingRectSingle(vxs,
                 out double x1, out double y1,
@@ -108,9 +108,9 @@ namespace PixelFarm.CpuBlit.VertexProcessing
     //----------------------------------------------------
     public static class BoundingRectInt
     {
-        public static void GetBoundingRect(this VertexStore vxs, ref RectInt rect)
+        public static void GetBoundingRect(this VertexStore vxs, ref Q1Rect rect)
         {
-            RectD rect1 = new RectD();
+            Q1RectD rect1 = new Q1RectD();
             BoundingRect.GetBoundingRect(vxs, ref rect1);
             rect.Left = (int)System.Math.Round(rect1.Left);
             rect.Bottom = (int)System.Math.Round(rect1.Bottom);

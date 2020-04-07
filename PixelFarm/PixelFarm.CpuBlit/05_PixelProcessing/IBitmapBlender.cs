@@ -35,7 +35,7 @@ namespace PixelFarm.CpuBlit.PixelProcessing
         void BlendVL(int x, int y1, int y2, Color sourceColor, byte cover);
         //------------------------------------------------------------------------------------------- 
 
-        void CopyFrom(IBitmapSrc sourceImage, RectInt sourceImageRect, int destXOffset, int destYOffset); //not used
+        void CopyFrom(IBitmapSrc sourceImage, Q1Rect sourceImageRect, int destXOffset, int destYOffset); //not used
         // line stuff
         void CopyHL(int x, int y, int len, Color sourceColor);//not used
         void CopyVL(int x, int y, int len, Color sourceColor);//not used

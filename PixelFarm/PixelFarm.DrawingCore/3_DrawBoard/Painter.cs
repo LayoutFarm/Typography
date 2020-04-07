@@ -57,7 +57,7 @@ namespace PixelFarm.Drawing
 
         public abstract int Width { get; }
         public abstract int Height { get; }
-        public abstract PixelFarm.CpuBlit.VertexProcessing.RectInt ClipBox { get; set; }
+        public abstract Rectangle ClipBox { get; set; }
         public abstract void SetClipBox(int x1, int y1, int x2, int y2);
         /// <summary>
         /// we DO NOT store vxs

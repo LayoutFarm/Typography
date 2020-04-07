@@ -5,13 +5,16 @@ using PixelFarm.VectorMath;
 
 namespace PixelFarm.CpuBlit.VertexProcessing
 {
-    public struct RectD
+    /// <summary>
+    /// Cartesian's Quadrant1 Rect, (x0,y0)=> (x1,y1) = (left,bottom)=> (right,top)
+    /// </summary>
+    public struct Q1RectD
     {
         public double Left, Bottom, Right, Top;
-        public static RectD ZeroIntersection() => new RectD(double.MaxValue, double.MaxValue, double.MinValue, double.MinValue);
+        public static Q1RectD ZeroIntersection() => new Q1RectD(double.MaxValue, double.MaxValue, double.MinValue, double.MinValue);
 
-
-        public RectD(double left, double bottom, double right, double top)
+         
+        public Q1RectD(double left, double bottom, double right, double top)
         {
             this.Left = left;
             this.Bottom = bottom;
@@ -19,9 +22,9 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             this.Top = top;
         }
  
-        public static RectD CreateFromLTWH(double left, double top, double width, double height)
+        public static Q1RectD CreateFromLTWH(double left, double top, double width, double height)
         {
-            return new RectD(left, top + height, left + width, top);
+            return new Q1RectD(left, top + height, left + width, top);
         }
 
         // This function assumes the rect is normalized
@@ -32,7 +35,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         ////
         public bool Contains(double x, double y) => (x >= Left && x <= Right && y >= Bottom && y <= Top);
         ////
-        public bool Contains(RectD innerRect) => Contains(innerRect.Left, innerRect.Bottom) && Contains(innerRect.Right, innerRect.Top);
+        public bool Contains(Q1RectD innerRect) => Contains(innerRect.Left, innerRect.Bottom) && Contains(innerRect.Right, innerRect.Top);
         ////
         public bool Contains(Vector2 position) => Contains(position.x, position.y);
         ////

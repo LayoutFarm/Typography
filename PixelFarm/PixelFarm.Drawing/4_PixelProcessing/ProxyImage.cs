@@ -39,7 +39,7 @@ namespace PixelFarm.CpuBlit.PixelProcessing
         public virtual int Height => _linkedImage.Height;
         public virtual int Stride => _linkedImage.Stride;
         // 
-        public virtual RectInt GetBounds()
+        public virtual Q1Rect GetBounds()
         {
             return _linkedImage.GetBounds();
         }
@@ -51,7 +51,7 @@ namespace PixelFarm.CpuBlit.PixelProcessing
 
         public virtual Color GetPixel(int x, int y) => _linkedImage.GetPixel(x, y);
 
-        public virtual void CopyFrom(IBitmapSrc sourceImage, RectInt sourceImageRect, int destXOffset, int destYOffset)
+        public virtual void CopyFrom(IBitmapSrc sourceImage, Q1Rect sourceImageRect, int destXOffset, int destYOffset)
         {
             _linkedImage.CopyFrom(sourceImage, sourceImageRect, destXOffset, destYOffset);
         }

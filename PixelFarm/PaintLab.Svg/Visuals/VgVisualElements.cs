@@ -198,7 +198,7 @@ namespace PaintLab.Svg
         VgVisualDoc _vgVisualDoc;
 
         Image _backimg;
-        RectD _boundRect;
+        Q1RectD _boundRect;
         bool _needBoundUpdate;
 
         internal float _imgW;
@@ -1463,11 +1463,11 @@ namespace PaintLab.Svg
         public void InvalidateBounds()
         {
             _needBoundUpdate = true;
-            _boundRect = RectD.ZeroIntersection();// new RectD(this.X, this.Y, 2, 2);
+            _boundRect = Q1RectD.ZeroIntersection();// new RectD(this.X, this.Y, 2, 2);
         }
 
 
-        public RectD GetRectBounds()
+        public Q1RectD GetRectBounds()
         {
             //TODO: check bounds where border-width > 1
 
@@ -1477,7 +1477,7 @@ namespace PaintLab.Svg
                 using (VgVistorArgsPool.Borrow(out VgVisitorArgs paintArgs))
                 {
                     //when we find bounds, lets start with  RectD.ZeroIntersectio
-                    RectD rectTotal = RectD.ZeroIntersection();
+                    Q1RectD rectTotal = Q1RectD.ZeroIntersection();
                     bool evaluated = false;
                     paintArgs._currentTx = this.CoordTx;
 
@@ -1515,7 +1515,7 @@ namespace PaintLab.Svg
                     }
 
 
-                    return _boundRect = evaluated ? rectTotal : new RectD();
+                    return _boundRect = evaluated ? rectTotal : new Q1RectD();
                 }
             }
 

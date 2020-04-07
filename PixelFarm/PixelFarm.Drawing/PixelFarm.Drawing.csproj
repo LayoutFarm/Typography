@@ -350,9 +350,6 @@
     <Compile Include="..\PixelFarm.PrimitiveGeo\RectangleF.cs">
       <Link>0_REF_DrawingCore\1_PrimitiveGeo\RectangleF.cs</Link>
     </Compile>
-    <Compile Include="..\PixelFarm.PrimitiveGeo\RectInt.cs">
-      <Link>0_REF_DrawingCore\1_PrimitiveGeo\RectInt.cs</Link>
-    </Compile>
     <Compile Include="..\BackEnd.Triangulation\delaunay\AdvancingFront.cs">
       <Link>0_REF_Triangulation\Delaunay\AdvancingFront.cs</Link>
     </Compile>
@@ -479,8 +476,11 @@
     <Compile Include="..\PixelFarm.Vectors\2_geometry\Ellipse.cs">
       <Link>0_REF_Painter\1_Vectors\2_Geometry\Ellipse.cs</Link>
     </Compile>
-    <Compile Include="..\PixelFarm.Vectors\2_geometry\RectD.cs">
-      <Link>0_REF_Painter\1_Vectors\2_Geometry\RectD.cs</Link>
+    <Compile Include="..\PixelFarm.Vectors\2_Geometry\Q1Rect.cs">
+      <Link>0_REF_Painter\1_Vectors\2_Geometry\Q1Rect.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Vectors\2_Geometry\Q1RectD.cs">
+      <Link>0_REF_Painter\1_Vectors\2_Geometry\Q1RectD.cs</Link>
     </Compile>
     <Compile Include="..\PixelFarm.Vectors\3_transform\1_Affine.cs">
       <Link>0_REF_Painter\1_Vectors\3_Transform\1_Affine.cs</Link>

@@ -203,7 +203,7 @@ namespace SampleWinForms
 
             VgVisualDocBuilder builder = new VgVisualDocBuilder();
             VgVisualElement vgVisElem = builder.CreateVgVisualDoc(docBuilder.ResultDocument, _vgDocHost).VgRootElem;
-            PixelFarm.CpuBlit.VertexProcessing.RectD bounds = vgVisElem.GetRectBounds();
+            PixelFarm.CpuBlit.VertexProcessing.Q1RectD bounds = vgVisElem.GetRectBounds();
             float actualXOffset = (float)-bounds.Left;
             float actualYOffset = (float)-bounds.Bottom;
 

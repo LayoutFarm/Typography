@@ -282,7 +282,7 @@ namespace PixelFarm.CpuBlit
         public override int ReferenceX => 0;
         public override int ReferenceY => 0;
         //
-        public RectInt Bounds => new RectInt(0, 0, _width, _height);
+       
         public override bool IsReferenceImage => false;
         public CpuBlit.Imaging.PixelFormat PixelFormat => _pixelFormat;
         //
@@ -444,7 +444,7 @@ namespace PixelFarm.CpuBlit
             return buff2;
         }
         //
-        RectInt IBitmapSrc.GetBounds() => new RectInt(0, 0, _width, _height);
+        Q1Rect IBitmapSrc.GetBounds() => new Q1Rect(0, 0, _width, _height);
         int IBitmapSrc.Width => _width;
         int IBitmapSrc.Height => _height;
         int IBitmapSrc.Stride => _strideBytes;
@@ -496,7 +496,7 @@ namespace PixelFarm.CpuBlit
         int Stride { get; }
         int Height { get; }
 
-        RectInt GetBounds();
+        Q1Rect GetBounds();
 
         int GetBufferOffsetXY32(int x, int y);
 
