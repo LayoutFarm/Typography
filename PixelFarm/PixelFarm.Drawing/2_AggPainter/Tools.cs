@@ -377,25 +377,7 @@ namespace PixelFarm.CpuBlit
             }
 
         }
-        public static void Rectangle(this AggRenderSurface gx, RectD rect, Color color, double strokeWidth = 1)
-        {
-            gx.Rectangle(rect.Left, rect.Bottom, rect.Right, rect.Top, color, strokeWidth);
-        }
-
-        public static void Rectangle(this AggRenderSurface gx, RectInt rect, Color color)
-        {
-            gx.Rectangle(rect.Left, rect.Bottom, rect.Right, rect.Top, color);
-        }
-
-        public static void FillRectangle(this AggRenderSurface gx, RectD rect, Color fillColor)
-        {
-            gx.FillRectangle(rect.Left, rect.Bottom, rect.Right, rect.Top, fillColor);
-        }
-
-        public static void FillRectangle(this AggRenderSurface gx, RectInt rect, Color fillColor)
-        {
-            gx.FillRectangle(rect.Left, rect.Bottom, rect.Right, rect.Top, fillColor);
-        }
+        
 
         public static void FillRectangle(this AggRenderSurface gx,
             Vector2 leftBottom,

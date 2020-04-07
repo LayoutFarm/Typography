@@ -2,9 +2,10 @@
 
 using System;
 using PixelFarm.Drawing;
-using PixelFarm.CpuBlit.Imaging;
+
+using PixelFarm.CpuBlit.VertexProcessing;
 using PixelFarm.CpuBlit.PixelProcessing;
- 
+
 namespace PixelFarm.CpuBlit
 {
 
@@ -84,15 +85,19 @@ namespace PixelFarm.CpuBlit
                 _currentClipTech = ClipingTechnique.None;
             }
         }
-
-        public override RectInt ClipBox
+        public override Rectangle ClipBox
         {
-            get => _aggsx.GetClippingRect();
-            set => _aggsx.SetClippingRect(value);
+            get => throw new NotImplementedException();
+            set => throw new NotImplementedException();
         }
+        //public override RectInt ClipBox
+        //{
+        //    get => _aggsx.GetClippingRect();
+        //    set => _aggsx.SetClippingRect(value);
+        //}
         public override void SetClipBox(int x1, int y1, int x2, int y2)
         {
-            _aggsx.SetClippingRect(new RectInt(x1, y1, x2, y2));
+            _aggsx.SetClippingRect(new Q1Rect(x1, y1, x2, y2));
         }
         //---------------------------------------------------------------
 
@@ -110,7 +115,7 @@ namespace PixelFarm.CpuBlit
             //same size as primary _aggsx_0 
 
             _alphaBitmap = new MemBitmap(_aggsx_0.Width, _aggsx_0.Height);
- 
+
             _aggsx_mask = new AggRenderSurface() { PixelBlender = new PixelBlenderBGRA() };
             _aggsx_mask.AttachDstBitmap(_alphaBitmap);
             _aggsx_mask.SetScanlineRasOrigin(this.OriginX, this.OriginY); //also set the canvas origin for the aggsx_mask

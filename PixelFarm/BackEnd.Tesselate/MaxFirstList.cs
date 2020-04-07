@@ -29,7 +29,7 @@ namespace Tesselate
     class MaxFirstList<T>
       where T : IComparable<T>
     {
-        List<RefItem<T>> _innerList = new List<RefItem<T>>();
+        readonly List<RefItem<T>> _innerList = new List<RefItem<T>>();
         bool _isSorted = false;
         public MaxFirstList()
         {

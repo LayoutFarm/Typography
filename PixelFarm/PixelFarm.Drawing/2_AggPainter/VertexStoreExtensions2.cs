@@ -30,7 +30,7 @@ namespace PixelFarm.Drawing
         public static void ReverseClockDirection(this VertexStore src, VertexStore outputVxs)
         {
             //temp fix for reverse clock direction
-            RectD bounds = src.GetBoundingRect();
+            Q1RectD bounds = src.GetBoundingRect();
             double centerX = (bounds.Left + bounds.Width) / 2;
             double centerY = (bounds.Top + bounds.Height) / 2;
 

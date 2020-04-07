@@ -40,7 +40,6 @@
     <Compile Include="NativeMemMx.cs" />
     <Compile Include="Rectangle.cs" />
     <Compile Include="RectangleF.cs" />
-    <Compile Include="RectInt.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

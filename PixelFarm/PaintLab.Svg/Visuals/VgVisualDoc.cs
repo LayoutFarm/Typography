@@ -7,7 +7,7 @@ namespace PaintLab.Svg
 {
     public class VgVisualDoc
     {
-      
+
         VgVisualDocHost _vgVisualDocHost;
 
         internal List<SvgElement> _defsList = new List<SvgElement>();
@@ -32,7 +32,7 @@ namespace PaintLab.Svg
             _vgVisualDocHost?.InvalidateGraphics(e);
         }
 
-        internal void RequestImageAsync(LayoutFarm.ImageBinder binder, VgVisualElement imgRun, object requestFrom)
+        internal void RequestImageAsync(PixelFarm.Drawing.ImageBinder binder, VgVisualElement imgRun, object requestFrom)
         {
             _vgVisualDocHost?.RequestImageAsync(binder, imgRun, requestFrom);
         }
