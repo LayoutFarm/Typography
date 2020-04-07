@@ -7,7 +7,7 @@ namespace PaintLab.Svg
     public class VgPaintArgs : VgVisitorBase
     {
         float _opacity;
-        bool _maskMode;
+
         internal VgPaintArgs()
         {
             Opacity = 1;
@@ -42,14 +42,7 @@ namespace PaintLab.Svg
             P = null;
             PaintVisitHandler = null;
         }
-        public bool MaskMode
-        {
-            get => _maskMode;
-            set
-            {
-                _maskMode = value;
-            }
-        }
+        public bool MaskMode { get; set; }
     }
 
     public static class VgPaintArgsPool

@@ -34,7 +34,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
     //
     public class RoundedRect
     {
-        RectD _bounds;
+        Q1RectD _bounds;
         Vector2 _leftBottomRadius;
         Vector2 _rightBottomRadius;
         Vector2 _rightTopRadius;
@@ -45,7 +45,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         }
         public RoundedRect(double left, double bottom, double right, double top, double radius)
         {
-            _bounds = new RectD(left, bottom, right, top);
+            _bounds = new Q1RectD(left, bottom, right, top);
             _leftBottomRadius.x = radius;
             _leftBottomRadius.y = radius;
             _rightBottomRadius.x = radius;
@@ -67,19 +67,19 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             }
         }
 
-        public RoundedRect(RectD bounds, double r)
+        public RoundedRect(Q1RectD bounds, double r)
             : this(bounds.Left, bounds.Bottom, bounds.Right, bounds.Top, r)
         {
         }
 
-        public RoundedRect(RectInt bounds, double r)
+        public RoundedRect(Q1Rect bounds, double r)
             : this(bounds.Left, bounds.Bottom, bounds.Right, bounds.Top, r)
         {
         }
 
         public void SetRect(double left, double bottom, double right, double top)
         {
-            _bounds = new RectD(left, bottom, right, top);
+            _bounds = new Q1RectD(left, bottom, right, top);
             if (left > right) { _bounds.Left = right; _bounds.Right = left; }
             if (bottom > top) { _bounds.Bottom = top; _bounds.Top = bottom; }
         }

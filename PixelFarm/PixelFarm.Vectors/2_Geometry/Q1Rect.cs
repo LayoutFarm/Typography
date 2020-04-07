@@ -18,21 +18,25 @@
 //          http://www.antigrain.com
 //----------------------------------------------------------------------------
 using System;
-namespace PixelFarm.CpuBlit
+namespace PixelFarm.CpuBlit.VertexProcessing
 {
-    //TODO: merge with Rectangle
+
     //beware: the ctor!!=> left,bottom, right, top
-    public struct RectInt
+
+    /// <summary>
+    ///  Cartesian's Quadrant1 Rect, (x0,y0)=> (x1,y1) = (left,bottom)=> (right,top)
+    /// </summary>
+    public struct Q1Rect
     {
+        //(x0,y0)=> (x1,y1)
         public int Left, Bottom, Right, Top;
-        public RectInt(int left, int bottom, int right, int top)
+        public Q1Rect(int left, int bottom, int right, int top)
         {
             Left = left;
             Bottom = bottom;
             Right = right;
             Top = top;
         }
-
 
         // This function assumes the rect is normalized
         public int Width => Right - Left;
@@ -51,7 +55,7 @@ namespace PixelFarm.CpuBlit
             if (Bottom > Top) { t = Bottom; Bottom = Top; Top = t; }
         }
 
-        public void ExpandToInclude(RectInt rectToInclude)
+        public void ExpandToInclude(Q1Rect rectToInclude)
         {
             if (Right < rectToInclude.Right) Right = rectToInclude.Right;
             if (Top < rectToInclude.Top) Top = rectToInclude.Top;
@@ -59,7 +63,7 @@ namespace PixelFarm.CpuBlit
             if (Bottom > rectToInclude.Bottom) Bottom = rectToInclude.Bottom;
         }
 
-        public bool Clip(RectInt r)
+        public bool Clip(in Q1Rect r)
         {
             if (Right > r.Right) Right = r.Right;
             if (Top > r.Top) Top = r.Top;
@@ -74,7 +78,7 @@ namespace PixelFarm.CpuBlit
         public bool Contains(int x, int y) => (x >= Left && x <= Right && y >= Bottom && y <= Top);
 
 
-        public bool IntersectRectangles(RectInt rectToCopy, RectInt rectToIntersectWith)
+        public bool IntersectRectangles(Q1Rect rectToCopy, Q1Rect rectToIntersectWith)
         {
             Left = rectToCopy.Left;
             Bottom = rectToCopy.Bottom;
@@ -92,7 +96,7 @@ namespace PixelFarm.CpuBlit
             return false;
         }
 
-        public bool IntersectWithRectangle(RectInt rectToIntersectWith)
+        public bool IntersectWithRectangle(Q1Rect rectToIntersectWith)
         {
             if (Left < rectToIntersectWith.Left) Left = rectToIntersectWith.Left;
             if (Bottom < rectToIntersectWith.Bottom) Bottom = rectToIntersectWith.Bottom;
@@ -106,7 +110,7 @@ namespace PixelFarm.CpuBlit
             return false;
         }
 
-        public static bool DoIntersect(RectInt rect1, RectInt rect2)
+        public static bool DoIntersect(Q1Rect rect1, Q1Rect rect2)
         {
             int x1 = rect1.Left;
             int y1 = rect1.Bottom;
@@ -126,7 +130,7 @@ namespace PixelFarm.CpuBlit
 
 
         //---------------------------------------------------------unite_rectangles
-        public void unite_rectangles(RectInt r1, RectInt r2)
+        public void unite_rectangles(Q1Rect r1, Q1Rect r2)
         {
             Left = r1.Left;
             Bottom = r1.Bottom;
@@ -159,7 +163,7 @@ namespace PixelFarm.CpuBlit
             return new { x1 = Left, x2 = Right, y1 = Bottom, y2 = Top }.GetHashCode();
         }
 
-        public static bool ClipRects(RectInt pBoundingRect, ref RectInt pSourceRect, ref RectInt pDestRect)
+        public static bool ClipRects(Q1Rect pBoundingRect, ref Q1Rect pSourceRect, ref Q1Rect pDestRect)
         {
             // clip off the top so we don't write into random memory
             if (pDestRect.Top < pBoundingRect.Top)
@@ -236,7 +240,7 @@ namespace PixelFarm.CpuBlit
 
 
         //***************************************************************************************************************************************************
-        public static bool ClipRect(RectInt pBoundingRect, ref RectInt pDestRect)
+        public static bool ClipRect(Q1Rect pBoundingRect, ref Q1Rect pDestRect)
         {
             // clip off the top so we don't write into random memory
             if (pDestRect.Top < pBoundingRect.Top)

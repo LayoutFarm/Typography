@@ -153,7 +153,10 @@ namespace Typography.OpenFont
         internal static void AppendGlyph(Glyph dest, Glyph src)
         {
             int org_dest_len = dest._contourEndPoints.Length;
+#if DEBUG
             int src_contour_count = src._contourEndPoints.Length;
+#endif
+
             ushort org_last_point = (ushort)(dest._contourEndPoints[org_dest_len - 1] + 1); //since start at 0 
 
             dest.glyphPoints = Utils.ConcatArray(dest.glyphPoints, src.glyphPoints);
@@ -184,7 +187,7 @@ namespace Typography.OpenFont
         public short MinY => _bounds.YMin;
         public short MaxY => _bounds.YMax;
 
-       
+
 #if DEBUG
         public readonly int dbugId;
         static int s_debugTotalId;

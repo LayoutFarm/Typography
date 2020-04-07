@@ -125,8 +125,11 @@
     <Compile Include="..\pixelfarm.vectors\2_geometry\Ellipse.cs">
       <Link>0_REF_Vectors\2_Geometry\Ellipse.cs</Link>
     </Compile>
-    <Compile Include="..\pixelfarm.vectors\2_geometry\RectD.cs">
-      <Link>0_REF_Vectors\2_Geometry\RectD.cs</Link>
+    <Compile Include="..\PixelFarm.Vectors\2_Geometry\Q1Rect.cs">
+      <Link>0_REF_Vectors\2_Geometry\Q1Rect.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Vectors\2_Geometry\Q1RectD.cs">
+      <Link>0_REF_Vectors\2_Geometry\Q1RectD.cs</Link>
     </Compile>
     <Compile Include="..\PixelFarm.Vectors\3_Transform\1_Affine.cs">
       <Link>0_REF_Vectors\3_Transform\1_Affine.cs</Link>

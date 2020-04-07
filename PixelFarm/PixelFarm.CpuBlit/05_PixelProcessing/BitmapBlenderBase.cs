@@ -20,8 +20,7 @@
 
 using System;
 using PixelFarm.Drawing;
-
-
+using PixelFarm.CpuBlit.VertexProcessing;
 namespace PixelFarm.CpuBlit.PixelProcessing
 {
 
@@ -161,7 +160,7 @@ namespace PixelFarm.CpuBlit.PixelProcessing
             }
         }
 
-        void CopyFromNoClipping(IBitmapSrc sourceImage, RectInt clippedSourceImageRect, int destXOffset, int destYOffset)
+        void CopyFromNoClipping(IBitmapSrc sourceImage, Q1Rect clippedSourceImageRect, int destXOffset, int destYOffset)
         {
             if (BytesBetweenPixelsInclusive != BitDepth / 8
                 || sourceImage.BytesBetweenPixelsInclusive != sourceImage.BitDepth / 8)
@@ -260,16 +259,16 @@ namespace PixelFarm.CpuBlit.PixelProcessing
             }
         }
 
-        public void CopyFrom(IBitmapSrc sourceImage, RectInt sourceImageRect, int destXOffset, int destYOffset)
+        public void CopyFrom(IBitmapSrc sourceImage, Q1Rect sourceImageRect, int destXOffset, int destYOffset)
         {
-            RectInt sourceImageBounds = sourceImage.GetBounds();
-            RectInt clippedSourceImageRect = new RectInt();
+            Q1Rect sourceImageBounds = sourceImage.GetBounds();
+            Q1Rect clippedSourceImageRect = new Q1Rect();
             if (clippedSourceImageRect.IntersectRectangles(sourceImageRect, sourceImageBounds))
             {
-                RectInt destImageRect = clippedSourceImageRect;
+                Q1Rect destImageRect = clippedSourceImageRect;
                 destImageRect.Offset(destXOffset, destYOffset);
-                RectInt destImageBounds = GetBounds();
-                RectInt clippedDestImageRect = new RectInt();
+                Q1Rect destImageBounds = GetBounds();
+                Q1Rect clippedDestImageRect = new Q1Rect();
                 if (clippedDestImageRect.IntersectRectangles(destImageRect, destImageBounds))
                 {
                     // we need to make sure the source is also clipped to the dest. So, we'll copy this back to source and offset it.
@@ -286,7 +285,7 @@ namespace PixelFarm.CpuBlit.PixelProcessing
 
         public int BytesBetweenPixelsInclusive => _m_DistanceInBytesBetweenPixelsInclusive;
         public int BitDepth => _bitDepth;
-        public RectInt GetBounds() => new RectInt(0, 0, _width, _height);
+        public Q1Rect GetBounds() => new Q1Rect(0, 0, _width, _height);
 
         /// <summary>
         /// get, set blender of destination image buffer
@@ -736,10 +735,10 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                 }
             }
         }
-        public RectInt GetBoundingRect()
-        {
-            return new RectInt(0, 0, Width, Height);
-        }
+        //public RectInt GetBoundingRect()
+        //{
+        //    return new RectInt(0, 0, Width, Height);
+        //}
         //---------
         public void SetFilterImage(MemBitmap filterBmp)
         {
@@ -755,11 +754,11 @@ namespace PixelFarm.CpuBlit.PixelProcessing
 #endif
 
 
-        public int[] GetOrgInt32Buffer()
-        {
-            return null;
-            //return this.raw_buffer32;
-        }
+        //public int[] GetOrgInt32Buffer()
+        //{
+        //    return null;
+        //    //return this.raw_buffer32;
+        //}
         //        static unsafe void CopyOrBlend32_BasedOnAlpha(PixelBlenderBGRA recieveBlender,
         //            int* destBuffer,
         //            int arrayOffset,
