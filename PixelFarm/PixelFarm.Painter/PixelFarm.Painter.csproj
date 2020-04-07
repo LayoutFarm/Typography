@@ -165,7 +165,7 @@
     <Compile Include="CpuBlit.VertexProcessing\BoundingRect.cs" />
     <Compile Include="CpuBlit.VertexProcessing\CurveFlattener.cs" />
     <Compile Include="CpuBlit.VertexProcessing\LineWalker.cs" />
-    <Compile Include="CpuBlit.VertexProcessing\PathWriter.cs" />
+    <Compile Include="CpuBlit\PathWriter.cs" />
     <Compile Include="CpuBlit.VertexProcessing\RoundedRect.cs" />
     <Compile Include="CpuBlit.VertexProcessing\SimpleRect.cs" />
     <Compile Include="CpuBlit.VertexProcessing\Stroke.cs" />
