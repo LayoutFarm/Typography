@@ -29,13 +29,13 @@ namespace PixelFarm.CpuBlit.VertexProcessing
     /// </summary>
     public class SimpleRect
     {
-        RectD _bounds;
+        Q1RectD _bounds;
         public SimpleRect()
         {
         }
         public SimpleRect(double left, double bottom, double right, double top)
         {
-            _bounds = new RectD(left, bottom, right, top);
+            _bounds = new Q1RectD(left, bottom, right, top);
             if (left > right)
             {
                 _bounds.Left = right;
@@ -50,7 +50,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         }
         public void SetRect(double left, double bottom, double right, double top)
         {
-            _bounds = new RectD(left, bottom, right, top);
+            _bounds = new Q1RectD(left, bottom, right, top);
             if (left > right) { _bounds.Left = right; _bounds.Right = left; }
             if (bottom > top) { _bounds.Bottom = top; _bounds.Top = bottom; }
         }

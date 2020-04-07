@@ -62,9 +62,6 @@
     <Compile Include="..\PixelFarm.PrimitiveGeo\RectangleF.cs">
       <Link>0_REF_PrimitiveGeo\RectangleF.cs</Link>
     </Compile>
-    <Compile Include="..\PixelFarm.PrimitiveGeo\RectInt.cs">
-      <Link>0_REF_PrimitiveGeo\RectInt.cs</Link>
-    </Compile>
     <Compile Include="2_Abstract_DrawingElements\Brushes_Pens.cs" />
     <Compile Include="3_DrawBoard\CO.cs" />
     <Compile Include="2_Abstract_DrawingElements\CombineMode.cs" />

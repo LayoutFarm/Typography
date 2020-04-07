@@ -23,22 +23,23 @@
 //----------------------------------------------------------------------------
 
 using PixelFarm.Drawing;
+using PixelFarm.CpuBlit.VertexProcessing;
 namespace PixelFarm.CpuBlit.PixelProcessing
 {
     public sealed class ClipProxyImage : ProxyImage
     {
-        RectInt _clippingRect;
+        Q1Rect _clippingRect;
         public ClipProxyImage(PixelProcessing.IBitmapBlender refImage)
             : base(refImage)
         {
-            _clippingRect = new RectInt(0, 0, (int)refImage.Width - 1, (int)refImage.Height - 1);
+            _clippingRect = new Q1Rect(0, 0, (int)refImage.Width - 1, (int)refImage.Height - 1);
         }
 
         public bool SetClippingBox(int x1, int y1, int x2, int y2)
         {
-            RectInt cb = new RectInt(x1, y1, x2, y2);
+            Q1Rect cb = new Q1Rect(x1, y1, x2, y2);
             cb.Normalize();
-            if (cb.Clip(new RectInt(0, 0, (int)Width - 1, (int)Height - 1)))
+            if (cb.Clip(new Q1Rect(0, 0, (int)Width - 1, (int)Height - 1)))
             {
                 _clippingRect = cb;
                 return true;
@@ -54,10 +55,10 @@ namespace PixelFarm.CpuBlit.PixelProcessing
         {
             return _clippingRect.Contains(x, y);
         }
-        public RectInt GetClipArea(ref RectInt destRect, ref RectInt sourceRect, int sourceWidth, int sourceHeight)
+        public Q1Rect GetClipArea(ref Q1Rect destRect, ref Q1Rect sourceRect, int sourceWidth, int sourceHeight)
         {
-            RectInt rc = new RectInt(0, 0, 0, 0);
-            RectInt cb = ClipBox;
+            Q1Rect rc = new Q1Rect(0, 0, 0, 0);
+            Q1Rect cb = ClipBox;
             ++cb.Right;
             ++cb.Top;
             if (sourceRect.Left < 0)
@@ -105,7 +106,7 @@ namespace PixelFarm.CpuBlit.PixelProcessing
             }
         }
 
-        public RectInt ClipBox => _clippingRect;
+        public Q1Rect ClipBox => _clippingRect;
         int XMin => _clippingRect.Left;
         int YMin => _clippingRect.Bottom;
         int XMax => _clippingRect.Right;
@@ -307,13 +308,13 @@ namespace PixelFarm.CpuBlit.PixelProcessing
         }
 
         public override void CopyFrom(IBitmapSrc sourceImage,
-                       RectInt sourceImageRect,
+                       Q1Rect sourceImageRect,
                        int destXOffset,
                        int destYOffset)
         {
-            RectInt destRect = sourceImageRect;
+            Q1Rect destRect = sourceImageRect;
             destRect.Offset(destXOffset, destYOffset);
-            RectInt clippedSourceRect = new RectInt();
+            Q1Rect clippedSourceRect = new Q1Rect();
             if (clippedSourceRect.IntersectRectangles(destRect, _clippingRect))
             {
                 // move it back relative to the source
@@ -321,8 +322,6 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                 base.CopyFrom(sourceImage, clippedSourceRect, destXOffset, destYOffset);
             }
         }
-
-
         public override void BlendColorVSpan(int x, int y, int len, Color[] colors, int colorsIndex, byte[] covers, int coversIndex, bool firstCoverForAll)
         {
             if (x > XMax) return;

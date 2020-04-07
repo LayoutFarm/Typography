@@ -389,7 +389,7 @@ namespace PixelFarm.CpuBlit.Imaging
 
         void StackBlurRGBA32(BitmapBlenderBase img, int radius, int ry)
         {
-            int width = img.Width; 
+            int width = img.Width;
             int height = img.Height;
 
             //TODO: review here again
@@ -541,9 +541,9 @@ namespace PixelFarm.CpuBlit.Imaging
 
         public override void FromPix(Color c)
         {
-            r = c.red;
-            g = c.green;
-            b = c.blue;
+            r = c.R;
+            g = c.G;
+            b = c.B;
         }
 
         public override void Calc(double b1, double b2, double b3, double b4,
@@ -560,7 +560,7 @@ namespace PixelFarm.CpuBlit.Imaging
             //c.green = (byte)AggMath.uround(g);
             //c.blue = (byte)AggMath.uround(b);
 
-            c = new Color(c.alpha,
+            c = new Color(c.A,
                 (byte)AggMath.uround(r),
                 (byte)AggMath.uround(g),
                 (byte)AggMath.uround(b)
@@ -579,10 +579,10 @@ namespace PixelFarm.CpuBlit.Imaging
 
         public override void FromPix(Color c)
         {
-            r = c.red;
-            g = c.green;
-            b = c.blue;
-            a = c.alpha;
+            r = c.R;
+            g = c.G;
+            b = c.B;
+            a = c.A;
         }
 
         public override void Calc(double b1, double b2, double b3, double b4,
@@ -615,7 +615,7 @@ namespace PixelFarm.CpuBlit.Imaging
 
         public override void FromPix(Color c)
         {
-            r = c.red;
+            r = c.R;
         }
 
         public override void Calc(double b1, double b2, double b3, double b4,
