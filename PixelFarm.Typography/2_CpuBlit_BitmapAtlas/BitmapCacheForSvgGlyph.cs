@@ -1,7 +1,8 @@
 ﻿//MIT, 2019-present, WinterDev 
+
 using System;
 using System.Collections.Generic;
-using Typography.OpenFont; 
+using Typography.OpenFont;
 
 namespace PixelFarm.CpuBlit.BitmapAtlas
 {

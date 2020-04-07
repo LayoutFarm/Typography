@@ -5,12 +5,8 @@ using System.Collections.Generic;
 
 using PixelFarm.Drawing;
 using PixelFarm.Contours;
-using PixelFarm.CpuBlit;
-
-using Typography.OpenFont;
-
-
-
+using PixelFarm.CpuBlit; 
+using Typography.OpenFont; 
 namespace Typography.Contours
 {
     public struct GlyphControlParameters
@@ -20,8 +16,7 @@ namespace Typography.Contours
         public short minY;
         public short maxX;
         public short maxY;
-    }
-
+    } 
 
     public class GlyphMeshStore
     {

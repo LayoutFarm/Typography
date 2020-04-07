@@ -19,7 +19,7 @@
 
 using PixelFarm.Drawing;
 using PixelFarm.CpuBlit;
-
+using CO = PixelFarm.Drawing.Internal.CO;
 
 namespace PixelFarm.PathReconstruction
 {

@@ -145,7 +145,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         //}
 
 
-        public List<Poly2Tri.Polygon> Poly2TriPolygons { get; set; } 
+        public List<Poly2Tri.Polygon> Poly2TriPolygons { get; set; }
 
 #if DEBUG
         public override string ToString()
@@ -1065,7 +1065,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             {
                 switch (cmd)
                 {
-                    case PixelFarm.CpuBlit.VertexCmd.MoveTo:
+                    case VertexCmd.MoveTo:
 #if DEBUG
                         prevX = x;
                         prevY = y;
@@ -1079,7 +1079,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                         rectBoundsAccum.Update(x, y);
 
                         break;
-                    case PixelFarm.CpuBlit.VertexCmd.LineTo:
+                    case VertexCmd.LineTo:
                         _xylist.Add((float)x);
                         _xylist.Add((float)y);
 #if DEBUG
@@ -1089,7 +1089,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
 
                         rectBoundsAccum.Update(x, y);
                         break;
-                    case PixelFarm.CpuBlit.VertexCmd.Close:
+                    case VertexCmd.Close:
                         {
                             //don't add            
                             //_xylist.Add((float)prevMoveToX);
@@ -1111,7 +1111,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                             rectBoundsAccum.Init();
                         }
                         break;
-                    case PixelFarm.CpuBlit.VertexCmd.NoMore:
+                    case VertexCmd.NoMore:
                         goto EXIT_LOOP;
                     default:
                         throw new System.NotSupportedException();
@@ -1196,7 +1196,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
 
                         }
                         break;
-                    case PixelFarm.CpuBlit.VertexCmd.NoMore:
+                    case VertexCmd.NoMore:
                         goto EXIT_LOOP;
                     default:
                         throw new System.NotSupportedException();

@@ -156,29 +156,33 @@
       <Link>0_REF_Vectors\5_Clipper\ClipLiangBarsky.cs</Link>
     </Compile>
     <Compile Include="0_Base\ForNet20.cs" />
-    <Compile Include="2_General\TempContext.cs" />
-    <Compile Include="2_General\TextBaseline.cs" />
-    <Compile Include="3_Cpu_Blit\ColorRGBAf.cs" />
-    <Compile Include="2_General\ColorEx.cs" />
-    <Compile Include="4_CpuBlit_VertexProcessing\BoundingRect.cs" />
-    <Compile Include="4_CpuBlit_VertexProcessing\CurveFlattener.cs" />
-    <Compile Include="4_CpuBlit_VertexProcessing\LineWalker.cs" />
-    <Compile Include="4_CpuBlit_VertexProcessing\PathWriter.cs" />
-    <Compile Include="4_CpuBlit_VertexProcessing\RoundedRect.cs" />
-    <Compile Include="4_CpuBlit_VertexProcessing\SimpleRect.cs" />
-    <Compile Include="4_CpuBlit_VertexProcessing\Stroke.cs" />
-    <Compile Include="4_CpuBlit_VertexProcessing\StrokeGenerator.cs" />
-    <Compile Include="4_CpuBlit_VertexProcessing\StrokeGen.cs" />
-    <Compile Include="4_CpuBlit_VertexProcessing\StrokeMath.cs" />
-    <Compile Include="4_CpuBlit_VertexProcessing\SvgArcSegment.cs" />
-    <Compile Include="4_CpuBlit_VertexProcessing\VectorToolBox.cs" />
-    <Compile Include="4_CpuBlit_VertexProcessing\VertexData.cs" />
-    <Compile Include="2_General\ITextPrinter.cs" />
-    <Compile Include="3_Cpu_Blit\MemBitmap.cs" />
-    <Compile Include="4_CpuBlit_VertexProcessing\VertexHitTester.cs" />
-    <Compile Include="4_CpuBlit_VertexProcessing\VertexStoreExtensions.cs" />
-    <Compile Include="4_CpuBlit_VertexProcessing\VertexStoreTransformExtensions.cs" />
-    <Compile Include="4_CpuBlit_VertexProcessing\VxsClipping.cs" />
+    <Compile Include="CpuBlit\TempMemPtr.cs" />
+    <Compile Include="Drawing\ClipingTechnique.cs" />
+    <Compile Include="TempContext.cs" />
+    <Compile Include="Drawing\TextBaseline.cs" />
+    <Compile Include="CpuBlit\ColorRGBAf.cs" />
+    <Compile Include="Drawing\ColorEx.cs" />
+    <Compile Include="CpuBlit.VertexProcessing\BoundingRect.cs" />
+    <Compile Include="CpuBlit.VertexProcessing\CurveFlattener.cs" />
+    <Compile Include="CpuBlit.VertexProcessing\LineWalker.cs" />
+    <Compile Include="CpuBlit.VertexProcessing\PathWriter.cs" />
+    <Compile Include="CpuBlit.VertexProcessing\RoundedRect.cs" />
+    <Compile Include="CpuBlit.VertexProcessing\SimpleRect.cs" />
+    <Compile Include="CpuBlit.VertexProcessing\Stroke.cs" />
+    <Compile Include="CpuBlit.VertexProcessing\StrokeGenerator.cs" />
+    <Compile Include="CpuBlit.VertexProcessing\StrokeGen.cs" />
+    <Compile Include="CpuBlit.VertexProcessing\StrokeMath.cs" />
+    <Compile Include="CpuBlit.VertexProcessing\SvgArcSegment.cs" />
+    <Compile Include="CpuBlit.VertexProcessing\VectorToolBox.cs" />
+    <Compile Include="CpuBlit.VertexProcessing\VertexData.cs" />
+    <Compile Include="Drawing\ITextPrinter.cs" />
+    <Compile Include="CpuBlit\MemBitmap.cs" />
+    <Compile Include="CpuBlit.VertexProcessing\VertexHitTester.cs" />
+    <Compile Include="CpuBlit.VertexProcessing\VertexStoreExtensions.cs" />
+    <Compile Include="CpuBlit.VertexProcessing\VertexStoreTransformExtensions.cs" />
+    <Compile Include="CpuBlit.VertexProcessing\VxsClipping.cs" />
+    <Compile Include="Drawing.Internal\CO.cs" />
+    <Compile Include="Drawing.Internal\MicroPainter.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\PixelFarm.DrawingCore\PixelFarm.DrawingCore.csproj">

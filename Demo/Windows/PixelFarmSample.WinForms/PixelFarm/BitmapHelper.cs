@@ -34,7 +34,7 @@ namespace PixelFarm.CpuBlit
             TempMemPtr memPtr = MemBitmap.GetBufferPtr(srcMemBmp);
             unsafe
             {
-                MemMx.memcpy((byte*)dstHBmpScan0, (byte*)memPtr.Ptr, srcMemBmp.Stride * srcMemBmp.Height);
+                PixelFarm.Drawing.Internal. MemMx.memcpy((byte*)dstHBmpScan0, (byte*)memPtr.Ptr, srcMemBmp.Stride * srcMemBmp.Height);
             }
             //System.Runtime.InteropServices.Marshal.Copy(rawBuffer, 0,
             //   hBmpScan0, rawBuffer.Length);
@@ -86,7 +86,7 @@ namespace PixelFarm.CpuBlit
                             //   startRowAt,
                             //   (IntPtr)target,
                             //   stride);
-                            MemMx.memcpy(target, src, stride);
+                            PixelFarm.Drawing.Internal.MemMx.memcpy(target, src, stride);
 
                             startRowAt += stride;
                             target += stride;
@@ -208,7 +208,7 @@ namespace PixelFarm.CpuBlit
                             //   startRowAt,
                             //   (IntPtr)target,
                             //   stride);
-                            MemMx.memcpy(target, src, stride);
+                            PixelFarm.Drawing.Internal.MemMx.memcpy(target, src, stride);
 
                             startRowAt -= stride;
                             target += stride;
@@ -322,7 +322,7 @@ namespace PixelFarm.CpuBlit
                     for (int y = h; y > 0; --y)
                     {
                         byte* src = bufferH + ((y - 1) * stride);
-                        MemMx.memcpy(target, src, stride);
+                        PixelFarm.Drawing.Internal.MemMx.memcpy(target, src, stride);
                         startRowAt -= stride;
                         target += stride;
                     }
@@ -419,7 +419,7 @@ namespace PixelFarm.CpuBlit
                           System.Drawing.Imaging.PixelFormat.Format32bppArgb); //read as 32 bits
             unsafe
             {
-                PixelFarm.CpuBlit.NativeMemMx.MemCopy(
+                PixelFarm.Drawing.Internal.NativeMemMx.MemCopy(
                     (byte*)targetBufferPtr.Ptr,
                     (byte*)bmpData.Scan0,
                     bmpData.Stride * dstMemBmp.Height

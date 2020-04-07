@@ -1,11 +1,12 @@
 ﻿//MIT, 2014-present, WinterDev
-using PixelFarm.CpuBlit;
-using PixelFarm.Drawing.Fonts;
 using System;
+
+using PixelFarm.CpuBlit;
 using PixelFarm.VectorMath;
+using PixelFarm.Contours;
+
 using Typography.Contours;
 using Typography.OpenFont;
-using PixelFarm.Contours;
 
 namespace SampleWinForms.UI
 {
@@ -242,7 +243,7 @@ namespace SampleWinForms.UI
         static readonly PixelFarm.Drawing.Color ColorGray = new PixelFarm.Drawing.Color(0xFF, 0x80, 0x80, 0x80);
         static readonly PixelFarm.Drawing.Color ColorDeepPink = new PixelFarm.Drawing.Color(0xFF, 0xFF, 0x14, 0x93);
 
-       
+
         void DrawEdge(PixelFarm.Drawing.Painter painter, EdgeLine edge)
         {
             if (edge.IsOutside)

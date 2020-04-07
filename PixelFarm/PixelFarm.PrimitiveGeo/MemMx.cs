@@ -22,7 +22,8 @@
 //#define USE_UNSAFE // no real code for this yet
 
 using System;
-namespace PixelFarm.CpuBlit
+
+namespace PixelFarm.Drawing.Internal
 {
     public static class MemMx
     {

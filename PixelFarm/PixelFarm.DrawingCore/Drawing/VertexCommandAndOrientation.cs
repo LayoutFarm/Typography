@@ -1,7 +1,7 @@
 ﻿//BSD, 2014-present, WinterDev
 
 
-namespace PixelFarm.CpuBlit
+namespace PixelFarm.Drawing
 {
     /// <summary>
     /// vertex command and flags

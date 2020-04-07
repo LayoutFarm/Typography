@@ -29,6 +29,9 @@ namespace PixelFarm.CpuBlit.Rasterization
 
     partial class ScanlineRasterizer
     {
+        /// <summary>
+        /// rect-clipper
+        /// </summary>
         class VectorClipper
         {
             Q1Rect _clipBox;

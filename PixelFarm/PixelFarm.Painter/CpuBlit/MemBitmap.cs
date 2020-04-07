@@ -20,79 +20,11 @@
 
 using System;
 using PixelFarm.Drawing;
+using PixelFarm.Drawing.Internal;
 using PixelFarm.CpuBlit.VertexProcessing;
-namespace PixelFarm.CpuBlit.Imaging
-{
-    /// <summary>
-    /// agg buffer's pixel format
-    /// </summary>
-    public enum PixelFormat
-    {
-        ARGB32,
-        RGB24,
-        GrayScale8,
-    }
-
-    public struct TempMemPtr : IDisposable
-    {
-        int _lenInBytes; //in bytes 
-        IntPtr _nativeBuffer;
-        bool _isOwner;
-
-        public TempMemPtr(IntPtr nativeBuffer32, int lenInBytes, bool isOwner = false)
-        {
-            _lenInBytes = lenInBytes;
-            _nativeBuffer = nativeBuffer32;
-            _isOwner = isOwner;
-        }
-        //
-        public int LengthInBytes => _lenInBytes;
-        //
-        public IntPtr Ptr => _nativeBuffer;
-        //
-        public void Dispose()
-        {
-            if (_isOwner)
-            {
-                //destroy in
-                System.Runtime.InteropServices.Marshal.FreeHGlobal(_nativeBuffer);
-                _nativeBuffer = IntPtr.Zero;
-            }
-
-        }
-
-
-        //---------------
-        //helper...
-        public static TempMemPtr FromBmp(MemBitmap memBmp)
-        {
-            return MemBitmap.GetBufferPtr(memBmp);
-        }
-        public unsafe static TempMemPtr FromBmp(IBitmapSrc actualBmp, out int* headPtr)
-        {
-            TempMemPtr ptr = actualBmp.GetBufferPtr();
-            headPtr = (int*)ptr.Ptr;
-            return ptr;
-        }
-
-        public unsafe static TempMemPtr FromBmp(MemBitmap memBmp, out int* headPtr)
-        {
-            TempMemPtr ptr = MemBitmap.GetBufferPtr(memBmp);
-            headPtr = (int*)ptr.Ptr;
-            return ptr;
-        }
-        public unsafe static TempMemPtr FromBmp(MemBitmap bmp, out byte* headPtr)
-        {
-            TempMemPtr ptr = MemBitmap.GetBufferPtr(bmp);
-            headPtr = (byte*)ptr.Ptr;
-            return ptr;
-        }
-    }
-}
 namespace PixelFarm.CpuBlit
 {
-
-
+    
 
 #if DEBUG
 
@@ -204,7 +136,15 @@ namespace PixelFarm.CpuBlit
 #endif
 
 
-
+    /// <summary>
+    /// agg buffer's pixel format
+    /// </summary>
+    public enum PixelFormat
+    {
+        ARGB32,
+        RGB24,
+        GrayScale8,
+    }
     /// <summary>
     /// 32 bpp native memory bitmap
     /// </summary>
@@ -216,7 +156,7 @@ namespace PixelFarm.CpuBlit
 
         readonly int _strideBytes;
         readonly int _bitDepth;
-        readonly CpuBlit.Imaging.PixelFormat _pixelFormat;
+        readonly PixelFormat _pixelFormat;
         readonly bool _pixelBufferFromExternalSrc;
 
         IntPtr _pixelBuffer;
@@ -238,7 +178,7 @@ namespace PixelFarm.CpuBlit
             _width = width;
             _height = height;
             _strideBytes = CalculateStride(width,
-                _pixelFormat = CpuBlit.Imaging.PixelFormat.ARGB32, //***
+                _pixelFormat = PixelFormat.ARGB32, //***
                 out _bitDepth,
                 out int bytesPerPixel);
 
@@ -254,7 +194,7 @@ namespace PixelFarm.CpuBlit
         {
             get
             {
-                if (PixelFormat == Imaging.PixelFormat.ARGB32)
+                if (PixelFormat == CpuBlit.PixelFormat.ARGB32)
                 {
                     return BitmapBufferFormat.BGRA;//on windows
                 }
@@ -282,17 +222,17 @@ namespace PixelFarm.CpuBlit
         public override int ReferenceX => 0;
         public override int ReferenceY => 0;
         //
-       
+
         public override bool IsReferenceImage => false;
-        public CpuBlit.Imaging.PixelFormat PixelFormat => _pixelFormat;
+        public CpuBlit.PixelFormat PixelFormat => _pixelFormat;
         //
         public int Stride => _strideBytes;
         public int BitDepth => _bitDepth;
         //
         public bool IsBigEndian { get; set; }
-        public static CpuBlit.Imaging.TempMemPtr GetBufferPtr(MemBitmap bmp)
+        public static TempMemPtr GetBufferPtr(MemBitmap bmp)
         {
-            return new CpuBlit.Imaging.TempMemPtr(bmp._pixelBuffer, bmp._pixelBufferInBytes);
+            return new TempMemPtr(bmp._pixelBuffer, bmp._pixelBufferInBytes);
         }
 
         public static void ReplaceBuffer(MemBitmap bmp, int[] pixelBuffer)
@@ -391,30 +331,30 @@ namespace PixelFarm.CpuBlit
         }
 
 
-        public static int CalculateStride(int width, CpuBlit.Imaging.PixelFormat format)
+        public static int CalculateStride(int width, CpuBlit.PixelFormat format)
         {
             int bitDepth, bytesPerPixel;
             return CalculateStride(width, format, out bitDepth, out bytesPerPixel);
         }
-        public static int CalculateStride(int width, CpuBlit.Imaging.PixelFormat format, out int bitDepth, out int bytesPerPixel)
+        public static int CalculateStride(int width, CpuBlit.PixelFormat format, out int bitDepth, out int bytesPerPixel)
         {
             //stride calcuation helper
 
             switch (format)
             {
-                case CpuBlit.Imaging.PixelFormat.ARGB32:
+                case CpuBlit.PixelFormat.ARGB32:
                     {
                         bitDepth = 32;
                         bytesPerPixel = (bitDepth + 7) / 8;
                         return width * (32 / 8);
                     }
-                case CpuBlit.Imaging.PixelFormat.GrayScale8:
+                case CpuBlit.PixelFormat.GrayScale8:
                     {
                         bitDepth = 8; //bit per pixel
                         bytesPerPixel = (bitDepth + 7) / 8;
                         return 4 * ((width * bytesPerPixel + 3) / 4);
                     }
-                case CpuBlit.Imaging.PixelFormat.RGB24:
+                case CpuBlit.PixelFormat.RGB24:
                     {
                         bitDepth = 24; //bit per pixel
                         bytesPerPixel = (bitDepth + 7) / 8;
@@ -431,7 +371,7 @@ namespace PixelFarm.CpuBlit
             unsafe
             {
 
-                using (CpuBlit.Imaging.TempMemPtr pixBuffer = MemBitmap.GetBufferPtr(memBmp))
+                using (TempMemPtr pixBuffer = MemBitmap.GetBufferPtr(memBmp))
                 {
                     //fixed (byte* header = &pixelBuffer[0])
                     byte* header = (byte*)pixBuffer.Ptr;
@@ -453,9 +393,9 @@ namespace PixelFarm.CpuBlit
         int IBitmapSrc.BitDepth => _bitDepth;
         //
         int IBitmapSrc.GetBufferOffsetXY32(int x, int y) => (y * _width) + x;
-        CpuBlit.Imaging.TempMemPtr IBitmapSrc.GetBufferPtr()
+        TempMemPtr IBitmapSrc.GetBufferPtr()
         {
-            return new CpuBlit.Imaging.TempMemPtr(_pixelBuffer, _pixelBufferInBytes);
+            return new TempMemPtr(_pixelBuffer, _pixelBufferInBytes);
         }
         //
         void IBitmapSrc.WriteBuffer(int[] newBuffer)
@@ -500,7 +440,7 @@ namespace PixelFarm.CpuBlit
 
         int GetBufferOffsetXY32(int x, int y);
 
-        Imaging.TempMemPtr GetBufferPtr();
+        TempMemPtr GetBufferPtr();
 
 
         int BytesBetweenPixelsInclusive { get; }
@@ -516,13 +456,13 @@ namespace PixelFarm.CpuBlit
         {
             //calculate stride for the width
 
-            int destStride = MemBitmap.CalculateStride(width, CpuBlit.Imaging.PixelFormat.ARGB32);
+            int destStride = MemBitmap.CalculateStride(width, PixelFormat.ARGB32);
             int newBmpW = destStride / 4;
             int[] buff2 = new int[newBmpW * height];
             unsafe
             {
 
-                using (CpuBlit.Imaging.TempMemPtr srcBufferPtr = MemBitmap.GetBufferPtr(memBmp))
+                using (TempMemPtr srcBufferPtr = MemBitmap.GetBufferPtr(memBmp))
                 {
                     byte* srcBuffer = (byte*)srcBufferPtr.Ptr;
                     int srcIndex = 0;
@@ -565,8 +505,8 @@ namespace PixelFarm.CpuBlit
             MemBitmap copyBmp = new MemBitmap(toCopyRect.Width, toCopyRect.Height);
             unsafe
             {
-                using (CpuBlit.Imaging.TempMemPtr srcBufferPtr = MemBitmap.GetBufferPtr(src))
-                using (CpuBlit.Imaging.TempMemPtr dstBufferPtr = MemBitmap.GetBufferPtr(copyBmp))
+                using (TempMemPtr srcBufferPtr = MemBitmap.GetBufferPtr(src))
+                using (TempMemPtr dstBufferPtr = MemBitmap.GetBufferPtr(copyBmp))
                 {
 
                     int* srcPtr = (int*)srcBufferPtr.Ptr;
@@ -619,7 +559,7 @@ namespace PixelFarm.CpuBlit
         //        } 
         //    }
         //}
-        internal static void Clear(Imaging.TempMemPtr tmp, Color color)
+        internal static void Clear(PixelFarm.CpuBlit.TempMemPtr tmp, Color color)
         {
             unsafe
             {
@@ -742,7 +682,7 @@ namespace PixelFarm.CpuBlit
                 int srcH = source.Height;
                 int srcW = source.Width;
 
-                Imaging.TempMemPtr dstMemPtr = MemBitmap.GetBufferPtr(thumbBitmap);
+                TempMemPtr dstMemPtr = MemBitmap.GetBufferPtr(thumbBitmap);
                 int dstStrideInt32 = newBmpW;
 
                 for (int dstY = dstRoi2.Top; dstY < dstRoi2.Bottom; ++dstY)

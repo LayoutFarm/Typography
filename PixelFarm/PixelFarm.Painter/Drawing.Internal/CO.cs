@@ -20,7 +20,7 @@
 
 //#define ABGR
 #define ARGB
-namespace PixelFarm.Drawing
+namespace PixelFarm.Drawing.Internal
 {
     /// <summary>
     /// color order
