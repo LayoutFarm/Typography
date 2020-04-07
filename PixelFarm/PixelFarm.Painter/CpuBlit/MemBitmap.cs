@@ -24,7 +24,7 @@ using PixelFarm.Drawing.Internal;
 using PixelFarm.CpuBlit.VertexProcessing;
 namespace PixelFarm.CpuBlit
 {
-    using CO = PixelFarm.Drawing.Internal.CO;
+    
 
 #if DEBUG
 

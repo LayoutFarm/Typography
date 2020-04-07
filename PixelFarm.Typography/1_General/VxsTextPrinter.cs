@@ -12,7 +12,7 @@ namespace PixelFarm.Drawing
 
     public class VxsTextPrinter : TextPrinterBase, ITextPrinter
     {
-        LayoutFarm.OpenFontTextService _textServices;
+        OpenFontTextService _textServices;
 
         /// <summary>
         /// target canvas
@@ -26,7 +26,7 @@ namespace PixelFarm.Drawing
         GlyphBitmapStore _glyphBitmapStore;
         BitmapCacheForSvgGlyph _glyphSvgStore;
 
-        public VxsTextPrinter(Painter painter, LayoutFarm.OpenFontTextService textService)
+        public VxsTextPrinter(Painter painter, OpenFontTextService textService)
         {
 
             //

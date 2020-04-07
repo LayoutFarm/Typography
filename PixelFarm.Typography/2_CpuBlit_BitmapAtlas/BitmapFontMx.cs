@@ -112,16 +112,16 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
 
     public class BitmapFontManager<B> : BitmapAtlasManager<B> where B : IDisposable
     {
-        LayoutFarm.OpenFontTextService _textServices;
+        OpenFontTextService _textServices;
         Dictionary<int, SimpleBitmapAtlas> _createdAtlases = new Dictionary<int, SimpleBitmapAtlas>();
         Dictionary<string, SimpleBitmapAtlas> _msdfTextureFonts = new Dictionary<string, SimpleBitmapAtlas>();
 
-        public BitmapFontManager(LayoutFarm.OpenFontTextService textServices, LoadNewBmpDelegate<SimpleBitmapAtlas, B> _createNewDel)
+        public BitmapFontManager(OpenFontTextService textServices, LoadNewBmpDelegate<SimpleBitmapAtlas, B> _createNewDel)
             : base(_createNewDel)
         {
             _textServices = textServices;
         }
-        public BitmapFontManager(LayoutFarm.OpenFontTextService textServices)
+        public BitmapFontManager(OpenFontTextService textServices)
         {
             _textServices = textServices;
         }

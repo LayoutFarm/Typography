@@ -34,7 +34,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
         Color _fontColor;
 
 
-        LayoutFarm.OpenFontTextService _textServices;
+        OpenFontTextService _textServices;
         BitmapFontManager<MemBitmap> _bmpFontMx;
         SimpleBitmapAtlas _fontAtlas;
         public FontAtlasTextPrinter(AggPainter painter)
@@ -42,7 +42,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             _painter = painter;
 
             this.PositionTechnique = PositionTechnique.OpenFont;
-            _textServices = new LayoutFarm.OpenFontTextService();
+            _textServices = new OpenFontTextService();
 
             //2. 
             _bmpFontMx = new BitmapFontManager<MemBitmap>(
