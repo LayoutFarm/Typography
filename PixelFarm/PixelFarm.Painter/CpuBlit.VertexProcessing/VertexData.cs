@@ -24,21 +24,21 @@ namespace PixelFarm.CpuBlit
 {
     public struct VertexData
     {
-        public VertexCmd command;
+        public PixelFarm.Drawing.VertexCmd command;
         public double x;
         public double y;
-        public VertexData(VertexCmd command)
+        public VertexData(PixelFarm.Drawing.VertexCmd command)
         {
             this.command = command;
             x = y = 0;
         }
-        public VertexData(VertexCmd command, Vector2 position)
+        public VertexData(PixelFarm.Drawing.VertexCmd command, Vector2 position)
         {
             this.command = command;
             this.x = position.x;
             this.y = position.y;
         }
-        public VertexData(VertexCmd command, double x, double y)
+        public VertexData(PixelFarm.Drawing.VertexCmd command, double x, double y)
         {
             this.command = command;
             this.x = x;
@@ -47,7 +47,7 @@ namespace PixelFarm.CpuBlit
 
         public Vector2 position
         {
-            get { return new Vector2(this.x, this.y); }
+            get => new Vector2(this.x, this.y);
             set { this.x = value.x; this.y = value.y; }
         }
 

@@ -68,7 +68,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
 
             //find last point
             FindActualPointCount(vxs, out m_num_points);
-            VertexCmd cmd = vxs.GetVertex(m_num_points - 1, out vtx0, out vty0);
+            PixelFarm.Drawing.VertexCmd cmd = vxs.GetVertex(m_num_points - 1, out vtx0, out vty0);
 
             //
             //vtx0 = GetXN(m_num_points - 1);
@@ -81,7 +81,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             vxs.GetVertex(0, out vtx1, out vty1);
             inside_flag = false;
             //
-            for (i = 1; i <= m_num_points && cmd != VertexCmd.NoMore; ++i)
+            for (i = 1; i <= m_num_points && cmd != PixelFarm.Drawing.VertexCmd.NoMore; ++i)
             {
                 yflag1 = (vty1 >= ty);
                 // Check if endpoints straddle (are on opposite sides) of X axis
@@ -127,8 +127,8 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         {
             int pp = vxs.Count;
             double vtx0, vty0;
-            VertexCmd cmd = vxs.GetVertex(--pp, out vtx0, out vty0);
-            while (cmd == VertexCmd.NoMore || cmd == VertexCmd.Close)
+            PixelFarm.Drawing.VertexCmd cmd = vxs.GetVertex(--pp, out vtx0, out vty0);
+            while (cmd == PixelFarm.Drawing.VertexCmd.NoMore || cmd == PixelFarm.Drawing.VertexCmd.Close)
             {
                 cmd = vxs.GetVertex(--pp, out vtx0, out vty0);
             }

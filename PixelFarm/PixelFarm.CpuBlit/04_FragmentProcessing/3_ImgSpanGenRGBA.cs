@@ -33,7 +33,7 @@ using PixelFarm.CpuBlit.Imaging;
 
 using subpix_const = PixelFarm.CpuBlit.Imaging.ImageFilterLookUpTable.ImgSubPixConst;
 using filter_const = PixelFarm.CpuBlit.Imaging.ImageFilterLookUpTable.ImgFilterConst;
-
+using CO = PixelFarm.Drawing.Internal.CO;
 
 namespace PixelFarm.CpuBlit.FragmentProcessing
 {
@@ -114,7 +114,7 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
         }
         internal unsafe static void NN_StepXBy1(IBitmapSrc bmpsrc, int srcIndex, Drawing.Color[] outputColors, int dstIndex, int len)
         {
-            using (CpuBlit.Imaging.TempMemPtr srcBufferPtr = bmpsrc.GetBufferPtr())
+            using (CpuBlit.TempMemPtr srcBufferPtr = bmpsrc.GetBufferPtr())
             {
                 int* pSource = (int*)srcBufferPtr.Ptr + srcIndex;
                 do
@@ -155,7 +155,7 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
                 spanInterpolator.Begin(x + dx, y + dy, len);
                 unsafe
                 {
-                    using (CpuBlit.Imaging.TempMemPtr.FromBmp(_bmpSrc, out int* srcBuffer))
+                    using ( TempMemPtr.FromBmp(_bmpSrc, out int* srcBuffer))
                     {
                         //TODO: if no any transformation,=> skip spanInterpolator (see above example)
                         do
@@ -215,7 +215,7 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
 
                 if (_noTransformation)
                 {
-                    using (CpuBlit.Imaging.TempMemPtr.FromBmp(_bmpSrc, out int* srcBuffer))
+                    using (CpuBlit.TempMemPtr.FromBmp(_bmpSrc, out int* srcBuffer))
                     {
                         int bufferIndex = _bmpSrc.GetBufferOffsetXY32(x, y);
                         do
@@ -238,7 +238,7 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
                 {
                     //Bilinear interpolation, without lookup table
                     ISpanInterpolator spanInterpolator = base.Interpolator;
-                    using (CpuBlit.Imaging.TempMemPtr srcBufferPtr = _bmpSrc.GetBufferPtr())
+                    using (CpuBlit.TempMemPtr srcBufferPtr = _bmpSrc.GetBufferPtr())
                     {
                         int* srcBuffer = (int*)srcBufferPtr.Ptr;
 
@@ -516,7 +516,7 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
 
             unsafe
             {
-                using (CpuBlit.Imaging.TempMemPtr srcBufferPtr = _bmpSrc.GetBufferPtr())
+                using (CpuBlit.TempMemPtr srcBufferPtr = _bmpSrc.GetBufferPtr())
                 {
                     int* srcBuffer = (int*)srcBufferPtr.Ptr;
                     spanInterpolator.Begin(x + base.dx, y + base.dy, len);

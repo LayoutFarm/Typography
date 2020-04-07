@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using PixelFarm.Drawing;
+using PixelFarm.Drawing.Internal;
 using PixelFarm.CpuBlit;
 
 namespace PixelFarm.PathReconstruction

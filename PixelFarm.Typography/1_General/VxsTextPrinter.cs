@@ -1,7 +1,6 @@
 ﻿//MIT, 2016-present, WinterDev, Sam Hocevar
 using System;
 
-using PixelFarm.Drawing.Fonts;
 using PixelFarm.CpuBlit.BitmapAtlas;
 
 using Typography.Contours;
@@ -9,7 +8,7 @@ using Typography.OpenFont;
 using Typography.TextLayout;
 
 namespace PixelFarm.Drawing
-{ 
+{
 
     public class VxsTextPrinter : TextPrinterBase, ITextPrinter
     {
@@ -68,7 +67,7 @@ namespace PixelFarm.Drawing
         {
 
         }
-        
+
         protected override void OnFontSizeChanged()
         {
             //update some font metrics property   
@@ -107,7 +106,7 @@ namespace PixelFarm.Drawing
             }
         }
 
-       
+
 
         public void PrepareStringForRenderVx(RenderVxFormattedString renderVx, char[] text, int startAt, int len)
         {
@@ -167,7 +166,7 @@ namespace PixelFarm.Drawing
             //TODO: review this again, we should use pixel? 
             float fontSizePoint = this.FontSizeInPoints;
             float scale = _currentTypeface.CalculateScaleToPixelFromPointSize(fontSizePoint);
-            RenderVxGlyphPlan[] glyphPlans = renderVx.GlyphList;
+            Internal.RenderVxGlyphPlan[] glyphPlans = renderVx.GlyphList;
             int j = glyphPlans.Length;
             //---------------------------------------------------
             //consider use cached glyph, to increase performance 
@@ -178,7 +177,7 @@ namespace PixelFarm.Drawing
 
             for (int i = 0; i < j; ++i)
             {
-                RenderVxGlyphPlan glyphPlan = glyphPlans[i];
+                Internal.RenderVxGlyphPlan glyphPlan = glyphPlans[i];
                 //-----------------------------------
                 //TODO: review here ***
                 //PERFORMANCE revisit here 
@@ -376,7 +375,7 @@ namespace PixelFarm.Drawing
             DrawFromGlyphPlans(glyphPlanSeq, x, y);
         }
 
-       
+
     }
 
 

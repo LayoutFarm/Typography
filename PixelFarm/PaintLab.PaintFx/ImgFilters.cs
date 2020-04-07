@@ -1,12 +1,15 @@
 ﻿//MIT, 2014-present, WinterDev
-using PixelFarm.Drawing;
-using PixelFarm.CpuBlit.Imaging;
-using PixelFarm.CpuBlit.PixelProcessing;
 
 using System;
 
+using PixelFarm.Drawing;
+using PixelFarm.CpuBlit.Imaging;
+using PixelFarm.CpuBlit.PixelProcessing;
+using CO = PixelFarm.Drawing.Internal.CO;
+
+
 namespace PaintFx.Effects
-{   
+{
     public abstract class CpuBlitImgFilter : PixelFarm.Drawing.IImageFilter, ICpuBlitImgFilter
     {
         protected PixelFarm.CpuBlit.PixelProcessing.BitmapBlenderBase _target;
@@ -41,7 +44,7 @@ namespace PaintFx.Effects
         {
             unsafe
             {
-                using (TempMemPtr bufferPtr = _target.GetBufferPtr())
+                using (PixelFarm.CpuBlit.TempMemPtr bufferPtr = _target.GetBufferPtr())
                 {
                     int[] output = new int[bufferPtr.LengthInBytes / 4]; //TODO: review here again
 
@@ -95,7 +98,7 @@ namespace PaintFx.Effects
             unsafe
             {
 
-                using (TempMemPtr bufferPtr = _target.GetBufferPtr())
+                using (PixelFarm.CpuBlit.TempMemPtr bufferPtr = _target.GetBufferPtr())
                 {
                     int[] output = new int[bufferPtr.LengthInBytes / 4]; //TODO: review here again
 
@@ -144,7 +147,7 @@ namespace PaintFx.Effects
 
                 _edge.SetAngle(Angle);
 
-                using (TempMemPtr bufferPtr = _target.GetBufferPtr())
+                using (PixelFarm.CpuBlit.TempMemPtr bufferPtr = _target.GetBufferPtr())
                 {
                     int[] output = new int[bufferPtr.LengthInBytes / 4]; //TODO: review here again
 
@@ -190,7 +193,7 @@ namespace PaintFx.Effects
         {
             unsafe
             {
-                using (TempMemPtr bufferPtr = _target.GetBufferPtr())
+                using (PixelFarm.CpuBlit.TempMemPtr bufferPtr = _target.GetBufferPtr())
                 {
                     int[] output = new int[bufferPtr.LengthInBytes / 4]; //TODO: review here again
 
@@ -235,7 +238,7 @@ namespace PaintFx.Effects
         {
             unsafe
             {
-                using (TempMemPtr bufferPtr = _target.GetBufferPtr())
+                using (PixelFarm.CpuBlit.TempMemPtr bufferPtr = _target.GetBufferPtr())
                 {
                     int[] output = new int[bufferPtr.LengthInBytes / 4]; //TODO: review here again
 
@@ -278,7 +281,7 @@ namespace PaintFx.Effects
         {
             unsafe
             {
-                using (TempMemPtr bufferPtr = _target.GetBufferPtr())
+                using (PixelFarm.CpuBlit.TempMemPtr bufferPtr = _target.GetBufferPtr())
                 {
                     int[] output = new int[bufferPtr.LengthInBytes / 4]; //TODO: review here again
 
@@ -345,12 +348,12 @@ namespace PaintFx.Effects
         {
             unsafe
             {
-                using (TempMemPtr bufferPtr = _target.GetBufferPtr())
+                using (PixelFarm.CpuBlit.TempMemPtr bufferPtr = _target.GetBufferPtr())
                 {
-                     
+
                     byte* srcBuffer = (byte*)bufferPtr.Ptr;
                     int* srcBuffer1 = (int*)srcBuffer;
-                    
+
                     int stride = _target.Stride;
                     int w = _target.Width;
                     int h = _target.Height;
@@ -380,7 +383,7 @@ namespace PaintFx.Effects
                             srcBuffer1++;
                         }
                     }
-                   
+
                 }
             }
         }
