@@ -117,7 +117,7 @@ namespace PixelFarm.CpuBlit
             //TODO:
             //goto latest path command
         }
-      
+
         public void UnbindVxs()
         {
             _myvxs = null;
@@ -175,16 +175,33 @@ namespace PixelFarm.CpuBlit
                     _latest_moveTo_X = _latest_x = x0,
                     _latest_moveTo_Y = _latest_y = y0);
             }
+            else if (_myvxs.Count == 0)
+            {
+                _myvxs.AddMoveTo(
+                      _latest_moveTo_X = _latest_x = x0,
+                      _latest_moveTo_Y = _latest_y = y0);
+            }
         }
         public void MoveToRel(double dx0, double dy0)
         {
-            if (dx0 == 0 && dy0 == 0) return;
-
-            //*** move to, relative to last(x,y) ***
-            _latestSVGPathCmd = SvgPathCommand.MoveTo;
-            _myvxs.AddMoveTo(
-                _latest_moveTo_X = (_latest_x += dx0),
-                _latest_moveTo_Y = (_latest_y += dy0));
+            if (dx0 == 0 && dy0 == 0)
+            {
+                if (_myvxs.Count == 0)
+                {
+                    _latestSVGPathCmd = SvgPathCommand.MoveTo;
+                    _myvxs.AddMoveTo(
+                        _latest_moveTo_X = (_latest_x += dx0),
+                        _latest_moveTo_Y = (_latest_y += dy0));
+                }
+            }
+            else
+            {
+                //*** move to, relative to last(x,y) ***
+                _latestSVGPathCmd = SvgPathCommand.MoveTo;
+                _myvxs.AddMoveTo(
+                    _latest_moveTo_X = (_latest_x += dx0),
+                    _latest_moveTo_Y = (_latest_y += dy0));
+            }
         }
         public void LineTo(double x1, double y1)
         {

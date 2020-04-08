@@ -631,7 +631,7 @@ namespace PixelFarm.CpuBlit
                     //#endif
 
                     //ARGB
-                    uint colorARGB = (uint)((color.A << CO.A_SHIFT) | ((color.R << CO.R_SHIFT) | (color.B << CO.G_SHIFT) | color.B << CO.B_SHIFT));
+                    uint colorARGB = (uint)((color.A << CO.A_SHIFT) | ((color.R << CO.R_SHIFT) | (color.G << CO.G_SHIFT) | color.B << CO.B_SHIFT));
                     int n = len32;
                     unsafe
                     {

@@ -125,10 +125,8 @@ namespace PixelFarm.CpuBlit
             this.SpreadMethod = linearGrBrush.SpreadMethod;
             _endColor = c1.Color;
         }
-        public void SetOffset(float x, float y)
-        {
+        public Point SpanOrigin { get; set; }
 
-        }
         Color GetColorAt(int x, int y)
         {
             double new_x = x;
@@ -158,9 +156,11 @@ namespace PixelFarm.CpuBlit
         public void GenerateColors(Color[] outputColors, int startIndex, int x, int y, int spanLen)
         {
             //start at current span generator 
+            int sp_x = SpanOrigin.X;
+            int sp_y = SpanOrigin.Y;
             for (int cur_x = x; cur_x < x + spanLen; ++cur_x)
             {
-                outputColors[startIndex] = GetColorAt(cur_x, y);
+                outputColors[startIndex] = GetColorAt(cur_x - sp_x, y - sp_y);
                 startIndex++;
             }
         }
@@ -266,15 +266,9 @@ namespace PixelFarm.CpuBlit
                 }
             }
         }
-        /// <summary>
-        /// set origin 
-        /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        public void SetOrigin(float x, float y)
-        {
 
-        }
+        public Point SpanOrigin { get; set; }
+
         Color GetProperColor(float distance)
         {
             //assume we have at list 1 pair  
@@ -302,8 +296,12 @@ namespace PixelFarm.CpuBlit
         public void GenerateColors(Color[] outputColors, int startIndex, int x, int y, int spanLen)
         {
             //start at current span generator 
+            int new_centerX = _center_x + SpanOrigin.X;
+            int new_centerY = _center_y + SpanOrigin.Y;
+
             if (_invertCoordTx != null)
             {
+
                 for (int cur_x = x; cur_x < x + spanLen; ++cur_x)
                 {
                     double new_x = cur_x;
@@ -311,8 +309,8 @@ namespace PixelFarm.CpuBlit
                     _invertCoordTx.Transform(ref new_x, ref new_y);
 
                     float r = (float)Math.Sqrt(
-                        (new_x - _center_x) * (new_x - _center_x) +
-                        (new_y - _center_y) * (new_y - _center_y));
+                       (new_x - new_centerX) * (new_x - new_centerX) +
+                       (new_y - new_centerY) * (new_y - new_centerY));
 
                     outputColors[startIndex] = GetProperColor(r);
 
@@ -322,9 +320,10 @@ namespace PixelFarm.CpuBlit
             }
             else
             {
+
                 for (int cur_x = x; cur_x < x + spanLen; ++cur_x)
                 {
-                    float r = CalculateDistance((cur_x - _center_x), (y - _center_y));
+                    float r = CalculateDistance((cur_x - new_centerX), (y - new_centerY));
                     outputColors[startIndex] = GetProperColor(r);
                     startIndex++;
                 }
@@ -355,14 +354,12 @@ namespace PixelFarm.CpuBlit
         List<VertexStore> _cacheVxsList = new List<VertexStore>();
         List<GouraudVerticeBuilder.CoordAndColor> _cacheColorAndVertexList = new List<GouraudVerticeBuilder.CoordAndColor>();
 
-    
-
         public PolygonGradientBrush()
         {
             this.DilationValue = 0.175f;
             this.LinearGamma = 0.809f;
         }
-        
+
         public float[] GetXYCoords() => _xyCoords;
         public Color[] GetColors() => _colors;
         public void BuildFrom(Drawing.PolygonGradientBrush polygonGrBrush)
@@ -387,6 +384,7 @@ namespace PixelFarm.CpuBlit
         public VertexStore CurrentVxs { get; set; }
         public int CachePartCount => _cacheVxsList.Count;
 
+        public Point SpanOrigin { get; set; }
 
         public void BuildCacheVertices(GouraudVerticeBuilder grBuilder)
         {
@@ -394,7 +392,10 @@ namespace PixelFarm.CpuBlit
             _cacheColorAndVertexList.Clear(); //clear prev data
 
             grBuilder.DilationValue = this.DilationValue;
-            using (Tools.BorrowVxs(out var tmpVxs))
+
+            int sp_x = SpanOrigin.X;
+            int sp_y = SpanOrigin.Y;
+            using (Tools.BorrowVxs(out var tmpVxs, out var tmpVxs2))
             {
                 for (int i = 0; i < _vertexCount;)
                 {
@@ -404,11 +405,12 @@ namespace PixelFarm.CpuBlit
 
                     grBuilder.SetColor(_colors[v0], _colors[v1], _colors[v2]);
                     grBuilder.SetTriangle(
-                        _outputCoords[v0 << 1], _outputCoords[(v0 << 1) + 1],
-                        _outputCoords[v1 << 1], _outputCoords[(v1 << 1) + 1],
-                        _outputCoords[v2 << 1], _outputCoords[(v2 << 1) + 1]);
+                        _outputCoords[v0 << 1] + sp_x, _outputCoords[(v0 << 1) + 1] + sp_y,
+                        _outputCoords[v1 << 1] + sp_x, _outputCoords[(v1 << 1) + 1] + sp_y,
+                        _outputCoords[v2 << 1] + sp_x, _outputCoords[(v2 << 1) + 1] + sp_y);
 
-                    //get result from _gouraudSpanBuilder
+                    //get result from _gouraudSpanBuilder 
+
                     grBuilder.MakeVxs(tmpVxs);
 
                     grBuilder.GetArrangedVertices(
@@ -419,6 +421,7 @@ namespace PixelFarm.CpuBlit
                     _cacheColorAndVertexList.Add(c0);
                     _cacheColorAndVertexList.Add(c1);
                     _cacheColorAndVertexList.Add(c2);
+
 
                     _cacheVxsList.Add(tmpVxs.CreateTrim());
 
