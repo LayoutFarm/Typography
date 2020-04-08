@@ -64,7 +64,7 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
         public int dxInt => _dx_int;
         public int dyInt => _dy_int;
         //
-
+        
         public void SetFilterOffset(double dx, double dy)
         {
             _dx_dbl = dx;

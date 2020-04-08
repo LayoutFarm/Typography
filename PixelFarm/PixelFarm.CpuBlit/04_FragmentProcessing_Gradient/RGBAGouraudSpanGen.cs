@@ -154,7 +154,6 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
             _c1 = c1;
             _c2 = c2;
         }
-
         void ISpanGenerator.Prepare()
         {
 
@@ -166,8 +165,12 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
             _rgba2.Init(_c0, _c1);
             _rgba3.Init(_c1, _c2);
         }
+        public Point SpanOrigin { get; set; }
         void ISpanGenerator.GenerateColors(Color[] outputColors, int startIndex, int x, int y, int len)
         {
+            x -= SpanOrigin.X;
+            y -= SpanOrigin.Y;
+
             _rgba1.Calculate(y);//(m_rgba1.m_1dy > 2) ? m_rgba1.m_y1 : y);
             RGBA_Calculator pc1 = _rgba1;
             RGBA_Calculator pc2 = _rgba2;
@@ -208,6 +211,8 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
                 //use LineInterpolatorDDA
             }
 #endif
+
+
             var line_r = new LineInterpolatorDDA255(pc1._r, pc2._r, nlen, 14);
             var line_g = new LineInterpolatorDDA255(pc1._g, pc2._g, nlen, 14);
             var line_b = new LineInterpolatorDDA255(pc1._b, pc2._b, nlen, 14);

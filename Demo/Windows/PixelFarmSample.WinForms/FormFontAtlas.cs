@@ -8,8 +8,7 @@ using System.IO;
 using System.Text;
 using System.Windows.Forms;
 
-using PixelFarm.CpuBlit;
-using PixelFarm.Drawing.Fonts;
+using PixelFarm.CpuBlit; 
 using Typography.OpenFont;
 using Typography.OpenFont.Extensions;
 using PixelFarm.CpuBlit.BitmapAtlas;

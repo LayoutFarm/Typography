@@ -54,7 +54,7 @@ namespace PixelFarm.CpuBlit.PixelProcessing
 
         public IntPtr GetInternalBufferPtr32 => _raw_buffer32;
 
-        public Imaging.TempMemPtr GetBufferPtr() => new Imaging.TempMemPtr(_raw_buffer32, _rawBufferLenInBytes);
+        public TempMemPtr GetBufferPtr() => new TempMemPtr(_raw_buffer32, _rawBufferLenInBytes);
 
         protected void SetBufferToNull()
         {
@@ -62,7 +62,7 @@ namespace PixelFarm.CpuBlit.PixelProcessing
             _rawBufferLenInBytes = 0;
         }
 
-        protected void SetBuffer(Imaging.TempMemPtr tmpMem)
+        protected void SetBuffer(TempMemPtr tmpMem)
         {
             _raw_buffer32 = tmpMem.Ptr;
             _rawBufferLenInBytes = tmpMem.LengthInBytes;
@@ -97,7 +97,7 @@ namespace PixelFarm.CpuBlit.PixelProcessing
         /// <param name="bitsPerPixel"></param>
         /// <param name="imgbuffer"></param>
         /// <param name="outputPxBlender"></param>
-        protected void Attach(int width, int height, int bitsPerPixel, CpuBlit.Imaging.TempMemPtr imgbuffer, PixelBlender32 outputPxBlender)
+        protected void Attach(int width, int height, int bitsPerPixel, TempMemPtr imgbuffer, PixelBlender32 outputPxBlender)
         {
             if (width <= 0 || height <= 0)
             {
@@ -176,8 +176,8 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                 unsafe
                 {
 
-                    using (CpuBlit.Imaging.TempMemPtr memPtr = sourceImage.GetBufferPtr())
-                    using (CpuBlit.Imaging.TempMemPtr destPtr = this.GetBufferPtr())
+                    using (TempMemPtr memPtr = sourceImage.GetBufferPtr())
+                    using (TempMemPtr destPtr = this.GetBufferPtr())
                     {
                         byte* sourceBuffer = (byte*)memPtr.Ptr;
                         byte* destBuffer = (byte*)destPtr.Ptr;
@@ -185,7 +185,7 @@ namespace PixelFarm.CpuBlit.PixelProcessing
 
                         for (int i = 0; i < clippedSourceImageRect.Height; i++)
                         {
-                            MemMx.memmove(destBuffer, destOffset * 4, sourceBuffer, sourceOffset, lengthInBytes);
+                            PixelFarm.Drawing.Internal.MemMx.memmove(destBuffer, destOffset * 4, sourceBuffer, sourceOffset, lengthInBytes);
                             sourceOffset += sourceImage.Stride;
                             destOffset += Stride;
                         }
@@ -212,8 +212,8 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                                         //byte[] sourceBuffer = sourceImage.GetBuffer();
                                         //byte[] destBuffer = GetBuffer();
 
-                                        using (CpuBlit.Imaging.TempMemPtr srcMemPtr = sourceImage.GetBufferPtr())
-                                        using (CpuBlit.Imaging.TempMemPtr destBufferPtr = this.GetBufferPtr())
+                                        using (TempMemPtr srcMemPtr = sourceImage.GetBufferPtr())
+                                        using (TempMemPtr destBufferPtr = this.GetBufferPtr())
                                         {
 
                                             int destOffset = GetBufferOffsetXY32(
@@ -411,13 +411,13 @@ namespace PixelFarm.CpuBlit.PixelProcessing
         }
         public void SetPixel(int x, int y, Color color)
         {
-            _outputPxBlender.CopyPixel(new Imaging.TempMemPtr(_raw_buffer32, _rawBufferLenInBytes), GetBufferOffsetXY32(x, y), color);
+            _outputPxBlender.CopyPixel(new TempMemPtr(_raw_buffer32, _rawBufferLenInBytes), GetBufferOffsetXY32(x, y), color);
         }
 
         public void CopyHL(int x, int y, int len, Color sourceColor)
         {
 
-            _outputPxBlender.CopyPixels(new Imaging.TempMemPtr(_raw_buffer32, _rawBufferLenInBytes), GetBufferOffsetXY32(x, y), sourceColor, len);
+            _outputPxBlender.CopyPixels(new TempMemPtr(_raw_buffer32, _rawBufferLenInBytes), GetBufferOffsetXY32(x, y), sourceColor, len);
         }
 
         public void CopyVL(int x, int y, int len, Color sourceColor)
@@ -455,7 +455,7 @@ namespace PixelFarm.CpuBlit.PixelProcessing
             {
                 Color c2 = Color.FromArgb(alpha, sourceColor);
 
-                Imaging.TempMemPtr buffer = this.GetBufferPtr();
+                TempMemPtr buffer = this.GetBufferPtr();
                 do
                 {
                     //copy pixel-by-pixel
@@ -538,13 +538,13 @@ namespace PixelFarm.CpuBlit.PixelProcessing
             }
 #endif
         }
-        
+
         public void BlendSolidHSpan(int x, int y, int len, Color sourceColor, byte[] covers, int coversIndex)
         {
             int colorAlpha = sourceColor.A;
             if (colorAlpha != 0)
             {
-                Imaging.TempMemPtr buffer = this.GetBufferPtr();
+                TempMemPtr buffer = this.GetBufferPtr();
                 int bufferOffset32 = GetBufferOffsetXY32(x, y);
                 do
                 {
@@ -575,7 +575,7 @@ namespace PixelFarm.CpuBlit.PixelProcessing
 
                     int bufferOffset32 = GetBufferOffsetXY32(x, y);
                     int actualW = scanWidthInBytes / 4;
-                    Imaging.TempMemPtr dst = new Imaging.TempMemPtr(_raw_buffer32, _rawBufferLenInBytes);
+                    TempMemPtr dst = new TempMemPtr(_raw_buffer32, _rawBufferLenInBytes);
                     do
                     {
                         //TODO: review here again
@@ -600,7 +600,7 @@ namespace PixelFarm.CpuBlit.PixelProcessing
         public void CopyColorHSpan(int x, int y, int len, Color[] colors, int colorsIndex)
         {
             int bufferOffset32 = GetBufferOffsetXY32(x, y);
-            Imaging.TempMemPtr dst = new Imaging.TempMemPtr(_raw_buffer32, _rawBufferLenInBytes);
+            TempMemPtr dst = new TempMemPtr(_raw_buffer32, _rawBufferLenInBytes);
             do
             {
                 _outputPxBlender.CopyPixel(dst, bufferOffset32, colors[colorsIndex]);
@@ -614,7 +614,7 @@ namespace PixelFarm.CpuBlit.PixelProcessing
         {
             int bufferOffset32 = GetBufferOffsetXY32(x, y);
             int actualW = _strideInBytes / 4;
-            Imaging.TempMemPtr dst = new Imaging.TempMemPtr(_raw_buffer32, _rawBufferLenInBytes);
+            TempMemPtr dst = new TempMemPtr(_raw_buffer32, _rawBufferLenInBytes);
             do
             {
                 _outputPxBlender.CopyPixel(dst, bufferOffset32, colors[colorsIndex]);
@@ -629,7 +629,7 @@ namespace PixelFarm.CpuBlit.PixelProcessing
             int bufferOffset32 = GetBufferOffsetXY32Check(x, y);
             if (bufferOffset32 > -1)
             {
-                Imaging.TempMemPtr dst = new Imaging.TempMemPtr(_raw_buffer32, _rawBufferLenInBytes);
+                TempMemPtr dst = new TempMemPtr(_raw_buffer32, _rawBufferLenInBytes);
                 _outputPxBlender.BlendPixels(dst, bufferOffset32, colors, colorsIndex, covers, coversIndex, firstCoverForAll, len);
             }
             else

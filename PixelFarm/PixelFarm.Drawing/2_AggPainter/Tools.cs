@@ -327,7 +327,7 @@ namespace PixelFarm.CpuBlit
         {
             Color prevColor = p.FillColor;
             p.FillColor = color;
-            p.Fill(rgn);
+            p.FillRegion(rgn);
             p.FillColor = prevColor;
         }
 

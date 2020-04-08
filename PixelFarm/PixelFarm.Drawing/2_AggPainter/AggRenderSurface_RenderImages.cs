@@ -111,10 +111,10 @@ namespace PixelFarm.CpuBlit
         /// <param name="spanGen"></param>
         public void Render(VertexStore vxs, ISpanGenerator spanGen)
         {
-            float offset_x = _sclineRas.OffsetOriginX;
-            float offset_y = _sclineRas.OffsetOriginY;
+            //float offset_x = _sclineRas.OffsetOriginX;
+            //float offset_y = _sclineRas.OffsetOriginY;
 
-            _sclineRas.OffsetOriginX = _sclineRas.OffsetOriginY = 0;
+            //_sclineRas.OffsetOriginX = _sclineRas.OffsetOriginY = 0;
             _sclineRas.AddPath(vxs);
             _bmpRasterizer.RenderWithSpan(
                 _destBitmapBlender,
@@ -122,8 +122,8 @@ namespace PixelFarm.CpuBlit
                 _sclinePack8,
                 spanGen);
 
-            _sclineRas.OffsetOriginX = offset_x;
-            _sclineRas.OffsetOriginY = offset_y;
+            //_sclineRas.OffsetOriginX = offset_x;
+            //_sclineRas.OffsetOriginY = offset_y;
         }
 
         public void Render(IBitmapSrc source,

@@ -64,7 +64,7 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
         int _dilation;
         int _dilation_hr;
         SubBitmapBlender _buf;
-        PixelFarm.CpuBlit.Imaging.TempMemPtr _data;
+        TempMemPtr _data;
         int _DataSizeInBytes = 0;
         int _width;
         int _height;
@@ -150,7 +150,7 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
                 _data.Dispose();
 
                 IntPtr nativeBuff = System.Runtime.InteropServices.Marshal.AllocHGlobal(_DataSizeInBytes);
-                _data = new Imaging.TempMemPtr(nativeBuff, _DataSizeInBytes);
+                _data = new TempMemPtr(nativeBuff, _DataSizeInBytes);
             }
 
             _buf = new PixelProcessing.SubBitmapBlender(_data, 0, bufferWidth, bufferHeight, bufferWidth * bytesPerPixel, src.BitDepth, bytesPerPixel);
@@ -158,8 +158,8 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
             unsafe
             {
 
-                using (CpuBlit.Imaging.TempMemPtr destMemPtr = _buf.GetBufferPtr())
-                using (CpuBlit.Imaging.TempMemPtr srcMemPtr = src.GetBufferPtr())
+                using (TempMemPtr destMemPtr = _buf.GetBufferPtr())
+                using (TempMemPtr srcMemPtr = src.GetBufferPtr())
                 {
                     int* destBuffer = (int*)destMemPtr.Ptr;
                     int* srcBuffer = (int*)srcMemPtr.Ptr;

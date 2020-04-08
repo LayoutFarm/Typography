@@ -28,7 +28,7 @@ namespace PixelFarm.Drawing.WinGdi
                 unsafe
                 {
                     byte* dst = (byte*)MemBitmap.GetBufferPtr(memBitmap).Ptr;
-                    MemMx.memcpy(dst, (byte*)bmpData2.Scan0, bmpData2.Stride * bmpData2.Height);
+                    PixelFarm.Drawing.Internal.MemMx.memcpy(dst, (byte*)bmpData2.Scan0, bmpData2.Stride * bmpData2.Height);
                 }
                 return memBitmap;
             }
@@ -44,7 +44,7 @@ namespace PixelFarm.Drawing.WinGdi
                 unsafe
                 {
                     byte* ptr = (byte*)MemBitmap.GetBufferPtr(bitmap).Ptr;
-                    MemMx.memcpy((byte*)bmpdata.Scan0, ptr, bmpdata.Stride * bmp.Height);
+                    PixelFarm.Drawing.Internal.MemMx.memcpy((byte*)bmpdata.Scan0, ptr, bmpdata.Stride * bmp.Height);
                 }
                 bmp.UnlockBits(bmpdata);
                 //save to stream
@@ -76,7 +76,7 @@ namespace PixelFarm.Drawing.WinGdi
                 unsafe
                 {
                     byte* ptr = (byte*)MemBitmap.GetBufferPtr(bitmap).Ptr;
-                    MemMx.memcpy((byte*)bmpdata.Scan0, ptr, bmpdata.Stride * bmp.Height);
+                    PixelFarm.Drawing.Internal.MemMx.memcpy((byte*)bmpdata.Scan0, ptr, bmpdata.Stride * bmp.Height);
                 }
                 bmp.UnlockBits(bmpdata);
 

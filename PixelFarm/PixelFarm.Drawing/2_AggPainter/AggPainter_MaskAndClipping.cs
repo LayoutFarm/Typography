@@ -52,6 +52,7 @@ namespace PixelFarm.CpuBlit
                     this.TargetBufferName = TargetBufferName.AlphaMask;
                     //2.
                     Color prevColor = this.FillColor; //save
+                    Brush prevBrush = CurrentBrush;
 
                     this.FillColor = Color.White;
                     _aggsx.Render(vxs, FillColor);
@@ -59,6 +60,8 @@ namespace PixelFarm.CpuBlit
                     //fill vxs with white color (on black bg)
 
                     this.FillColor = prevColor; //restore
+                    CurrentBrush = prevBrush;//restore
+
                     //3. switch back to default layer
                     this.TargetBufferName = TargetBufferName.Default;//swicth to default buffer
                     this.EnableBuiltInMaskComposite = true;
@@ -165,15 +168,7 @@ namespace PixelFarm.CpuBlit
                         _aggsx = _aggsx_mask;//*** 
                         break;
                 }
-                //TempMemPtr tmp = MemBitmap.GetBufferPtr(_aggsx.DestBitmap);
-                //unsafe
-                //{
-                //    _bxt = new BitmapBuffer(
-                //       _aggsx.Width,
-                //       _aggsx.Height,
-                //        tmp.Ptr,
-                //        tmp.LengthInBytes);
-                //}
+
             }
         }
 
@@ -209,10 +204,9 @@ namespace PixelFarm.CpuBlit
             }
         }
 
-        public override void Fill(Region rgn)
+        public override void FillRegion(Region rgn)
         {
-            var region = rgn as CpuBlitRegion;
-            if (region == null) return;
+            if (!(rgn is CpuBlitRegion region)) return;
             switch (region.Kind)
             {
                 case CpuBlitRegion.CpuBlitRegionKind.BitmapBasedRegion:
@@ -240,21 +234,18 @@ namespace PixelFarm.CpuBlit
                     }
                     break;
             }
-
         }
-        public override void Draw(Region rgn)
+
+        public override void DrawRegion(Region rgn)
         {
-            var region = rgn as PixelFarm.CpuBlit.CpuBlitRegion;
-            if (region == null) return;
+            if (!(rgn is PixelFarm.CpuBlit.CpuBlitRegion region)) return;
             switch (region.Kind)
             {
                 case CpuBlitRegion.CpuBlitRegionKind.BitmapBasedRegion:
                     {
                         var bmpRgn = (PixelFarm.PathReconstruction.BitmapBasedRegion)region;
                         //check if it has outline data or not
-                        //if not then just return
-
-
+                        //if not then just return 
                     }
                     break;
                 case CpuBlitRegion.CpuBlitRegionKind.VxsRegion:
@@ -272,6 +263,29 @@ namespace PixelFarm.CpuBlit
             }
         }
 
+        public override void FillRegion(VertexStore vxs)
+        {
+            
+
+            this.SetClipRgn(vxs);
+
+            float ox = this.OriginX;
+            float oy = this.OriginY;
+
+            Q1RectD bounds = vxs.GetBoundingRect();
+            SetOrigin((float)(ox + bounds.Left), (float)(oy + bounds.Bottom));
+
+            FillRect(0, 0, bounds.Width, bounds.Height);
+
+
+
+            SetClipRgn(null);
+            SetOrigin(ox, oy);
+        }
+        public override void DrawRegion(VertexStore vxs)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     public enum TargetBufferName

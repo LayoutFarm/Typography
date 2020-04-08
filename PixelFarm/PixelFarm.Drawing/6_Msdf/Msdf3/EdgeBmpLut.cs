@@ -182,7 +182,7 @@ namespace Msdfgen
             int srcColorABGR = (int)srcColor.ToABGR();
             int existingColor = *dstPtr;
             //int existing_R = (existingColor >> CO.R_SHIFT) & 0xFF;
-            int existing_G = (existingColor >> CO.G_SHIFT) & 0xFF;
+            int existing_G = (existingColor >> PixelFarm.Drawing.Internal.CO.G_SHIFT) & 0xFF;
             //int existing_B = (existingColor >> CO.B_SHIFT) & 0xFF;
 
 
@@ -364,7 +364,7 @@ namespace Msdfgen
             _corners = corners;
             _flattenEdges = flattenEdges;
             EdgeOfNextContours = segOfNextContours;
-            CornerOfNextContours = cornerOfNextContours; 
+            CornerOfNextContours = cornerOfNextContours;
         }
         internal void SetOverlappedList(List<CornerList> overlappedList)
         {
@@ -389,7 +389,7 @@ namespace Msdfgen
                 _overlappedEdgeList.Add(corners);
             }
         }
-       
+
         public List<int> EdgeOfNextContours { get; private set; }
         public List<int> CornerOfNextContours { get; private set; }
 

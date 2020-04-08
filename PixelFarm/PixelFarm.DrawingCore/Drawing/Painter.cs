@@ -19,7 +19,7 @@
 // Class to output the vertex source of a string as a run of glyphs.
 //----------------------------------------------------------------------------
 
-using System.Collections.Generic;
+
 using PixelFarm.CpuBlit;
 namespace PixelFarm.Drawing
 {
@@ -114,8 +114,10 @@ namespace PixelFarm.Drawing
         public abstract void Fill(VertexStore vxs);
         public abstract void Draw(VertexStore vxs);
         //---------------------------------------
-        public abstract void Fill(Region rgn);
-        public abstract void Draw(Region rgn);
+        public abstract void FillRegion(Region rgn);
+        public abstract void FillRegion(VertexStore vxs);
+        public abstract void DrawRegion(Region rgn);
+        public abstract void DrawRegion(VertexStore vxs);
         //---------------------------------------
 
 

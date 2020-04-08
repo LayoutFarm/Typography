@@ -62,20 +62,19 @@
     <Compile Include="..\PixelFarm.PrimitiveGeo\RectangleF.cs">
       <Link>0_REF_PrimitiveGeo\RectangleF.cs</Link>
     </Compile>
-    <Compile Include="2_Abstract_DrawingElements\Brushes_Pens.cs" />
-    <Compile Include="3_DrawBoard\CO.cs" />
-    <Compile Include="2_Abstract_DrawingElements\CombineMode.cs" />
-    <Compile Include="2_Abstract_DrawingElements\DashStyle.cs" />
-    <Compile Include="2_Abstract_DrawingElements\Image.cs" />
-    <Compile Include="2_Abstract_DrawingElements\Region.cs" />
-    <Compile Include="3_DrawBoard\0_VertexCommandAndOrientation.cs" />
-    <Compile Include="3_DrawBoard\1_VertexStore.cs" />
-    <Compile Include="3_DrawBoard\CRC32Calculator.cs" />
-    <Compile Include="3_DrawBoard\DrawBoard.cs" />
-    <Compile Include="3_DrawBoard\Others.cs" />
-    <Compile Include="3_DrawBoard\Painter.cs" />
-    <Compile Include="3_DrawBoard\RenderVx.cs" />
-    <Compile Include="3_DrawBoard\RequestFont.cs" />
+    <Compile Include="Drawing\Brushes_Pens.cs" />
+    <Compile Include="Drawing\CombineMode.cs" />
+    <Compile Include="Drawing\DashStyle.cs" />
+    <Compile Include="Drawing\Image.cs" />
+    <Compile Include="Drawing\Region.cs" />
+    <Compile Include="Drawing\CRC32Calculator.cs" />
+    <Compile Include="Drawing\DrawBoard.cs" />
+    <Compile Include="Drawing\LenAndLenUnit.cs" />
+    <Compile Include="Drawing\Painter.cs" />
+    <Compile Include="Drawing\RenderVx.cs" />
+    <Compile Include="Drawing\RequestFont.cs" />
+    <Compile Include="Drawing\VertexCommandAndOrientation.cs" />
+    <Compile Include="Drawing\VertexStore.cs" />
     <Compile Include="ExtensionAttribute.cs" />
   </ItemGroup>
   <ItemGroup>

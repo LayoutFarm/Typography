@@ -3,7 +3,7 @@
 using System;
 namespace PixelFarm.Drawing
 {
-    using Fonts;
+    using Internal;
     public abstract class RenderVx : IDisposable
     {
         public virtual void Dispose() { }
@@ -35,7 +35,7 @@ namespace PixelFarm.Drawing
     }
 
 
-    namespace Fonts
+    namespace Internal
     {
         public struct RenderVxGlyphPlan
         {

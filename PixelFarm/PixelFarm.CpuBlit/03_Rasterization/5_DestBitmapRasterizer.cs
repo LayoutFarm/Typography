@@ -101,7 +101,7 @@ namespace PixelFarm.CpuBlit.Rasterization
             unsafe
             {
 
-                using (CpuBlit.Imaging.TempMemPtr dest_bufferPtr = dest.GetBufferPtr())
+                using (TempMemPtr dest_bufferPtr = dest.GetBufferPtr())
                 {
                     byte* dest_buffer = (byte*)dest_bufferPtr.Ptr;
                     int dest_stride = _destImgStride = dest.Stride;
