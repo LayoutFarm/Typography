@@ -22,10 +22,8 @@ namespace PixelFarm.CpuBlit
 
         public override Brush CurrentBrush
         {
-            get
-            {
-                return _curBrush;
-            }
+            get => _curBrush;
+
             set
             {
                 _curBrush = value;
@@ -128,18 +126,29 @@ namespace PixelFarm.CpuBlit
                             //------------------------------------------- 
                             //original agg's gradient fill 
                             LinearGradientSpanGen linearSpanGen = ResolveLinearGrBrush((LinearGradientBrush)br);
-                            linearSpanGen.SetOffset(0, 0);//TODO: review this offset
+                            Q1RectD bounds = vxs.GetBoundingRect();
+
+                            Point prevOrg = linearSpanGen.SpanOrigin;
+                            //TODO: rounding
+
+                            linearSpanGen.SpanOrigin = new Point((int)(OriginX + bounds.Left), (int)(OriginY + bounds.Bottom)); //*** 
+
                             Fill(vxs, linearSpanGen);
+
+                            linearSpanGen.SpanOrigin = prevOrg;//restore
+
                         }
                         break;
                     case BrushKind.CircularGraident:
                         {
+                            Q1RectD bounds = vxs.GetBoundingRect();
                             RadialGradientSpanGen radialSpanGen = ResolveRadialGrBrush((RadialGradientBrush)br);
-                            radialSpanGen.SetOrigin(0, 0);//TODO: review this offset 
+                            //radialSpanGen.SetOrigin(0, 0);//TODO: review this offset 
+                            Point prevOrg = radialSpanGen.SpanOrigin;
+                            radialSpanGen.SpanOrigin = new Point((int)(OriginX + bounds.Left), (int)(OriginY + bounds.Bottom)); //*** 
                             radialSpanGen.Opactiy = FillOpacity;
-
                             Fill(vxs, radialSpanGen);
-
+                            radialSpanGen.SpanOrigin = prevOrg;//restore
                         }
                         break;
                     case BrushKind.PolygonGradient:
@@ -183,6 +192,7 @@ namespace PixelFarm.CpuBlit
                 out brush._outputCoords,
                 out brush._vertexCount);
 
+            brush.SpanOrigin = new Point((int)OriginX, (int)OriginY);
             brush.BuildCacheVertices(_gouraudVertBuilder);
 
             polygonGrBrush.InnerBrush = brush; //cache this brush
@@ -193,23 +203,39 @@ namespace PixelFarm.CpuBlit
         void FillWithPolygonGraidentBrush(VertexStore vxs, Drawing.PolygonGradientBrush polygonGrBrush)
         {
             //we use mask technique (simlar to texture brush) 
-            //1. switch to mask layer
 
+            Q1RectD bounds = vxs.GetBoundingRect();
+
+            //1. switch to mask layer 
             SetClipRgn(vxs);
 
+            Point prevOrg = _rgbaGourandSpanGen.SpanOrigin;
+            float ox = OriginX;
+            float oy = OriginY;
+
+            Point newOrg = new Point((int)(bounds.Left + ox), (int)(bounds.Bottom + oy));
+            _rgbaGourandSpanGen.SpanOrigin = newOrg;
+
             PolygonGradientBrush brush = ResolvePolygonGradientBrush(polygonGrBrush);
-          
+
             //TODO: add gamma here...
             //aggsx.ScanlineRasterizer.ResetGamma(new GammaLinear(0.0f, this.LinearGamma)); //*** 
 
             int partCount = brush.CachePartCount;
+
+            SetOrigin(newOrg.X, newOrg.Y);
+
             for (int i = 0; i < partCount; i++)
             {
-                brush.SetSpanGenWithCurrentValues(i, _rgbaGourandSpanGen); //*** this affects assoc gouraudSpanGen
+                brush.SetSpanGenWithCurrentValues(i, _rgbaGourandSpanGen); //*** this affects assoc gouraudSpanGen 
+
                 this.Fill(brush.CurrentVxs, _rgbaGourandSpanGen);
             }
 
             SetClipRgn(null);
+            _rgbaGourandSpanGen.SpanOrigin = prevOrg;//restore
+
+            SetOrigin(ox, oy);
         }
         public override void FillEllipse(double left, double top, double width, double height)
         {
@@ -311,21 +337,59 @@ namespace PixelFarm.CpuBlit
                                 //-------------------------------------------  
                                 //check inner object
                                 LinearGradientSpanGen linearGradientSpanGen = ResolveLinearGrBrush((LinearGradientBrush)br);
-                                linearGradientSpanGen.SetOffset((float)-left, (float)-top);
+                                Point prev_o = linearGradientSpanGen.SpanOrigin;
+                                linearGradientSpanGen.SpanOrigin = new Point((int)(left + OriginX), (int)(top + OriginY));
                                 Fill(rectTool.MakeVxs(v1), linearGradientSpanGen);
+                                linearGradientSpanGen.SpanOrigin = prev_o;
                             }
                             break;
                         case BrushKind.CircularGraident:
                             {
                                 //var radialGr = (Drawing.RadialGradientBrush)br;
                                 RadialGradientSpanGen radialSpanGen = ResolveRadialGrBrush((Drawing.RadialGradientBrush)br);
-                                radialSpanGen.SetOrigin((float)-left, (float)-top);
+                                Point prev_o = radialSpanGen.SpanOrigin;
+                                radialSpanGen.SpanOrigin = new Point((int)(left + OriginX), (int)(top + OriginY));
                                 Fill(rectTool.MakeVxs(v1), radialSpanGen);
+                                radialSpanGen.SpanOrigin = prev_o;
                             }
                             break;
                         case BrushKind.PolygonGradient:
                             {
-                                FillWithPolygonGraidentBrush(rectTool.MakeVxs(v1), (Drawing.PolygonGradientBrush)br);
+                                //we use mask technique (simlar to texture brush) 
+
+
+                                Point prevOrg = _rgbaGourandSpanGen.SpanOrigin;
+                                float ox = OriginX;
+                                float oy = OriginY;
+
+                                Point newOrg = new Point((int)(left + ox), (int)(top + oy));
+                                _rgbaGourandSpanGen.SpanOrigin = newOrg;
+
+                                PolygonGradientBrush brush = ResolvePolygonGradientBrush((Drawing.PolygonGradientBrush)br);
+
+                                //TODO: add gamma here...
+                                //aggsx.ScanlineRasterizer.ResetGamma(new GammaLinear(0.0f, this.LinearGamma)); //*** 
+
+                                int partCount = brush.CachePartCount;
+
+                                SetOrigin(newOrg.X, newOrg.Y);
+
+                                for (int i = 0; i < partCount; i++)
+                                {
+                                    brush.SetSpanGenWithCurrentValues(i, _rgbaGourandSpanGen); //*** this affects assoc gouraudSpanGen 
+
+                                    this.Fill(brush.CurrentVxs, _rgbaGourandSpanGen);
+                                }
+
+                                SetClipRgn(null);
+                                _rgbaGourandSpanGen.SpanOrigin = prevOrg;//restore
+
+                                SetOrigin(ox, oy);
+                            }
+                            break;
+                        case BrushKind.Solid:
+                            {
+                                _aggsx.Render(rectTool.MakeVxs(v1), ((SolidBrush)br).Color);
                             }
                             break;
                         default:
