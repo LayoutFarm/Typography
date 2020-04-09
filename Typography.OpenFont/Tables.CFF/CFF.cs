@@ -1090,7 +1090,7 @@ namespace Typography.OpenFont.CFF
             type2Parser.SetCurrentCff1Font(_currentCff1Font);
 
 #if DEBUG
-            //double total = 0;
+            double total = 0;
 #endif
             for (int i = 0; i < glyphCount; ++i)
             {
@@ -1124,11 +1124,14 @@ namespace Typography.OpenFont.CFF
 
                     if (_useCompactInstruction)
                     {
-                        //this is our extension 
+                        //this is our extension,
+                        //if you don't want compact version
+                        //just use original 
+
                         glyphData.GlyphInstructions = _instCompacter.Compact(instList.InnerInsts);
 
 #if DEBUG
-                        //total += glyphData.GlyphInstructions.Length / (float)instList.InnerInsts.Count;
+                        total += glyphData.GlyphInstructions.Length / (float)instList.InnerInsts.Count;
 #endif
 
                     }
@@ -1142,7 +1145,11 @@ namespace Typography.OpenFont.CFF
             }
 
 #if DEBUG
-            //double avg = total / glyphCount;
+            if (_useCompactInstruction)
+            {
+                double avg = total / glyphCount;
+                System.Diagnostics.Debug.WriteLine("cff instruction compact avg:" + avg + "%");
+            }
 #endif
 
         }
