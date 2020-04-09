@@ -87,7 +87,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Typography.MsdfGen", "Build
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PixelFarm.Drawing", "PixelFarm\PixelFarm.Drawing\PixelFarm.Drawing.csproj", "{51D63482-5697-4B16-8401-506965624657}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PaintLab.PaintFx.MiniAgg", "..\PixelFarm\src\PixelFarm\PaintLab.PaintFx\PaintLab.PaintFx.MiniAgg.csproj", "{A533E1C7-AB74-4BCF-BC7A-12D4DBBFA918}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PaintLab.PaintFx.MiniAgg", "PixelFarm\PaintLab.PaintFx\PaintLab.PaintFx.MiniAgg.csproj", "{A533E1C7-AB74-4BCF-BC7A-12D4DBBFA918}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
@@ -105,7 +105,7 @@ Global
 		Typography.TextFlow\Typography.TextFlow.projitems*{7a8a63d2-2cb5-41f5-8e83-6f6e54398cf4}*SharedItemsImports = 13
 		Typography.TextBreak\Typography.TextBreak\Typography.TextBreak.projitems*{9a99f103-b119-4a4d-8093-6a03baa6d36b}*SharedItemsImports = 13
 		Demo\Shared\DrawingGL.Common.projitems*{a09b4bf0-2c5e-42e9-b23c-afd0b5a8697d}*SharedItemsImports = 4
-		..\PixelFarm\src\PixelFarm\BackEnd.PaintFx\PdnSharedProject\PdnSharedProject.projitems*{a533e1c7-ab74-4bcf-bc7a-12d4dbbfa918}*SharedItemsImports = 4
+		PixelFarm\BackEnd.PaintFx\PdnSharedProject\PdnSharedProject.projitems*{a533e1c7-ab74-4bcf-bc7a-12d4dbbfa918}*SharedItemsImports = 4
 		Demo\Shared\DrawingGL.Common.projitems*{b824ffb2-d057-490a-8967-892c0e20c0b6}*SharedItemsImports = 4
 		PixelFarm\BackEnd.Triangulation\Triangulation.projitems*{c5e5802d-6a45-4fe9-bae7-5f0ae91d72c1}*SharedItemsImports = 4
 		Unpack_SH\Unpack_SH.projitems*{ce0d5c56-c9da-4f22-9ad8-3677d0e034a4}*SharedItemsImports = 13
