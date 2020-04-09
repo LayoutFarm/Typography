@@ -145,8 +145,8 @@ namespace PixelFarm.Drawing
             UpdateGlyphLayoutSettings();
             _glyphMeshStore.SetFont(_currentTypeface, this.FontSizeInPoints);
             _glyphMeshStore.SimulateOblique = this.SimulateSlant;
-            TextBufferSpan textBuffSpan = new TextBufferSpan(buffer, startAt, len);
-            Size s = _textServices.MeasureString(ref textBuffSpan, _painter.CurrentFont);
+            var textBuffSpan = new TextBufferSpan(buffer, startAt, len);
+            Size s = _textServices.MeasureString(textBuffSpan, _painter.CurrentFont);
             w = s.Width;
             h = s.Height;
         }
@@ -370,8 +370,8 @@ namespace PixelFarm.Drawing
         {
             UpdateGlyphLayoutSettings();
             //unscale layout, with design unit scale
-            TextBufferSpan buffSpan = new TextBufferSpan(textBuffer, startAt, len);
-            GlyphPlanSequence glyphPlanSeq = _textServices.CreateGlyphPlanSeq(ref buffSpan, _reqFont);
+            var buffSpan = new TextBufferSpan(textBuffer, startAt, len);
+            GlyphPlanSequence glyphPlanSeq = _textServices.CreateGlyphPlanSeq(buffSpan, _reqFont);
             DrawFromGlyphPlans(glyphPlanSeq, x, y);
         }
 

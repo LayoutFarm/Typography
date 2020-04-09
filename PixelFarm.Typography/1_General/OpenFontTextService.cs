@@ -110,17 +110,17 @@ namespace PixelFarm.Drawing
             set => _txtServices.CurrentScriptLang = value;
         }
         //
-        public void CalculateUserCharGlyphAdvancePos(ref TextBufferSpan textBufferSpan, RequestFont font, ref TextSpanMeasureResult measureResult)
+        public void CalculateUserCharGlyphAdvancePos(in TextBufferSpan textBufferSpan, RequestFont font, ref TextSpanMeasureResult measureResult)
         {
-            CalculateUserCharGlyphAdvancePos(ref textBufferSpan,
-                this.BreakToLineSegments(ref textBufferSpan),
+            CalculateUserCharGlyphAdvancePos(textBufferSpan,
+                this.BreakToLineSegments(textBufferSpan),
                 font,
                 ref measureResult);
         }
         //
         ReusableTextBuffer _reusableTextBuffer = new ReusableTextBuffer();
         //
-        public void CalculateUserCharGlyphAdvancePos(ref TextBufferSpan textBufferSpan,
+        public void CalculateUserCharGlyphAdvancePos(in TextBufferSpan textBufferSpan,
             ILineSegmentList lineSegs,
             RequestFont font,
             ref TextSpanMeasureResult measureResult)
@@ -252,8 +252,8 @@ namespace PixelFarm.Drawing
                 lineGapInPx,
                 recommedLineSpacingInPx);
 
-            TextBufferSpan w = new TextBufferSpan(new char[] { ' ' });
-            Size whiteSpaceW = MeasureString(ref w, font);
+            var span = new TextBufferSpan(new char[] { ' ' });
+            Size whiteSpaceW = MeasureString(span, font);
             PixelFarm.Drawing.Internal.RequestFontCacheAccess.SetWhitespaceWidth(font, _system_id, whiteSpaceW.Width);
             return typeface;
         }
@@ -263,7 +263,7 @@ namespace PixelFarm.Drawing
             return PixelFarm.Drawing.Internal.RequestFontCacheAccess.GetWhitespaceWidth(f, _system_id);
         }
 
-        public GlyphPlanSequence CreateGlyphPlanSeq(ref TextBufferSpan textBufferSpan, RequestFont font)
+        public GlyphPlanSequence CreateGlyphPlanSeq(in TextBufferSpan textBufferSpan, RequestFont font)
         {
 
             Typeface typeface = ResolveTypeface(font);
@@ -273,14 +273,14 @@ namespace PixelFarm.Drawing
 
             return _txtServices.GetUnscaledGlyphPlanSequence(_reusableTextBuffer, textBufferSpan.start, textBufferSpan.len);
         }
-        public Size MeasureString(ref TextBufferSpan textBufferSpan, RequestFont font)
+        public Size MeasureString(in TextBufferSpan textBufferSpan, RequestFont font)
         {
             Typeface typeface = ResolveTypeface(font);
             _txtServices.SetCurrentFont(typeface, font.SizeInPoints);
             _txtServices.MeasureString(textBufferSpan.GetRawCharBuffer(), textBufferSpan.start, textBufferSpan.len, out int w, out int h);
             return new Size(w, h);
         }
-        public void MeasureString(ref TextBufferSpan textBufferSpan, RequestFont font, int limitWidth, out int charFit, out int charFitWidth)
+        public void MeasureString(in TextBufferSpan textBufferSpan, RequestFont font, int limitWidth, out int charFit, out int charFitWidth)
         {
             Typeface typeface = ResolveTypeface(font);
             _txtServices.SetCurrentFont(typeface, font.SizeInPoints);
@@ -373,12 +373,13 @@ namespace PixelFarm.Drawing
 
 
 
-        public ILineSegmentList BreakToLineSegments(ref TextBufferSpan textBufferSpan)
+        public ILineSegmentList BreakToLineSegments(in TextBufferSpan textBufferSpan)
         {
             //a text buffer span is separated into multiple line segment list 
             char[] str = textBufferSpan.GetRawCharBuffer();
+#if DEBUG
             int cur_startAt = textBufferSpan.start;
-
+#endif
 
             MyLineSegmentList lineSegments = MyLineSegmentList.GetFreeLineSegmentList();
             foreach (BreakSpan breakSpan in _txtServices.BreakToLineSegments(str, textBufferSpan.start, textBufferSpan.len))
