@@ -50,7 +50,7 @@ The core modules are Typography.OpenFont and Typography.GlyphLayout.
 - This project contains [a font reader](Typography.OpenFont/OpenFontReader.cs) that can read files implementing Open Font Format
   ([ISO/IEC 14496-22:2015](http://www.iso.org/iso/home/store/catalogue_ics/catalogue_detail_ics.htm?csnumber=66391) and [Microsoft OpenType Specification](https://www.microsoft.com/en-us/Typography/OpenTypeSpecification.aspx))
   or Web Open Font Format (either WOFF [1.0](https://www.w3.org/TR/2012/REC-WOFF-20121213/) or [2.0](https://www.w3.org/TR/WOFF2/))
-- The OpenType GSUB, GPOS tables are in here but the layout mechanism is implemented in **Typography.GlyphLayout** below.
+- The OpenType GSUB, GPOS layout mechanism is in here but a more easy-to-use interface is provided in **Typography.GlyphLayout** below.
 - No Visual/Graphics Rendering Here
 
 
