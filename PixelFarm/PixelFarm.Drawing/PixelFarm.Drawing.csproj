@@ -214,7 +214,6 @@
     <Compile Include="..\PixelFarm.CpuBlit\08_imageresampling\ImageTransform.cs">
       <Link>0_REF_CpuBlit\08_ImageResampling\ImageTransform.cs</Link>
     </Compile>
-    <Compile Include="..\..\Build\NET20\ForNet20.cs">
     <Compile Include="..\PixelFarm.DrawingCore\Drawing\Brushes_Pens.cs">
       <Link>0_REF_DrawingCore\Brushes_Pens.cs</Link>
     </Compile>
