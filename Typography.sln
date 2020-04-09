@@ -100,7 +100,6 @@ Global
 		Typography.TextBreak\Typography.TextBreak\Typography.TextBreak.projitems*{2e593fca-b809-4270-9eb2-93f380af2d6c}*SharedItemsImports = 5
 		Unpack_SH\Unpack_SH.projitems*{49f57b62-b937-4715-9cf5-e5431d049d56}*SharedItemsImports = 5
 		PixelFarm\BackEnd.Triangulation\Triangulation.projitems*{4f435da3-706a-4e6d-ae29-e1e95bd6f68a}*SharedItemsImports = 13
-		PixelFarm\BackEnd.PaintFx\PdnSharedProject\PdnSharedProject.projitems*{51d63482-5697-4b16-8401-506965624657}*SharedItemsImports = 4
 		Typography.TextFlow\Typography.TextFlow.projitems*{65b22280-ed4d-43a2-947c-bbfab44ad8fd}*SharedItemsImports = 5
 		Typography.TextServices\Typography.TextServices.projitems*{6faf0ad2-22f1-46d9-ade4-ece3fa670bd0}*SharedItemsImports = 5
 		Typography.TextFlow\Typography.TextFlow.projitems*{7a8a63d2-2cb5-41f5-8e83-6f6e54398cf4}*SharedItemsImports = 13
