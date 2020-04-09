@@ -24,7 +24,7 @@ The Typography library is **a cross-platform library** and does **NOT** need the
 
 You can use the library to read font files (.ttf, .otf, .ttc, .otc, .woff, .woff2) and
 
-1) Access [all information inside the font](Typography.OpenFont/Glyph.cs). 
+1) Access [all information inside the font](Typography.OpenFont/Typeface.cs). 
 2) Layout the font glyphs according to the [OpenFont specification](http://www.iso.org/iso/home/store/catalogue_ics/catalogue_detail_ics.htm?csnumber=66391).
 
 _The core modules (Typography.OpenFont, Typography.GlyphLayout) do **NOT** provide a glyph rendering implementation_. 
@@ -35,7 +35,7 @@ from font files and render using their rendering engine.
 
 ![sum2](https://user-images.githubusercontent.com/7447159/78152244-bc6bff00-7463-11ea-847f-138e4ee3c7ff.png) 
 
-_1. [MatterHackers](https://github.com/MatterHackers/MatterControl)/[agg-sharp](https://github.com/MatterHackers/agg-sharp), 2. [CSharpMath/SkiaSharp, Xamarin.Forms)](https://github.com/verybadcat/CSharpMath), 3. [emoji.wpf/wpf](https://github.com/samhocevar/emoji.wpf),
+_1. [MatterHackers](https://github.com/MatterHackers/MatterControl)/[agg-sharp](https://github.com/MatterHackers/agg-sharp), 2. [CSharpMath/SkiaSharp, Xamarin.Forms](https://github.com/verybadcat/CSharpMath), 3. [emoji.wpf/wpf](https://github.com/samhocevar/emoji.wpf),
 4. [zwcloud's ImGui/GL,GLES](https://github.com/zwcloud/ImGui)_
 
 ---
@@ -78,7 +78,7 @@ PixelFarm's Typography
 
 Since the core library does not provide a glyph rendering implementation, You can learn
 how to do it from the example repositories above, or you may learn it from my 
-implementation => **PixelFarm.Typography**.
+implementation => [**PixelFarm.Typography**](PixelFarm.Typography).
 
 PixelFarm.Typography links the core Typography library to the _PixelFarm_ Rendering library.
 You can learn how to implement string drawing, how to implement text-layout services, and how to cache glyph shapes, so you can apply this to your own library.
