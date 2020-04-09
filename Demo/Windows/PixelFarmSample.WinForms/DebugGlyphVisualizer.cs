@@ -1,11 +1,12 @@
 ﻿//MIT, 2014-present, WinterDev
-using PixelFarm.CpuBlit;
-using PixelFarm.Drawing.Fonts;
 using System;
+
+using PixelFarm.CpuBlit;
 using PixelFarm.VectorMath;
+using PixelFarm.Contours;
+
 using Typography.Contours;
 using Typography.OpenFont;
-using PixelFarm.Contours;
 
 namespace SampleWinForms.UI
 {
@@ -113,12 +114,12 @@ namespace SampleWinForms.UI
 
             PixelFarm.Drawing.VertexStore vxs = new PixelFarm.Drawing.VertexStore();
             txToVxs1.WriteOutput(vxs);
-            _painter.UseSubPixelLcdEffect = this.UseLcdTechnique;
+            _painter.UseLcdEffectSubPixelRendering = this.UseLcdTechnique;
             //5. use PixelFarm's Agg to render to bitmap...
             //5.1 clear background
             _painter.Clear(PixelFarm.Drawing.Color.White);
 
-            RectD bounds = RectD.ZeroIntersection;
+            PixelFarm.CpuBlit.VertexProcessing.Q1RectD bounds = PixelFarm.CpuBlit.VertexProcessing.Q1RectD.ZeroIntersection();
             PixelFarm.CpuBlit.VertexProcessing.BoundingRect.GetBoundingRect(vxs, ref bounds);
             //----------------------------------------------------
             float scale = _typeface.CalculateScaleToPixelFromPointSize(_sizeInPoint);
@@ -242,7 +243,7 @@ namespace SampleWinForms.UI
         static readonly PixelFarm.Drawing.Color ColorGray = new PixelFarm.Drawing.Color(0xFF, 0x80, 0x80, 0x80);
         static readonly PixelFarm.Drawing.Color ColorDeepPink = new PixelFarm.Drawing.Color(0xFF, 0xFF, 0x14, 0x93);
 
-       
+
         void DrawEdge(PixelFarm.Drawing.Painter painter, EdgeLine edge)
         {
             if (edge.IsOutside)

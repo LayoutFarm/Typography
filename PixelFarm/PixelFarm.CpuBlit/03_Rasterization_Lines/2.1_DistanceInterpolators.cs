@@ -1,4 +1,6 @@
 ﻿//BSD, 2014-present, WinterDev
+//MatterHackers
+
 //----------------------------------------------------------------------------
 // Anti-Grain Geometry - Version 2.4
 // Copyright (C) 2002-2005 Maxim Shemanarev (http://www.antigrain.com)
@@ -35,7 +37,7 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
             }
         }
         //
-        public void IncX() { _dist += _dy; }
+        public void IncX() => _dist += _dy;
         //
         public int Distance => _dist;
         //

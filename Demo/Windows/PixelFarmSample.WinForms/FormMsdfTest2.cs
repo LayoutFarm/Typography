@@ -20,12 +20,12 @@ namespace SampleWinForms
 {
     public partial class FormMsdfTest2 : Form
     {
-        LayoutFarm.OpenFontTextService _textServices;
+        OpenFontTextService _textServices;
         public FormMsdfTest2()
         {
             InitializeComponent();
             //
-            _textServices = new LayoutFarm.OpenFontTextService();
+            _textServices = new OpenFontTextService();
 
         }
 

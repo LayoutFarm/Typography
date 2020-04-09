@@ -27,8 +27,8 @@
 //----------------------------------------------------------------------------
 
 using System;
-using PixelFarm.CpuBlit.Imaging;
 using PixelFarm.Drawing;
+using CO = PixelFarm.Drawing.Internal.CO;
 
 namespace PixelFarm.CpuBlit.PixelProcessing
 {
@@ -174,10 +174,7 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                 fixed (int* ptr = &dstBuffer[arrayOffset])
                 {
                     //TODO: consider use memcpy() impl*** 
-                    byte y = (byte)(((srcColor.red * 77) + (srcColor.green * 151) + (srcColor.blue * 28)) >> 8);
-                    srcColor = new Color(srcColor.alpha, y, y, y);
-
-                    *ptr = srcColor.ToARGB();
+                    *ptr = srcColor.ToGrayValueARGB();
                 }
 
             }
@@ -194,11 +191,11 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                     {
                         //TODO: consider use memcpy() impl***
 
-                        byte y = (byte)(((srcColor.red * 77) + (srcColor.green * 151) + (srcColor.blue * 28)) >> 8);
-                        srcColor = new Color(srcColor.alpha, y, y, y);
+                        //byte y = (byte)(((srcColor.R * 77) + (srcColor.G * 151) + (srcColor.B * 28)) >> 8);
+                        //srcColor = new Color(srcColor.A, y, y, y);
 
                         int* ptr = ptr_byte;
-                        int argb = srcColor.ToARGB();
+                        int argb = srcColor.ToGrayValueARGB();
 
                         //---------
                         if ((count % 2) != 0)
@@ -225,27 +222,29 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                     }
                 }
             }
-
         }
 
         static unsafe void BlendPixel32Internal(int* dstPtr, Color srcColor, int coverageValue)
         {
 
             //calculate new alpha
-            byte y = (byte)(((srcColor.red * 77) + (srcColor.green * 151) + (srcColor.blue * 28)) >> 8);
-            srcColor = new Color(srcColor.alpha, y, y, y);
 
-            int src_a = (byte)((srcColor.alpha * coverageValue + 255) >> 8);
+
+            int src_a = (byte)((srcColor.A * coverageValue + 255) >> 8);
             //after apply the alpha
             unchecked
             {
                 if (src_a == 255)
                 {
-                    *dstPtr = srcColor.ToARGB(); //just copy
+                    *dstPtr = srcColor.ToGrayValueARGB(); //just copy
                 }
                 else
                 {
+                    byte y = (byte)(((srcColor.R * 77) + (srcColor.G * 151) + (srcColor.B * 28)) >> 8);
+                    srcColor = new Color(srcColor.A, y, y, y);
+
                     int dest = *dstPtr;
+
                     //separate each component
                     byte a = (byte)((dest >> CO.A_SHIFT) & 0xff);
                     byte r = (byte)((dest >> CO.R_SHIFT) & 0xff);
@@ -255,9 +254,9 @@ namespace PixelFarm.CpuBlit.PixelProcessing
 
                     *dstPtr =
                      ((byte)((src_a + a) - ((src_a * a + BASE_MASK) >> ColorEx.BASE_SHIFT)) << CO.A_SHIFT) |
-                     ((byte)(((srcColor.red - r) * src_a + (r << ColorEx.BASE_SHIFT)) >> ColorEx.BASE_SHIFT) << CO.R_SHIFT) |
-                     ((byte)(((srcColor.green - g) * src_a + (g << ColorEx.BASE_SHIFT)) >> (int)ColorEx.BASE_SHIFT) << CO.G_SHIFT) |
-                     ((byte)(((srcColor.blue - b) * src_a + (b << ColorEx.BASE_SHIFT)) >> ColorEx.BASE_SHIFT) << CO.B_SHIFT);
+                     ((byte)(((srcColor.R - r) * src_a + (r << ColorEx.BASE_SHIFT)) >> ColorEx.BASE_SHIFT) << CO.R_SHIFT) |
+                     ((byte)(((srcColor.G - g) * src_a + (g << ColorEx.BASE_SHIFT)) >> (int)ColorEx.BASE_SHIFT) << CO.G_SHIFT) |
+                     ((byte)(((srcColor.B - b) * src_a + (b << ColorEx.BASE_SHIFT)) >> ColorEx.BASE_SHIFT) << CO.B_SHIFT);
                 }
             }
         }
@@ -267,29 +266,32 @@ namespace PixelFarm.CpuBlit.PixelProcessing
             {
 
                 //convert srcColor to grey-scale image
-                byte y = (byte)(((srcColor.red * 77) + (srcColor.green * 151) + (srcColor.blue * 28)) >> 8);
-                srcColor = new Color(srcColor.alpha, y, y, y);
 
-                if (srcColor.alpha == 255)
+
+                if (srcColor.A == 255)
                 {
-                    *dstPtr = srcColor.ToARGB(); //just copy
+                    *dstPtr = srcColor.ToGrayValueARGB(); //just copy
                 }
                 else
                 {
+                    byte y = (byte)(((srcColor.R * 77) + (srcColor.G * 151) + (srcColor.B * 28)) >> 8);
+                    srcColor = new Color(srcColor.A, y, y, y);
+
                     int dest = *dstPtr;
+
                     //separate each component
                     byte a = (byte)((dest >> CO.A_SHIFT) & 0xff);
                     byte r = (byte)((dest >> CO.R_SHIFT) & 0xff);
                     byte g = (byte)((dest >> CO.G_SHIFT) & 0xff);
                     byte b = (byte)((dest >> CO.B_SHIFT) & 0xff);
 
-                    byte src_a = srcColor.alpha;
+                    byte src_a = srcColor.A;
 
                     *dstPtr =
                      ((byte)((src_a + a) - ((src_a * a + BASE_MASK) >> ColorEx.BASE_SHIFT)) << CO.A_SHIFT) |
-                     ((byte)(((srcColor.red - r) * src_a + (r << ColorEx.BASE_SHIFT)) >> ColorEx.BASE_SHIFT) << CO.B_SHIFT) |
-                     ((byte)(((srcColor.green - g) * src_a + (g << ColorEx.BASE_SHIFT)) >> ColorEx.BASE_SHIFT) << CO.G_SHIFT) |
-                     ((byte)(((srcColor.blue - b) * src_a + (b << ColorEx.BASE_SHIFT)) >> ColorEx.BASE_SHIFT) << CO.B_SHIFT);
+                     ((byte)(((srcColor.R - r) * src_a + (r << ColorEx.BASE_SHIFT)) >> ColorEx.BASE_SHIFT) << CO.B_SHIFT) |
+                     ((byte)(((srcColor.G - g) * src_a + (g << ColorEx.BASE_SHIFT)) >> ColorEx.BASE_SHIFT) << CO.G_SHIFT) |
+                     ((byte)(((srcColor.B - b) * src_a + (b << ColorEx.BASE_SHIFT)) >> ColorEx.BASE_SHIFT) << CO.B_SHIFT);
                 }
             }
         }
@@ -420,13 +422,9 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                 int* ptr1 = (int*)dstBuffer.Ptr;
                 int* ptr_byte = &ptr1[arrayOffset];
                 {
-                    //TODO: consider use memcpy() impl***
-
-                    byte y = (byte)(((srcColor.red * 77) + (srcColor.green * 151) + (srcColor.blue * 28)) >> 8);
-                    srcColor = new Color(srcColor.alpha, y, y, y);
-
+                    //TODO: consider use memcpy() impl*** 
                     int* ptr = ptr_byte;
-                    int argb = srcColor.ToARGB();
+                    int argb = srcColor.ToGrayValueARGB();
 
                     //---------
                     if ((count % 2) != 0)
@@ -462,17 +460,28 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                 int* ptr1 = (int*)dstBuffer.Ptr;
                 int* ptr = &ptr1[arrayOffset];
                 {
-                    //TODO: consider use memcpy() impl*** 
-                    byte y = (byte)(((srcColor.red * 77) + (srcColor.green * 151) + (srcColor.blue * 28)) >> 8);
-                    srcColor = new Color(srcColor.alpha, y, y, y);
-
-                    *ptr = srcColor.ToARGB();
+                    //TODO: consider use memcpy() impl***  
+                    *ptr = srcColor.ToGrayValueARGB();
                 }
 
             }
         }
     }
 
+
+    static class ColorExtensions
+    {
+        /// <summary>
+        /// with ratio, R77,B151,B28
+        /// </summary>
+        /// <param name="srcColor"></param>
+        /// <returns></returns>
+        public static int ToGrayValueARGB(this in Color srcColor)
+        {
+            byte y = (byte)(((srcColor.R * 77) + (srcColor.G * 151) + (srcColor.B * 28)) >> 8);
+            return ((srcColor.A << 24) | (y << 16) | (y << 8) | y);
+        }
+    }
     public abstract class CustomPixelBlender : PixelBlender32
     {
 
@@ -610,11 +619,8 @@ namespace PixelFarm.CpuBlit.PixelProcessing
 
                 fixed (int* ptr = &dstBuffer[arrayOffset])
                 {
-                    //TODO: consider use memcpy() impl*** 
-                    byte y = (byte)(((srcColor.red * 77) + (srcColor.green * 151) + (srcColor.blue * 28)) >> 8);
-                    srcColor = new Color(srcColor.alpha, y, y, y);
-
-                    *ptr = srcColor.ToARGB();
+                    //TODO: consider use memcpy() impl***  
+                    *ptr = srcColor.ToGrayValueARGB();
                 }
 
             }
@@ -631,11 +637,8 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                     {
                         //TODO: consider use memcpy() impl***
 
-                        byte y = (byte)(((srcColor.red * 77) + (srcColor.green * 151) + (srcColor.blue * 28)) >> 8);
-                        srcColor = new Color(srcColor.alpha, y, y, y);
-
                         int* ptr = ptr_byte;
-                        int argb = srcColor.ToARGB();
+                        int argb = srcColor.ToGrayValueARGB();
 
                         //---------
                         if ((count % 2) != 0)
@@ -666,9 +669,9 @@ namespace PixelFarm.CpuBlit.PixelProcessing
         }
 
         protected abstract unsafe void BlendPixel32Internal(int* dstPtr, Color srcColor, int coverageValue);
-    
+
         protected abstract unsafe void BlendPixel32Internal(int* dstPtr, Color srcColor);
-         
+
         internal sealed override void BlendPixels(TempMemPtr dstBuffer, int arrayOffset, Color srcColor)
         {
             unsafe
@@ -1102,7 +1105,7 @@ namespace PixelFarm.CpuBlit.PixelProcessing
         {
             unchecked
             {
-                if (srcColor.alpha == 255)
+                if (srcColor.A == 255)
                 {
                     *dstPtr = srcColor.ToARGB(); //just copy
                 }
@@ -1115,13 +1118,13 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                     byte g = (byte)((dest >> CO.G_SHIFT) & 0xff);
                     byte b = (byte)((dest >> CO.B_SHIFT) & 0xff);
 
-                    byte src_a = srcColor.alpha;
+                    byte src_a = srcColor.A;
 
                     *dstPtr =
                      ((byte)((src_a + a) - ((src_a * a + BASE_MASK) >> ColorEx.BASE_SHIFT)) << CO.A_SHIFT) |
-                     ((byte)(((srcColor.red - r) * src_a + (r << ColorEx.BASE_SHIFT)) >> ColorEx.BASE_SHIFT) << CO.R_SHIFT) |
-                     ((byte)(((srcColor.green - g) * src_a + (g << ColorEx.BASE_SHIFT)) >> ColorEx.BASE_SHIFT) << CO.G_SHIFT) |
-                     ((byte)(((srcColor.blue - b) * src_a + (b << ColorEx.BASE_SHIFT)) >> ColorEx.BASE_SHIFT) << CO.B_SHIFT);
+                     ((byte)(((srcColor.R - r) * src_a + (r << ColorEx.BASE_SHIFT)) >> ColorEx.BASE_SHIFT) << CO.R_SHIFT) |
+                     ((byte)(((srcColor.G - g) * src_a + (g << ColorEx.BASE_SHIFT)) >> ColorEx.BASE_SHIFT) << CO.G_SHIFT) |
+                     ((byte)(((srcColor.B - b) * src_a + (b << ColorEx.BASE_SHIFT)) >> ColorEx.BASE_SHIFT) << CO.B_SHIFT);
                 }
             }
         }
@@ -1611,7 +1614,7 @@ namespace PixelFarm.CpuBlit.PixelProcessing
         {
             unchecked
             {
-                if (srcColor.alpha == 255)
+                if (srcColor.A == 255)
                 {
                     *dstPtr = srcColor.ToARGB(); //just copy
                 }
@@ -1624,7 +1627,7 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                     byte g = (byte)((dest >> CO.G_SHIFT) & 0xff);
                     byte b = (byte)((dest >> CO.B_SHIFT) & 0xff);
 
-                    byte src_a = srcColor.alpha;
+                    byte src_a = srcColor.A;
 
                     switch (enableCompo)
                     {
@@ -1632,16 +1635,16 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                             {
                                 *dstPtr =
                                  ((byte)((src_a + a) - ((src_a * a + BASE_MASK) >> ColorEx.BASE_SHIFT)) << CO.A_SHIFT) |
-                                 ((byte)(((srcColor.red - r) * src_a + (r << ColorEx.BASE_SHIFT)) >> ColorEx.BASE_SHIFT) << CO.R_SHIFT) |
-                                 ((byte)(((srcColor.green - g) * src_a + (g << ColorEx.BASE_SHIFT)) >> ColorEx.BASE_SHIFT) << CO.G_SHIFT) |
-                                 ((byte)(((srcColor.blue - b) * src_a + (b << ColorEx.BASE_SHIFT)) >> ColorEx.BASE_SHIFT) << CO.B_SHIFT);
+                                 ((byte)(((srcColor.R - r) * src_a + (r << ColorEx.BASE_SHIFT)) >> ColorEx.BASE_SHIFT) << CO.R_SHIFT) |
+                                 ((byte)(((srcColor.G - g) * src_a + (g << ColorEx.BASE_SHIFT)) >> ColorEx.BASE_SHIFT) << CO.G_SHIFT) |
+                                 ((byte)(((srcColor.B - b) * src_a + (b << ColorEx.BASE_SHIFT)) >> ColorEx.BASE_SHIFT) << CO.B_SHIFT);
                             }
                             break;
                         case EnableOutputColorComponent.R:
                             {
                                 *dstPtr =
                                    ((byte)((src_a + a) - ((src_a * a + BASE_MASK) >> ColorEx.BASE_SHIFT)) << CO.A_SHIFT) |
-                                   ((byte)(((srcColor.red - r) * src_a + (r << ColorEx.BASE_SHIFT)) >> ColorEx.BASE_SHIFT) << CO.R_SHIFT) |
+                                   ((byte)(((srcColor.R - r) * src_a + (r << ColorEx.BASE_SHIFT)) >> ColorEx.BASE_SHIFT) << CO.R_SHIFT) |
                                     (g << CO.G_SHIFT) |
                                     (b << CO.B_SHIFT);
                             }
@@ -1651,7 +1654,7 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                                 *dstPtr =
                                 ((byte)((src_a + a) - ((src_a * a + BASE_MASK) >> ColorEx.BASE_SHIFT)) << CO.A_SHIFT) |
                                 (r << CO.R_SHIFT) |
-                                ((byte)(((srcColor.green - g) * src_a + (g << ColorEx.BASE_SHIFT)) >> ColorEx.BASE_SHIFT) << CO.G_SHIFT) |
+                                ((byte)(((srcColor.G - g) * src_a + (g << ColorEx.BASE_SHIFT)) >> ColorEx.BASE_SHIFT) << CO.G_SHIFT) |
                                 (b << CO.B_SHIFT);
 
                             }
@@ -1662,7 +1665,7 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                                  ((byte)((src_a + a) - ((src_a * a + BASE_MASK) >> ColorEx.BASE_SHIFT)) << CO.A_SHIFT) |
                                  (r << CO.R_SHIFT) |
                                  (g << CO.G_SHIFT) |
-                                 ((byte)(((srcColor.blue - b) * src_a + (b << ColorEx.BASE_SHIFT)) >> ColorEx.BASE_SHIFT) << CO.B_SHIFT);
+                                 ((byte)(((srcColor.B - b) * src_a + (b << ColorEx.BASE_SHIFT)) >> ColorEx.BASE_SHIFT) << CO.B_SHIFT);
                             }
                             break;
                     }

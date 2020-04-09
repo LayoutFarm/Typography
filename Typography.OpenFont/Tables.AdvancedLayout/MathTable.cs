@@ -369,10 +369,10 @@ namespace Typography.OpenFont.MathGlyphs
         public bool IsShapeExtensible { get; internal set; }
 
         //optional 
-        public MathKern? TopLeftMathKern { get { return _mathKernRec.TopLeft; } }
-        public MathKern? TopRightMathKern { get { return _mathKernRec.TopRight; } }
-        public MathKern? BottomLeftMathKern { get { return _mathKernRec.BottomLeft; } }
-        public MathKern? BottomRightMathKern { get { return _mathKernRec.BottomRight; } }
+        public MathKern? TopLeftMathKern => _mathKernRec.TopLeft;
+        public MathKern? TopRightMathKern => _mathKernRec.TopRight;
+        public MathKern? BottomLeftMathKern => _mathKernRec.BottomLeft;
+        public MathKern? BottomRightMathKern => _mathKernRec.BottomRight;
         public bool HasSomeMathKern { get; private set; }
 
         //
@@ -425,12 +425,12 @@ namespace Typography.OpenFont.MathGlyphs
         //To ensure that the width/height is distributed equally and the symmetry of the shape is preserved,
         //following steps can be used by math handling client.
 
-        // Assemble all parts by overlapping connectors by maximum amount, and removing all extenders.
-        //This gives the smallest possible result.
+        //1. Assemble all parts by overlapping connectors by maximum amount, and removing all extenders.
+        //  This gives the smallest possible result.
 
-        // Determine how much extra width/height can be distributed into all connections between neighboring parts.
-        // If that is enough to achieve the size goal, extend each connection equally by changing overlaps of connectors to finish the job.
-        // If all connections have been extended to minimum overlap and further growth is needed, add one of each extender, 
+        //2. Determine how much extra width/height can be distributed into all connections between neighboring parts.
+        //   If that is enough to achieve the size goal, extend each connection equally by changing overlaps of connectors to finish the job.
+        //3. If all connections have been extended to minimum overlap and further growth is needed, add one of each extender, 
         //and repeat the process from the first step.
 
         //Note that for assemblies growing in vertical direction,
@@ -453,7 +453,7 @@ namespace Typography.OpenFont.MathGlyphs
         public readonly ushort EndConnectorLength;
         public readonly ushort FullAdvance;
         public readonly ushort PartFlags;
-        public bool IsExtender { get { return (PartFlags & 0x0001) != 0; } }
+        public bool IsExtender => (PartFlags & 0x0001) != 0;
 
         public GlyphPartRecord(ushort glyphId, ushort startConnectorLength, ushort endConnectorLength, ushort fullAdvance, ushort partFlags)
         {
@@ -665,11 +665,10 @@ namespace Typography.OpenFont.Tables
 
             //-------
             //fill to original glyph?
-            for (int n = allGlyphs.Length - 1; n >= 0; --n)
+            for (int n = 0; n < allGlyphs.Length; ++n)
             {
                 allGlyphs[n].MathGlyphInfo = mathGlyphInfos[n];
             }
-
         }
 
     }
@@ -828,7 +827,8 @@ namespace Typography.OpenFont.Tables
         {
 
             //MathGlyphInfo Table
-            //  The MathGlyphInfo table contains positioning information that is defined on per - glyph basis.The table consists of the following parts:
+            //  The MathGlyphInfo table contains positioning information that is defined on per - glyph basis.
+            //  The table consists of the following parts:
             //    Offset to MathItalicsCorrectionInfo table that contains information on italics correction values.
             //    Offset to MathTopAccentAttachment table that contains horizontal positions for attaching mathematical accents.
             //    Offset to Extended Shape coverage table.The glyphs covered by this table are to be considered extended shapes.
@@ -869,15 +869,15 @@ namespace Typography.OpenFont.Tables
             //(2.3)
             if (offsetTo_Extended_Shape_coverage_Table > 0)
             {
-                //may be null?, eg. found in font Linux Libertine Regular (https://sourceforge.net/projects/linuxlibertine/)
-                extendedShapeCoverageTable = CoverageTable.CreateFrom(reader, startAt + offsetTo_Extended_Shape_coverage_Table);
+                //may be null, eg. found in font Linux Libertine Regular (https://sourceforge.net/projects/linuxlibertine/)
+                _extendedShapeCoverageTable = CoverageTable.CreateFrom(reader, startAt + offsetTo_Extended_Shape_coverage_Table);
             }
 
             (MathKernInfoRecord[], CoverageTable)? mathKernInfo = null;
             //(2.4)
             if (offsetTo_MathKernInfo_Table > 0)
             {
-                //may be null? eg. latin-modern-math.otf => not found
+                //may be null, eg. latin-modern-math.otf => not found
                 //we found this in Asana-math-regular
                 reader.BaseStream.Position = startAt + offsetTo_MathKernInfo_Table;
                 mathKernInfo = ReadMathKernInfoTable(reader);
@@ -927,13 +927,20 @@ namespace Typography.OpenFont.Tables
         {
             //MathTopAccentAttachment Table
 
-            //The MathTopAccentAttachment table contains information on horizontal positioning of top math accents. The table consists of the following parts:
+            //The MathTopAccentAttachment table contains information on horizontal positioning of top math accents. 
+            //The table consists of the following parts:
 
-            //Coverage of glyphs for which information on horizontal positioning of math accents is provided.To position accents over any other glyph, its geometrical center(with respect to advance width) can be used.
+            //Coverage of glyphs for which information on horizontal positioning of math accents is provided.
+            //To position accents over any other glyph, its geometrical center(with respect to advance width) can be used.
 
             //Count of covered glyphs.
 
-            //Array of top accent attachment points for each covered glyph, in order of coverage.These attachment points are to be used for finding horizontal positions of accents over characters.It is done by aligning the attachment point of the base glyph with the attachment point of the accent.Note that this is very similar to mark - to - base attachment, but here alignment only happens in the horizontal direction, and the vertical positions of accents are determined by different means.
+            //Array of top accent attachment points for each covered glyph, in order of coverage.
+            //These attachment points are to be used for finding horizontal positions of accents over characters.
+            //It is done by aligning the attachment point of the base glyph with the attachment point of the accent.
+            //Note that this is very similar to mark-to-base attachment, but here alignment only happens in the horizontal direction, 
+            //and the vertical positions of accents are determined by different means.
+
             //MathTopAccentAttachment Table
             //Type          Name                        Description
             //Offset16      TopAccentCoverage           Offset to Coverage table - from the beginning of MathTopAccentAttachment table.
@@ -1261,7 +1268,9 @@ namespace Typography.OpenFont.Tables
             //Type              Name                    Description
             //MathValueRecord   ItalicsCorrection       Italics correction of this GlyphAssembly.Should not depend on the assembly size.
             //uint16            PartCount               Number of parts in this assembly.
-            //GlyphPartRecord   PartRecords[PartCount]  Array of part records, from left to right and bottom to top. 
+            //GlyphPartRecord   PartRecords[PartCount]  Array of part records, 
+            //                                          from left to right  (for assemblies that extend horizontally) and 
+            //                                          bottom to top(for assemblies that extend vertically).. 
 
             //The result of the assembly process is an array of glyphs with an offset specified for each of those glyphs.
             //When drawn consecutively at those offsets, the glyphs should combine correctly and produce the required shape.

@@ -109,9 +109,9 @@ namespace SampleWinForms.UI
             _flushOutput = flushOutput;
         }
 
-        public int DebugMarkVertexCommand=> _addDebugVertexCmd;
-            
-        
+        public int DebugMarkVertexCommand => _addDebugVertexCmd;
+
+
         void DrawMarkedNode(TreeNode node)
         {
 
@@ -372,11 +372,10 @@ namespace SampleWinForms.UI
             _flattenVxsNode.Nodes.Clear();
             _treeView.SuspendLayout();
             _flattenVxs = vxs;
-            int count = vxs.Count;
-            VertexCmd cmd;
-            double x, y;
+
+            PixelFarm.Drawing.VertexCmd cmd;
             int index = 0;
-            while ((cmd = vxs.GetVertex(index, out x, out y)) != VertexCmd.NoMore)
+            while ((cmd = vxs.GetVertex(index, out double x, out double y)) != PixelFarm.Drawing.VertexCmd.NoMore)
             {
 
                 var node = new TreeNode() { Tag = new NodeInfo(NodeInfoKind.FlattenVertexCommand, index) };
@@ -393,13 +392,10 @@ namespace SampleWinForms.UI
             _treeView.SuspendLayout();
             _orgVxs = vxs;
 
-            int count = vxs.Count;
-            VertexCmd cmd;
-            double x, y;
+            PixelFarm.Drawing.VertexCmd cmd;
             int index = 0;
-            while ((cmd = vxs.GetVertex(index, out x, out y)) != VertexCmd.NoMore)
+            while ((cmd = vxs.GetVertex(index, out double x, out double y)) != PixelFarm.Drawing.VertexCmd.NoMore)
             {
-
                 var node = new TreeNode() { Tag = new NodeInfo(NodeInfoKind.OrgVertexCommand, index) };
                 node.Text = (index) + " " + cmd + ": (" + x + "," + y + ")";
                 _orgCmds.Nodes.Add(node);

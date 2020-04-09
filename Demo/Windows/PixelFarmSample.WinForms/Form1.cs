@@ -134,7 +134,7 @@ namespace SampleWinForms
             //---------------------------------------------
 
             _painter.Clear(PixelFarm.Drawing.Color.White);
-            _painter.UseSubPixelLcdEffect = _contourAnalysisOpts.LcdTechnique;
+            _painter.UseLcdEffectSubPixelRendering = _contourAnalysisOpts.LcdTechnique;
             _painter.FillColor = PixelFarm.Drawing.Color.Black;
 
             _selectedTextPrinter = _devVxsTextPrinter;
@@ -188,7 +188,7 @@ namespace SampleWinForms
 
         bool _readyToRender;
 
-        LayoutFarm.OpenFontTextService _textService;
+        PixelFarm.Drawing.OpenFontTextService _textService;
 
         VgVisualDocHost _vgDocHost = new VgVisualDocHost();
         MemBitmap ParseAndRenderSvg(System.Text.StringBuilder svgContent)
@@ -203,7 +203,7 @@ namespace SampleWinForms
 
             VgVisualDocBuilder builder = new VgVisualDocBuilder();
             VgVisualElement vgVisElem = builder.CreateVgVisualDoc(docBuilder.ResultDocument, _vgDocHost).VgRootElem;
-            RectD bounds = vgVisElem.GetRectBounds();
+            PixelFarm.CpuBlit.VertexProcessing.Q1RectD bounds = vgVisElem.GetRectBounds();
             float actualXOffset = (float)-bounds.Left;
             float actualYOffset = (float)-bounds.Bottom;
 
@@ -250,10 +250,9 @@ namespace SampleWinForms
                 _winBmp = new Bitmap(_destImg.Width, _destImg.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
                 _g = this.CreateGraphics();
 
-                _painter.CurrentFont = new PixelFarm.Drawing.RequestFont("tahoma", 14);
+                _painter.CurrentFont = new PixelFarm.Drawing.RequestFont("tahoma", 14); 
 
-
-                _textService = new LayoutFarm.OpenFontTextService();
+                _textService = new PixelFarm.Drawing.OpenFontTextService();
                 _textService.LoadFontsFromFolder("../../../TestFonts");
 
                 _devVxsTextPrinter = new PixelFarm.Drawing.VxsTextPrinter(_painter, _textService);
@@ -295,7 +294,7 @@ namespace SampleWinForms
                     {
                         //clear previous draw
                         _painter.Clear(PixelFarm.Drawing.Color.White);
-                        _painter.UseSubPixelLcdEffect = _contourAnalysisOpts.LcdTechnique;
+                        _painter.UseLcdEffectSubPixelRendering = _contourAnalysisOpts.LcdTechnique;
                         _painter.FillColor = PixelFarm.Drawing.Color.Black;
 
                         _selectedTextPrinter = _devVxsTextPrinter;

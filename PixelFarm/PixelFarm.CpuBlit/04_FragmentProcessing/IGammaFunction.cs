@@ -21,8 +21,16 @@
 
 namespace PixelFarm.CpuBlit.FragmentProcessing
 {
+    /// <summary>
+    /// gamma function generator
+    /// </summary>
     public interface IGammaFunction
     {
+        /// <summary>
+        /// get gamma value for input x,
+        /// </summary>
+        /// <param name="x">0.0-1.0</param>
+        /// <returns></returns>
         float GetGamma(float x);
     }
 }

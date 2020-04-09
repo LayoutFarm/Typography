@@ -49,7 +49,7 @@
     <Compile Include="..\..\..\PixelFarm.Typography\3_Typography_Contours\TextPrinterBase.cs">
       <Link>DevTextPrinter\TextPrinterBase.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\PixelFarm\PixelFarm.Painter\2_General\TextBaseline.cs">
+    <Compile Include="..\..\..\PixelFarm\PixelFarm.Painter\Drawing\TextBaseline.cs">
       <Link>DevTextPrinter\TextBaseline.cs</Link>
     </Compile>
     <Compile Include="..\..\Shared\GlyphOutlineBuilder\GlyphOutlineBuilder.cs">

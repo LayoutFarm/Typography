@@ -1,4 +1,5 @@
 //BSD, 2014-present, WinterDev
+//MatterHackers
 //----------------------------------------------------------------------------
 // Anti-Grain Geometry - Version 2.4
 // Copyright (C) 2002-2005 Maxim Shemanarev (http://www.antigrain.com)
@@ -20,6 +21,7 @@
 #if true
 using System;
 using PixelFarm.Drawing;
+using PixelFarm.CpuBlit.VertexProcessing;
 using PixelFarm.CpuBlit.PixelProcessing;
 namespace PixelFarm.CpuBlit.Rasterization.Lines
 {
@@ -62,7 +64,7 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
         int _dilation;
         int _dilation_hr;
         SubBitmapBlender _buf;
-        PixelFarm.CpuBlit.Imaging.TempMemPtr _data;
+        TempMemPtr _data;
         int _DataSizeInBytes = 0;
         int _width;
         int _height;
@@ -148,7 +150,7 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
                 _data.Dispose();
 
                 IntPtr nativeBuff = System.Runtime.InteropServices.Marshal.AllocHGlobal(_DataSizeInBytes);
-                _data = new Imaging.TempMemPtr(nativeBuff, _DataSizeInBytes);
+                _data = new TempMemPtr(nativeBuff, _DataSizeInBytes);
             }
 
             _buf = new PixelProcessing.SubBitmapBlender(_data, 0, bufferWidth, bufferHeight, bufferWidth * bytesPerPixel, src.BitDepth, bytesPerPixel);
@@ -156,8 +158,8 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
             unsafe
             {
 
-                using (CpuBlit.Imaging.TempMemPtr destMemPtr = _buf.GetBufferPtr())
-                using (CpuBlit.Imaging.TempMemPtr srcMemPtr = src.GetBufferPtr())
+                using (TempMemPtr destMemPtr = _buf.GetBufferPtr())
+                using (TempMemPtr srcMemPtr = src.GetBufferPtr())
                 {
                     int* destBuffer = (int*)destMemPtr.Ptr;
                     int* srcBuffer = (int*)srcMemPtr.Ptr;
@@ -589,7 +591,7 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
         LineImagePattern _pattern;
         int _start;
         double _scale_x;
-        RectInt _clip_box;
+        Q1Rect _clip_box;
         bool _clipping;
         //---------------------------------------------------------------------
         //typedef renderer_outline_image<BaseRenderer, ImagePattern> self_type;
@@ -601,7 +603,7 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
             _pattern = patt;
             _start = (0);
             _scale_x = (1.0);
-            _clip_box = new RectInt(0, 0, 0, 0);
+            _clip_box = new Q1Rect(0, 0, 0, 0);
             _clipping = (false);
         }
 
@@ -614,7 +616,7 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
             set => _pattern = value;
         }
         //---------------------------------------------------------------------
-        public void ResetClipping() { _clipping = false; }
+        public void ResetClipping() => _clipping = false;
 
         public void SetClipBox(double x1, double y1, double x2, double y2)
         {
@@ -678,19 +680,19 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
         {
         }
 
-        public override void Line0(LineParameters lp)
+        public override void Line0(in LineParameters lp)
         {
         }
 
-        public override void Line1(LineParameters lp, int sx, int sy)
+        public override void Line1(in LineParameters lp, int sx, int sy)
         {
         }
 
-        public override void Line2(LineParameters lp, int ex, int ey)
+        public override void Line2(in LineParameters lp, int ex, int ey)
         {
         }
 
-        public void Line3NoClip(LineParameters lp,
+        public void Line3NoClip(in LineParameters lp,
                            int sx, int sy, int ex, int ey)
         {
             throw new NotImplementedException();
@@ -724,7 +726,7 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
              */
         }
 
-        public override void Line3(LineParameters lp,
+        public override void Line3(in LineParameters lp,
                    int sx, int sy, int ex, int ey)
         {
             throw new NotImplementedException();

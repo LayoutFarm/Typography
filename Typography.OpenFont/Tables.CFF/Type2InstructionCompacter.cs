@@ -1,8 +1,8 @@
-﻿//MIT, 2020-present, WinterDev  
+//MIT, 2020-present, WinterDev  
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
+
 
 namespace Typography.OpenFont.CFF
 {
@@ -11,7 +11,9 @@ namespace Typography.OpenFont.CFF
     {
         //This is our extension
         //-----------------------
-
+#if DEBUG
+        public static bool s_dbugBreakMe;
+#endif
         List<Type2Instruction>? _step1List;
         List<Type2Instruction>? _step2List;
 
@@ -108,7 +110,12 @@ namespace Typography.OpenFont.CFF
                         default: throw new NotSupportedException();
                         case CompactRange.None:
                             {
-
+                                if (collecting_count > 0)
+                                {
+                                    FlushWaitingNumbers();
+                                }
+                                step1List.Add(inst);
+                                _latestCompactRange = CompactRange.None;
                             }
                             break;
                         case CompactRange.SByte:
@@ -166,8 +173,6 @@ namespace Typography.OpenFont.CFF
                             }
                             break;
                     }
-
-
                 }
                 else
                 {
@@ -299,10 +304,8 @@ namespace Typography.OpenFont.CFF
             //return _step1List.ToArray();
 
         }
+
 #if DEBUG
-
-
-         
         void dbugReExpandAndCompare_ForStep1(List<Type2Instruction> step1, List<Type2Instruction> org)
         {
             List<Type2Instruction> expand1 = new List<Type2Instruction>(org.Count);
@@ -337,7 +340,18 @@ namespace Typography.OpenFont.CFF
             //--------------------------------------------
             if (expand1.Count != org.Count)
             {
-                throw new NotSupportedException();
+                //ERR=> then find first diff
+                int min = Math.Min(expand1.Count, org.Count);
+                for (int i = 0; i < min; ++i)
+                {
+                    Type2Instruction inst_exp = expand1[i];
+                    Type2Instruction inst_org = org[i];
+                    if (inst_exp.Op != inst_org.Op ||
+                       inst_exp.Value != inst_org.Value)
+                    {
+                        throw new NotSupportedException();
+                    }
+                }
             }
             else
             {

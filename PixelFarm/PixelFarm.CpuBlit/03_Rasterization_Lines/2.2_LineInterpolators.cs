@@ -1,4 +1,5 @@
 ﻿//BSD, 2014-present, WinterDev
+//MatterHackers
 //----------------------------------------------------------------------------
 // Anti-Grain Geometry - Version 2.4
 // Copyright (C) 2002-2005 Maxim Shemanarev (http://www.antigrain.com)
@@ -17,8 +18,12 @@
 using System;
 using PixelFarm.CpuBlit.FragmentProcessing;
 
+
 namespace PixelFarm.CpuBlit.Rasterization.Lines
 {
+
+
+
     //================================================line_interpolator_aa_base
     struct LineInterpolatorAAData : IDisposable
     {
@@ -42,21 +47,29 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
 
         public const int MAX_HALF_WIDTH = 64;
 
-        OutlineRenderer _ren;
-        public LineInterpolatorAAData(OutlineRenderer ren, LineParameters lp)
+        readonly OutlineRenderer _ren;
+
+        public LineInterpolatorAAData(OutlineRenderer ren, in LineParameters lp)
         {
 
             _ren = ren;
+
             //TODO: consider resuable array
-            _dist = ren.GetFreeDistArray();// new int[MAX_HALF_WIDTH + 1];
-            _covers = ren.GetFreeConvArray(); // new byte[MAX_HALF_WIDTH * 2 + 4];
+            _dist = LineAADataPool.GetFreeDistArray();// new int[MAX_HALF_WIDTH + 1];
+            _covers = LineAADataPool.GetFreeConvArray(); // new byte[MAX_HALF_WIDTH * 2 + 4];
 
 
-            _li = new LineInterpolatorDDA2(
-                lp.vertical ? LineAA.DblHr(lp.x2 - lp.x1) :
-                              LineAA.DblHr(lp.y2 - lp.y1),
-                lp.vertical ? Math.Abs(lp.y2 - lp.y1) :
-                              Math.Abs(lp.x2 - lp.x1) + 1);
+            _li = LineAADataPool.GetFreeInterpolatorDDA2();
+
+            if (lp.vertical)
+            {
+                _li.Set(LineAA.DblHr(lp.x2 - lp.x1), Math.Abs(lp.y2 - lp.y1));
+            }
+            else
+            {
+                _li.Set(LineAA.DblHr(lp.y2 - lp.y1), Math.Abs(lp.x2 - lp.x1) + 1);
+            }
+
 
             //---------------------------------------------------------
             _lp = lp;
@@ -96,24 +109,20 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
             }
             _dist[i++] = 0x7FFF0000;
         }
-
         public void Dispose()
         {
-            _ren.ReleaseConvArray(_covers);
-            _ren.ReleaseDistArray(_dist); 
+            LineAADataPool.ReleaseConvArray(_covers);
+            LineAADataPool.ReleaseDistArray(_dist);
+            LineAADataPool.ReleaseInterpolatorDDA2(_li);
+
         }
 
-        public void AdjustForward()
-        {
-            _li.adjust_forward();
-        }
+        public void AdjustForward() => _li.adjust_forward();
 
         public int Y => _li.Y;
 
-        public void Prev()
-        {
-            _li.Prev();
-        }
+        public void Prev() => _li.Prev();
+
         public int BaseStepH(ref DistanceInterpolator1 di)
         {
             _li.Next();
@@ -214,7 +223,6 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
         public void Dispose()
         {
             _aa_data.Dispose();
-
         }
         //
         int Count => _aa_data.Count;
@@ -654,9 +662,6 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
                                                offset1 - offset0, _aa_data._covers,
                                                offset0);
             return npix != 0 && ++_aa_data.m_step < _aa_data._count;
-
-
-
         }
     }
 

@@ -9,7 +9,7 @@
  
   <ItemGroup>
     <PackageReference Include="Nullable" Version="1.2.1" PrivateAssets="all" />
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\Msdf\*.cs"/>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\6_Msdf\*.cs"/>
   </ItemGroup>
 
 </Project>

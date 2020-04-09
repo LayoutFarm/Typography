@@ -35,7 +35,7 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
         {
             public double x;
             public double y;
-            public Drawing.Color color;
+            public Drawing.Color color; 
         }
 
         public GouraudVerticeBuilder()
