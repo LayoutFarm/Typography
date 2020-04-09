@@ -95,6 +95,10 @@
     <Content Include="x_backup\ScanlineRasToDestBitmapRendererExtension.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\PixelFarm.DrawingCore\PixelFarm.DrawingCore.csproj">
+      <Project>{fde310c7-9c58-47f9-a6af-3f518613bc4b}</Project>
+      <Name>PixelFarm.DrawingCore</Name>
+    </ProjectReference>
     <ProjectReference Include="..\PixelFarm.Painter\PixelFarm.Painter.csproj">
       <Project>{0cc424d5-20ac-4849-993d-3a720dbae94f}</Project>
       <Name>PixelFarm.Painter</Name>
