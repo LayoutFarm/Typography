@@ -165,8 +165,8 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
         }
         public void MeasureString(char[] buffer, int startAt, int len, out int w, out int h)
         {
-            TextBufferSpan textBuffSpan = new TextBufferSpan(buffer, startAt, len);
-            Size s = _textServices.MeasureString(ref textBuffSpan, _painter.CurrentFont);
+            var textBuffSpan = new TextBufferSpan(buffer, startAt, len);
+            Size s = _textServices.MeasureString(textBuffSpan, _painter.CurrentFont);
             w = s.Width;
             h = s.Height;
         }
@@ -318,10 +318,10 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
         public override void DrawString(char[] textBuffer, int startAt, int len, float x, float y)
         {
             //create temp buffer span that describe the part of a whole char buffer
-            TextBufferSpan textBufferSpan = new TextBufferSpan(textBuffer, startAt, len);
+            var textBufferSpan = new TextBufferSpan(textBuffer, startAt, len);
             //ask text service to parse user input char buffer and create a glyph-plan-sequence (list of glyph-plan) 
             //with specific request font      
-            DrawFromGlyphPlans(_textServices.CreateGlyphPlanSeq(ref textBufferSpan, _font), startAt, len, x, y);
+            DrawFromGlyphPlans(_textServices.CreateGlyphPlanSeq(textBufferSpan, _font), startAt, len, x, y);
         }
 
     }
