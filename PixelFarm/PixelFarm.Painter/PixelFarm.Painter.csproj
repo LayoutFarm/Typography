@@ -183,7 +183,7 @@
     <Compile Include="4_CpuBlit_VertexProcessing\VertexStoreExtensions.cs" />
     <Compile Include="4_CpuBlit_VertexProcessing\VertexStoreTransformExtensions.cs" />
     <Compile Include="4_CpuBlit_VertexProcessing\VxsClipping.cs" />
-    <Compile Include="0_Base\ForNet20.cs" />
+    <Compile Include="..\..\Build\NET20\ForNet20.cs" />
     <Compile Include="CpuBlit\TempMemPtr.cs" />
     <Compile Include="Drawing\ClipingTechnique.cs" />
     <Compile Include="TempContext.cs" />
