@@ -12,6 +12,7 @@
     <ProjectReference Include="..\Typography.OpenFont\Typography.OpenFont.csproj"/>
 	<!--For explanation of following logic, see PixelFarm.One.HtmlRenderer-->
     <Compile Include="..\..\PixelFarm\**\*.cs" />
+    <Compile Include="..\..\PixelFarm\PaintLab\**\*.cs" />
     <Compile Remove="..\..\PixelFarm\BackEnd.PaintFx\PdnPixelEffectPixelFarm\**\*.cs" />
 	<Compile Remove="..\..\PixelFarm\PixelFarm.BitmapBufferEx\BitmapBufferEx\00_Porting\**\*.cs" />
     <Compile Remove="..\..\PixelFarm\**\obj\**\*.cs" />
