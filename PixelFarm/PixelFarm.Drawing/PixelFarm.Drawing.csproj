@@ -253,7 +253,7 @@
     <Compile Include="..\PixelFarm.DrawingCore\Drawing\VertexStore.cs">
       <Link>0_REF_DrawingCore\VertexStore.cs</Link>
     </Compile>
-    <Compile Include="..\PixelFarm.Painter\0_Base\ForNet20.cs">
+    <Compile Include="..\..\Build\NET20\ForNet20.cs">
       <Link>0_REF_Painter\0_Base\ForNet20.cs</Link>
     </Compile>
     <Compile Include="..\PixelFarm.Painter\CpuBlit.VertexProcessing\BoundingRect.cs">
