@@ -2,18 +2,16 @@
 
 using System;
 namespace PaintLab.Svg
-{ 
+{
     public static class VgResourceIO
     {
         //IO 
         [System.ThreadStatic]
-        static Action<LayoutFarm.ImageBinder, VgVisualElement, object> s_vgIO;
-        public static Action<LayoutFarm.ImageBinder, VgVisualElement, object> VgImgIOHandler
+        static Action<PixelFarm.Drawing.ImageBinder, VgVisualElement, object> s_vgIO;
+        public static Action<PixelFarm.Drawing.ImageBinder, VgVisualElement, object> VgImgIOHandler
         {
-            get
-            {
-                return s_vgIO;
-            }
+            get => s_vgIO;
+
             set
             {
                 if (value == null)

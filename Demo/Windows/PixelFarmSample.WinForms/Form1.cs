@@ -134,7 +134,7 @@ namespace SampleWinForms
             //---------------------------------------------
 
             _painter.Clear(PixelFarm.Drawing.Color.White);
-            _painter.UseSubPixelLcdEffect = _contourAnalysisOpts.LcdTechnique;
+            _painter.UseLcdEffectSubPixelRendering = _contourAnalysisOpts.LcdTechnique;
             _painter.FillColor = PixelFarm.Drawing.Color.Black;
 
             _selectedTextPrinter = _devVxsTextPrinter;
@@ -188,7 +188,7 @@ namespace SampleWinForms
 
         bool _readyToRender;
 
-        LayoutFarm.OpenFontTextService _textService;
+        PixelFarm.Drawing.OpenFontTextService _textService;
 
         VgVisualDocHost _vgDocHost = new VgVisualDocHost();
         MemBitmap ParseAndRenderSvg(System.Text.StringBuilder svgContent)
@@ -203,7 +203,7 @@ namespace SampleWinForms
 
             VgVisualDocBuilder builder = new VgVisualDocBuilder();
             VgVisualElement vgVisElem = builder.CreateVgVisualDoc(docBuilder.ResultDocument, _vgDocHost).VgRootElem;
-            RectD bounds = vgVisElem.GetRectBounds();
+            PixelFarm.CpuBlit.VertexProcessing.Q1RectD bounds = vgVisElem.GetRectBounds();
             float actualXOffset = (float)-bounds.Left;
             float actualYOffset = (float)-bounds.Bottom;
 
@@ -238,7 +238,7 @@ namespace SampleWinForms
             return memBitmap;
         }
 
-
+        PixelFarm.Drawing.Color _grayColor = new PixelFarm.Drawing.Color(0xFF, 0x80, 0x80, 0x80);
         void UpdateRenderOutput()
         {
             if (!_readyToRender) return;
@@ -250,10 +250,9 @@ namespace SampleWinForms
                 _winBmp = new Bitmap(_destImg.Width, _destImg.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
                 _g = this.CreateGraphics();
 
-                _painter.CurrentFont = new PixelFarm.Drawing.RequestFont("tahoma", 14);
+                _painter.CurrentFont = new PixelFarm.Drawing.RequestFont("tahoma", 14); 
 
-
-                _textService = new LayoutFarm.OpenFontTextService();
+                _textService = new PixelFarm.Drawing.OpenFontTextService();
                 _textService.LoadFontsFromFolder("../../../TestFonts");
 
                 _devVxsTextPrinter = new PixelFarm.Drawing.VxsTextPrinter(_painter, _textService);
@@ -295,7 +294,7 @@ namespace SampleWinForms
                     {
                         //clear previous draw
                         _painter.Clear(PixelFarm.Drawing.Color.White);
-                        _painter.UseSubPixelLcdEffect = _contourAnalysisOpts.LcdTechnique;
+                        _painter.UseLcdEffectSubPixelRendering = _contourAnalysisOpts.LcdTechnique;
                         _painter.FillColor = PixelFarm.Drawing.Color.Black;
 
                         _selectedTextPrinter = _devVxsTextPrinter;
@@ -344,7 +343,7 @@ namespace SampleWinForms
                                 case PixelFarm.Drawing.TextBaseline.Alphabetic:
                                     {
                                         //alphabetic baseline
-                                        _painter.StrokeColor = PixelFarm.Drawing.Color.Gray;
+                                        _painter.StrokeColor = _grayColor;
                                         _painter.DrawLine(x_pos,           /**/ y_pos,
                                                           x_pos + REF_LINE_LEN, y_pos);
 
@@ -357,7 +356,7 @@ namespace SampleWinForms
                                 case PixelFarm.Drawing.TextBaseline.Top:
                                     {
                                         //alphabetic baseline
-                                        _painter.StrokeColor = PixelFarm.Drawing.Color.Gray;
+                                        _painter.StrokeColor = _grayColor;
                                         _painter.DrawLine(x_pos,           /**/ y_pos + _selectedTextPrinter.FontAscendingPx,
                                                           x_pos + REF_LINE_LEN, y_pos + _selectedTextPrinter.FontAscendingPx);
                                         //em bottom
@@ -371,7 +370,7 @@ namespace SampleWinForms
                                 case PixelFarm.Drawing.TextBaseline.Bottom:
                                     {
                                         //alphabetic baseline
-                                        _painter.StrokeColor = PixelFarm.Drawing.Color.Gray;
+                                        _painter.StrokeColor = _grayColor;
                                         _painter.DrawLine(x_pos,           /**/ y_pos + _selectedTextPrinter.FontDescedingPx,
                                                           x_pos + REF_LINE_LEN, y_pos + _selectedTextPrinter.FontDescedingPx);
                                         //em bottom
@@ -547,7 +546,7 @@ namespace SampleWinForms
         void RenderGrids(int width, int height, int sqSize, AggPainter p)
         {
             //render grid 
-            p.FillColor = PixelFarm.Drawing.Color.Gray;
+            p.FillColor = new PixelFarm.Drawing.Color(0xFF, 0x80, 0x80, 0x80);//gray
 
             float pointW = (sqSize >= 100) ? 2 : 1;
 

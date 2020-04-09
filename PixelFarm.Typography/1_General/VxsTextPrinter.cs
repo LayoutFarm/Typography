@@ -1,7 +1,6 @@
 ﻿//MIT, 2016-present, WinterDev, Sam Hocevar
 using System;
 
-using PixelFarm.Drawing.Fonts;
 using PixelFarm.CpuBlit.BitmapAtlas;
 
 using Typography.Contours;
@@ -9,11 +8,11 @@ using Typography.OpenFont;
 using Typography.TextLayout;
 
 namespace PixelFarm.Drawing
-{ 
+{
 
     public class VxsTextPrinter : TextPrinterBase, ITextPrinter
     {
-        LayoutFarm.OpenFontTextService _textServices;
+        OpenFontTextService _textServices;
 
         /// <summary>
         /// target canvas
@@ -27,7 +26,7 @@ namespace PixelFarm.Drawing
         GlyphBitmapStore _glyphBitmapStore;
         BitmapCacheForSvgGlyph _glyphSvgStore;
 
-        public VxsTextPrinter(Painter painter, LayoutFarm.OpenFontTextService textService)
+        public VxsTextPrinter(Painter painter, OpenFontTextService textService)
         {
 
             //
@@ -69,7 +68,7 @@ namespace PixelFarm.Drawing
         {
 
         }
-        
+
         protected override void OnFontSizeChanged()
         {
             //update some font metrics property   
@@ -108,7 +107,7 @@ namespace PixelFarm.Drawing
             }
         }
 
-       
+
 
         public void PrepareStringForRenderVx(RenderVxFormattedString renderVx, char[] text, int startAt, int len)
         {
@@ -168,7 +167,7 @@ namespace PixelFarm.Drawing
             //TODO: review this again, we should use pixel? 
             float fontSizePoint = this.FontSizeInPoints;
             float scale = _currentTypeface.CalculateScaleToPixelFromPointSize(fontSizePoint);
-            RenderVxGlyphPlan[] glyphPlans = renderVx.GlyphList;
+            Internal.RenderVxGlyphPlan[] glyphPlans = renderVx.GlyphList;
             int j = glyphPlans.Length;
             //---------------------------------------------------
             //consider use cached glyph, to increase performance 
@@ -179,7 +178,7 @@ namespace PixelFarm.Drawing
 
             for (int i = 0; i < j; ++i)
             {
-                RenderVxGlyphPlan glyphPlan = glyphPlans[i];
+                Internal.RenderVxGlyphPlan glyphPlan = glyphPlans[i];
                 //-----------------------------------
                 //TODO: review here ***
                 //PERFORMANCE revisit here 
@@ -283,10 +282,10 @@ namespace PixelFarm.Drawing
             {
                 if (!hasColorGlyphs)
                 {
-                    bool savedUseLcdMode = _painter.UseSubPixelLcdEffect; //save,restore later
+                    bool savedUseLcdMode = _painter.UseLcdEffectSubPixelRendering; //save,restore later
                     RenderQuality savedRederQuality = _painter.RenderQuality;
                     _painter.RenderQuality = RenderQuality.HighQuality;
-                    _painter.UseSubPixelLcdEffect = true;
+                    _painter.UseLcdEffectSubPixelRendering = true;
 
                     int seqLen = seq.Count;
 
@@ -304,7 +303,7 @@ namespace PixelFarm.Drawing
 
                     //restore
                     _painter.RenderQuality = savedRederQuality;
-                    _painter.UseSubPixelLcdEffect = savedUseLcdMode;
+                    _painter.UseLcdEffectSubPixelRendering = savedUseLcdMode;
 
                 }
                 else
@@ -377,7 +376,7 @@ namespace PixelFarm.Drawing
             DrawFromGlyphPlans(glyphPlanSeq, x, y);
         }
 
-       
+
     }
 
 

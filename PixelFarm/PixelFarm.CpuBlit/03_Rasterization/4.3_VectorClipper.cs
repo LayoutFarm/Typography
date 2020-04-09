@@ -22,33 +22,36 @@
 
 //#include "agg_clip_liang_barsky.h"
 
-
+using PixelFarm.CpuBlit.VertexProcessing;
 using PixelFarm.CpuBlit.PrimitiveProcessing;
 namespace PixelFarm.CpuBlit.Rasterization
 {
 
     partial class ScanlineRasterizer
     {
+        /// <summary>
+        /// rect-clipper
+        /// </summary>
         class VectorClipper
         {
-            RectInt _clipBox;
+            Q1Rect _clipBox;
             int _x1;
             int _y1;
             int _f1;
             bool _clipping;
-            CellAARasterizer _ras;
+            readonly CellAARasterizer _ras;
             public VectorClipper(CellAARasterizer ras)
             {
                 _ras = ras;
-                _clipBox = new RectInt(0, 0, 0, 0);
+                _clipBox = new Q1Rect(0, 0, 0, 0);
                 _x1 = _y1 = _f1 = 0;
                 _clipping = false;
             }
-            public RectInt GetVectorClipBox() => _clipBox;
+            public Q1Rect GetVectorClipBox() => _clipBox;
 
             public void SetClipBox(int x1, int y1, int x2, int y2)
             {
-                _clipBox = new RectInt(x1, y1, x2, y2);
+                _clipBox = new Q1Rect(x1, y1, x2, y2);
                 _clipBox.Normalize();
                 _clipping = true;
             }
@@ -75,12 +78,12 @@ namespace PixelFarm.CpuBlit.Rasterization
                     //changed
                     if (value)
                     {
-                        _clipBox = new RectInt(_clipBox.Left, _clipBox.Bottom, _clipBox.Left + (_clipBox.Width * 3), _clipBox.Height);
+                        _clipBox = new Q1Rect(_clipBox.Left, _clipBox.Bottom, _clipBox.Left + (_clipBox.Width * 3), _clipBox.Height);
                     }
                     else
                     {
                         //set back
-                        _clipBox = new RectInt(_clipBox.Left, _clipBox.Bottom, _clipBox.Left + (_clipBox.Width / 3), _clipBox.Height);
+                        _clipBox = new Q1Rect(_clipBox.Left, _clipBox.Bottom, _clipBox.Left + (_clipBox.Width / 3), _clipBox.Height);
                     }
                     _clipBoxWidthX3ForSubPixelLcdEffect = value;
                 }

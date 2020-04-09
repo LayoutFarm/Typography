@@ -46,12 +46,12 @@ namespace Typography.OpenFont.Tables
                 {
                     //https://www.microsoft.com/typography/OTSPEC/glyf.htm
                     //header, 
-                    //Type 	Name 	Description
+                    //Type 	    Name 	            Description
                     //SHORT 	numberOfContours 	If the number of contours is greater than or equal to zero, this is a single glyph; if negative, this is a composite glyph.
-                    //SHORT 	xMin 	Minimum x for coordinate data.
-                    //SHORT 	yMin 	Minimum y for coordinate data.
-                    //SHORT 	xMax 	Maximum x for coordinate data.
-                    //SHORT 	yMax 	Maximum y for coordinate data.
+                    //SHORT 	xMin 	            Minimum x for coordinate data.
+                    //SHORT 	yMin 	            Minimum y for coordinate data.
+                    //SHORT 	xMax 	            Maximum x for coordinate data.
+                    //SHORT 	yMax 	            Maximum y for coordinate data.
                     short contoursCount = reader.ReadInt16();
                     if (contoursCount >= 0)
                     {
@@ -125,31 +125,35 @@ namespace Typography.OpenFont.Tables
 
         static short[] ReadCoordinates(BinaryReader input, int pointCount, SimpleGlyphFlag[] flags, SimpleGlyphFlag isByte, SimpleGlyphFlag signOrSame)
         {
-            //https://www.microsoft.com/typography/OTSPEC/glyf.htm
+            //https://docs.microsoft.com/en-us/typography/opentype/spec/glyf
             //Note: In the glyf table, the position of a point is not stored in absolute terms but as a vector relative to the previous point. 
             //The delta-x and delta-y vectors represent these (often small) changes in position.
 
             //Each flag is a single bit. Their meanings are shown below.
             //Bit	Flags  	        Description
-            //0     On Curve 	 	If set, the point is on the curve; otherwise, it is off the curve.
-            //1     x-Short Vector  If set, the corresponding x-coordinate is 1 byte long. If not set, 2 bytes.
-            //2     y-Short Vector 	If set, the corresponding y-coordinate is 1 byte long. If not set, 2 bytes.
-            //3     Repeat 	 	    If set, the next byte specifies the number of additional times this set of flags is to be repeated.
+            //0     ON_CURVE_POINT  If set, the point is on the curve; otherwise, it is off the curve.
+            //1     X_SHORT_VECTOR  If set, the corresponding x-coordinate is 1 byte long. If not set, 2 bytes.
+            //2     Y_SHORT_VECTOR 	If set, the corresponding y-coordinate is 1 byte long. If not set, 2 bytes.
+            //3     REPEAT_FLAG     If set, the next byte specifies the number of additional times this set of flags is to be repeated.
             //                      In this way, the number of flags listed can be smaller than the number of points in a character.
-            //4     This x is same(Positive x-Short Vector) This flag has two meanings, depending on how the x-Short Vector flag is set.
+
+            //4     X_IS_SAME_OR_POSITIVE_X_SHORT_VECTOR
+            //                      This flag has two meanings, depending on how the x-Short Vector flag is set.
             //                      If x-Short Vector is set, this bit describes the sign of the value, 
             //                      with 1 equalling positive and 0 negative. 
             //                      If the x-Short Vector bit is not set and this bit is set, then the current x-coordinate is the same as the previous x-coordinate. 
             //                      If the x-Short Vector bit is not set and this bit is also not set, the current x-coordinate is a signed 16-bit delta vector.
-            //5     This y is same  (Positive y-Short Vector)  This flag has two meanings,
+
+            //5     Y_IS_SAME_OR_POSITIVE_Y_SHORT_VECTOR
+            //                      This flag has two meanings,
             //                      depending on how the y-Short Vector flag is set. 
             //                      If y-Short Vector is set, this bit describes the sign of the value,
             //                      with 1 equalling positive and 0 negative. 
             //                      If the y-Short Vector bit is not set and this bit is set, then the current y-coordinate is the same as the previous y-coordinate.
             //                      If the y-Short Vector bit is not set and this bit is also not set,
             //                      the current y-coordinate is a signed 16-bit delta vector.  
-            //6  Reserved 	 	This bit is reserved. Set it to zero.
-            //7  Reserved 	 	This bit is reserved. Set it to zero.
+            //6     OVERLAP_SIMPLE 	This bit is reserved. Set it to zero. (not used in OpenType)
+            //7     Reserved 	 	This bit is reserved. Set it to zero.
 
             var xs = new short[pointCount];
             int x = 0;
@@ -190,16 +194,18 @@ namespace Typography.OpenFont.Tables
 
         static Glyph ReadSimpleGlyph(BinaryReader reader, int contourCount, Bounds bounds, ushort index)
         {
-            //https://www.microsoft.com/typography/OTSPEC/glyf.htm
+            //https://docs.microsoft.com/en-us/typography/opentype/spec/glyf
             //Simple Glyph Description
-            //This is the table information needed if numberOfContours is greater than zero, that is, a glyph is not a composite.
-            //Type 	Name 	Description
-            //USHORT 	endPtsOfContours[n] 	Array of last points of each contour; n is the number of contours.
-            //USHORT 	instructionLength 	Total number of bytes for instructions.
-            //BYTE 	instructions[n] 	Array of instructions for each glyph; n is the number of instructions.
-            //BYTE 	flags[n] 	Array of flags for each coordinate in outline; n is the number of flags.
-            //BYTE or SHORT 	xCoordinates[ ] 	First coordinates relative to (0,0); others are relative to previous point.
-            //BYTE or SHORT 	yCoordinates[ ] 	First coordinates relative to (0,0); others are relative to previous point.
+            //This is the table information needed if numberOfContours is greater than zero, 
+            //that is, a glyph is not a composite.
+
+            //Type 	    Name 	                                Description
+            //uint16 	endPtsOfContours[numberOfContours] 	    Array of last points of each contour; 
+            //uint16 	instructionLength 	                    Total number of bytes for instructions.
+            //uint8 	instructions[instructionLength] 	    Array of instructions for each glyph;
+            //uint8 	flags[variable] 	                    Array of flags for each coordinate in outline; variable is the number of flags.
+            //uint8 or int16 	xCoordinates[variable] 	        First coordinates relative to (0,0); others are relative to previous point.
+            //uint8 or int16 	yCoordinates[variable] 	        First coordinates relative to (0,0); others are relative to previous point.
 
             ushort[] endPoints = Utils.ReadUInt16Array(reader, contourCount);
             //-------------------------------------------------------
@@ -230,7 +236,7 @@ namespace Typography.OpenFont.Tables
         internal enum CompositeGlyphFlags : ushort
         {
             //These are the constants for the flags field:
-            //Bit   Flags 	 	Description
+            //Bit   Flags 	 	            Description
             //0     ARG_1_AND_2_ARE_WORDS  	If this is set, the arguments are words; otherwise, they are bytes.
             //1     ARGS_ARE_XY_VALUES 	  	If this is set, the arguments are xy values; otherwise, they are points.
             //2     ROUND_XY_TO_GRID 	  	For the xy values if the preceding is true.
@@ -270,11 +276,12 @@ namespace Typography.OpenFont.Tables
             //A composite glyph starts with two USHORT values (“flags” and “glyphIndex,” i.e. the index of the first contour in this composite glyph); 
             //the data then varies according to “flags”).
             //Type 	    Name 	    Description
-            //USHORT 	flags 	    component flag
-            //USHORT 	glyphIndex 	glyph index of component
+            //uint16 	flags 	    component flag
+            //uint16 	glyphIndex 	glyph index of component
             //VARIABLE 	argument1 	x-offset for component or point number; type depends on bits 0 and 1 in component flags
             //VARIABLE 	argument2 	y-offset for component or point number; type depends on bits 0 and 1 in component flags
             //---------
+            //note: VARIABLE => may be uint8,int8,uint16 or int16
             //see more at https://fontforge.github.io/assets/old/Composites/index.html
             //---------
 

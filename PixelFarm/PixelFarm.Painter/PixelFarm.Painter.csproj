@@ -127,8 +127,11 @@
     <Compile Include="..\pixelfarm.vectors\2_geometry\Ellipse.cs">
       <Link>0_REF_Vectors\2_Geometry\Ellipse.cs</Link>
     </Compile>
-    <Compile Include="..\pixelfarm.vectors\2_geometry\RectD.cs">
-      <Link>0_REF_Vectors\2_Geometry\RectD.cs</Link>
+    <Compile Include="..\PixelFarm.Vectors\2_Geometry\Q1Rect.cs">
+      <Link>0_REF_Vectors\2_Geometry\Q1Rect.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Vectors\2_Geometry\Q1RectD.cs">
+      <Link>0_REF_Vectors\2_Geometry\Q1RectD.cs</Link>
     </Compile>
     <Compile Include="..\PixelFarm.Vectors\3_Transform\1_Affine.cs">
       <Link>0_REF_Vectors\3_Transform\1_Affine.cs</Link>
@@ -180,6 +183,34 @@
     <Compile Include="4_CpuBlit_VertexProcessing\VertexStoreExtensions.cs" />
     <Compile Include="4_CpuBlit_VertexProcessing\VertexStoreTransformExtensions.cs" />
     <Compile Include="4_CpuBlit_VertexProcessing\VxsClipping.cs" />
+    <Compile Include="0_Base\ForNet20.cs" />
+    <Compile Include="CpuBlit\TempMemPtr.cs" />
+    <Compile Include="Drawing\ClipingTechnique.cs" />
+    <Compile Include="TempContext.cs" />
+    <Compile Include="Drawing\TextBaseline.cs" />
+    <Compile Include="CpuBlit\ColorRGBAf.cs" />
+    <Compile Include="Drawing\ColorEx.cs" />
+    <Compile Include="CpuBlit.VertexProcessing\BoundingRect.cs" />
+    <Compile Include="CpuBlit.VertexProcessing\CurveFlattener.cs" />
+    <Compile Include="CpuBlit.VertexProcessing\LineWalker.cs" />
+    <Compile Include="CpuBlit\PathWriter.cs" />
+    <Compile Include="CpuBlit.VertexProcessing\RoundedRect.cs" />
+    <Compile Include="CpuBlit.VertexProcessing\SimpleRect.cs" />
+    <Compile Include="CpuBlit.VertexProcessing\Stroke.cs" />
+    <Compile Include="CpuBlit.VertexProcessing\StrokeGenerator.cs" />
+    <Compile Include="CpuBlit.VertexProcessing\StrokeGen.cs" />
+    <Compile Include="CpuBlit.VertexProcessing\StrokeMath.cs" />
+    <Compile Include="CpuBlit.VertexProcessing\SvgArcSegment.cs" />
+    <Compile Include="CpuBlit.VertexProcessing\VectorToolBox.cs" />
+    <Compile Include="CpuBlit.VertexProcessing\VertexData.cs" />
+    <Compile Include="Drawing\ITextPrinter.cs" />
+    <Compile Include="CpuBlit\MemBitmap.cs" />
+    <Compile Include="CpuBlit.VertexProcessing\VertexHitTester.cs" />
+    <Compile Include="CpuBlit.VertexProcessing\VertexStoreExtensions.cs" />
+    <Compile Include="CpuBlit.VertexProcessing\VertexStoreTransformExtensions.cs" />
+    <Compile Include="CpuBlit.VertexProcessing\VxsClipping.cs" />
+    <Compile Include="Drawing.Internal\CO.cs" />
+    <Compile Include="Drawing.Internal\MicroPainter.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\PixelFarm.DrawingCore\PixelFarm.DrawingCore.csproj">

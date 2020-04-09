@@ -101,13 +101,13 @@ namespace PixelFarm.CpuBlit.Rasterization
             unsafe
             {
 
-                using (CpuBlit.Imaging.TempMemPtr dest_bufferPtr = dest.GetBufferPtr())
+                using (TempMemPtr dest_bufferPtr = dest.GetBufferPtr())
                 {
                     byte* dest_buffer = (byte*)dest_bufferPtr.Ptr;
                     int dest_stride = _destImgStride = dest.Stride;
                     //*** set color before call Blend()
                     _color = color;
-                    byte color_alpha = color.alpha;
+                    byte color_alpha = color.A;
                     //---------------------------
                     //3. loop, render single scanline with subpixel rendering 
 
@@ -400,10 +400,10 @@ namespace PixelFarm.CpuBlit.Rasterization
             //-----------------
             //TODO: review color order here
             //B-G-R-A?   
-            byte color_c0 = _color.blue;
-            byte color_c1 = _color.green;
-            byte color_c2 = _color.red;
-            byte color_alpha = _color.alpha;
+            byte color_c0 = _color.B;
+            byte color_c1 = _color.G;
+            byte color_c2 = _color.R;
+            byte color_alpha = _color.A;
             //-----------------
             //single line 
             //from tripple width (x3) grayScaleLineBuffer
@@ -633,7 +633,7 @@ namespace PixelFarm.CpuBlit.Rasterization
                 }
             }
         }
-        
+
 #if DEBUG
         static float mix(float farColor, float nearColor, float weight)
         {
@@ -1434,12 +1434,7 @@ namespace PixelFarm.CpuBlit.Rasterization
         public DestBitmapRasterizer()
         {
         }
-        public ScanlineRenderMode ScanlineRenderMode
-        {
-            get;
-            set;
-        }
-
+        public ScanlineRenderMode ScanlineRenderMode { get; set; }
         public void RenderWithColor(PixelProcessing.IBitmapBlender dest,
                 ScanlineRasterizer sclineRas,
                 Scanline scline,
@@ -1713,72 +1708,6 @@ namespace PixelFarm.CpuBlit.Rasterization
 
     }
 
-
-
-    // This function prepares the alpha-channel information 
-    //// for the glyph averaging the values in accordance with 
-    //// the method suggested by Steve Gibson. The function
-    //// extends the width by 4 extra pixels, 2 at the beginning 
-    //// and 2 at the end. Also, it doesn't align the new width 
-    //// to 4 bytes, that is, the output gm.gmBlackBoxX is the 
-    //// actual width of the array.
-    ////---------------------------------
-    //template<class LutType>
-    //void prepare_lcd_glyph(const LutType& lut, 
-    //                       const unsigned char* gbuf1, 
-    //                       const GLYPHMETRICS& gm, 
-    //                       unsigned char* gbuf2, 
-    //                       GLYPHMETRICS* gm2)
-    //{
-    //    unsigned src_stride = (gm.gmBlackBoxX + 3) / 4 * 4;
-    //    unsigned dst_width  = src_stride + 4;
-    //    memset(gbuf2, 0, dst_width * gm.gmBlackBoxY);
-
-    //    for(unsigned y = 0; y < gm.gmBlackBoxY; ++y)
-    //    {
-    //        const unsigned char* src_ptr = gbuf1 + src_stride * y;
-    //        unsigned char* dst_ptr = gbuf2 + dst_width * y;
-    //        unsigned x;
-    //        for(x = 0; x < gm.gmBlackBoxX; ++x)
-    //        {
-    //            unsigned v = *src_ptr++;
-    //            dst_ptr[0] += lut.tertiary(v);
-    //            dst_ptr[1] += lut.secondary(v);
-    //            dst_ptr[2] += lut.primary(v);
-    //            dst_ptr[3] += lut.secondary(v);
-    //            dst_ptr[4] += lut.tertiary(v);
-    //            ++dst_ptr;
-    //        }
-    //    }
-    //    gm2->gmBlackBoxX = dst_width;
-    //}
-
-    // Blend one span into the R-G-B 24 bit frame buffer
-    // For the B-G-R byte order or for 32-bit buffers modify
-    // this function accordingly. The general idea is 'span' 
-    // contains alpha values for individual color channels in the 
-    // R-G-B order, so, for the B-G-R order you will have to 
-    // choose values from the 'span' array differently
-    //---------------------------------
-    //void blend_lcd_span(int x, 
-    //                    int y, 
-    //                    const unsigned char* span, 
-    //                    int width, 
-    //                    const rgba& color, 
-    //                    unsigned char* rgb24_buf, 
-    //                    unsigned rgb24_stride)
-    //{
-    //    unsigned char* p = rgb24_buf + rgb24_stride * y + x;
-    //    unsigned char rgb[3] = { color.r, color.g, color.b };
-    //    int i = x % 3;
-    //    do
-    //    {
-    //        int a0 = int(*span++) * color.a;
-    //        *p++ = (unsigned char)((((rgb[i++] - *p) * a0) + (*p << 16)) >> 16);
-    //        if(i > 2) i = 0;
-    //    }
-    //    while(--width);
-    //}
 
 }
 

@@ -8,10 +8,17 @@ namespace Typography.OpenFont
     [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
     public struct GlyphPointF
     {
+        //from https://docs.microsoft.com/en-us/typography/opentype/spec/glyf
+        //'point' of the glyph contour.
+        //eg. ... In the glyf table, the position of a point ...
+        //  ...  the point is on the curve; otherwise, it is off the curve....
+
         internal Vector2 P;
         internal bool onCurve;
+
         public GlyphPointF(float x, float y, bool onCurve)
-        {
+        {          
+             
             P = new Vector2(x, y);
             this.onCurve = onCurve;
         }

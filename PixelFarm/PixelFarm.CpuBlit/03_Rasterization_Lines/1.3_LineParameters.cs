@@ -1,5 +1,4 @@
 ﻿//BSD, 2014-present, WinterDev
-
 //MatterHackers
 //----------------------------------------------------------------------------
 // Anti-Grain Geometry - Version 2.4
@@ -92,22 +91,13 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
         //---------------------------------------------------------------------
         public uint OrthogonalQuadrant => s_orthogonal_quadrant[_octant];
         public uint DiagonalQuadrant => s_diagonal_quadrant[_octant];
-        //
-        //
+        // 
         public int dx => Math.Abs(x2 - x1);
         public int dy => Math.Abs(y2 - y1);
-        //---------------------------------------------------------------------
-        public bool IsSameOrthogonalQuadrant(LineParameters lp)
-        {
-            return s_orthogonal_quadrant[_octant] == s_orthogonal_quadrant[lp._octant];
-        }
-        //---------------------------------------------------------------------
-        public bool IsSameDiagonalQuadrant(LineParameters lp)
-        {
-            return s_diagonal_quadrant[_octant] == s_diagonal_quadrant[lp._octant];
-        }
 
-        //---------------------------------------------------------------------
+        public bool IsSameOrthogonalQuadrant(LineParameters lp) => s_orthogonal_quadrant[_octant] == s_orthogonal_quadrant[lp._octant];
+
+        public bool IsSameDiagonalQuadrant(LineParameters lp) => s_diagonal_quadrant[_octant] == s_diagonal_quadrant[lp._octant];
 
         public bool Divide(out LineParameters lp1, out LineParameters lp2)
         {

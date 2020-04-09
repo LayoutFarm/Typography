@@ -331,10 +331,10 @@ namespace PixelFarm.CpuBlit.Imaging
                             //Drawing.Color x2y1Color = srcCB.GetPixel(x2, y1);
                             //Drawing.Color x1y2Color = srcCB.GetPixel(x1, y2);
                             //Drawing.Color x2y2Color = srcCB.GetPixel(x2, y2);
-                            float a = (x1y1Color.alpha * dx1y1) + (x2y1Color.alpha * dx2y1) + (x1y2Color.alpha * dx1y2) + (x2y2Color.alpha * dx2y2);
-                            float b = (x1y1Color.blue * dx1y1) + (x2y1Color.blue * dx2y1) + (x1y2Color.blue * dx1y2) + (x2y2Color.blue * dx2y2);
-                            float g = (x1y1Color.green * dx1y1) + (x2y1Color.green * dx2y1) + (x1y2Color.green * dx1y2) + (x2y2Color.green * dx2y2);
-                            float r = (x1y1Color.red * dx1y1) + (x2y1Color.red * dx2y1) + (x1y2Color.red * dx1y2) + (x2y2Color.red * dx2y2);
+                            float a = (x1y1Color.A * dx1y1) + (x2y1Color.A * dx2y1) + (x1y2Color.A * dx1y2) + (x2y2Color.A * dx2y2);
+                            float b = (x1y1Color.B * dx1y1) + (x2y1Color.B * dx2y1) + (x1y2Color.B * dx1y2) + (x2y2Color.B * dx2y2);
+                            float g = (x1y1Color.G * dx1y1) + (x2y1Color.G * dx2y1) + (x1y2Color.G * dx1y2) + (x2y2Color.G * dx2y2);
+                            float r = (x1y1Color.R * dx1y1) + (x2y1Color.R * dx2y1) + (x1y2Color.R * dx1y2) + (x2y2Color.R * dx2y2);
                             destWriter.SetPixel(x, y, new Drawing.Color((byte)a, (byte)r, (byte)g, (byte)b));
 
                         }

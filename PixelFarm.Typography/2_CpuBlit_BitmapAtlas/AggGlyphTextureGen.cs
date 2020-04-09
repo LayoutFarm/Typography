@@ -38,7 +38,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
 
                 _txToVxs.WriteOutput(glyphVxs, pxscale);
 
-                RectD bounds = glyphVxs.GetBoundingRect();
+                Q1RectD bounds = glyphVxs.GetBoundingRect();
 
                 //-------------------------------------------- 
                 int w = (int)System.Math.Ceiling(bounds.Width);
@@ -82,13 +82,13 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                     glyphVxs.TranslateToNewVxs(dx + 0.33f, dy, vxs2); //offset to proper x of subpixel rendering  ***
                     glyphVxs = vxs2;
 
-                    RectD bounds2 = vxs2.GetBoundingRect();
+                    Q1RectD bounds2 = vxs2.GetBoundingRect();
                     if (w < bounds2.Right)
                     {
                         w = (int)Math.Ceiling(bounds2.Right);
                     }
                     // 
-                    painter.UseSubPixelLcdEffect = true;
+                    painter.UseLcdEffectSubPixelRendering = true;
                     //we use white glyph on black bg for this texture                
 
 
@@ -118,7 +118,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                     glyphVxs.TranslateToNewVxs(dx, dy, vxs2);
                     glyphVxs = vxs2;
 
-                    painter.UseSubPixelLcdEffect = false;
+                    painter.UseLcdEffectSubPixelRendering = false;
 
                     if (TextureKind == TextureKind.StencilGreyScale)
                     {

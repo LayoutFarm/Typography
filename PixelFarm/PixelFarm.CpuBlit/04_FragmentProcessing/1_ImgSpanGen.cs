@@ -64,7 +64,7 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
         public int dxInt => _dx_int;
         public int dyInt => _dy_int;
         //
-
+        
         public void SetFilterOffset(double dx, double dy)
         {
             _dx_dbl = dx;
@@ -74,13 +74,8 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
         }
         public void SetFilterOffset(double d) => SetFilterOffset(d, d);
         public virtual void Prepare() { }
-        public Drawing.Color BackgroundColor
-        {
-            get;
-            set;
-        }
+        public Drawing.Color BackgroundColor { get; set; }
         public abstract void GenerateColors(Drawing.Color[] outputColors, int startIndex, int x, int y, int len);
-
 
         internal void SetSrcBitmap(IBitmapSrc src)
         {

@@ -14,7 +14,7 @@ namespace SampleWinForms.UI
         AggPainter p;
         Bitmap winBmp;
         VisualLine _visualLine;
-        LayoutFarm.OpenFontTextService _openFontTextServices;
+        PixelFarm.Drawing.OpenFontTextService _openFontTextServices;
         public SampleTextBoxControllerForPixelFarm()
         {
         }
@@ -27,7 +27,7 @@ namespace SampleWinForms.UI
             p = AggPainter.Create(destImg);
             winBmp = new Bitmap(400, 300, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
 
-            _openFontTextServices = new LayoutFarm.OpenFontTextService();
+            _openFontTextServices = new PixelFarm.Drawing.OpenFontTextService();
 
             _printer = new PixelFarm.Drawing.VxsTextPrinter(p, _openFontTextServices);
             _visualLine = new VisualLine();

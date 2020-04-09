@@ -43,7 +43,7 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                 image.BytesBetweenPixelsInclusive);
         }
 
-        public SubBitmapBlender(PixelFarm.CpuBlit.Imaging.TempMemPtr buffer,
+        public SubBitmapBlender(TempMemPtr buffer,
             int arrayOffset32,
             int width,
             int height,
@@ -76,7 +76,7 @@ namespace PixelFarm.CpuBlit.PixelProcessing
         {
             _sourceImage?.WriteBuffer(newbuffer);
         }
-        void AttachBuffer(PixelFarm.CpuBlit.Imaging.TempMemPtr buffer,
+        void AttachBuffer(TempMemPtr buffer,
           int elemOffset,
           int width,
           int height,
@@ -128,7 +128,7 @@ namespace PixelFarm.CpuBlit.PixelProcessing
         //    return false;
         //}
 
-        void SetBuffer(PixelFarm.CpuBlit.Imaging.TempMemPtr src, int arrayElemOffset)
+        void SetBuffer(TempMemPtr src, int arrayElemOffset)
         {
             int height = this.Height;
 
@@ -163,7 +163,7 @@ namespace PixelFarm.CpuBlit.PixelProcessing
         /// <param name="parentImage"></param>
         /// <param name="subImgBounds"></param>
         /// <returns></returns>
-        public static SubBitmapBlender CreateSubBitmapBlender(IBitmapBlender parentImage, RectInt subImgBounds)
+        public static SubBitmapBlender CreateSubBitmapBlender(IBitmapBlender parentImage, PixelFarm.CpuBlit.VertexProcessing.Q1Rect subImgBounds)
         {
             if (subImgBounds.Left < 0 || subImgBounds.Bottom < 0 || subImgBounds.Right > parentImage.Width || subImgBounds.Top > parentImage.Height
                 || subImgBounds.Left >= subImgBounds.Right || subImgBounds.Bottom >= subImgBounds.Top)

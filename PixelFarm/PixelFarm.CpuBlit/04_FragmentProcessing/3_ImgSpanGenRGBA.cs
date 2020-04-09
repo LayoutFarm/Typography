@@ -33,7 +33,7 @@ using PixelFarm.CpuBlit.Imaging;
 
 using subpix_const = PixelFarm.CpuBlit.Imaging.ImageFilterLookUpTable.ImgSubPixConst;
 using filter_const = PixelFarm.CpuBlit.Imaging.ImageFilterLookUpTable.ImgFilterConst;
-
+using CO = PixelFarm.Drawing.Internal.CO;
 
 namespace PixelFarm.CpuBlit.FragmentProcessing
 {
@@ -108,15 +108,13 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
         {
             base.Prepare();
 
-            ISpanInterpolator spanInterpolator = base.Interpolator;
-
-            _noTransformation = (spanInterpolator.GetType() == typeof(SpanInterpolatorLinear)
-                && ((SpanInterpolatorLinear)spanInterpolator).Transformer.GetType() == typeof(VertexProcessing.Affine)
-                && ((VertexProcessing.Affine)((SpanInterpolatorLinear)spanInterpolator).Transformer).IsIdentity);
+            _noTransformation = (base.Interpolator is SpanInterpolatorLinear spanInterpolatorLinear &&
+               spanInterpolatorLinear.Transformer is VertexProcessing.Affine aff &&
+               aff.IsIdentity);
         }
         internal unsafe static void NN_StepXBy1(IBitmapSrc bmpsrc, int srcIndex, Drawing.Color[] outputColors, int dstIndex, int len)
         {
-            using (CpuBlit.Imaging.TempMemPtr srcBufferPtr = bmpsrc.GetBufferPtr())
+            using (CpuBlit.TempMemPtr srcBufferPtr = bmpsrc.GetBufferPtr())
             {
                 int* pSource = (int*)srcBufferPtr.Ptr + srcIndex;
                 do
@@ -157,7 +155,7 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
                 spanInterpolator.Begin(x + dx, y + dy, len);
                 unsafe
                 {
-                    using (CpuBlit.Imaging.TempMemPtr.FromBmp(_bmpSrc, out int* srcBuffer))
+                    using ( TempMemPtr.FromBmp(_bmpSrc, out int* srcBuffer))
                     {
                         //TODO: if no any transformation,=> skip spanInterpolator (see above example)
                         do
@@ -201,11 +199,10 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
         {
             base.Prepare();
 
-            ISpanInterpolator spanInterpolator = base.Interpolator;
-
-            _noTransformation = (spanInterpolator.GetType() == typeof(SpanInterpolatorLinear)
-                && ((SpanInterpolatorLinear)spanInterpolator).Transformer.GetType() == typeof(VertexProcessing.Affine)
-                && ((VertexProcessing.Affine)((SpanInterpolatorLinear)spanInterpolator).Transformer).IsIdentity);
+            _noTransformation = (base.Interpolator is SpanInterpolatorLinear spanInterpolatorLinear &&
+               spanInterpolatorLinear.Transformer is VertexProcessing.Affine aff &&
+               aff.IsIdentity);
+             
         }
         public sealed override void GenerateColors(Drawing.Color[] outputColors, int startIndex, int x, int y, int len)
         {
@@ -218,7 +215,7 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
 
                 if (_noTransformation)
                 {
-                    using (CpuBlit.Imaging.TempMemPtr.FromBmp(_bmpSrc, out int* srcBuffer))
+                    using (CpuBlit.TempMemPtr.FromBmp(_bmpSrc, out int* srcBuffer))
                     {
                         int bufferIndex = _bmpSrc.GetBufferOffsetXY32(x, y);
                         do
@@ -241,7 +238,7 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
                 {
                     //Bilinear interpolation, without lookup table
                     ISpanInterpolator spanInterpolator = base.Interpolator;
-                    using (CpuBlit.Imaging.TempMemPtr srcBufferPtr = _bmpSrc.GetBufferPtr())
+                    using (CpuBlit.TempMemPtr srcBufferPtr = _bmpSrc.GetBufferPtr())
                     {
                         int* srcBuffer = (int*)srcBufferPtr.Ptr;
 
@@ -251,10 +248,10 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
                         int acc_r, acc_g, acc_b, acc_a;
 
                         Color bgColor = this.BackgroundColor;
-                        int back_r = bgColor.red;
-                        int back_g = bgColor.green;
-                        int back_b = bgColor.blue;
-                        int back_a = bgColor.alpha;
+                        int back_r = bgColor.R;
+                        int back_g = bgColor.G;
+                        int back_b = bgColor.B;
+                        int back_a = bgColor.A;
                         int maxx = _bmpSrc.Width - 1;
                         int maxy = _bmpSrc.Height - 1;
                         int srcColor = 0;
@@ -519,7 +516,7 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
 
             unsafe
             {
-                using (CpuBlit.Imaging.TempMemPtr srcBufferPtr = _bmpSrc.GetBufferPtr())
+                using (CpuBlit.TempMemPtr srcBufferPtr = _bmpSrc.GetBufferPtr())
                 {
                     int* srcBuffer = (int*)srcBufferPtr.Ptr;
                     spanInterpolator.Begin(x + base.dx, y + base.dy, len);

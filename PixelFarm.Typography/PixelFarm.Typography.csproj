@@ -49,7 +49,7 @@
     <Compile Include="2_CpuBlit_BitmapAtlas\GlyphBitmapStore.cs" />
     <Compile Include="3_Typography_Contours\GlyphPathBuilder.cs" />
     <Compile Include="2_CpuBlit_BitmapAtlas\BitmapCacheForSvgGlyph.cs" />
-    <Compile Include="4_PixelFarm_Contours\GlyphTranslatorToVxs.cs" />
+    <Compile Include="3_Typography_Contours\GlyphTranslatorToVxs.cs" />
     <Compile Include="3_Typography_Contours\GlyphMeshStore.cs" />
     <Compile Include="1_General\OpenFontTextService.cs" />
     <Compile Include="2_CpuBlit_BitmapAtlas\BitmapFontMx.cs" />

@@ -7,8 +7,6 @@ using Typography.OpenFont.Extensions;
 using Typography.TextLayout;
 using Typography.Contours;
 
-using PixelFarm.Drawing;
-
 namespace PixelFarm.CpuBlit.BitmapAtlas
 {
     public class GlyphTextureBuildDetail
@@ -230,16 +228,16 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                         outlineBuilder.BuildFromGlyphIndex(gindex, sizeInPoint);
 
                         BitmapAtlasItemSource glyphImg = aggTextureGen.CreateAtlasItem(outlineBuilder, 1);
-                        if (applyFilter)
-                        {
+                        //if (applyFilter)
+                        //{
 
-                            glyphImg = Sharpen(glyphImg, 1);
-                            //TODO:
-                            //the filter make the image shift x and y 1 px
-                            //temp fix with this,
-                            glyphImg.TextureXOffset += 1;
-                            glyphImg.TextureYOffset += 1;
-                        }
+                        //    glyphImg = Sharpen(glyphImg, 1);
+                        //    //TODO:
+                        //    //the filter make the image shift x and y 1 px
+                        //    //temp fix with this,
+                        //    glyphImg.TextureXOffset += 1;
+                        //    glyphImg.TextureYOffset += 1;
+                        //}
                         //
                         glyphImg.UniqueInt16Name = gindex;
                         _onEachGlyphDel?.Invoke(glyphImg);
@@ -248,28 +246,28 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                 }
             }
         }
-        /// <summary>
-        /// test only, shapen org image with Paint.net sharpen filter
-        /// </summary>
-        /// <param name="org"></param>
-        /// <param name="radius"></param>
-        /// <returns></returns>
-        static BitmapAtlasItemSource Sharpen(BitmapAtlasItemSource org, int radius)
-        {
-            BitmapAtlasItemSource newImg = new BitmapAtlasItemSource(org.Width, org.Height);
-            CpuBlit.Imaging.ShapenFilterPdn sharpen1 = new CpuBlit.Imaging.ShapenFilterPdn();
-            int[] orgBuffer = org.GetImageBuffer();
-            unsafe
-            {
-                fixed (int* orgHeader = &orgBuffer[0])
-                {
-                    int[] output = sharpen1.Sharpen(orgHeader, org.Width, org.Height, org.Width * 4, radius);
-                    newImg.SetImageBuffer(output, org.IsBigEndian);
-                }
-            }
+        ///// <summary>
+        ///// test only, shapen org image with Paint.net sharpen filter
+        ///// </summary>
+        ///// <param name="org"></param>
+        ///// <param name="radius"></param>
+        ///// <returns></returns>
+        //static BitmapAtlasItemSource Sharpen(BitmapAtlasItemSource org, int radius)
+        //{
+        //    BitmapAtlasItemSource newImg = new BitmapAtlasItemSource(org.Width, org.Height);
+        //    CpuBlit.Imaging.ShapenFilterPdn sharpen1 = new CpuBlit.Imaging.ShapenFilterPdn();
+        //    int[] orgBuffer = org.GetImageBuffer();
+        //    unsafe
+        //    {
+        //        fixed (int* orgHeader = &orgBuffer[0])
+        //        {
+        //            int[] output = sharpen1.Sharpen(orgHeader, org.Width, org.Height, org.Width * 4, radius);
+        //            newImg.SetImageBuffer(output, org.IsBigEndian);
+        //        }
+        //    }
 
-            return newImg;
-        }
+        //    return newImg;
+        //}
         static ushort[] GetUniqueGlyphIndexList(List<ushort> inputGlyphIndexList)
         {
             Dictionary<ushort, bool> uniqueGlyphIndices = new Dictionary<ushort, bool>(inputGlyphIndexList.Count);

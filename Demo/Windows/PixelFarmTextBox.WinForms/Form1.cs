@@ -8,7 +8,6 @@ using System.Windows.Forms;
 
 
 using PixelFarm.CpuBlit;
-using PixelFarm.Drawing.Fonts;
 
 using Typography.OpenFont;
 using Typography.Contours;
@@ -34,7 +33,7 @@ namespace PixelFarmTextBox.WinForms
         TypographyTest.BasicFontOptions _basicOptions;
         TypographyTest.GlyphRenderOptions _renderOptions;
 
-        LayoutFarm.OpenFontTextService _openFontTextService;
+        PixelFarm.Drawing.OpenFontTextService _openFontTextService;
 
         public Form1()
         {
@@ -78,7 +77,7 @@ namespace PixelFarmTextBox.WinForms
 
             painter.CurrentFont = new PixelFarm.Drawing.RequestFont("tahoma", 14);
 
-            _openFontTextService = new LayoutFarm.OpenFontTextService();
+            _openFontTextService = new PixelFarm.Drawing.OpenFontTextService();
             //....
             _devVxsTextPrinter = new PixelFarm.Drawing.VxsTextPrinter(painter, _openFontTextService);
             _devVxsTextPrinter.ScriptLang = _basicOptions.ScriptLang;
@@ -119,7 +118,7 @@ namespace PixelFarmTextBox.WinForms
                     {
                         //clear previous draw
                         painter.Clear(PixelFarm.Drawing.Color.White);
-                        painter.UseSubPixelLcdEffect = false;
+                        painter.UseLcdEffectSubPixelRendering = false;
                         painter.FillColor = PixelFarm.Drawing.Color.Black;
 
                         selectedTextPrinter = _devVxsTextPrinter;
@@ -175,7 +174,7 @@ namespace PixelFarmTextBox.WinForms
             //-------------
             //pre-render
             painter.Clear(PixelFarm.Drawing.Color.White);
-            painter.UseSubPixelLcdEffect = false;
+            painter.UseLcdEffectSubPixelRendering = false;
             painter.FillColor = PixelFarm.Drawing.Color.Black;
 
             //

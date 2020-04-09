@@ -1,4 +1,4 @@
-﻿//Apache2, 2018, apache/pdfbox Authors ( https://github.com/apache/pdfbox) 
+//Apache2, 2018, apache/pdfbox Authors ( https://github.com/apache/pdfbox) 
 //
 //Apache PDFBox
 //Copyright 2014 The Apache Software Foundation
@@ -1101,7 +1101,7 @@ namespace Typography.OpenFont.CFF
             Type2CharStringParser type2Parser = new Type2CharStringParser(globalSubrRawBufferList, localSubrRawBufferList);
 
 #if DEBUG
-            //double total = 0;
+            double total = 0;
 #endif
             for (int i = 0; i < glyphCount; ++i)
             {
@@ -1129,13 +1129,16 @@ namespace Typography.OpenFont.CFF
                 Type2GlyphInstructionList instList = type2Parser.ParseType2CharString(buffer);
                 //use compact form or not
 
-                if (_useCompactInstruction)
-                {
-                    //this is our extension 
-                    instructions = _instCompacter.Compact(instList.InnerInsts);
+                    if (_useCompactInstruction)
+                    {
+                        //this is our extension,
+                        //if you don't want compact version
+                        //just use original 
+
+                        instructions = _instCompacter.Compact(instList.InnerInsts);
 
 #if DEBUG
-                    //total += glyphData.GlyphInstructions.Length / (float)instList.InnerInsts.Count;
+                        total += instructions.Length / (float)instList.InnerInsts.Count;
 #endif
 
                 }
@@ -1149,7 +1152,11 @@ namespace Typography.OpenFont.CFF
             }
 
 #if DEBUG
-            //double avg = total / glyphCount;
+            if (_useCompactInstruction)
+            {
+                double avg = total / glyphCount;
+                System.Diagnostics.Debug.WriteLine("cff instruction compact avg:" + avg + "%");
+            }
 #endif
             return glyphs;
         }

@@ -1,7 +1,6 @@
 //Apache2, 2014-present, WinterDev
 using System;
 using System.Collections.Generic;
-using PixelFarm.Drawing;
 
 using Typography.OpenFont;
 using Typography.OpenFont.Extensions;
@@ -10,7 +9,7 @@ using Typography.TextLayout;
 using Typography.TextServices;
 using Typography.FontManagement;
 
-namespace LayoutFarm
+namespace PixelFarm.Drawing
 {
 
     public class OpenFontTextService : ITextService
@@ -23,9 +22,9 @@ namespace LayoutFarm
         Dictionary<int, Typeface> _resolvedTypefaceCache = new Dictionary<int, Typeface>();
         readonly int _system_id;
         //
-        public static Typography.OpenFont.ScriptLang DefaultScriptLang { get; set; }
+        public static ScriptLang DefaultScriptLang { get; set; }
 
-        public OpenFontTextService(Typography.OpenFont.ScriptLang scLang = null)
+        public OpenFontTextService(ScriptLang scLang = null)
         {
             _system_id = PixelFarm.Drawing.Internal.RequestFontCacheAccess.GetNewCacheSystemId();
 

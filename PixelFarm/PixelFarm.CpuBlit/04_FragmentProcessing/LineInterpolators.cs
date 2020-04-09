@@ -26,7 +26,7 @@ using System;
 namespace PixelFarm.CpuBlit.FragmentProcessing
 {
     //===================================================dda_line_interpolator
-    public struct LineInterpolatorDDA
+    struct LineInterpolatorDDA
     {
         int _y;
         int _dy;
@@ -41,64 +41,51 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
             _dy = (0);
         }
 
-        //--------------------------------------------------------------------
-        //public void operator ++ ()
-        public void Next()
-        {
-            _dy += _inc;
-        }
+        public void Next() => _dy += _inc;//public void operator ++ ()
 
-        //--------------------------------------------------------------------
-        //public void operator -- ()
-        public void Prev()
-        {
-            _dy -= _inc;
-        }
+        public void Prev() => _dy -= _inc;//public void operator -- ()
 
-        //--------------------------------------------------------------------
-        //public void operator += (int n)
-        public void Next(int n)
-        {
-            _dy += _inc * n;
-        }
+        public void Next(int n) => _dy += _inc * n;//public void operator += (int n)
 
-        //--------------------------------------------------------------------
-        //public void operator -= (int n)
-        public void Prev(int n)
-        {
-            _dy -= _inc * n;
-        }
+        public void Prev(int n) => _dy -= _inc * n;//public void operator -= (int n)
+
         //--------------------------------------------------------------------
         public int y() => _y + (_dy >> (_fractionShift));  // - m_YShift)); }
         //
         public int dy() => _dy;
-        //
     }
 
+
+   
     //=================================================dda2_line_interpolator
 
     class LineInterpolatorDDA2
     {
 
         //----------------------
-        //this need to be class ***
-        //----------------------
-
-        readonly int _cnt;
-        readonly int _lft;
-        readonly int _rem;
+        //this need to be class ***?
+        //---------------------- 
+        int _cnt;
+        int _lft;
+        int _rem;
         int _mod;
         int _y;
         //-------------------------------------------- Forward-adjusted line
-        public LineInterpolatorDDA2(int y1, int y2, int count)
+
+        public LineInterpolatorDDA2()
+        {
+        }
+        public LineInterpolatorDDA2(int y1, int y2, int count) => Set(y1, y2, count);
+
+        public void Set(int y1, int y2, int count)
         {
             //dbugIdN = 0;
             _cnt = (count <= 0 ? 1 : count);
             _lft = ((y2 - y1) / _cnt);
             _rem = ((y2 - y1) % _cnt);
-
             _mod = (_rem);
             _y = (y1);
+
             if (_mod <= 0)
             {
                 _mod += count;
@@ -107,7 +94,7 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
             }
             _mod -= count;
         }
-        public LineInterpolatorDDA2(int y, int count)
+        public void Set(int y, int count)
         {
             //dbugIdN = 0;
             _cnt = (count <= 0 ? 1 : count);
@@ -122,6 +109,8 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
                 _lft--;
             }
         }
+
+
 #if DEBUG
         //static int dbugIdN;
 #endif
@@ -153,15 +142,8 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
         }
 
         //--------------------------------------------------------------------
-        public void adjust_forward()
-        {
-            _mod -= _cnt;
-        }
-        //--------------------------------------------------------------------
-        public void adjust_backward()
-        {
-            _mod += _cnt;
-        }
+        public void adjust_forward() => _mod -= _cnt;
+        public void adjust_backward() => _mod += _cnt;
         //
         public int Y => _y;
         //
@@ -247,6 +229,7 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
             }
 
             _inc = (_ver ? ((y2 > y1) ? 1 : -1) : ((x2 > x1) ? 1 : -1));
+
             _interpolator = new LineInterpolatorDDA2(_ver ? x1 : y1,
                            _ver ? x2 : y2,
                            _len);

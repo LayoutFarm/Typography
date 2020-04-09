@@ -181,7 +181,7 @@ namespace Typography.OpenFont
         public short MinY => Bounds.YMin;
         public short MaxY => Bounds.YMax;
 
-       
+
 #if DEBUG
         public readonly int dbugId;
         static int s_debugTotalId;
