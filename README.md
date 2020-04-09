@@ -1,7 +1,7 @@
 ![Typography, this image was rendered with this library, in subpixel rendering mode](https://user-images.githubusercontent.com/7447159/31848163-cc9e00fe-b655-11e7-8a40-69258e440c7a.png)
 ===========
 
-Pure C# Font Reader, Glyph Layout and Rendering.
+Pure C# Font Reading, Glyph Layout and Rendering.
 ---
 
 While developing the [PixelFarm Rendering library](https://github.com/PaintLab/PixelFarm),
@@ -17,22 +17,21 @@ So, I spinned off the way to render a glyph from a font to here, the **Typograph
 _Sov_Thanamas font from https://www.f0nt.com/release/sov_thanamas/_
  
 ---
-
 Cross Platform
 ---
-The Typography library is **cross-platforms library** and does **NOT** need the PixelFarm Rendering library.
 
-You can use the library to reads font files( .ttf, .otf, .ttc, .otc, .woff, .woff2) and
+The Typography library is **a cross-platform library** and does **NOT** need the PixelFarm Rendering library.
 
-1) Access all information inside the font. 
+You can use the library to read font files (.ttf, .otf, .ttc, .otc, .woff, .woff2) and
+
+1) Access [all information inside the font](Typography.OpenFont/Glyph.cs). 
 2) Layout the font glyphs according to the [OpenFont specification](http://www.iso.org/iso/home/store/catalogue_ics/catalogue_detail_ics.htm?csnumber=66391).
 
-_The core modules (Typography.OpenFont, Typography. GlyphLayout) does **NOT** provide a glyph rendering implementation_. 
-But when you are able to read/access all glyphs and you are able to know
-exact position of each glyph=> It is easy to you to render it by your own.
+_The core modules (Typography.OpenFont, Typography.GlyphLayout) do **NOT** provide a glyph rendering implementation_. 
+But as you are able to access and read all glyphs, it is easy to render them provided the exact position of each glyph.
 
-I take some screen snapshots (below) of some projects that use Typography to read each glyph
-from a font file then render it by their rendering engine.
+Below are some screenshots of projects that use Typography to read each glyph
+from font files and render using their rendering engine.
 
 ![sum2](https://user-images.githubusercontent.com/7447159/78152244-bc6bff00-7463-11ea-847f-138e4ee3c7ff.png) 
 
@@ -40,29 +39,29 @@ _1. [MatterHackers](https://github.com/MatterHackers/MatterControl)/[agg-sharp](
 4. [zwcloud's ImGui/GL,GLES](https://github.com/zwcloud/ImGui)_
 
 ---
-Project Arrangement, What are each project used for?
+Project arrangement: The purpose of each project
 ---
-Core Modules are Typography.OpenFont  and Typography.GlyphLayout
+
+The core modules are Typography.OpenFont and Typography.GlyphLayout.
  
 **Typography.OpenFont**
 
-- This project is a core project, no dependency on others.
-- This project contains a font reader that implements Open Font Format,
-  ([ISO/IEC 14496-22:2015](http://www.iso.org/iso/home/store/catalogue_ics/catalogue_detail_ics.htm?csnumber=66391) , and [Microsoft OpenType Specification]( https://www.microsoft.com/en-us/Typography/OpenTypeSpecification.aspx))
-  and Web Open Font Format (both WOFF [1.0](https://www.w3.org/TR/2012/REC-WOFF-20121213/), [2.0](https://www.w3.org/TR/WOFF2/))
-- OpenType GSUB, GPOS layout mechanism are 'sleep' in here.
+- This project is the core and does not depend on other projects.
+- This project contains [a font reader](Typography.OpenFont/OpenFontReader.cs) that can read files implementing Open Font Format
+  ([ISO/IEC 14496-22:2015](http://www.iso.org/iso/home/store/catalogue_ics/catalogue_detail_ics.htm?csnumber=66391) and [Microsoft OpenType Specification](https://www.microsoft.com/en-us/Typography/OpenTypeSpecification.aspx))
+  or Web Open Font Format (either WOFF [1.0](https://www.w3.org/TR/2012/REC-WOFF-20121213/) or [2.0](https://www.w3.org/TR/WOFF2/))
+- OpenType GSUB, GPOS layout mechanism are 'sleep' in here. <!--TODO: What is "sleep"?-->
 - No Visual/Graphics Rendering Here
 
 
 **Typography.GlyphLayout**
 
-_since GlyphLayout engine is not stable and quite complex, 
-I separated this from the OpenFont core project_
+_Since the GlyphLayout engine is not stable and quite complex, 
+I separated this from the OpenFont core project._
 
-- This project invokes OpenType Layout Engine/Mechanism (esp. GSUB, GPOS) inside the 
-Typography.OpenFont
-- The engine converts a string to a glyph-index List and substitutes some glyph,
-   and place them  into a proper position  by the request 'settings' 
+- This project invokes OpenType Layout Engine/Mechanism (esp. GSUB, GPOS) inside Typography.OpenFont
+- The engine converts a string to a list of glyph indexes, then substitutes glyphs
+   and places them into proper positions with respect to the provided settings,
       eg [Script/Languague Setup](https://github.com/LayoutFarm/Typography/issues/82), 
            or [Advanced GSUB/GPOS on Emoji](https://github.com/LayoutFarm/Typography/issues/18)
 - No Visual/Graphics Rendering Here
@@ -71,38 +70,32 @@ Typography.OpenFont
 
 _1) CoreModules, 2) Typography.One: a more easy-to-use than core module_
 
-see more detail about the 2 modules and others here : https://github.com/LayoutFarm/Typography/issues/99
-
+See more detail about the 2 modules and others here : https://github.com/LayoutFarm/Typography/issues/99
 
 ---
 PixelFarm's Typography
 ---
 
-Since the core library does not provide glyph rendering implementation, You can learn
-how to do it from the example repositories above, or You may learn it from my 
+Since the core library does not provide a glyph rendering implementation, You can learn
+how to do it from the example repositories above, or you may learn it from my 
 implementation => **PixelFarm.Typography**.
 
 PixelFarm.Typography links the core Typography library to the _PixelFarm_ Rendering library.
-You can see , for example, How to implement string drawing, how to implement text-layout services, how to cache glyph shapes. So you can apply this with your own library.
-
+You can learn how to implement string drawing, how to implement text-layout services, and how to cache glyph shapes, so you can apply this to your own library.
 
 ![sum3](https://user-images.githubusercontent.com/7447159/78159669-10c7ac80-746d-11ea-9f22-4aee4d7f3807.png)
 
 _HtmlRenderer on GLES2 surface, text are rendered with the PixelFarm.Typography_
 
-
-
 -----------
-
 License
 -----------
 
-The project is based on multiple open-sourced projects (listed below) **all using permissive licenses**.
+The project is based on multiple open-sourced projects (listed below) **all using permissive licenses (no GPL)**.
 
 A license for a whole project is [**MIT**](https://opensource.org/licenses/MIT).
 
-But if you use some part of the codebase,
-please check each source file's header for the licensing info if available.
+But if you copy source code directly, please check each source file's header for the licensing info if available.
 
  
 **Font** 
