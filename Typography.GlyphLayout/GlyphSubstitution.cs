@@ -88,24 +88,26 @@ namespace Typography.TextLayout
             _lookupTables.Clear();
 
             // check if this lang has
-            GSUB gsubTable = _typeface.GSUBTable;
-            ScriptTable scriptTable = gsubTable.ScriptList[_language];
+            var gsubTable = _typeface.GSUBTable;
+            if (gsubTable == null) return;
+            var scriptTable = gsubTable.ScriptList[_language];
             if (scriptTable == null)
             {
                 //no script table for request lang-> no lookup process here
                 return;
             }
 
-            ScriptTable.LangSysTable selectedLang = null;
+            ScriptTable.LangSysTable selectedLang;
             if (scriptTable.langSysTables != null && scriptTable.langSysTables.Length > 0)
             {
                 // TODO: review here
                 selectedLang = scriptTable.langSysTables[0];
             }
-            else
+            else if (scriptTable.defaultLang != null)
             {
                 selectedLang = scriptTable.defaultLang;
             }
+            else return;
 
             if (selectedLang.HasRequireFeature)
             {
@@ -184,7 +186,7 @@ namespace Typography.TextLayout
             }
             return selectedRanges.ToArray();
         }
-        public static void CollectAllAssociateGlyphIndex(this Typeface typeface, List<ushort> outputGlyphIndexList, ScriptLang scLang, UnicodeLangBits[] selectedRangs = null)
+        public static void CollectAllAssociateGlyphIndex(this Typeface typeface, List<ushort> outputGlyphIndexList, ScriptLang scLang, UnicodeLangBits[]? selectedRangs = null)
         {
             //-----------
             //general glyph index in the unicode range
@@ -192,7 +194,7 @@ namespace Typography.TextLayout
             //if user dose not specific the unicode lanf bit ranges
             //the we try to select it ourself. 
 
-            if (ScriptLangs.TryGetUnicodeLangBitsArray(scLang.shortname, out UnicodeLangBits[] unicodeLangBitsRanges))
+            if (ScriptLangs.TryGetUnicodeLangBitsArray(scLang.shortname, out UnicodeLangBits[]? unicodeLangBitsRanges))
             {
                 //one lang may contains may ranges
                 if (selectedRangs != null)

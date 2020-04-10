@@ -9,10 +9,9 @@ namespace Typography.OpenFont.Tables
 
     class NameEntry : TableEntry
     {
-        public const string _N = "name";
-        public override string Name => _N;
+        public const string Name = "name";
         //
-        protected override void ReadContentFrom(BinaryReader reader)
+        public NameEntry(TableHeader header, BinaryReader reader) : base(header, reader)
         {
 
             ushort uFSelector = reader.ReadUInt16();
@@ -98,7 +97,7 @@ namespace Typography.OpenFont.Tables
         /// 
         /// Font Family name is used in combination with Font Subfamily name (name ID 2)...
         /// </summary>
-        public string FontName { get; private set; }
+        public string? FontName { get; private set; }
         /// <summary>
         ///  	Font Subfamily name. The Font Subfamily name distinguishes the fonts in a group with the 
         ///  	same Font Family name (name ID 1).
@@ -107,16 +106,16 @@ namespace Typography.OpenFont.Tables
         ///      A font with no distinctive weight or style (e.g. medium weight, not italic, and OS/2.fsSelection bit 6 set) 
         ///      should use the string “Regular” as the Font Subfamily name (for English language). 
         /// </summary>
-        public string FontSubFamily { get; private set; }
-        public string UniqueFontIden { get; private set; }
+        public string? FontSubFamily { get; private set; }
+        public string? UniqueFontIden { get; private set; }
         /// <summary>
         /// Full font name that reflects all family and relevant subfamily descriptors. 
         /// The full font name is generally a combination of name IDs 1 and 2, or 
         /// of name IDs 16 and 17, or a similar human-readable variant. 
         /// </summary>
-        public string FullFontName { get; set; }
+        public string? FullFontName { get; set; }
 
-        public string VersionString { get; set; }
+        public string? VersionString { get; set; }
 
         /// <summary>
         /// PostScript name for the font; Name ID 6 specifies a string which is used to invoke a PostScript language font that corresponds to this OpenType font.
@@ -127,11 +126,11 @@ namespace Typography.OpenFont.Tables
         ///the same CFF may be shared among multiple font components in a Font Collection.
         ///...
         /// </summary>
-        public string PostScriptName { get; set; }
-        public string PostScriptCID_FindfontName { get; set; }
+        public string? PostScriptName { get; set; }
+        public string? PostScriptCID_FindfontName { get; set; }
         //
-        public string TypographicFamilyName { get; set; }
-        public string TypographyicSubfamilyName { get; set; }
+        public string? TypographicFamilyName { get; set; }
+        public string? TypographyicSubfamilyName { get; set; }
 
 
         struct TT_NAME_RECORD

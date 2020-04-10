@@ -1,5 +1,5 @@
 ﻿//MIT, 2016-present, WinterDev
-
+#nullable enable
 using Typography.OpenFont;
 
 namespace Typography.Contours
@@ -12,33 +12,26 @@ namespace Typography.Contours
 
     public abstract class GlyphOutlineBuilderBase
     {
-        readonly Typeface _typeface;
-        TrueTypeInterpreter _trueTypeInterpreter;
-        protected GlyphPointF[] _outputGlyphPoints;
-        protected ushort[] _outputContours;
+        TrueTypeInterpreter? _trueTypeInterpreter;
+        protected GlyphPointF[]? _outputGlyphPoints;
+        protected ushort[]? _outputContours;
 
-        protected OpenFont.CFF.Cff1Font _ownerCff;
-        protected OpenFont.CFF.Cff1GlyphData _cffGlyphData;
+        protected OpenFont.CFF.Cff1GlyphData? _cff;
 
         /// <summary>
         /// scale for converting latest glyph points to latest request font size
         /// </summary>
         float _recentPixelScale;
 
-        Typography.OpenFont.CFF.CffEvaluationEngine _cffEvalEngine;
+        Typography.OpenFont.CFF.CffEvaluationEngine? _cffEvalEngine;
 
         public GlyphOutlineBuilderBase(Typeface typeface)
         {
-            _typeface = typeface;
+            Typeface = typeface;
             this.UseTrueTypeInstructions = true;//default?
             _recentPixelScale = 1;
-
-            if (typeface.IsCffFont)
-            {
-                _cffEvalEngine = new OpenFont.CFF.CffEvaluationEngine();
-            }
         }
-        public Typeface Typeface => _typeface;
+        public Typeface Typeface { get; private set; }
         /// <summary>
         /// use Maxim's Agg Vertical Hinting
         /// </summary>
@@ -55,7 +48,7 @@ namespace Typography.Contours
         /// <param name="sizeInPoints"></param>
         public void BuildFromGlyphIndex(ushort glyphIndex, float sizeInPoints)
         {
-            BuildFromGlyph(_typeface.GetGlyph(glyphIndex), sizeInPoints);
+            BuildFromGlyph(Typeface.GetGlyph(glyphIndex), sizeInPoints);
         }
         /// <summary>
         /// build glyph shape from glyph to be read
@@ -65,20 +58,17 @@ namespace Typography.Contours
         public void BuildFromGlyph(Glyph glyph, float sizeInPoints)
         {
             //for true type font
-            _outputGlyphPoints = glyph.GlyphPoints;
-            _outputContours = glyph.EndPoints;
-
-
-            //------------
-            //temp fix for Cff Font
-            if (glyph.IsCffGlyph)
+            if (glyph.TtfWoffInfo is { } ttf)
+                (_outputContours, _outputGlyphPoints) = ttf;
+            else if (glyph.CffInfo is { } cff)
             {
-                _cffGlyphData = glyph.GetCff1GlyphData();
-                _ownerCff = glyph.GetOwnerCff();
+                //------------
+                //temp fix for Cff Font
+                _cff = cff;
+
+                //---------------
             }
-
-            //---------------
-
+            else throw new System.NotImplementedException("Bitmap and SVG glyphs not implemented");
 
 
             if ((RecentFontSizeInPixels = Typeface.ConvPointsToPixels(sizeInPoints)) < 0)
@@ -103,13 +93,16 @@ namespace Typography.Contours
             try
             {
                 if (RecentFontSizeInPixels > 0 && UseTrueTypeInstructions &&
-                    _typeface.HasPrepProgramBuffer &&
+                    Typeface.HasPrepProgramBuffer &&
                     glyph.HasGlyphInstructions)
                 {
                     if (_trueTypeInterpreter == null)
                     {
-                        _trueTypeInterpreter = new TrueTypeInterpreter();
-                        _trueTypeInterpreter.Typeface = _typeface;
+                        _trueTypeInterpreter = new TrueTypeInterpreter(Typeface);
+                    }
+                    else if (_trueTypeInterpreter.Typeface != Typeface)
+                    {
+                        _trueTypeInterpreter.Typeface = Typeface;
                     }
                     _trueTypeInterpreter.UseVerticalHinting = this.UseVerticalHinting;
                     //output as points,
@@ -120,7 +113,7 @@ namespace Typography.Contours
                     _recentPixelScale = 1;
                 }
             }
-            catch (System.Exception ex)
+            catch
             {
 
             }
@@ -129,14 +122,16 @@ namespace Typography.Contours
         public virtual void ReadShapes(IGlyphTranslator tx)
         {
             //read output from glyph points
-            if (_cffGlyphData != null)
+            if (_cff is { } cff)
             {
-                _cffEvalEngine.Run(tx, _ownerCff, _cffGlyphData, _recentPixelScale);
+                _cffEvalEngine ??= new OpenFont.CFF.CffEvaluationEngine();
+                _cffEvalEngine.Run(tx, cff, _recentPixelScale);
             }
-            else
+            else if (_outputGlyphPoints is { } points && _outputContours is { } contours)
             {
-                tx.Read(_outputGlyphPoints, _outputContours, _recentPixelScale);
+                tx.Read(points, contours, _recentPixelScale);
             }
+            else throw new System.InvalidOperationException($"{nameof(BuildFromGlyph)} not called");
         }
     }
 

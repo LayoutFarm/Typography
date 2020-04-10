@@ -7,9 +7,7 @@ namespace Typography.OpenFont.Tables
 {
     class GlyphLocations : TableEntry
     {
-        public const string _N = "loca";
-        public override string Name => _N;
-
+        public const string Name = "loca";
 
         // loca - Index to Location
 
@@ -34,17 +32,15 @@ namespace Typography.OpenFont.Tables
         //There are two versions of this table, the short and the long. The version is specified in the indexToLocFormat entry in the 'head' table.
 
         uint[] _offsets;
-        public GlyphLocations(int glyphCount, bool isLongVersion)
-        {
-            _offsets = new uint[glyphCount + 1];
-            this.IsLongVersion = isLongVersion;
-        }
         public bool IsLongVersion { get; private set; }
         public uint[] Offsets => _offsets;
         public int GlyphCount => _offsets.Length - 1;
 
-        protected override void ReadContentFrom(BinaryReader reader)
+        public GlyphLocations(int glyphCount, bool isLongVersion, TableHeader header, BinaryReader reader) : base(header, reader)
         {
+            _offsets = new uint[glyphCount + 1];
+            this.IsLongVersion = isLongVersion;
+
             //Short version
             //Type 	Name 	Description
             //USHORT 	offsets[n] 	The actual local offset divided by 2 is stored. 
@@ -58,7 +54,6 @@ namespace Typography.OpenFont.Tables
 
             //Note that the local offsets should be long-aligned, i.e., multiples of 4. Offsets which are not long-aligned may seriously degrade performance of some processors. 
 
-            int glyphCount = GlyphCount;
             int lim = glyphCount + 1;
             _offsets = new uint[lim];
             if (IsLongVersion)

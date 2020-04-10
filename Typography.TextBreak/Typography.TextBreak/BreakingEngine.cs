@@ -24,7 +24,7 @@ namespace Typography.TextBreak
             return c >= this.FirstUnicodeChar && c <= this.LastUnicodeChar;
         }
         protected abstract CustomDic CurrentCustomDic { get; }
-        protected abstract WordGroup GetWordGroupForFirstChar(char c);
+        protected abstract WordGroup? GetWordGroupForFirstChar(char c);
         public bool BreakPeroidInTextSpan { get; set; }
 
 
@@ -78,7 +78,7 @@ namespace Typography.TextBreak
                 }
                 //----------------------
 
-                WordGroup wordgroup = GetWordGroupForFirstChar(c);
+                WordGroup? wordgroup = GetWordGroupForFirstChar(c);
                 if (wordgroup == null)
                 {
                     //continue next char
@@ -118,7 +118,7 @@ namespace Typography.TextBreak
                             //end  ***
                             visitor.State = VisitorState.End;
                             //----------------------------------------
-                            WordGroup next1 = GetSubGroup(visitor, c_wordgroup);
+                            WordGroup? next1 = GetSubGroup(visitor, c_wordgroup);
 
                             bool latest_candidate_isNotWord = false;
                             if (next1 != null)
@@ -203,7 +203,7 @@ namespace Typography.TextBreak
                             goto ENTER_LOOP;
                         }
                         //----------------------------------------
-                        WordGroup next = GetSubGroup(visitor, c_wordgroup);
+                        WordGroup? next = GetSubGroup(visitor, c_wordgroup);
                         //for debug
                         //string prefix = (next == null) ? "" : next.GetPrefix(CurrentCustomDic.TextBuffer);  
                         if (next != null)
@@ -457,7 +457,7 @@ namespace Typography.TextBreak
                 }
             }
         }
-        internal WordGroup GetSubGroup(WordVisitor visitor, WordGroup wordGroup)
+        internal WordGroup? GetSubGroup(WordVisitor visitor, WordGroup wordGroup)
         {
 
             char c = visitor.Char;
@@ -470,7 +470,7 @@ namespace Typography.TextBreak
             }
             //-----------------
             //can handle 
-            WordGroup[] subGroups = wordGroup.GetSubGroups();
+            WordGroup[]? subGroups = wordGroup.GetSubGroups();
             if (subGroups != null)
             {
                 return subGroups[c - this.FirstUnicodeChar];
@@ -480,7 +480,7 @@ namespace Typography.TextBreak
 
         int FindInWordSpans(WordVisitor visitor, WordGroup wordGroup)
         {
-            WordSpan[] wordSpans = wordGroup.GetWordSpans();
+            WordSpan[]? wordSpans = wordGroup.GetWordSpans();
             if (wordSpans == null)
             {
                 throw new NotSupportedException();

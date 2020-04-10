@@ -176,9 +176,9 @@ namespace Typography.TextLayout
     }
     struct GlyphLayoutPlanContext
     {
-        public readonly GlyphSubstitution _glyphSub;
-        public readonly GlyphSetPosition _glyphPos;
-        public GlyphLayoutPlanContext(GlyphSubstitution glyphSub, GlyphSetPosition glyphPos)
+        public readonly GlyphSubstitution? _glyphSub;
+        public readonly GlyphSetPosition? _glyphPos;
+        public GlyphLayoutPlanContext(GlyphSubstitution? glyphSub, GlyphSetPosition? glyphPos)
         {
             _glyphSub = glyphSub;
             _glyphPos = glyphPos;
@@ -216,20 +216,22 @@ namespace Typography.TextLayout
         GlyphLayoutPlanCollection _layoutPlanCollection = new GlyphLayoutPlanCollection();
         Typeface _typeface;
         ScriptLang _scriptLang;
-        GlyphSubstitution _gsub;
-        GlyphSetPosition _gpos;
+        GlyphSubstitution? _gsub;
+        GlyphSetPosition? _gpos;
         bool _needPlanUpdate;
 
         GlyphIndexList _inputGlyphs = new GlyphIndexList();//reusable input glyph
         GlyphPosStream _glyphPositions = new GlyphPosStream();
 
 
-        public GlyphLayout()
+        public GlyphLayout(Typeface typeface)
         {
             PositionTechnique = PositionTechnique.OpenFont;
             EnableLigature = true;
             EnableComposition = true;
-            ScriptLang = ScriptLangs.Latin;
+            _scriptLang = ScriptLangs.Latin;
+            _typeface = typeface;
+            _needPlanUpdate = true;
         }
 
 
@@ -503,7 +505,7 @@ namespace Typography.TextLayout
     {
         List<GlyphPos> _glyphPosList = new List<GlyphPos>();
 
-        Typeface _typeface;
+        Typeface? _typeface;
         public GlyphPosStream() { }
 
         public int Count => _glyphPosList.Count;
@@ -513,13 +515,14 @@ namespace Typography.TextLayout
             _typeface = null;
             _glyphPosList.Clear();
         }
-        public Typeface Typeface
+        public Typeface? Typeface
         {
             get => _typeface;
             set => _typeface = value;
         }
         public void AddGlyph(ushort o_offset, ushort glyphIndex, Glyph glyph)
         {
+            if (_typeface is null) throw new InvalidOperationException(nameof(Typeface) + " not set");
             if (!glyph.HasOriginalAdvancedWidth)
             {
                 //TODO: review here, 

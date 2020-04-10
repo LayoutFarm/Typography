@@ -14,8 +14,8 @@ namespace Typography.TextBreak
     /// </summary>
     public class CustomDic
     {
-        CustomDicTextBuffer _textBuffer;
-        WordGroup[] _wordGroups;
+        CustomDicTextBuffer? _textBuffer;
+        WordGroup[]? _wordGroups;
         char _firstChar, _lastChar;
 
 
@@ -26,7 +26,8 @@ namespace Typography.TextBreak
         }
         public char FirstChar => _firstChar;
         public char LastChar => _lastChar;
-        internal CustomDicTextBuffer TextBuffer => _textBuffer;
+        internal CustomDicTextBuffer TextBuffer =>
+            _textBuffer ?? throw new InvalidOperationException(nameof(LoadSortedUniqueWordList) + " not called");
 
 
         public void LoadSortedUniqueWordList(IEnumerable<string> sortedWordList)
@@ -64,7 +65,7 @@ namespace Typography.TextBreak
                     WordSpan wordspan = new WordSpan(startAt, (byte)lineLen);
                     //each wordgroup contains text span
 
-                    DevelopingWordGroup found;
+                    DevelopingWordGroup? found;
                     if (!wordGroups.TryGetValue(c0, out found))
                     {
                         found = new DevelopingWordGroup(new WordSpan(startAt, 1));
@@ -89,6 +90,7 @@ namespace Typography.TextBreak
         //
         void DoIndex(Dictionary<char, DevelopingWordGroup> wordGroups)
         {
+            if (_textBuffer == null) throw new InvalidOperationException(nameof(LoadSortedUniqueWordList) + " not called");
             //1. expand word group
             WordGroup[] newWordGroups = new WordGroup[_lastChar - _firstChar + 1];
 
@@ -104,6 +106,8 @@ namespace Typography.TextBreak
         }
         public void GetWordList(char startWithChar, List<string> output)
         {
+            if (_textBuffer == null) throw new InvalidOperationException(nameof(LoadSortedUniqueWordList) + " not called");
+            if (_wordGroups == null) throw new InvalidOperationException(nameof(DoIndex) + " not called");
             if (startWithChar >= _firstChar && startWithChar <= _lastChar)
             {
                 //in range 
@@ -115,8 +119,10 @@ namespace Typography.TextBreak
                 }
             }
         }
-        internal WordGroup GetWordGroupForFirstChar(char c)
+        internal WordGroup? GetWordGroupForFirstChar(char c)
         {
+            if (_wordGroups == null) throw new InvalidOperationException(nameof(DoIndex) + " not called");
+
             if (c >= _firstChar && c <= _lastChar)
             {
                 //in range
@@ -176,8 +182,8 @@ namespace Typography.TextBreak
 
     class DevelopingWordGroup
     {
-        List<WordSpan> _wordSpanList = new List<WordSpan>();
-        DevelopingWordGroup[] _subGroups;
+        List<WordSpan>? _wordSpanList = new List<WordSpan>();
+        DevelopingWordGroup[]? _subGroups;
         WordSpan _prefixSpan;
         internal DevelopingWordGroup(WordSpan prefixSpan)
         {
@@ -237,7 +243,7 @@ namespace Typography.TextBreak
         //
         internal void AddWordSpan(WordSpan span)
         {
-            _wordSpanList.Add(span);
+            _wordSpanList?.Add(span);
 #if DEBUG
             dbugDataState = debugDataState.UnIndex;
 #endif
@@ -250,9 +256,10 @@ namespace Typography.TextBreak
                 return _wordSpanList.Count;
             }
         }
-        WordGroup _resultWordGroup;//after call DoIndex()
+        WordGroup? _resultWordGroup;//after call DoIndex()
         internal void DoIndex(CustomDicTextBuffer textBuffer, CustomDic owner)
         {
+            if (_wordSpanList == null) throw new InvalidOperationException(nameof(DoIndex) + " already called");
 
             //recursive
             if (this.PrefixLen > 7)
@@ -351,7 +358,7 @@ namespace Typography.TextBreak
             }
 
             //--------------------------------
-            WordGroup[] newsubGroups = null;
+            WordGroup[]? newsubGroups = null;
             if (_subGroups != null)
             {
                 newsubGroups = new WordGroup[_subGroups.Length];
@@ -373,11 +380,11 @@ namespace Typography.TextBreak
 
         }
         //
-        public WordGroup ResultWordGroup => _resultWordGroup;
+        public WordGroup ResultWordGroup => _resultWordGroup ?? throw new InvalidOperationException(nameof(DoIndex) + " not called");
         //
         void DoIndexOfSmallAmount(CustomDicTextBuffer textBuffer)
         {
-
+            if (_wordSpanList == null) throw new InvalidOperationException(nameof(DoIndex) + " already called");
             //convention...
             //data must me sorted (ascending) before use with the wordSpanList 
 
@@ -424,15 +431,16 @@ namespace Typography.TextBreak
 
     class CustomDicTextBuffer
     {
-        List<char> _tmpCharList;
+        List<char>? _tmpCharList;
         int _position;
-        char[] _charBuffer;
+        char[]? _charBuffer;
         public CustomDicTextBuffer(int initCapacity)
         {
             _tmpCharList = new List<char>(initCapacity);
         }
         public void AddWord(char[] wordBuffer)
         {
+            if (_tmpCharList == null) return;
             _tmpCharList.AddRange(wordBuffer);
             //append with  ' ' 
             _tmpCharList.Add(' ');
@@ -440,7 +448,7 @@ namespace Typography.TextBreak
         }
         public void Freeze()
         {
-            _charBuffer = _tmpCharList.ToArray();
+            _charBuffer ??= _tmpCharList?.ToArray();
             _tmpCharList = null;
         }
         //
@@ -450,22 +458,23 @@ namespace Typography.TextBreak
         {
             //refactor note:
             //remain in this style -> easy to debug
-
+            if (_charBuffer == null) throw new InvalidOperationException("Buffer not frozen yet");
             return _charBuffer[index];
         }
         public string GetString(int index, int len)
         {
+            if (_charBuffer == null) throw new InvalidOperationException("Buffer not frozen yet");
             return new string(_charBuffer, index, len);
         }
     }
 
     public class WordGroup
     {
-        readonly WordGroup[] _subGroups;
-        readonly WordSpan[] _wordSpans;
+        readonly WordGroup[]? _subGroups;
+        readonly WordSpan[]? _wordSpans;
         readonly WordSpan _prefixSpan;
         readonly bool _prefixIsWord;
-        internal WordGroup(WordSpan prefixSpan, WordGroup[] subGroups, WordSpan[] wordSpanList, bool isPrefixIsWord)
+        internal WordGroup(WordSpan prefixSpan, WordGroup[]? subGroups, WordSpan[]? wordSpanList, bool isPrefixIsWord)
         {
             _prefixSpan = prefixSpan;
             _subGroups = subGroups;
@@ -514,8 +523,8 @@ namespace Typography.TextBreak
                 return _wordSpans.Length;
             }
         }
-        internal WordSpan[] GetWordSpans() => _wordSpans;
-        internal WordGroup[] GetSubGroups() => _subGroups;
+        internal WordSpan[]? GetWordSpans() => _wordSpans;
+        internal WordGroup[]? GetSubGroups() => _subGroups;
 
 #if DEBUG
         public override string ToString()

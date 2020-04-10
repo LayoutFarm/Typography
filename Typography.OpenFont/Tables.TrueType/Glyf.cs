@@ -6,31 +6,33 @@ namespace Typography.OpenFont.Tables
 {
     class Glyf : TableEntry
     {
-        public const string _N = "glyf";
-        public override string Name => _N;
+        public const string Name = "glyf";
         //
         Glyph[] _glyphs;
-        GlyphLocations _glyphLocations;
 
         //--------------------
         //both ttf and cff
         //we don't share EmptyGlyph between typefaces
-        internal readonly Glyph _emptyGlyph = new Glyph(new GlyphPointF[0], new ushort[0], Bounds.Zero, null, 0);
+        public static Glyph GenerateTypefaceSpecificEmptyGlyph() =>
+            new Glyph(new GlyphPointF[0], new ushort[0], Bounds.Zero, null, 0);
+        internal readonly Glyph _emptyGlyph;
 
-        public Glyf(GlyphLocations glyphLocations)
-        {
-            _glyphLocations = glyphLocations;
-        }
         public Glyph[] Glyphs
         {
             get => _glyphs;
             internal set => _glyphs = value;
         }
-        protected override void ReadContentFrom(BinaryReader reader)
-        {
 
+        /// <summary>WOFF2 constructor</summary>
+        internal Glyf(TableHeader header, Glyph[] glyphs, Glyph emptyGlyph) : base(header, null) {
+            _emptyGlyph = emptyGlyph;
+            _glyphs = glyphs;
+        }
+        /// <summary>TTF/OTF constructor</summary>
+        internal Glyf(GlyphLocations locations, TableHeader header, BinaryReader reader) : base(header, reader)
+        {
+            _emptyGlyph = GenerateTypefaceSpecificEmptyGlyph();
             uint tableOffset = this.Header.Offset;
-            GlyphLocations locations = _glyphLocations;
             int glyphCount = locations.GlyphCount;
             _glyphs = new Glyph[glyphCount];
 
@@ -82,7 +84,7 @@ namespace Typography.OpenFont.Tables
 
                 }
 #endif
-                _glyphs[glyphIndex] = ReadCompositeGlyph(_glyphs, reader, tableOffset, glyphIndex);
+                _glyphs[glyphIndex] = ReadCompositeGlyph(locations, _glyphs, reader, tableOffset, glyphIndex);
 
 
             }
@@ -264,7 +266,7 @@ namespace Typography.OpenFont.Tables
             UNSCALED_COMPONENT_OFFSET = 1 << 12
         }
 
-        Glyph ReadCompositeGlyph(Glyph[] createdGlyphs, BinaryReader reader, uint tableOffset, ushort compositeGlyphIndex)
+        Glyph ReadCompositeGlyph(GlyphLocations locations, Glyph[] createdGlyphs, BinaryReader reader, uint tableOffset, ushort compositeGlyphIndex)
         {
             //------------------------------------------------------ 
             //https://www.microsoft.com/typography/OTSPEC/glyf.htm
@@ -284,12 +286,12 @@ namespace Typography.OpenFont.Tables
             //---------
 
             //move to composite glyph position
-            reader.BaseStream.Seek(tableOffset + _glyphLocations.Offsets[compositeGlyphIndex], SeekOrigin.Begin);//reset
+            reader.BaseStream.Seek(tableOffset + locations.Offsets[compositeGlyphIndex], SeekOrigin.Begin);//reset
             //------------------------
             short contoursCount = reader.ReadInt16(); // ignored
             Bounds bounds = Utils.ReadBounds(reader);
 
-            Glyph finalGlyph = null;
+            Glyph? finalGlyph = null;
             CompositeGlyphFlags flags;
 
 #if DEBUG
@@ -303,7 +305,7 @@ namespace Typography.OpenFont.Tables
                 {
                     // This glyph is not read yet, resolve it first!
                     long storedOffset = reader.BaseStream.Position;
-                    Glyph missingGlyph = ReadCompositeGlyph(createdGlyphs, reader, tableOffset, glyphIndex);
+                    Glyph missingGlyph = ReadCompositeGlyph(locations, createdGlyphs, reader, tableOffset, glyphIndex);
                     createdGlyphs[glyphIndex] = missingGlyph;
                     reader.BaseStream.Position = storedOffset;
                 }

@@ -1,4 +1,4 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,10 +6,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Typography.TextBreak;
 
-[TestClass]
 public class FrenchTests
 {
-    [TestMethod]
+    [Fact]
     public void EngEngine()
     {
         //Text source: https://en.wikibooks.org/wiki/French/Texts/Simple/Le_Corbeau_et_le_Renard
@@ -53,9 +52,8 @@ Jura, mais un peu tard, qu’on ne l’y prendrait plus.";
 |Jura|,| |mais| |un| |peu| |tard|,| |qu|’|on| |ne| |l|’|y| |prendrait| |plus.|";
         string BreakText(string text, string seperator = "|")
         {
-            var breaker = new CustomBreaker { ThrowIfCharOutOfRange = true };
             var breakList = new List<BreakAtInfo>();
-            breaker.SetNewBreakHandler(vis => breakList.Add(new BreakAtInfo(vis.LatestBreakAt, vis.LatestWordKind)));
+            var breaker = new CustomBreaker(vis => breakList.Add(new BreakAtInfo(vis.LatestBreakAt, vis.LatestWordKind))) { ThrowIfCharOutOfRange = true };
 
 
 #warning Use `breaker.BreakWords(text, breakList);` once #156 is merged
@@ -71,33 +69,32 @@ Jura, mais un peu tard, qu’on ne l’y prendrait plus.";
             return sb.ToString();
         }
         var brokenString = BreakText(Le_Corbeau_et_le_Renard);
-        Assert.AreEqual(Le_Corbeau_et_le_Renard__Broken, brokenString);
+        Assert.Equal(Le_Corbeau_et_le_Renard__Broken, brokenString);
     }
-    [TestMethod]
+    [Fact]
     public void WordKindTest()
     {
-        var breaker = new CustomBreaker { ThrowIfCharOutOfRange = true };
         var breakList = new List<BreakSpan>();
+        var breaker = new CustomBreaker(vis => breakList.Add(vis.GetBreakSpan())) { ThrowIfCharOutOfRange = true };
         char[] test = "«Maître leçon»".ToCharArray();
-
-        breaker.SetNewBreakHandler(vis => breakList.Add(vis.GetBreakSpan()));
 
 
 #warning Use `breaker.BreakWords("«Maître leçon»", breakList);` once #156 is merged
 
         breaker.BreakWords(test, 0, test.Length);
 
-        Assert.AreEqual(breakList.Count, 5);
-        void BreakSpanEqual(BreakSpan actual, BreakSpan expected)
+        Action<BreakSpan> BreakSpanEqual(BreakSpan expected) => actual =>
         {
-            Assert.AreEqual(expected.startAt, actual.startAt);
-            Assert.AreEqual(expected.len, actual.len);
-            Assert.AreEqual(expected.wordKind, actual.wordKind);
-        }
-        BreakSpanEqual(breakList[0], new BreakSpan { startAt = 0, len = 1, wordKind = WordKind.Punc });
-        BreakSpanEqual(breakList[1], new BreakSpan { startAt = 1, len = 6, wordKind = WordKind.Text });
-        BreakSpanEqual(breakList[2], new BreakSpan { startAt = 7, len = 1, wordKind = WordKind.Whitespace });
-        BreakSpanEqual(breakList[3], new BreakSpan { startAt = 8, len = 5, wordKind = WordKind.Text });
-        BreakSpanEqual(breakList[4], new BreakSpan { startAt = 13, len = 1, wordKind = WordKind.Punc });
+            Assert.Equal(expected.startAt, actual.startAt);
+            Assert.Equal(expected.len, actual.len);
+            Assert.Equal(expected.wordKind, actual.wordKind);
+        };
+        Assert.Collection(breakList,
+          BreakSpanEqual(new BreakSpan { startAt = 0, len = 1, wordKind = WordKind.Punc }),
+          BreakSpanEqual(new BreakSpan { startAt = 1, len = 6, wordKind = WordKind.Text }),
+          BreakSpanEqual(new BreakSpan { startAt = 7, len = 1, wordKind = WordKind.Whitespace }),
+          BreakSpanEqual(new BreakSpan { startAt = 8, len = 5, wordKind = WordKind.Text }),
+          BreakSpanEqual(new BreakSpan { startAt = 13, len = 1, wordKind = WordKind.Punc })
+        );
     }
 }

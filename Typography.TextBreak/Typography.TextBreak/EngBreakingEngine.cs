@@ -21,7 +21,7 @@ namespace Typography.TextBreak
         public bool BreakPeroidInTextSpan { get; set; }
 
         public bool EnableCustomAbbrv { get; set; }
-        public CustomAbbrvDic EngCustomAbbrvDic { get; set; }
+        public CustomAbbrvDic? EngCustomAbbrvDic { get; set; }
 
 
         BreakBounds _breakBounds = new BreakBounds();

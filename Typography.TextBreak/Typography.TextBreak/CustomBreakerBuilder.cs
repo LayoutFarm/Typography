@@ -17,21 +17,21 @@ namespace Typography.TextBreak
         //custom dic may be shared among breaking engine
 
         [System.ThreadStatic]
-        static CustomDic s_thaiDic;
+        static CustomDic? s_thaiDic;
         [System.ThreadStatic]
-        static CustomDic s_laoDic;
+        static CustomDic? s_laoDic;
 
         [System.ThreadStatic]
-        static CustomAbbrvDic s_enAbbrvDic;
+        static CustomAbbrvDic? s_enAbbrvDic;
 
 
         [System.ThreadStatic]
-        static DictionaryProvider s_dicProvider;
+        static DictionaryProvider? s_dicProvider;
 
         static void InitAllDics()
         {
             //
-
+            if (s_dicProvider == null) return;
             if (s_thaiDic == null)
             {
                 var customDic = new CustomDic();
@@ -67,7 +67,7 @@ namespace Typography.TextBreak
             InitAllDics();
         }
 
-        public static CustomBreaker NewCustomBreaker()
+        public static CustomBreaker? NewCustomBreaker(NewWordBreakHandlerDelegate newWordBreakHandler)
         {
             if (s_thaiDic == null)
             {
@@ -78,19 +78,23 @@ namespace Typography.TextBreak
                 }
                 InitAllDics();
             }
-            var breaker = new CustomBreaker();
+            var breaker = new CustomBreaker(newWordBreakHandler);
 
             breaker.EngBreakingEngine.EngCustomAbbrvDic = s_enAbbrvDic;//optional 
             breaker.EngBreakingEngine.EnableCustomAbbrv = true;//optional 
             // 
-            var thBreaker = new ThaiDictionaryBreakingEngine();
-            //thBreaker.DontMergeLastIncompleteWord = true;
-            thBreaker.SetDictionaryData(s_thaiDic);
-            breaker.AddBreakingEngine(thBreaker);
+            if (s_thaiDic != null)
+            {
+                var thBreaker = new ThaiDictionaryBreakingEngine(s_thaiDic);
+                //thBreaker.DontMergeLastIncompleteWord = true;
+                breaker.AddBreakingEngine(thBreaker);
+            }
             //
-            var laoBreak = new LaoDictionaryBreakingEngine();
-            laoBreak.SetDictionaryData(s_laoDic);
-            breaker.AddBreakingEngine(laoBreak);
+            if (s_laoDic != null)
+            {
+                var laoBreak = new LaoDictionaryBreakingEngine(s_laoDic);
+                breaker.AddBreakingEngine(laoBreak);
+            }
             return breaker;
         }
     }

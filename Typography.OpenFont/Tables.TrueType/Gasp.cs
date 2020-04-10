@@ -8,8 +8,7 @@ namespace Typography.OpenFont.Tables
     /// </summary>
     class Gasp : TableEntry
     {
-        public const string _N = "gasp";
-        public override string Name => _N;
+        public const string Name = "gasp";
         //
         //https://www.microsoft.com/typography/otspec/gasp.htm
 
@@ -33,7 +32,7 @@ namespace Typography.OpenFont.Tables
 
         //The 'gasp' table consists of a header followed by groupings of 'gasp' records:
         GaspRangeRecord[] _rangeRecords;
-        protected override void ReadContentFrom(BinaryReader reader)
+        public Gasp(TableHeader header, BinaryReader reader) : base(header, reader)
         {
 
             //Type 	Name 	Description

@@ -1,4 +1,4 @@
-﻿//MIT, 2016-present, WinterDev
+//MIT, 2016-present, WinterDev
 
 
 

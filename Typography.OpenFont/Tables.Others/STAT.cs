@@ -23,10 +23,9 @@ namespace Typography.OpenFont.Tables
     class STAT : TableEntry
     {
 
-        public const string _N = "STAT";
-        public override string Name => _N;
+        public const string Name = "STAT";
         //
-        protected override void ReadContentFrom(BinaryReader reader)
+        internal STAT(TableHeader header, BinaryReader reader) : base(header, reader)
         {
             //Style Attributes Header 
             //The style attributes table, version 1.2, is organized as follows: 
@@ -86,11 +85,10 @@ namespace Typography.OpenFont.Tables
             AxisRecord[] axisRecords = new AxisRecord[designAxisCount];
             for (int i = 0; i < designAxisCount; ++i)
             {
-                var axisRecord = new AxisRecord();
-                axisRecords[i] = axisRecord;
-                axisRecord.axisTagName = Utils.TagToString(reader.ReadUInt32()); //4
-                axisRecord.axisNameId = reader.ReadUInt16(); //2
-                axisRecord.axisOrdering = reader.ReadUInt16(); //2
+                axisRecords[i] = new AxisRecord(
+                    Utils.TagToString(reader.ReadUInt32()), //4
+                    reader.ReadUInt16(), //2
+                    reader.ReadUInt16()); //2
 
 
                 //***
@@ -130,17 +128,14 @@ namespace Typography.OpenFont.Tables
                 reader.BaseStream.Position = axisValueOffsets_beginPos + offset;
 
                 ushort format = reader.ReadUInt16();//common field of all axis value table
-                AxisValueTableBase axisValueTbl = null;
                 switch (format)
                 {
                     default: throw new NotSupportedException();
-                    case 1: axisValueTbl = new AxisValueTableFmt1(); break;
-                    case 2: axisValueTbl = new AxisValueTableFmt2(); break;
-                    case 3: axisValueTbl = new AxisValueTableFmt3(); break;
-                    case 4: axisValueTbl = new AxisValueTableFmt4(); break;
+                    case 1: axisValueTables[i] = new AxisValueTableFmt1(reader); break;
+                    case 2: axisValueTables[i] = new AxisValueTableFmt2(reader); break;
+                    case 3: axisValueTables[i] = new AxisValueTableFmt3(reader); break;
+                    case 4: axisValueTables[i] = new AxisValueTableFmt4(reader); break;
                 }
-                axisValueTbl.ReadContent(reader);
-                axisValueTables[i] = axisValueTbl;
             }
 
 
@@ -195,6 +190,13 @@ namespace Typography.OpenFont.Tables
             public string axisTagName;
             public ushort axisNameId;
             public ushort axisOrdering;
+
+            public AxisRecord(string axisTagName, ushort axisNameId, ushort axisOrdering)
+            {
+                this.axisTagName = axisTagName;
+                this.axisNameId = axisNameId;
+                this.axisOrdering = axisOrdering;
+            }
 #if DEBUG
             public override string ToString()
             {
@@ -206,13 +208,6 @@ namespace Typography.OpenFont.Tables
         public abstract class AxisValueTableBase
         {
             public abstract int Format { get; }
-
-
-            /// <summary>
-            /// assume we have read format
-            /// </summary>
-            /// <param name="reader"></param>
-            public abstract void ReadContent(BinaryReader reader);
         }
 
 
@@ -238,7 +233,7 @@ namespace Typography.OpenFont.Tables
             public ushort flags;
             public ushort valueNameId;
             public float value;
-            public override void ReadContent(BinaryReader reader)
+            public AxisValueTableFmt1(BinaryReader reader)
             {
                 //at here, assume we have read format, 
                 //Fixed =>	32-bit signed fixed-point number (16.16) 
@@ -298,7 +293,7 @@ namespace Typography.OpenFont.Tables
             public float nominalValue;
             public float rangeMinValue;
             public float rangeMaxValue;
-            public override void ReadContent(BinaryReader reader)
+            public AxisValueTableFmt2(BinaryReader reader)
             {
                 axisIndex = reader.ReadUInt16();
                 flags = reader.ReadUInt16();
@@ -343,7 +338,7 @@ namespace Typography.OpenFont.Tables
             public float value;
             public float linkedValue;
 
-            public override void ReadContent(BinaryReader reader)
+            public AxisValueTableFmt3(BinaryReader reader)
             {
                 axisIndex = reader.ReadUInt16();
                 flags = reader.ReadUInt16();
@@ -372,7 +367,7 @@ namespace Typography.OpenFont.Tables
             public AxisValueRecord[] _axisValueRecords;
             public ushort flags;
             public ushort valueNameId;
-            public override void ReadContent(BinaryReader reader)
+            public AxisValueTableFmt4(BinaryReader reader)
             {
                 ushort axisCount = reader.ReadUInt16();
                 flags = reader.ReadUInt16();

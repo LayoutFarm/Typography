@@ -184,7 +184,7 @@ namespace Typography.OpenFont.Tables
         {
             // Only check codepoint if nextCodepoint is a variation selector
 
-            if (_variationSelectors.TryGetValue(nextCodepoint, out VariationSelector sel))
+            if (_variationSelectors.TryGetValue(nextCodepoint, out VariationSelector? sel))
             {
 
                 // If the sequence is a non-default UVS, return the mapped glyph
@@ -353,7 +353,7 @@ namespace Typography.OpenFont.Tables
                 variationSelectors.Add(varSelectors[i], sel);
             }
 
-            return new CharMapFormat14 { _variationSelectors = variationSelectors };
+            return new CharMapFormat14(variationSelectors);
         }
 
         class VariationSelector
@@ -364,6 +364,11 @@ namespace Typography.OpenFont.Tables
         }
 
         private Dictionary<int, VariationSelector> _variationSelectors;
+
+        CharMapFormat14(Dictionary<int, VariationSelector> variationSelectors)
+        {
+            _variationSelectors = variationSelectors;
+        }
     }
 
     /// <summary>

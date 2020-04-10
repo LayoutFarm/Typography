@@ -10,6 +10,8 @@
     <AssemblyName>TextBoxSample.WinForms</AssemblyName>
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <LangVersion>8.0</LangVersion>
+    <NoWarn>CS8632<!--<Nullable>enable</Nullable> does not work with tranditional .csprojs--></NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -34,6 +36,11 @@
     <Reference Include="System" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
+    <ProjectReference Include="..\..\..\Build\Typography.OpenFont\Typography.OpenFont.csproj" />
+    <ProjectReference Include="..\..\..\Build\Typography.GlyphLayout\Typography.GlyphLayout.csproj" />
+    <ProjectReference Include="..\..\..\Build\Typography.TextFlow\Typography.TextFlow.csproj" />
+    <ProjectReference Include="..\..\..\Build\Typography.TextBreak\Typography.TextBreak.csproj" />
+    <ProjectReference Include="..\..\..\Build\Typography.TextServices\Typography.TextServices.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\..\..\PixelFarm.Typography\3_Typography_Contours\GlyphMeshCollection.cs">
@@ -47,9 +54,6 @@
     </Compile>
     <Compile Include="..\..\..\PixelFarm\PixelFarm.Painter\Drawing\TextBaseline.cs">
       <Link>DevTextPrinter\TextBaseline.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Shared\DevTextPrinter\FontManagement.cs">
-      <Link>DevTextPrinter\FontManagement.cs</Link>
     </Compile>
     <Compile Include="..\..\Shared\GlyphOutlineBuilder\GlyphOutlineBuilder.cs">
       <Link>GlyphOutlineBuilder\GlyphOutlineBuilder.cs</Link>
@@ -104,20 +108,6 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\Build\N20\Typography.GlyphLayout\Typography.GlyphLayout.csproj">
-      <Project>{c6807d05-09be-4313-9f8b-bd2d51c55819}</Project>
-      <Name>Typography.GlyphLayout</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\Build\N20\Typography.OpenFont\Typography.OpenFont.csproj">
-      <Project>{29ed0dfe-373c-4e98-bd4b-43f8e5fb16f6}</Project>
-      <Name>Typography.OpenFont</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\Build\N20\Typography.TextFlow\Typography.TextFlow.csproj">
-      <Project>{333f3209-8da9-4d33-a560-299ed4c6dfa5}</Project>
-      <Name>Typography.TextFlow</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

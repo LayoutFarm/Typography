@@ -8,8 +8,7 @@ namespace Typography.OpenFont.Tables
     //https://docs.microsoft.com/en-us/typography/opentype/spec/maxp
     class MaxProfile : TableEntry
     {
-        public const string _N = "maxp";
-        public override string Name => _N;
+        public const string Name = "maxp";
 
         //This table establishes the memory requirements for this font.
         //Fonts with CFF data must use Version 0.5 of this table,
@@ -57,7 +56,7 @@ namespace Typography.OpenFont.Tables
         public ushort MaxComponentElements { get; private set; }
         public ushort MaxComponentDepth { get; private set; }
 
-        protected override void ReadContentFrom(BinaryReader input)
+        public MaxProfile(TableHeader header, BinaryReader input) : base(header, input)
         {
             Version = input.ReadUInt32(); // 0x00010000 == 1.0
             GlyphCount = input.ReadUInt16();

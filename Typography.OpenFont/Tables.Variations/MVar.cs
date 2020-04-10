@@ -13,8 +13,7 @@ namespace Typography.OpenFont.Tables
     /// </summary>
     class MVar : TableEntry
     {
-        public const string _N = "MVAR";
-        public override string Name => _N;
+        public const string Name = "MVAR";
 
         //The metrics variations table is used in variable fonts 
         //to provide variations for font-wide metric values 
@@ -47,13 +46,9 @@ namespace Typography.OpenFont.Tables
 
 
         public ValueRecord[] valueRecords;
-        public ItemVariationStoreTable itemVariationStore;
+        public ItemVariationStoreTable? itemVariationStore;
 
-        public MVar()
-        {
-
-        }
-        protected override void ReadContentFrom(BinaryReader reader)
+        internal MVar(TableHeader header, BinaryReader reader) : base(header, reader)
         {
             long startAt = reader.BaseStream.Position;
 
@@ -107,8 +102,7 @@ namespace Typography.OpenFont.Tables
             if (valueRecordCount > 0)
             {
                 reader.BaseStream.Position = startAt + itemVariationStoreOffset;
-                itemVariationStore = new ItemVariationStoreTable();
-                itemVariationStore.ReadContentFrom(reader);
+                itemVariationStore = new ItemVariationStoreTable(reader);
             }
 
         }
@@ -178,7 +172,7 @@ namespace Typography.OpenFont.Tables
         {
 
             static Dictionary<string, ValueTagInfo> s_registerTags = new Dictionary<string, ValueTagInfo>();
-            public static bool TryGetValueTagInfo(string tag, out ValueTagInfo valueTagInfo)
+            public static bool TryGetValueTagInfo(string tag, [System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out ValueTagInfo? valueTagInfo)
             {
                 return s_registerTags.TryGetValue(tag, out valueTagInfo);
             }

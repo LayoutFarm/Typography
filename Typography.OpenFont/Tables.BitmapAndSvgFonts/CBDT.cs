@@ -31,36 +31,28 @@ namespace Typography.OpenFont.Tables
     //byte alignment is sufficient.
     class CBDT : TableEntry, IDisposable
     {
-        public const string _N = "CBDT";
-        public override string Name => _N;
+        public const string Name = "CBDT";
 
         GlyphBitmapDataFmt17 _format17 = new GlyphBitmapDataFmt17();
         GlyphBitmapDataFmt18 _format18 = new GlyphBitmapDataFmt18();
         GlyphBitmapDataFmt19 _format19 = new GlyphBitmapDataFmt19();
 
-
-        System.IO.MemoryStream _ms; //sub-stream contains image data
-        Typography.OpenFont.IO.ByteOrderSwappingBinaryReader _binReader;
+        // BinaryReaders also dispose their underlying streams
+        IO.ByteOrderSwappingBinaryReader? _binReader; // underlying stream contains image data
         public void Dispose()
         {
             if (_binReader != null)
             {
-                ((System.IDisposable)_binReader).Dispose();
+                ((IDisposable)_binReader).Dispose();
                 _binReader = null;
             }
-            if (_ms != null)
-            {
-                _ms.Dispose();
-                _ms = null;
-            }
         }
-        protected override void ReadContentFrom(BinaryReader reader)
+        internal CBDT(TableHeader header, BinaryReader reader) : base(header, reader)
         {
 
             //we will read this later
             byte[] data = reader.ReadBytes((int)this.Header.Length);//***
-            _ms = new MemoryStream(data);
-            _binReader = new IO.ByteOrderSwappingBinaryReader(_ms);
+            _binReader = new IO.ByteOrderSwappingBinaryReader(new MemoryStream(data));
 
             //ushort majorVersion = reader.ReadUInt16();
             //ushort minorVersion = reader.ReadUInt16();
@@ -69,9 +61,12 @@ namespace Typography.OpenFont.Tables
         }
         public void FillGlyphInfo(Glyph glyph)
         {
+            if (_binReader is null) throw new ObjectDisposedException(nameof(_binReader));
             //int srcOffset, int srcLen, int srcFormat,
-            _binReader.BaseStream.Position = glyph.BitmapStreamOffset;
-            switch (glyph.BitmapFormat)
+            if (!(glyph.BitmapSVGInfo is { } bitmapSvg))
+                throw new NotSupportedException("Only Bitmap/SVG glyphs are supported");
+            _binReader.BaseStream.Position = bitmapSvg.streamOffset;
+            switch (bitmapSvg.imgFormat)
             {
                 case 17: _format17.FillGlyphInfo(_binReader, glyph); break;
                 case 18: _format18.FillGlyphInfo(_binReader, glyph); break;
@@ -80,11 +75,14 @@ namespace Typography.OpenFont.Tables
                     throw new NotSupportedException();
             }
         }
-        public void CopyBitmapContent(Glyph glyph, System.IO.Stream outputStream)
+        public void CopyBitmapContent(Glyph glyph, Stream outputStream)
         {
+            if (_binReader is null) throw new ObjectDisposedException(nameof(_binReader));
             //1 
-            _binReader.BaseStream.Position = glyph.BitmapStreamOffset;
-            switch (glyph.BitmapFormat)
+            if (!(glyph.BitmapSVGInfo is { } bitmapSvg))
+                throw new NotSupportedException("Only Bitmap/SVG glyphs are supported");
+            _binReader.BaseStream.Position = bitmapSvg.streamOffset;
+            switch (bitmapSvg.imgFormat)
             {
                 case 17: _format17.ReadRawBitmap(_binReader, glyph, outputStream); break;
                 case 18: _format18.ReadRawBitmap(_binReader, glyph, outputStream); break;

@@ -9,12 +9,11 @@ namespace Typography.OpenFont.Tables
 {
     public class COLR : TableEntry
     {
-        public const string _N = "COLR";
-        public override string Name => _N;
+        public const string Name = "COLR";
 
         // Read the COLR table
         // https://www.microsoft.com/typography/otspec/colr.htm
-        protected override void ReadContentFrom(BinaryReader reader)
+        internal COLR(TableHeader header, BinaryReader reader) : base(header, reader)
         {
             long offset = reader.BaseStream.Position;
 
@@ -42,8 +41,8 @@ namespace Typography.OpenFont.Tables
             }
         }
 
-        public ushort[] GlyphLayers { get; private set; }
-        public ushort[] GlyphPalettes { get; private set; }
+        public ushort[]? GlyphLayers { get; private set; }
+        public ushort[]? GlyphPalettes { get; private set; }
         public readonly Dictionary<ushort, ushort> LayerIndices = new Dictionary<ushort, ushort>();
         public readonly Dictionary<ushort, ushort> LayerCounts = new Dictionary<ushort, ushort>();
     }

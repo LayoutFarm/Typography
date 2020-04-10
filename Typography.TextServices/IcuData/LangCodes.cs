@@ -671,7 +671,7 @@ namespace Typography.TextBreak
             //parse
             using (StringReader reader = new StringReader(LangsCode))
             {
-                string line = reader.ReadLine();
+                string? line = reader.ReadLine();
                 while (line != null)
                 {
 
@@ -702,7 +702,9 @@ namespace Typography.TextBreak
                 }
             }
         }
-        public static bool TryGetFullLanguageNameFromLangCode(string langCode1, string langCode2, out string fullLangName)
+        
+        public static bool TryGetFullLanguageNameFromLangCode
+            (string langCode1, string langCode2, [System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out string? fullLangName)
         {
             if (!_init_data) InitData();
             //

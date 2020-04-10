@@ -8,17 +8,16 @@ namespace Typography.OpenFont.Tables
     {
 
 
-        public const string _N = "SVG "; //with 1 whitespace ***
-        public override string Name => _N;
+        public const string Name = "SVG "; //with 1 whitespace ***
         //
         // https://www.microsoft.com/typography/otspec/svg.htm
         //OpenType fonts with either TrueType or CFF outlines may also contain an optional 'SVG ' table, 
         //which allows some or all glyphs in the font to be defined with color, gradients, or animation.
 
 
-        Dictionary<ushort, byte[]> _dicSvgEntries;
+        Dictionary<ushort, byte[]>? _dicSvgEntries;
         SvgDocumentEntry[] _entries; //TODO: review again
-        protected override void ReadContentFrom(BinaryReader reader)
+        internal SvgTable(TableHeader header, BinaryReader reader) : base(header, reader)
         {
             long svgTableStartAt = reader.BaseStream.Position;
             //SVG Main Header
@@ -123,7 +122,7 @@ namespace Typography.OpenFont.Tables
                     _dicSvgEntries.Add(en.startGlyphID, en.svgBuffer);
                 }
             }
-            if (_dicSvgEntries.TryGetValue(glyphIndex, out byte[] svgData))
+            if (_dicSvgEntries.TryGetValue(glyphIndex, out byte[]? svgData))
             {
                 outputStBuilder.Append(System.Text.Encoding.UTF8.GetString(svgData));
                 return true;

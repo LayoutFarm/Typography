@@ -7,8 +7,7 @@ namespace Typography.OpenFont.Tables
 {
     class Kern : TableEntry
     {
-        public const string _N = "kern";
-        public override string Name => _N;
+        public const string Name = "kern";
         // 
         //https://www.microsoft.com/typography/otspec/kern.htm
 
@@ -19,7 +18,7 @@ namespace Typography.OpenFont.Tables
             //TODO: review if have more than 1 table
             return _kernSubTables[0].GetKernDistance(left, right);
         }
-        protected override void ReadContentFrom(BinaryReader reader)
+        public Kern(TableHeader header, BinaryReader reader) : base(header, reader)
         {
             ushort verion = reader.ReadUInt16();
             ushort nTables = reader.ReadUInt16();//subtable count

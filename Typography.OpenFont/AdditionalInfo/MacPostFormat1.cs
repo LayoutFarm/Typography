@@ -8,7 +8,7 @@ namespace Typography.OpenFont
     {
 
 
-        static string[] s_stdMacGlyphNames;
+        static string[]? s_stdMacGlyphNames;
 
         public static string[] GetStdMacGlyphNames()
         {
@@ -19,7 +19,7 @@ namespace Typography.OpenFont
                 {
                     string[] seps = new string[] { " " };
 
-                    string line = strReader.ReadLine();
+                    string? line = strReader.ReadLine();
 
                     while (line != null)
                     {

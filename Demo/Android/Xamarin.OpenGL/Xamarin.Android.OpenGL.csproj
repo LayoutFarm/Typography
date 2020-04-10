@@ -16,6 +16,8 @@
     <AndroidResgenFile>Resources\Resource.Designer.cs</AndroidResgenFile>
     <TargetFrameworkVersion>v9.0</TargetFrameworkVersion>
     <AndroidManifest>Properties\AndroidManifest.xml</AndroidManifest>
+    <LangVersion>latest</LangVersion>
+    <NoWarn>CS8632<!--<Nullable>enable</Nullable> does not work with tranditional .csprojs--></NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>True</DebugSymbols>
@@ -51,6 +53,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)..\..\..\Typography.TextServices\FontStoreAndManagment\FontManagement.cs">
+      <Link>DevTextPrinter\FontManagement.cs</Link>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)..\..\..\PixelFarm.Typography\3_Typography_Contours\GlyphOutlineBuilderBase.cs">
+      <Link>GlyphOutlineBuilder\GlyphOutlineBuilderBase.cs</Link>
+    </Compile>
     <Compile Include="App\CustomApp.cs" />
     <Compile Include="GLView1.cs" />
     <Compile Include="MainActivity.cs" />
@@ -75,16 +83,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Properties\AndroidManifest.xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\Build\NetStandard\Typography.GlyphLayout\Typography.GlyphLayout.csproj">
-      <Project>{8ce29063-ca6c-4913-bf2d-764ce857da06}</Project>
-      <Name>Typography.GlyphLayout</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\Build\NetStandard\Typography.OpenFont\Typography.OpenFont.csproj">
-      <Project>{280d17d5-4435-4ead-839a-33c5a8990e7e}</Project>
-      <Name>Typography.OpenFont</Name>
-    </ProjectReference>
+    <ProjectReference Include="..\..\..\Build\Typography.OpenFont\Typography.OpenFont.csproj" />
+    <ProjectReference Include="..\..\..\Build\Typography.GlyphLayout\Typography.GlyphLayout.csproj" />
   </ItemGroup>
   <Import Project="..\..\Shared\DrawingGL.Common.projitems" Label="Shared" />
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />

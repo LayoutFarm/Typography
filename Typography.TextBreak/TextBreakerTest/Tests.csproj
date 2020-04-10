@@ -73,8 +73,8 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Build\N20\Typography.TextBreak\Typography.TextBreak.csproj">
-      <Project>{bc10cc51-a795-40d0-96f0-f87585d59d02}</Project>
+    <ProjectReference Include="..\..\Build\Typography.TextBreak\Typography.TextBreak.csproj">
+      <Project>{dc8ee8cc-8882-4de5-8405-b7452f83b30a}</Project>
       <Name>Typography.TextBreak</Name>
     </ProjectReference>
     <ProjectReference Include="..\Reference_TextBreak.Icu\Reference_TextBreak.Icu.csproj">

@@ -9,15 +9,13 @@
     <Import_RootNamespace>DrawingGL.Common</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)DevTextPrinter\FontManagement.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DrawingGL.Text\TextBaseline.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DrawingGL\Color.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DrawingGL\Shaders.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DrawingGL\SimpleCanvas.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GlyphPathBuilder\GlyphMeshCollection.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)GlyphPathBuilder\GlyphOutlineBuilder.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)GlyphPathBuilder\GlyphOutlineBuilderBase.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GlyphPathBuilder\TextPrinterBase.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GlyphOutlineBuilder\GlyphOutlineBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tesselate\ActiveRegion.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tesselate\ContourVertex.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DrawingGL\CurveFlattener.cs" />

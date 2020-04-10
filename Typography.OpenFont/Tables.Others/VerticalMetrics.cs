@@ -9,8 +9,7 @@ namespace Typography.OpenFont.Tables
     /// </summary>
     class VerticalMetrics : TableEntry
     {
-        public const string _N = "vmtx";
-        public override string Name => _N;
+        public const string Name = "vmtx";
 
         // https://www.microsoft.com/typography/otspec/vmtx.htm
         // vmtx - Vertical Metrics Table
@@ -58,17 +57,12 @@ namespace Typography.OpenFont.Tables
         //Type      Name                Description
         // int16    topSideBearing[]    The top sidebearing of the glyph. Signed integer in FUnits.
 
-        ushort _numOfLongVerMetrics;
         AdvanceHeightAndTopSideBearing[] _advHeightAndTopSideBearings;
-        public VerticalMetrics(ushort numOfLongVerMetrics)
+        internal VerticalMetrics(ushort numOfLongVerMetrics, TableHeader header, BinaryReader reader) : base(header, reader)
         {
-            _numOfLongVerMetrics = numOfLongVerMetrics;
-        }
-        protected override void ReadContentFrom(BinaryReader reader)
-        {
-            _advHeightAndTopSideBearings = new AdvanceHeightAndTopSideBearing[_numOfLongVerMetrics];
+            _advHeightAndTopSideBearings = new AdvanceHeightAndTopSideBearing[numOfLongVerMetrics];
             int m = 0;
-            for (int i = _numOfLongVerMetrics - 1; i >= 0; --i)
+            for (int i = numOfLongVerMetrics - 1; i >= 0; --i)
             {
                 _advHeightAndTopSideBearings[m] = new AdvanceHeightAndTopSideBearing(
                     reader.ReadUInt16(),

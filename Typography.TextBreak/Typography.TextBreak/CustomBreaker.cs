@@ -21,10 +21,11 @@ namespace Typography.TextBreak
         bool _breakNumberAfterText;
 
 
-        public CustomBreaker()
+        public CustomBreaker(NewWordBreakHandlerDelegate newWordBreakHandler)
         {
             ThrowIfCharOutOfRange = false;
             _breakingEngine = _engBreakingEngine; //default eng-breaking engine
+            _visitor = new WordVisitor(newWordBreakHandler);
         }
         public void SetNewBreakHandler(NewWordBreakHandlerDelegate newWordBreakHandler)
         {

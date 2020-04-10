@@ -12,6 +12,8 @@
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
+    <LangVersion>8.0</LangVersion>
+    <NoWarn>CS8632<!--<Nullable>enable</Nullable> does not work with tranditional .csprojs--></NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -128,9 +130,6 @@
     <Compile Include="..\PaintLab.WebLexer\XmlLexer_debug.cs">
       <Link>0_REF_PaintLab.WebLexer\XmlLexer_debug.cs</Link>
     </Compile>
-    <Compile Include="..\PixelFarm.DrawingCore\ExtensionAttribute.cs">
-      <Link>0_REF_PaintLab.WebDom\Net20\ExtensionAttribute.cs</Link>
-    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Visuals\VgDocBuilder.cs" />
     <Compile Include="Visuals\VgDocument.cs" />
@@ -146,7 +145,7 @@
     <Compile Include="Visuals\VgVisualDocHost.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\x_autogen2\PixelFarm.MiniAgg.One\PixelFarm.MiniAgg.One.csproj">
+    <ProjectReference Include="..\..\Build\PixelFarm.MiniAgg.One\PixelFarm.MiniAgg.One.csproj">
       <Project>{fb5f78f5-c921-405d-8f21-42f7c15c2ad9}</Project>
       <Name>PixelFarm.MiniAgg.One</Name>
     </ProjectReference>

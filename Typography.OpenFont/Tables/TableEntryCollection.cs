@@ -8,19 +8,19 @@ namespace Typography.OpenFont.Tables
     {
         Dictionary<string, TableEntry> _tables = new Dictionary<string, TableEntry>();
         public TableEntryCollection() { }
-        public void AddEntry(TableEntry en)
+        public void AddEntry(string tableName, TableEntry en)
         {
-            _tables.Add(en.Name, en);
+            _tables.Add(tableName, en);
         }
 
-        public bool TryGetTable(string tableName, out TableEntry entry)
+        public bool TryGetTable(string tableName, [System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out TableEntry? entry)
         {
             return _tables.TryGetValue(tableName, out entry);
         }
 
-        public void ReplaceTable(TableEntry table)
+        public void ReplaceTable(string tableName, TableEntry table)
         {
-            _tables[table.Name] = table;
+            _tables[tableName] = table;
         }
     }
 }
