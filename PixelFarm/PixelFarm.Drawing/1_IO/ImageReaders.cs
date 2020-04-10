@@ -1,11 +1,10 @@
 ﻿//MIT, 2017-present, WinterDev
 using System;
+using System.IO;
+using PixelFarm.Platforms;
 namespace PixelFarm.CpuBlit.Imaging
 {
-    public delegate void SaveImageBufferToFileDel(IntPtr imgBuffer, int stride, int width, int height, string filename);
 
-    //---------------------------------
-    //png
     public static class PngImageReader
     {
 
@@ -33,11 +32,10 @@ namespace PixelFarm.CpuBlit.Imaging
         {
             return s_saveToFile != null;
         }
-        public static void InstallImageSaveToFileService(SaveImageBufferToFileDel saveToFileDelegate)
+        internal static void InstallImageSaveToFileService(SaveImageBufferToFileDel saveToFileDelegate)
         {
             s_saveToFile = saveToFileDelegate;
         }
-
 
 #if DEBUG
         public static void dbugSaveToPngFile(this MemBitmap bmp, string filename)
@@ -105,7 +103,7 @@ namespace PixelFarm.CpuBlit.Imaging
         {
             return s_saveToFile != null;
         }
-        public static void InstallImageSaveToFileService(SaveImageBufferToFileDel saveToFileDelegate)
+        internal static void InstallImageSaveToFileService(SaveImageBufferToFileDel saveToFileDelegate)
         {
             s_saveToFile = saveToFileDelegate;
         }
@@ -125,4 +123,43 @@ namespace PixelFarm.CpuBlit.Imaging
 #endif
     }
 
+}
+namespace PixelFarm.Platforms
+{
+    public delegate void SaveImageBufferToFileDel(IntPtr imgBuffer,
+      int stride, int width, int height,
+      string filename);
+
+    public delegate PixelFarm.Drawing.Image ReadImageDataFromMemStream(MemoryStream ms, string hint);
+
+    public class ImageIOSetupParameters
+    {
+        public SaveImageBufferToFileDel SaveToPng;
+        public SaveImageBufferToFileDel SaveToJpg;
+        public ReadImageDataFromMemStream ReadFromMemStream;
+    }
+    public static class ImageIOPortal
+    {
+        static ReadImageDataFromMemStream s_readImgDataFromMemStream;
+        public static PixelFarm.Drawing.Image ReadImageDataFromMemStream(MemoryStream ms, string kind)
+        {
+            return s_readImgDataFromMemStream(ms, kind);
+        }
+        public static void Setup(ImageIOSetupParameters pars)
+        {
+            //check 
+
+            if (pars.SaveToPng != null)
+            {
+                PixelFarm.CpuBlit.Imaging.PngImageWriter.InstallImageSaveToFileService(pars.SaveToPng);
+            }
+            if (pars.SaveToJpg != null)
+            {
+                PixelFarm.CpuBlit.Imaging.PngImageWriter.InstallImageSaveToFileService(pars.SaveToJpg);
+            }
+
+            s_readImgDataFromMemStream = pars.ReadFromMemStream;
+        }
+
+    }
 }

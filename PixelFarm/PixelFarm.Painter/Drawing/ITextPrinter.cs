@@ -51,16 +51,16 @@ namespace PixelFarm.Drawing
         //
         bool SupportsWordBreak { get; }
 
-        ILineSegmentList BreakToLineSegments(ref TextBufferSpan textBufferSpan);
+        ILineSegmentList BreakToLineSegments(in TextBufferSpan textBufferSpan);
         //
-        Size MeasureString(ref TextBufferSpan textBufferSpan, RequestFont font);
+        Size MeasureString(in TextBufferSpan textBufferSpan, RequestFont font);
 
-        void MeasureString(ref TextBufferSpan textBufferSpan, RequestFont font, int maxWidth, out int charFit, out int charFitWidth);
+        void MeasureString(in TextBufferSpan textBufferSpan, RequestFont font, int maxWidth, out int charFit, out int charFitWidth);
 
-        void CalculateUserCharGlyphAdvancePos(ref TextBufferSpan textBufferSpan,
+        void CalculateUserCharGlyphAdvancePos(in TextBufferSpan textBufferSpan,
                 RequestFont font,
                 ref TextSpanMeasureResult result);
-        void CalculateUserCharGlyphAdvancePos(ref TextBufferSpan textBufferSpan, ILineSegmentList lineSegs,
+        void CalculateUserCharGlyphAdvancePos(in TextBufferSpan textBufferSpan, ILineSegmentList lineSegs,
                 RequestFont font,
                 ref TextSpanMeasureResult result);
     }
