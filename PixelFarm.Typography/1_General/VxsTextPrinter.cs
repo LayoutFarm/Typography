@@ -273,8 +273,10 @@ namespace PixelFarm.Drawing
                     _painter.SetOrigin((float)Math.Round(left + snapToPx.ExactX) + 0.33f, (float)Math.Floor(baseLine + snapToPx.ExactY));
                     GlyphBitmap glyphBmp = _glyphBitmapStore.GetGlyphBitmap(snapToPx.CurrentGlyphIndex);
                     //how to draw the image
-                    //1. 
-                    _painter.DrawImage(glyphBmp.Bitmap);
+                    if (glyphBmp != null)
+                    {
+                        _painter.DrawImage(glyphBmp.Bitmap);
+                    }                    
                 }
             }
             else

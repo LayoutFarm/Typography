@@ -30,7 +30,6 @@
         {
             this.label1 = new System.Windows.Forms.Label();
             this.chkSelected = new System.Windows.Forms.CheckBox();
-            this.chkDoFilter = new System.Windows.Forms.CheckBox();
             this.cmbHintTech = new System.Windows.Forms.ComboBox();
             this.label2 = new System.Windows.Forms.Label();
             this.SuspendLayout();
@@ -53,20 +52,10 @@
             this.chkSelected.TabIndex = 1;
             this.chkSelected.UseVisualStyleBackColor = true;
             // 
-            // chkDoFilter
-            // 
-            this.chkDoFilter.AutoSize = true;
-            this.chkDoFilter.Location = new System.Drawing.Point(6, 29);
-            this.chkDoFilter.Name = "chkDoFilter";
-            this.chkDoFilter.Size = new System.Drawing.Size(65, 17);
-            this.chkDoFilter.TabIndex = 2;
-            this.chkDoFilter.Text = "Do Filter";
-            this.chkDoFilter.UseVisualStyleBackColor = true;
-            // 
             // cmbHintTech
             // 
             this.cmbHintTech.FormattingEnabled = true;
-            this.cmbHintTech.Location = new System.Drawing.Point(118, 29);
+            this.cmbHintTech.Location = new System.Drawing.Point(49, 25);
             this.cmbHintTech.Name = "cmbHintTech";
             this.cmbHintTech.Size = new System.Drawing.Size(171, 21);
             this.cmbHintTech.TabIndex = 3;
@@ -74,7 +63,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(77, 29);
+            this.label2.Location = new System.Drawing.Point(8, 25);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(29, 13);
             this.label2.TabIndex = 4;
@@ -86,7 +75,6 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.label2);
             this.Controls.Add(this.cmbHintTech);
-            this.Controls.Add(this.chkDoFilter);
             this.Controls.Add(this.chkSelected);
             this.Controls.Add(this.label1);
             this.Name = "UIFontScriptOpt";
@@ -101,7 +89,6 @@
 
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.CheckBox chkSelected;
-        private System.Windows.Forms.CheckBox chkDoFilter;
         private System.Windows.Forms.ComboBox cmbHintTech;
         private System.Windows.Forms.Label label2;
     }
