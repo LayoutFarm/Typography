@@ -1505,10 +1505,8 @@ namespace PixelFarm.CpuBlit.Rasterization
                 _tempSpanColors.Clear(scline_width);
             }
 
-            int offsetX = (int)Math.Round(sclineRas.OffsetOriginX);
-            int offsetY = (int)Math.Round(sclineRas.OffsetOriginY);
-
-
+            int src_offsetX = (int)Math.Round(sclineRas.OffsetOriginX);
+            int src_offsetY = (int)Math.Round(sclineRas.OffsetOriginY); 
 
             Color[] colorArray = _tempSpanColors.UnsafeInternalArray;
             while (sclineRas.SweepScanline(scline))
@@ -1530,7 +1528,7 @@ namespace PixelFarm.CpuBlit.Rasterization
                     } //make absolute value
 
                     //1. generate colors -> store in colorArray
-                    spanGenerator.GenerateColors(colorArray, 0, x - offsetX, y - offsetY, span_len);
+                    spanGenerator.GenerateColors(colorArray, 0, x - src_offsetX, y - src_offsetY, span_len);
                     //2. blend color in colorArray to destination image
                     dest.BlendColorHSpan(x, y, span_len,
                         colorArray, 0,
