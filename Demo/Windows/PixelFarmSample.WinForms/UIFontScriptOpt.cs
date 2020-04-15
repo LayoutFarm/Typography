@@ -1,10 +1,5 @@
 ﻿//MIT, 2020, WinterDev
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Data;
-using System.Text;
 using System.Windows.Forms;
 using Typography.OpenFont;
 
@@ -30,7 +25,7 @@ namespace SampleWinForms
         Typography.OpenFont.ScriptLang _scriptLang;
         public Typography.OpenFont.ScriptLang ScriptLang => _scriptLang;
         public bool Selected => chkSelected.Checked;
-        public bool DoFilter => chkDoFilter.Checked;
+
         public Typography.Contours.HintTechnique HintTechnique => (Typography.Contours.HintTechnique)cmbHintTech.SelectedItem;
         public void SetInfo(Typography.OpenFont.ScriptLang scriptLang, UnicodeLangBits langBits)
         {

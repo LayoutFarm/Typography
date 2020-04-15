@@ -8,7 +8,7 @@ using System.IO;
 using System.Text;
 using System.Windows.Forms;
 
-using PixelFarm.CpuBlit; 
+using PixelFarm.CpuBlit;
 using Typography.OpenFont;
 using Typography.OpenFont.Extensions;
 using PixelFarm.CpuBlit.BitmapAtlas;
@@ -228,7 +228,6 @@ namespace SampleWinForms
                     buildDetails.Add(new GlyphTextureBuildDetail()
                     {
                         ScriptLang = scriptLangUI.ScriptLang,
-                        DoFilter = scriptLangUI.DoFilter,
                         HintTechnique = scriptLangUI.HintTechnique,
                     });
                 }
