@@ -8,10 +8,11 @@ using PixelFarm.CpuBlit.BitmapAtlas;
 
 namespace SampleWinForms
 {
-    class FontAtlasBuilderHelper
+    struct FontAtlasBuilderHelper
     {
-        public string TextureName { get; private set; }
-        public string OutputImgFilename { get; private set; }
+        public string TextureName { get; set; }
+        public string OutputImgFilename { get; set; }
+
 #if DEBUG
         public long dbugBuildTimeMillisec { get; set; }
 #endif
@@ -41,20 +42,25 @@ namespace SampleWinForms
             //4. merge all glyph in the builder into a single image
             using (MemBitmap totalGlyphsImg = atlasBuilder.BuildSingleImage(true))
             {
-                string textureName = typeface.Name.ToLower() + "_" + fontKey;
-                string output_imgFilename = textureName + ".png";
+                
+                if (TextureName == null)
+                {
+                    string textureName = typeface.Name.ToLower() + "_" + fontKey;
+                    string output_imgFilename = textureName + ".png";
 
-                TextureName = textureName;
-                OutputImgFilename = output_imgFilename;
+                    TextureName = textureName;
+                    OutputImgFilename = output_imgFilename;
+                }
+
 
                 //5. save atlas info to disk
-                using (FileStream fs = new FileStream(textureName + ".info", FileMode.Create))
+                using (FileStream fs = new FileStream(TextureName + ".info", FileMode.Create))
                 {
                     atlasBuilder.SaveAtlasInfo(fs);
                 }
 
                 //6. save total-glyph-image to disk
-                totalGlyphsImg.SaveImage(output_imgFilename);
+                totalGlyphsImg.SaveImage(OutputImgFilename);
             }
 
 #if DEBUG
