@@ -17,14 +17,11 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
 
     }
 
-    public class GlyphTextureBitmapGenerator
+    public struct GlyphTextureBitmapGenerator
     {
 
         public delegate void OnEachGlyph(BitmapAtlasItemSource glyphImage);
-        public GlyphTextureBitmapGenerator()
-        {
-
-        }
+         
         /// <summary>
         /// version of msdf generator
         /// </summary>
