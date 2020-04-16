@@ -41,6 +41,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FontAtlasBuilderHelper.cs" />
     <Compile Include="UIFontScriptOpt.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -78,7 +79,7 @@
     <Compile Include="UIFontAtlasFileViewer.Designer.cs">
       <DependentUpon>UIFontAtlasFileViewer.cs</DependentUpon>
     </Compile>
-    <Compile Include="Utils.cs" />
+    <Compile Include="SimpleUtils.cs" />
     <EmbeddedResource Include="UIFontAtlasFileViewer.resx">
       <DependentUpon>UIFontAtlasFileViewer.cs</DependentUpon>
     </EmbeddedResource>
