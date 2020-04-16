@@ -12,9 +12,9 @@ namespace SampleWinForms
     {
         public string TextureName { get; private set; }
         public string OutputImgFilename { get; private set; }
-
-        public long BuildTimeMillisec { get; set; }
-
+#if DEBUG
+        public long dbugBuildTimeMillisec { get; set; }
+#endif
         public void Build(
             GlyphTextureBitmapGenerator glyphTextureGen,
             Typeface typeface, float fontSizeInPoints,
@@ -55,10 +55,11 @@ namespace SampleWinForms
 
                 //6. save total-glyph-image to disk
                 totalGlyphsImg.SaveImage(output_imgFilename);
-            } 
+            }
 
 #if DEBUG
             dbugStopWatch.Stop();
+            dbugBuildTimeMillisec = dbugStopWatch.ElapsedMilliseconds;
 #endif
 
         }

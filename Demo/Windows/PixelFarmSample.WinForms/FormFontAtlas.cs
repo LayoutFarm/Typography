@@ -255,8 +255,8 @@ namespace SampleWinForms
 
 #if DEBUG
 
-            this.Text += ", finished: build time(ms)=" + helper.BuildTimeMillisec;
-            System.Diagnostics.Debug.WriteLine("font atlas build time (ms): " + helper.BuildTimeMillisec);
+            this.Text += ", finished: build time(ms)=" + helper.dbugBuildTimeMillisec;
+            System.Diagnostics.Debug.WriteLine("font atlas build time (ms): " + helper.dbugBuildTimeMillisec);
 #endif
 
 
