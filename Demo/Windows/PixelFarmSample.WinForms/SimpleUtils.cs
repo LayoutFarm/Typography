@@ -13,9 +13,7 @@ namespace SampleWinForms
             {
                 pictureBox.Image = null;
                 currentBmp.Dispose();
-                currentBmp = null;
             }
         }
-
     }
 }

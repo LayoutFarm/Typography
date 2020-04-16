@@ -211,7 +211,7 @@ namespace SampleWinForms
             PixelFarm.Drawing.RequestFont reqFont = new PixelFarm.Drawing.RequestFont(
                 typeface.Name,
                 fontSizeInPoints,
-                 PixelFarm.Drawing.FontStyle.Regular
+                PixelFarm.Drawing.FontStyle.Regular
                 );
 
 
@@ -241,10 +241,8 @@ namespace SampleWinForms
 
             //-------------------------------------------------------------------------------
 
-
             //1. create glyph-texture-bitmap generator
             var glyphTextureGen = new GlyphTextureBitmapGenerator();
-
             //2. generate the glyphs
             TextureKindAndDescription textureKindAndDesc = (TextureKindAndDescription)this.cmbTextureKind.SelectedItem;
             if (textureKindAndDesc.Kind == TextureKind.Msdf)
@@ -252,51 +250,25 @@ namespace SampleWinForms
                 glyphTextureGen.MsdfGenVersion = textureKindAndDesc.TechniqueDetail;
             }
 
-#if DEBUG
-            //overall, glyph atlas generation time
-            System.Diagnostics.Stopwatch dbugStopWatch = new System.Diagnostics.Stopwatch();
-            dbugStopWatch.Start();
-#endif
-            SimpleBitmapAtlasBuilder atlasBuilder = glyphTextureGen.CreateTextureFontFromBuildDetail(typeface,
-                fontSizeInPoints,
-                textureKindAndDesc.Kind,
-                buildDetails.ToArray());
-
-            //3. set information before write to font-info
-            atlasBuilder.SpaceCompactOption = SimpleBitmapAtlasBuilder.CompactOption.ArrangeByHeight;
-            atlasBuilder.FontFilename = typeface.Name;
-            atlasBuilder.FontKey = reqFont.FontKey;
-
-            //4. merge all glyph in the builder into a single image
-            MemBitmap totalGlyphsImg = atlasBuilder.BuildSingleImage(true);
+            FontAtlasBuilderHelper helper = new FontAtlasBuilderHelper();
+            helper.Build(glyphTextureGen, typeface, fontSizeInPoints, textureKindAndDesc.Kind, buildDetails.ToArray(), reqFont.FontKey);
 
 #if DEBUG
-            dbugStopWatch.Stop();
-            this.Text += ", finished: build time(ms)=" + dbugStopWatch.ElapsedMilliseconds;
-            System.Diagnostics.Debug.WriteLine("font atlas build time (ms): " + dbugStopWatch.ElapsedMilliseconds);
+
+            this.Text += ", finished: build time(ms)=" + helper.dbugBuildTimeMillisec;
+            System.Diagnostics.Debug.WriteLine("font atlas build time (ms): " + helper.dbugBuildTimeMillisec);
 #endif
 
-            string textureName = typeface.Name.ToLower() + "_" + reqFont.FontKey;
-            string output_imgFilename = textureName + ".png";
-
-            //5. save atlas info to disk
-            using (FileStream fs = new FileStream(textureName + ".info", FileMode.Create))
-            {
-                atlasBuilder.SaveAtlasInfo(fs);
-            }
-
-            //6. save total-glyph-image to disk
-            totalGlyphsImg.SaveImage(output_imgFilename);
 
             ///------------------------------------------------
             //lets view result ...
 
             SimpleUtils.DisposeExistingPictureBoxImage(picOutput);
 
-            uiFontAtlasFileViewer1.LoadFontAtlasFile(textureName + ".info", textureName + ".png");
+            uiFontAtlasFileViewer1.LoadFontAtlasFile(helper.TextureInfoFilename, helper.OutputImgFilename);
 
-            this.picOutput.Image = new Bitmap(output_imgFilename);
-            this.lblOutput.Text = "Output: " + output_imgFilename;
+            this.picOutput.Image = new Bitmap(helper.OutputImgFilename);
+            this.lblOutput.Text = "Output: " + helper.OutputImgFilename;
 
             ////read .info back and convert to base64
             //byte[] atlas_info_content = File.ReadAllBytes(textureName + ".info");
