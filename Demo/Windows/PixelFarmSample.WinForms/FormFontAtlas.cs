@@ -265,7 +265,7 @@ namespace SampleWinForms
 
             SimpleUtils.DisposeExistingPictureBoxImage(picOutput);
 
-            uiFontAtlasFileViewer1.LoadFontAtlasFile(helper.TextureName, helper.OutputImgFilename);
+            uiFontAtlasFileViewer1.LoadFontAtlasFile(helper.TextureInfoFilename, helper.OutputImgFilename);
 
             this.picOutput.Image = new Bitmap(helper.OutputImgFilename);
             this.lblOutput.Text = "Output: " + helper.OutputImgFilename;

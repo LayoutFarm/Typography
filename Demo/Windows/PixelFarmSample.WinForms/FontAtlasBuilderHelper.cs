@@ -10,7 +10,7 @@ namespace SampleWinForms
 {
     struct FontAtlasBuilderHelper
     {
-        public string TextureName { get; set; }
+        public string TextureInfoFilename { get; set; }
         public string OutputImgFilename { get; set; }
 
 #if DEBUG
@@ -43,18 +43,18 @@ namespace SampleWinForms
             using (MemBitmap totalGlyphsImg = atlasBuilder.BuildSingleImage(true))
             {
                 
-                if (TextureName == null)
+                if (TextureInfoFilename == null)
                 {
                     string textureName = typeface.Name.ToLower() + "_" + fontKey;
                     string output_imgFilename = textureName + ".png";
 
-                    TextureName = textureName;
+                    TextureInfoFilename = textureName;
                     OutputImgFilename = output_imgFilename;
                 }
 
 
                 //5. save atlas info to disk
-                using (FileStream fs = new FileStream(TextureName + ".info", FileMode.Create))
+                using (FileStream fs = new FileStream(TextureInfoFilename + ".info", FileMode.Create))
                 {
                     atlasBuilder.SaveAtlasInfo(fs);
                 }
