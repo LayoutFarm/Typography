@@ -23,20 +23,31 @@
 
 using System;
 
+
 namespace PixelFarm.Drawing.Internal
 {
     public static class MemMx
     {
-        //----------------------------------------------------------filling_rule_e
+
+        public unsafe delegate void _memset(byte* dest, byte c, int byteCount);
+        public unsafe delegate void _memcpy(byte* dest, byte* src, int byteCount);
+
         public static void memcpy(byte[] dest,
             int destIndex, byte[] source,
             int sourceIndex, int count)
         {
-            NativeMemMx.MemCopy(dest, destIndex, source, sourceIndex, count);
+            unsafe
+            {
+                fixed (byte* head_dest = &dest[destIndex])
+                fixed (byte* head_src = &source[sourceIndex])
+                {
+                    s_memCopyImpl(head_dest, head_src, count);
+                }
+            }
         }
         public static unsafe void memcpy(byte* dest, byte* src, int len)
         {
-            NativeMemMx.MemCopy(dest, src, len);
+            s_memCopyImpl(dest, src, len);
         }
         public static void memmove(byte[] dest, int destIndex, byte[] source, int sourceIndex, int count)
         {
@@ -55,7 +66,7 @@ namespace PixelFarm.Drawing.Internal
             if (source != dest
                 || destIndex < sourceIndex)
             {
-                NativeMemMx.memcpy(dest + destIndex, source + sourceIndex, count);
+                s_memCopyImpl(dest + destIndex, source + sourceIndex, count);
                 // memcpy(dest, destIndex, source, sourceIndex, Count);
             }
             else
@@ -65,15 +76,54 @@ namespace PixelFarm.Drawing.Internal
         }
         public static void memset(byte[] dest, int destIndex, byte byteValue, int count)
         {
-            NativeMemMx.MemSet(dest, destIndex, byteValue, count);
+            unsafe
+            {
+                fixed (byte* d = &dest[destIndex])
+                {
+                    s_memSetImpl(d, byteValue, count);
+                }
+
+            }
         }
         public static void memset_unsafe(IntPtr dest, byte byteValue, int count)
         {
             unsafe
             {
-                NativeMemMx.memset((byte*)dest, byteValue, count);
+                s_memSetImpl((byte*)dest, byteValue, count);
             }
         }
 
+        static _memcpy s_memCopyImpl;
+        static _memset s_memSetImpl;
+        public static void SetMemImpl(_memcpy memcopyImpl, _memset memsetImpl)
+        {
+            s_memCopyImpl = memcopyImpl;
+            s_memSetImpl = memsetImpl;
+        }
+
+        static void MemSet(byte[] dest, int startAt, byte value, int count)
+        {
+            unsafe
+            {
+                fixed (byte* head = &dest[startAt])
+                {
+                    s_memSetImpl(head, value, count);
+                }
+            }
+        }
+
+        static unsafe void MemCopy(byte* head_dest, byte* head_src, int len)
+        {
+            memcpy(head_dest, head_src, len);
+        }
+
+        static MemMx()
+        {
+            unsafe
+            {
+                //set default implementation
+                SetMemImpl(NativeMemMx.memcpy, NativeMemMx.memset);
+            }
+        }
     }
 }

@@ -65,14 +65,13 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         //
         public double Height => _bounds.Height;
         public double Width => _bounds.Width;
-        //
+
         public VertexStore MakeVxs(VertexStore output)
         {
             using (VectorToolBox.Borrow(output, out PathWriter pw))
             {
                 MakeVxs(pw);
             }
-
             return output;
         }
         public void MakeVxs(PathWriter pathWriter)

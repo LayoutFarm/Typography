@@ -24,7 +24,7 @@ using PixelFarm.Drawing.Internal;
 using PixelFarm.CpuBlit.VertexProcessing;
 namespace PixelFarm.CpuBlit
 {
-    
+
 
 #if DEBUG
 
@@ -473,7 +473,7 @@ namespace PixelFarm.CpuBlit
                         for (int line = 0; line < height; ++line)
                         {
                             //System.Runtime.InteropServices.Marshal.Copy(srcBuffer, srcIndex, (IntPtr)destHead2, destStride);
-                            NativeMemMx.memcpy((byte*)destHead2, srcBuffer + srcIndex, destStride);
+                            MemMx.memcpy((byte*)destHead2, srcBuffer + srcIndex, destStride);
                             srcIndex += srcStride;
                             destHead2 += destStride;
                         }
@@ -515,7 +515,7 @@ namespace PixelFarm.CpuBlit
                     int orgSrcW = src.Width;
                     for (int line = toCopyRect.Top; line < toCopyRect.Bottom; ++line)
                     {
-                        NativeMemMx.memcpy((byte*)dstPtr, (byte*)(srcPtr + ((line * orgSrcW) + toCopyRect.Left)), toCopyRect.Width * 4);
+                        MemMx.memcpy((byte*)dstPtr, (byte*)(srcPtr + ((line * orgSrcW) + toCopyRect.Left)), toCopyRect.Width * 4);
                         dstPtr += toCopyRect.Width;
                     }
                 }

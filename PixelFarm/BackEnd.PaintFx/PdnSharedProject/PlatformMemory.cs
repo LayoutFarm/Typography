@@ -28,7 +28,7 @@ namespace System
         //}
         public static unsafe void Copy(void* dstPtr, void* srcPtr, ulong len)
         {
-            PixelFarm.Drawing.Internal.NativeMemMx.memcpy((byte*)dstPtr, (byte*)srcPtr, (int)len);
+            PixelFarm.Drawing.Internal.MemMx.memcpy((byte*)dstPtr, (byte*)srcPtr, (int)len);
         }
         public static void Free(IntPtr hmem)
         {
@@ -60,12 +60,12 @@ namespace System
         //}
         public static unsafe void SetToZero(void* ptr, int len)
         {
-            PixelFarm.Drawing.Internal.NativeMemMx.memset((byte*)ptr, 0, (int)len);
+            PixelFarm.Drawing.Internal.MemMx.memset_unsafe((IntPtr)ptr, 0, (int)len);
             //platformMem.SetToZeroImpl(ptr, len);
         }
         public static unsafe void SetToZero(void* ptr, ulong len)
         {
-            PixelFarm.Drawing.Internal.NativeMemMx.memset((byte*)ptr, 0, (int)len);
+            PixelFarm.Drawing.Internal.MemMx.memset_unsafe((IntPtr)ptr, 0, (int)len);
             //platformMem.SetToZeroImpl(ptr, len);
         }
     }

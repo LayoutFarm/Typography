@@ -13,11 +13,7 @@
 // warranty, and with no claim as to its suitability for any purpose.
 //
 //----------------------------------------------------------------------------
-//
-// Class StringPrinter.cs
-// 
-// Class to output the vertex source of a string as a run of glyphs.
-//----------------------------------------------------------------------------
+ 
 
 
 using PixelFarm.CpuBlit;
@@ -43,9 +39,7 @@ namespace PixelFarm.Drawing
         //who implement this class
         //1. AggPainter 
         //2. GdiPlusPainter 
-        //3. GLPainter 
-        //4. SkiaPainter
-        //5. PdfPainter
+        //3. GLPainter
 
 
         public abstract float OriginX { get; }

@@ -419,7 +419,7 @@ namespace PixelFarm.CpuBlit
                           System.Drawing.Imaging.PixelFormat.Format32bppArgb); //read as 32 bits
             unsafe
             {
-                PixelFarm.Drawing.Internal.NativeMemMx.MemCopy(
+                PixelFarm.Drawing.Internal.MemMx.memcpy(
                     (byte*)targetBufferPtr.Ptr,
                     (byte*)bmpData.Scan0,
                     bmpData.Stride * dstMemBmp.Height
