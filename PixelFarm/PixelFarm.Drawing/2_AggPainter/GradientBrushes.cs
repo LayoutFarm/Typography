@@ -178,7 +178,7 @@ namespace PixelFarm.CpuBlit
         float _fillOpacity = 1;
         LinearGradientPair[] _orgList;
 
-        static float[] s_simpleDistanceTable = new float[1024 * 1024];
+        static readonly float[] s_simpleDistanceTable = new float[1024 * 1024];
         static RadialGradientSpanGen()
         {
             int index = 0;
@@ -249,17 +249,24 @@ namespace PixelFarm.CpuBlit
             this.SpreadMethod = radialGrBrush.SpreadMethod;
             Opactiy = 1;
         }
+
+        bool _partListInit;
+
         public float Opactiy
         {
             get => _fillOpacity;
             set
             {
+
+                if (_partListInit && _fillOpacity == value)
+                {
+                    return;
+                }
+
+                _partListInit = true;
                 _fillOpacity = value;
                 //apply to all
-                if (value < 1)
-                {
 
-                }
                 for (int i = 0; i < _orgList.Length; ++i)
                 {
                     _pairList[i] = _orgList[i].CreateWithNewOpacity(value);
@@ -292,10 +299,10 @@ namespace PixelFarm.CpuBlit
 
             return _endColor;
         }
-
+ 
         public void GenerateColors(Color[] outputColors, int startIndex, int x, int y, int spanLen)
         {
-            //start at current span generator 
+            //start at current span generator  
             int new_centerX = _center_x + SpanOrigin.X;
             int new_centerY = _center_y + SpanOrigin.Y;
 
@@ -316,13 +323,13 @@ namespace PixelFarm.CpuBlit
 
                     startIndex++;
                 }
-
             }
             else
             {
 
                 for (int cur_x = x; cur_x < x + spanLen; ++cur_x)
                 {
+
                     float r = CalculateDistance((cur_x - new_centerX), (y - new_centerY));
                     outputColors[startIndex] = GetProperColor(r);
                     startIndex++;

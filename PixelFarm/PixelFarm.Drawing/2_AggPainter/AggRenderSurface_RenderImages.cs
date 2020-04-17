@@ -69,41 +69,6 @@ namespace PixelFarm.CpuBlit
             output.AddLineTo(0, srcH);
             output.AddCloseFigure();
         }
-
-        //static Affine CreateAffine(double destX, double destY,
-        //    double hotspotOffsetX, double hotSpotOffsetY,
-        //    double scaleX, double scaleY,
-        //    double angleRad)
-        //{
-
-        //    AffinePlan[] plans = new AffinePlan[4];
-        //    int i = 0;
-        //    if (hotspotOffsetX != 0.0f || hotSpotOffsetY != 0.0f)
-        //    {
-        //        plans[i] = AffinePlan.Translate(-hotspotOffsetX, -hotSpotOffsetY);
-        //        i++;
-        //    }
-
-        //    if (scaleX != 1 || scaleY != 1)
-        //    {
-        //        plans[i] = AffinePlan.Scale(scaleX, scaleY);
-        //        i++;
-        //    }
-
-        //    if (angleRad != 0)
-        //    {
-        //        plans[i] = AffinePlan.Rotate(angleRad);
-        //        i++;
-        //    }
-
-        //    if (destX != 0 || destY != 0)
-        //    {
-        //        plans[i] = AffinePlan.Translate(destX, destY);
-        //        i++;
-        //    }
-        //    return Affine.New(plans);
-        //}
-
         /// <summary>
         /// we do NOT store vxs
         /// </summary>

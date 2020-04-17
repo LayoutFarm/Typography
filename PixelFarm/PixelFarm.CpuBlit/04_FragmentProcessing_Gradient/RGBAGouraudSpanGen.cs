@@ -165,11 +165,9 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
             _rgba2.Init(_c0, _c1);
             _rgba3.Init(_c1, _c2);
         }
-        public Point SpanOrigin { get; set; }
+
         void ISpanGenerator.GenerateColors(Color[] outputColors, int startIndex, int x, int y, int len)
         {
-            x -= SpanOrigin.X;
-            y -= SpanOrigin.Y;
 
             _rgba1.Calculate(y);//(m_rgba1.m_1dy > 2) ? m_rgba1.m_y1 : y);
             RGBA_Calculator pc1 = _rgba1;
@@ -208,7 +206,7 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
             if (SUBPIXEL_SHIFT != 4)
             {
                 throw new NotSupportedException();
-                //use LineInterpolatorDDA
+                //use LineInterpolatorDDA instead of LineInterpolatorDDA255
             }
 #endif
 

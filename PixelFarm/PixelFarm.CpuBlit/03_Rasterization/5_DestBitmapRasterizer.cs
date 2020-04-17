@@ -1486,7 +1486,6 @@ namespace PixelFarm.CpuBlit.Rasterization
             }
         }
 
-
         public void RenderWithSpan(PixelProcessing.IBitmapBlender dest,
                 ScanlineRasterizer sclineRas,
                 Scanline scline,
@@ -1506,7 +1505,8 @@ namespace PixelFarm.CpuBlit.Rasterization
             }
 
             int src_offsetX = (int)Math.Round(sclineRas.OffsetOriginX);
-            int src_offsetY = (int)Math.Round(sclineRas.OffsetOriginY); 
+            int src_offsetY = (int)Math.Round(sclineRas.OffsetOriginY);
+
 
             Color[] colorArray = _tempSpanColors.UnsafeInternalArray;
             while (sclineRas.SweepScanline(scline))
