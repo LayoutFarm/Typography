@@ -212,43 +212,52 @@
     <Compile Include="..\PixelFarm.CpuBlit\08_imageresampling\ImageTransform.cs">
       <Link>0_REF_CpuBlit\08_ImageResampling\ImageTransform.cs</Link>
     </Compile>
-    <Compile Include="..\PixelFarm.DrawingCore\Drawing\Brushes_Pens.cs">
+    <Compile Include="..\PixelFarm.DrawingCore\Brushes_Pens.cs">
       <Link>0_REF_DrawingCore\Brushes_Pens.cs</Link>
     </Compile>
-    <Compile Include="..\PixelFarm.DrawingCore\Drawing\CombineMode.cs">
+    <Compile Include="..\PixelFarm.DrawingCore\CombineMode.cs">
       <Link>0_REF_DrawingCore\CombineMode.cs</Link>
     </Compile>
-    <Compile Include="..\PixelFarm.DrawingCore\Drawing\CRC32Calculator.cs">
+    <Compile Include="..\PixelFarm.DrawingCore\CRC32Calculator.cs">
       <Link>0_REF_DrawingCore\CRC32Calculator.cs</Link>
     </Compile>
-    <Compile Include="..\PixelFarm.DrawingCore\Drawing\DashStyle.cs">
+    <Compile Include="..\PixelFarm.DrawingCore\DashStyle.cs">
       <Link>0_REF_DrawingCore\DashStyle.cs</Link>
     </Compile>
-    <Compile Include="..\PixelFarm.DrawingCore\Drawing\DrawBoard.cs">
+    <Compile Include="..\PixelFarm.DrawingCore\DrawBoard.cs">
       <Link>0_REF_DrawingCore\DrawBoard.cs</Link>
     </Compile>
-    <Compile Include="..\PixelFarm.DrawingCore\Drawing\Image.cs">
+    <Compile Include="..\PixelFarm.DrawingCore\ExtensionAttribute.cs">
+      <Link>0_REF_DrawingCore\ExtensionAttribute.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.DrawingCore\Image.cs">
       <Link>0_REF_DrawingCore\Image.cs</Link>
     </Compile>
-    <Compile Include="..\PixelFarm.DrawingCore\Drawing\LenAndLenUnit.cs">
+    <Compile Include="..\PixelFarm.DrawingCore\LenAndLenUnit.cs">
       <Link>0_REF_DrawingCore\LenAndLenUnit.cs</Link>
     </Compile>
-    <Compile Include="..\PixelFarm.DrawingCore\Drawing\Painter.cs">
+    <Compile Include="..\PixelFarm.DrawingCore\MemMx.cs">
+      <Link>0_REF_DrawingCore\MemMx.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.DrawingCore\NativeMemMx.cs">
+      <Link>0_REF_DrawingCore\NativeMemMx.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.DrawingCore\Painter.cs">
       <Link>0_REF_DrawingCore\Painter.cs</Link>
     </Compile>
-    <Compile Include="..\PixelFarm.DrawingCore\Drawing\Region.cs">
+    <Compile Include="..\PixelFarm.DrawingCore\Region.cs">
       <Link>0_REF_DrawingCore\Region.cs</Link>
     </Compile>
-    <Compile Include="..\PixelFarm.DrawingCore\Drawing\RenderVx.cs">
+    <Compile Include="..\PixelFarm.DrawingCore\RenderVx.cs">
       <Link>0_REF_DrawingCore\RenderVx.cs</Link>
     </Compile>
-    <Compile Include="..\PixelFarm.DrawingCore\Drawing\RequestFont.cs">
+    <Compile Include="..\PixelFarm.DrawingCore\RequestFont.cs">
       <Link>0_REF_DrawingCore\RequestFont.cs</Link>
     </Compile>
-    <Compile Include="..\PixelFarm.DrawingCore\Drawing\VertexCommandAndOrientation.cs">
+    <Compile Include="..\PixelFarm.DrawingCore\VertexCommandAndOrientation.cs">
       <Link>0_REF_DrawingCore\VertexCommandAndOrientation.cs</Link>
     </Compile>
-    <Compile Include="..\PixelFarm.DrawingCore\Drawing\VertexStore.cs">
+    <Compile Include="..\PixelFarm.DrawingCore\VertexStore.cs">
       <Link>0_REF_DrawingCore\VertexStore.cs</Link>
     </Compile>
     <Compile Include="..\PixelFarm.Painter\0_Base\ForNet20.cs">
@@ -346,12 +355,6 @@
     </Compile>
     <Compile Include="..\PixelFarm.PrimitiveGeo\ICoordTransformer.cs">
       <Link>0_REF_DrawingCore\1_PrimitiveGeo\ICoordTransformer.cs</Link>
-    </Compile>
-    <Compile Include="..\PixelFarm.PrimitiveGeo\MemMx.cs">
-      <Link>0_REF_DrawingCore\1_PrimitiveGeo\MemMx.cs</Link>
-    </Compile>
-    <Compile Include="..\PixelFarm.PrimitiveGeo\NativeMemMx.cs">
-      <Link>0_REF_DrawingCore\1_PrimitiveGeo\NativeMemMx.cs</Link>
     </Compile>
     <Compile Include="..\PixelFarm.PrimitiveGeo\Rectangle.cs">
       <Link>0_REF_DrawingCore\1_PrimitiveGeo\Rectangle.cs</Link>

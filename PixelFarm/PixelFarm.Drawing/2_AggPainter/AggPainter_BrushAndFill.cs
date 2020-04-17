@@ -43,7 +43,7 @@ namespace PixelFarm.CpuBlit
                         break;
                     case BrushKind.LinearGradient:
                         break;
-                    case BrushKind.CircularGraident:
+                    case BrushKind.CircularGradient:
                         break;
                     case BrushKind.PolygonGradient:
                         break;
@@ -129,23 +129,25 @@ namespace PixelFarm.CpuBlit
                             Q1RectD bounds = vxs.GetBoundingRect();
 
                             Point prevOrg = linearSpanGen.SpanOrigin;
-                            //TODO: rounding
+                            //TODO: rounding 
 
-                            linearSpanGen.SpanOrigin = new Point((int)(OriginX + bounds.Left), (int)(OriginY + bounds.Bottom)); //*** 
+                            linearSpanGen.SpanOrigin = new Point((int)(bounds.Left), (int)(bounds.Bottom)); //*** 
 
                             Fill(vxs, linearSpanGen);
 
                             linearSpanGen.SpanOrigin = prevOrg;//restore
 
+
                         }
                         break;
-                    case BrushKind.CircularGraident:
+                    case BrushKind.CircularGradient:
                         {
+                          
                             Q1RectD bounds = vxs.GetBoundingRect();
                             RadialGradientSpanGen radialSpanGen = ResolveRadialGrBrush((RadialGradientBrush)br);
                             //radialSpanGen.SetOrigin(0, 0);//TODO: review this offset 
                             Point prevOrg = radialSpanGen.SpanOrigin;
-                            radialSpanGen.SpanOrigin = new Point((int)(OriginX + bounds.Left), (int)(OriginY + bounds.Bottom)); //*** 
+                            radialSpanGen.SpanOrigin = new Point((int)(bounds.Left), (int)(bounds.Bottom)); //*** 
                             radialSpanGen.Opactiy = FillOpacity;
                             Fill(vxs, radialSpanGen);
                             radialSpanGen.SpanOrigin = prevOrg;//restore
@@ -209,12 +211,12 @@ namespace PixelFarm.CpuBlit
             //1. switch to mask layer 
             SetClipRgn(vxs);
 
-            Point prevOrg = _rgbaGourandSpanGen.SpanOrigin;
+
             float ox = OriginX;
             float oy = OriginY;
 
             Point newOrg = new Point((int)(bounds.Left + ox), (int)(bounds.Bottom + oy));
-            _rgbaGourandSpanGen.SpanOrigin = newOrg;
+
 
             PolygonGradientBrush brush = ResolvePolygonGradientBrush(polygonGrBrush);
 
@@ -233,7 +235,7 @@ namespace PixelFarm.CpuBlit
             }
 
             SetClipRgn(null);
-            _rgbaGourandSpanGen.SpanOrigin = prevOrg;//restore
+
 
             SetOrigin(ox, oy);
         }
@@ -337,33 +339,25 @@ namespace PixelFarm.CpuBlit
                                 //-------------------------------------------  
                                 //check inner object
                                 LinearGradientSpanGen linearGradientSpanGen = ResolveLinearGrBrush((LinearGradientBrush)br);
-                                Point prev_o = linearGradientSpanGen.SpanOrigin;
-                                linearGradientSpanGen.SpanOrigin = new Point((int)(left + OriginX), (int)(top + OriginY));
                                 Fill(rectTool.MakeVxs(v1), linearGradientSpanGen);
-                                linearGradientSpanGen.SpanOrigin = prev_o;
                             }
                             break;
-                        case BrushKind.CircularGraident:
+                        case BrushKind.CircularGradient:
                             {
-                                //var radialGr = (Drawing.RadialGradientBrush)br;
+
                                 RadialGradientSpanGen radialSpanGen = ResolveRadialGrBrush((Drawing.RadialGradientBrush)br);
                                 Point prev_o = radialSpanGen.SpanOrigin;
-                                radialSpanGen.SpanOrigin = new Point((int)(left + OriginX), (int)(top + OriginY));
+                                radialSpanGen.SpanOrigin = new Point(0, 0);
                                 Fill(rectTool.MakeVxs(v1), radialSpanGen);
                                 radialSpanGen.SpanOrigin = prev_o;
                             }
                             break;
                         case BrushKind.PolygonGradient:
                             {
-                                //we use mask technique (simlar to texture brush) 
+                                //we use mask technique (simlar to texture brush)  
 
-
-                                Point prevOrg = _rgbaGourandSpanGen.SpanOrigin;
                                 float ox = OriginX;
                                 float oy = OriginY;
-
-                                Point newOrg = new Point((int)(left + ox), (int)(top + oy));
-                                _rgbaGourandSpanGen.SpanOrigin = newOrg;
 
                                 PolygonGradientBrush brush = ResolvePolygonGradientBrush((Drawing.PolygonGradientBrush)br);
 
@@ -372,19 +366,18 @@ namespace PixelFarm.CpuBlit
 
                                 int partCount = brush.CachePartCount;
 
-                                SetOrigin(newOrg.X, newOrg.Y);
+                                SetOrigin((int)(left + ox), (int)(top + oy));
 
                                 for (int i = 0; i < partCount; i++)
                                 {
-                                    brush.SetSpanGenWithCurrentValues(i, _rgbaGourandSpanGen); //*** this affects assoc gouraudSpanGen 
-
+                                    brush.SetSpanGenWithCurrentValues(i, _rgbaGourandSpanGen); //*** this affects assoc gouraudSpanGen  
                                     this.Fill(brush.CurrentVxs, _rgbaGourandSpanGen);
                                 }
 
                                 SetClipRgn(null);
-                                _rgbaGourandSpanGen.SpanOrigin = prevOrg;//restore
 
-                                SetOrigin(ox, oy);
+
+                                SetOrigin(ox, oy); //restore
                             }
                             break;
                         case BrushKind.Solid:

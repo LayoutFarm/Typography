@@ -17,7 +17,7 @@ namespace PixelFarm.Drawing
     {
         Solid,
         LinearGradient,
-        CircularGraident,
+        CircularGradient,
         PolygonGradient,
         Texture
     }
@@ -185,7 +185,7 @@ namespace PixelFarm.Drawing
             IsValid = true;
             ColorStops = stops;
         }
-        public override BrushKind BrushKind => BrushKind.CircularGraident;
+        public override BrushKind BrushKind => BrushKind.CircularGradient;
         public SpreadMethod SpreadMethod { get; set; }
         public PointF StartPoint { get; }
         public PointF EndPoint { get; }

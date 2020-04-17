@@ -50,32 +50,28 @@
     <Compile Include="..\PixelFarm.PrimitiveGeo\ICoordTransformer.cs">
       <Link>0_REF_PrimitiveGeo\ICoordTransformer.cs</Link>
     </Compile>
-    <Compile Include="..\PixelFarm.PrimitiveGeo\MemMx.cs">
-      <Link>0_REF_PrimitiveGeo\MemMx.cs</Link>
-    </Compile>
-    <Compile Include="..\PixelFarm.PrimitiveGeo\NativeMemMx.cs">
-      <Link>0_REF_PrimitiveGeo\NativeMemMx.cs</Link>
-    </Compile>
     <Compile Include="..\PixelFarm.PrimitiveGeo\Rectangle.cs">
       <Link>0_REF_PrimitiveGeo\Rectangle.cs</Link>
     </Compile>
     <Compile Include="..\PixelFarm.PrimitiveGeo\RectangleF.cs">
       <Link>0_REF_PrimitiveGeo\RectangleF.cs</Link>
     </Compile>
-    <Compile Include="Drawing\Brushes_Pens.cs" />
-    <Compile Include="Drawing\CombineMode.cs" />
-    <Compile Include="Drawing\DashStyle.cs" />
-    <Compile Include="Drawing\Image.cs" />
-    <Compile Include="Drawing\Region.cs" />
-    <Compile Include="Drawing\CRC32Calculator.cs" />
-    <Compile Include="Drawing\DrawBoard.cs" />
-    <Compile Include="Drawing\LenAndLenUnit.cs" />
-    <Compile Include="Drawing\Painter.cs" />
-    <Compile Include="Drawing\RenderVx.cs" />
-    <Compile Include="Drawing\RequestFont.cs" />
-    <Compile Include="Drawing\VertexCommandAndOrientation.cs" />
-    <Compile Include="Drawing\VertexStore.cs" />
+    <Compile Include="DrawBoard.cs" />
+    <Compile Include="Brushes_Pens.cs" />
+    <Compile Include="CombineMode.cs" />
+    <Compile Include="DashStyle.cs" />
+    <Compile Include="Image.cs" />
+    <Compile Include="MemMx.cs" />
+    <Compile Include="NativeMemMx.cs" />
+    <Compile Include="Region.cs" />
+    <Compile Include="CRC32Calculator.cs" />
+    <Compile Include="LenAndLenUnit.cs" />
+    <Compile Include="RenderVx.cs" />
+    <Compile Include="RequestFont.cs" />
+    <Compile Include="VertexCommandAndOrientation.cs" />
+    <Compile Include="VertexStore.cs" />
     <Compile Include="ExtensionAttribute.cs" />
+    <Compile Include="Painter.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
