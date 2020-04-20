@@ -39,6 +39,8 @@ namespace PixelFarm.Drawing
             img._handleInnerImgAsOwner = handleInnerImgAsOwner;
         }
 
+        public abstract IntPtr GetRawBufferHead();
+        public abstract void ReleaseRawBufferHead(IntPtr ptr);
     }
 
 }

@@ -152,6 +152,9 @@
     <Compile Include="..\PixelFarm.DrawingCore\ExtensionAttribute.cs">
       <Link>ExtensionAttribute.cs</Link>
     </Compile>
+    <Compile Include="..\PixelFarm.PrimitiveDrawing\AffineMat.cs">
+      <Link>AffineMat.cs</Link>
+    </Compile>
     <Compile Include="1_VectorMaths\AggMath.cs" />
     <Compile Include="1_VectorMaths\AxisAlignedBoundingBox.cs" />
     <Compile Include="1_VectorMaths\BezierCurve.cs" />

@@ -190,6 +190,10 @@ namespace PixelFarm.CpuBlit
             dbugMemBitmapMonitor.dbugRegisterMemBitmap(this, width + "x" + height + ": " + DateTime.Now.ToString("u"));
 #endif
         }
+        public override IntPtr GetRawBufferHead() => _pixelBuffer;
+        public override void ReleaseRawBufferHead(IntPtr ptr)
+        {
+        }
         public BitmapBufferFormat BufferPixelFormat
         {
             get

@@ -225,7 +225,7 @@ namespace PixelFarm.Drawing
         //
         public abstract bool IsGpuDrawBoard { get; }
         public abstract void BlitFrom(DrawBoard src, float srcX, float srcY, float srcW, float srcH, float dstX, float dstY);
-        public abstract BitmapBufferProvider GetInternalBitmapProvider();
+        public abstract ImageBinder GetInternalBitmapProvider();
 
     }
 
@@ -246,38 +246,7 @@ namespace PixelFarm.Drawing
 
 
 
-    public enum BitmapBufferFormat
-    {
-        BGRA, //eg. System.Drawing.Bitmap
-        BGR, //eg. Native Windows GDI surface
-        RGBA, //eg. OpenGL 
-
-        RGBO, //my extension, 32 bits RGB ignore Alpha, assume its value= 1
-    }
-
-
-    public abstract class BitmapBufferProvider : Image
-    {
-        public abstract System.IntPtr GetRawBufferHead();
-        public abstract void ReleaseBufferHead();
-
-        public abstract bool IsYFlipped { get; }
-
-        /// <summary>
-        /// notify the bitmap provider that it can release the local bmp (eg. we have use it, not need anymore)
-        /// </summary>
-        public abstract void ReleaseLocalBitmapIfRequired();
-
-        public BitmapBufferFormat BitmapFormat { get; set; }
-        public override bool IsReferenceImage => true;
-        public override int ReferenceX => 0;
-        public override int ReferenceY => 0;
-
-
-#if DEBUG
-        public abstract void dbugNotifyUsage();
-#endif
-    }
+  
 
     public enum RenderQuality
     {
@@ -314,7 +283,7 @@ namespace PixelFarm.Drawing
         Hardware,
         HardwareWithSoftwareFallback
     }
-     
+
     public static class DrawBoardExtensionMethods
     {
 
