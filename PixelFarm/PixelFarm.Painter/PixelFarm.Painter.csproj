@@ -189,6 +189,14 @@
       <Project>{fde310c7-9c58-47f9-a6af-3f518613bc4b}</Project>
       <Name>PixelFarm.DrawingCore</Name>
     </ProjectReference>
+    <ProjectReference Include="..\PixelFarm.PrimitiveDrawing\PixelFarm.PrimitiveDrawing.csproj">
+      <Project>{112196ba-8717-4435-baf1-5014c2e05cfd}</Project>
+      <Name>PixelFarm.PrimitiveDrawing</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PixelFarm.PrimitiveGeo\PixelFarm.PrimitiveGeo.csproj">
+      <Project>{b951ff5b-d7a0-4259-880d-cb7a0c001956}</Project>
+      <Name>PixelFarm.PrimitiveGeo</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -399,9 +399,11 @@ namespace LayoutFarm.Css
         Inherit,
     }
 
-    //flex spec: 5.1 flow flow direction ('flex-direction');
+
+    //https://www.w3.org/TR/css-flexbox-1/#intro
+    //flex spec: 5.1 flew flow direction ('flex-direction');
     //inherit =no
-    public enum FlexFlowDirection : byte
+    public enum FlexDirection : byte
     {
         [Map(CssConstants.Row)]
         Row,
@@ -423,11 +425,12 @@ namespace LayoutFarm.Css
         WrapReverse
     }
 
+
     //flex spec: 8.2 axis alignment:this 'justify-content' property
     public enum FlexJustifyContent : byte
     {
         [Map(CssConstants.FlexStart)]
-        FlexStart,//default
+        FlexStart,//initial value
         [Map(CssConstants.FlexEnd)]
         FlextEnd,
         [Map(CssConstants.Center)]
@@ -440,12 +443,12 @@ namespace LayoutFarm.Css
 
     //flex spec 8.3: Cross-axis aligment: the 'align-items' and 
     //'align-self' properties
-    public enum FlexAlignItem : byte
+    public enum FlexAlignItems : byte
     {
         [Map(CssConstants.Stretch)]
         Stretch, //initial value
         [Map(CssConstants.FlexStart)]
-        FlexStart,//default
+        FlexStart,
         [Map(CssConstants.FlexEnd)]
         FlextEnd,
         [Map(CssConstants.Center)]
@@ -457,11 +460,11 @@ namespace LayoutFarm.Css
     public enum FlexAlignSelf : byte
     {
         [Map(CssConstants.Auto)]
-        Auto,
+        Auto, //initial value
         [Map(CssConstants.Stretch)]
-        Stretch, //initial value
+        Stretch,
         [Map(CssConstants.FlexStart)]
-        FlexStart,//default
+        FlexStart,
         [Map(CssConstants.FlexEnd)]
         FlextEnd,
         [Map(CssConstants.Center)]

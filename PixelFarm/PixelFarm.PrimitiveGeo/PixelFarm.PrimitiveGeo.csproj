@@ -32,9 +32,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="AffineMat.cs" />
     <Compile Include="BasicGeometries.cs" />
-    <Compile Include="Color.cs" />
     <Compile Include="ICoordTransformer.cs" />
     <Compile Include="Rectangle.cs" />
     <Compile Include="RectangleF.cs" />

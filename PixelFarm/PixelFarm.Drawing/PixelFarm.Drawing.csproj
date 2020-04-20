@@ -218,9 +218,6 @@
     <Compile Include="..\PixelFarm.DrawingCore\CombineMode.cs">
       <Link>0_REF_DrawingCore\CombineMode.cs</Link>
     </Compile>
-    <Compile Include="..\PixelFarm.DrawingCore\CRC32Calculator.cs">
-      <Link>0_REF_DrawingCore\CRC32Calculator.cs</Link>
-    </Compile>
     <Compile Include="..\PixelFarm.DrawingCore\DashStyle.cs">
       <Link>0_REF_DrawingCore\DashStyle.cs</Link>
     </Compile>
@@ -229,12 +226,6 @@
     </Compile>
     <Compile Include="..\PixelFarm.DrawingCore\ExtensionAttribute.cs">
       <Link>0_REF_DrawingCore\ExtensionAttribute.cs</Link>
-    </Compile>
-    <Compile Include="..\PixelFarm.DrawingCore\Image.cs">
-      <Link>0_REF_DrawingCore\Image.cs</Link>
-    </Compile>
-    <Compile Include="..\PixelFarm.DrawingCore\LenAndLenUnit.cs">
-      <Link>0_REF_DrawingCore\LenAndLenUnit.cs</Link>
     </Compile>
     <Compile Include="..\PixelFarm.DrawingCore\MemMx.cs">
       <Link>0_REF_DrawingCore\MemMx.cs</Link>
@@ -250,9 +241,6 @@
     </Compile>
     <Compile Include="..\PixelFarm.DrawingCore\RenderVx.cs">
       <Link>0_REF_DrawingCore\RenderVx.cs</Link>
-    </Compile>
-    <Compile Include="..\PixelFarm.DrawingCore\RequestFont.cs">
-      <Link>0_REF_DrawingCore\RequestFont.cs</Link>
     </Compile>
     <Compile Include="..\PixelFarm.DrawingCore\VertexCommandAndOrientation.cs">
       <Link>0_REF_DrawingCore\VertexCommandAndOrientation.cs</Link>
@@ -344,14 +332,32 @@
     <Compile Include="..\PixelFarm.Painter\TempContext.cs">
       <Link>0_REF_Painter\TempContext.cs</Link>
     </Compile>
-    <Compile Include="..\PixelFarm.PrimitiveGeo\AffineMat.cs">
-      <Link>0_REF_DrawingCore\1_PrimitiveGeo\AffineMat.cs</Link>
+    <Compile Include="..\PixelFarm.PrimitiveDrawing\AffineMat.cs">
+      <Link>0_REF_DrawingCore\1_PrimitiveDrawing\AffineMat.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.PrimitiveDrawing\Color.cs">
+      <Link>0_REF_DrawingCore\1_PrimitiveDrawing\Color.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.PrimitiveDrawing\CRC32Calculator.cs">
+      <Link>0_REF_DrawingCore\1_PrimitiveDrawing\CRC32Calculator.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.PrimitiveDrawing\Image.cs">
+      <Link>0_REF_DrawingCore\1_PrimitiveDrawing\Image.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.PrimitiveDrawing\ImageBinder.cs">
+      <Link>0_REF_DrawingCore\1_PrimitiveDrawing\ImageBinder.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.PrimitiveDrawing\LenAndLenUnit.cs">
+      <Link>0_REF_DrawingCore\1_PrimitiveDrawing\LenAndLenUnit.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.PrimitiveDrawing\RequestFont.cs">
+      <Link>0_REF_DrawingCore\1_PrimitiveDrawing\RequestFont.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.PrimitiveDrawing\TextMeasurement.cs">
+      <Link>0_REF_DrawingCore\1_PrimitiveDrawing\TextMeasurement.cs</Link>
     </Compile>
     <Compile Include="..\PixelFarm.PrimitiveGeo\BasicGeometries.cs">
       <Link>0_REF_DrawingCore\1_PrimitiveGeo\BasicGeometries.cs</Link>
-    </Compile>
-    <Compile Include="..\PixelFarm.PrimitiveGeo\Color.cs">
-      <Link>0_REF_DrawingCore\1_PrimitiveGeo\Color.cs</Link>
     </Compile>
     <Compile Include="..\PixelFarm.PrimitiveGeo\ICoordTransformer.cs">
       <Link>0_REF_DrawingCore\1_PrimitiveGeo\ICoordTransformer.cs</Link>
@@ -575,7 +581,6 @@
     <Compile Include="..\PixelFarm.Vectors\6_Contours\Vertex.cs">
       <Link>0_REF_Painter\1_Vectors\6_Contours\Vertex.cs</Link>
     </Compile>
-    <Compile Include="1_IO\ImageBinder.cs" />
     <Compile Include="1_IO\StorageService.cs" />
     <Compile Include="3_VertexProcessoring\Figures.cs" />
     <Compile Include="2_AggPainter\AggPainter.cs" />
