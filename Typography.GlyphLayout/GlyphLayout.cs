@@ -252,6 +252,7 @@ namespace Typography.TextLayout
 
         public bool EnableLigature { get; set; }
         public bool EnableComposition { get; set; }
+         
         public Typeface Typeface
         {
             get => _typeface;
@@ -266,8 +267,14 @@ namespace Typography.TextLayout
         }
 
 
-        //not thread-safe*** 
 
+
+        public delegate ushort GlyphNotFoundHandler(GlyphLayout glyphLayout, int codepoint, int nextcodepoint);
+        GlyphNotFoundHandler _glyphNotFoundHandler;
+
+
+
+        //not thread-safe*** 
         List<int> _reusableUserCodePoints = new List<int>();
 #if DEBUG
         List<dbugCodePointFromUserChar> _dbugReusableCodePointFromUserCharList = new List<dbugCodePointFromUserChar>();
@@ -325,6 +332,10 @@ namespace Typography.TextLayout
             Layout(_reusableUserCodePoints);
         }
 
+        public void SetGlyphIndexNotFoundHandler(GlyphNotFoundHandler glyphNotFoundHandler)
+        {
+            _glyphNotFoundHandler = glyphNotFoundHandler;
+        }
         public void Layout(IList<int> inputCodePoints)
         {
             Layout(inputCodePoints, 0, inputCodePoints.Count);
@@ -336,29 +347,45 @@ namespace Typography.TextLayout
             // convert codepoint-list to input glyph-list 
             // clear before use
             _inputGlyphs.Clear();
+
             int end = startAt + len;
+            int cur_codepoint, next_codepoint;
+
             for (int i = 0; i < end; ++i)
             {
                 //find glyph index by specific codepoint  
                 if (i + 1 < end)
                 {
-                    ushort glyphIndex = _typeface.GetGlyphIndex(inputCodePoints[i], inputCodePoints[i + 1], out bool skipNextCodepoint);
-                    _inputGlyphs.AddGlyph(i, glyphIndex);
-                    if (skipNextCodepoint)
-                    {
-                        // Maybe this is a UVS sequence; in that case,
-                        //***SKIP*** the second codepoint 
-                        ++i;
-                    }
+                    cur_codepoint = inputCodePoints[i];
+                    next_codepoint = inputCodePoints[i + 1];
                 }
                 else
                 {
-                    _inputGlyphs.AddGlyph(i, _typeface.GetGlyphIndex(inputCodePoints[i], 0, out bool skipNextCodepoint));
+                    cur_codepoint = inputCodePoints[i];
+                    next_codepoint = 0;
+                }
+
+                ushort glyphIndex = _typeface.GetGlyphIndex(cur_codepoint, next_codepoint, out bool skipNextCodepoint);
+
+                if (glyphIndex == 0 && _glyphNotFoundHandler != null)
+                {
+                    //handle glyph not found
+                    glyphIndex = _glyphNotFoundHandler(this, cur_codepoint, next_codepoint);
+                }
+
+                _inputGlyphs.AddGlyph(i, glyphIndex);
+                if (skipNextCodepoint)
+                {
+                    // Maybe this is a UVS sequence; in that case,
+                    //***SKIP*** the second codepoint 
+                    ++i;
                 }
             }
             //continue below...
             Layout(_inputGlyphs);
         }
+
+
         void Layout(GlyphIndexList glyphs)
         {
             if (_needPlanUpdate)
@@ -373,7 +400,7 @@ namespace Typography.TextLayout
             {
                 //TODO: review perf here
                 _gsub.EnableLigation = this.EnableLigature;
-                _gsub.EnableComposition = this.EnableComposition;
+                _gsub.EnableComposition = this.EnableComposition; 
                 _gsub.DoSubstitution(glyphs);
             }
 
