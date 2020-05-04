@@ -1020,7 +1020,8 @@ namespace Typography.OpenFont.CFF
                     }
                     else
                     {
-                        cff1Glyphs[i]._cff1GlyphData.Name = _uniqueStringTable[sid - Cff1FontSet.N_STD_STRINGS - 1];
+                        var index = sid - Cff1FontSet.N_STD_STRINGS - 1;
+                        if (index < _uniqueStringTable.Length) cff1Glyphs[i]._cff1GlyphData.Name = _uniqueStringTable[sid - Cff1FontSet.N_STD_STRINGS - 1];
                     }
 
                     count--;
