@@ -1020,7 +1020,20 @@ namespace Typography.OpenFont.CFF
                     }
                     else
                     {
-                        cff1Glyphs[i]._cff1GlyphData.Name = _uniqueStringTable[sid - Cff1FontSet.N_STD_STRINGS - 1];
+                        int index = sid - Cff1FontSet.N_STD_STRINGS - 1;
+                        if (index > -1)
+                        {
+                            cff1Glyphs[i]._cff1GlyphData.Name = _uniqueStringTable[sid - Cff1FontSet.N_STD_STRINGS - 1];
+                        }
+                        else
+                        {
+                            //skip this, 
+                            //eg. found in CID font,
+                            //we should provide this info later
+#if DEBUG
+                            System.Diagnostics.Debug.WriteLine("CFF: found unknow glyph-name");
+#endif
+                        }
                     }
 
                     count--;
