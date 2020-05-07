@@ -146,13 +146,13 @@ namespace Typography.OpenFont
         /// <returns></returns>
 
         public ushort GetGlyphIndex(int codepoint, int nextCodepoint, out bool skipNextCodepoint)
-        { 
-            return CmapTable.GetGlyphIndex(codepoint, nextCodepoint, out skipNextCodepoint); 
+        {
+            return CmapTable.GetGlyphIndex(codepoint, nextCodepoint, out skipNextCodepoint);
         }
         public ushort GetGlyphIndex(int codepoint)
         {
             return CmapTable.GetGlyphIndex(codepoint, 0, out bool skipNextCodepoint);
-        } 
+        }
         public void CollectUnicode(List<uint> unicodes)
         {
             CmapTable.CollectUnicode(unicodes);
@@ -208,9 +208,17 @@ namespace Typography.OpenFont
 
         public Glyph GetGlyph(ushort glyphIndex)
         {
-            return _glyphs[glyphIndex];
+            if (glyphIndex < _glyphs.Length)
+            {
+                return _glyphs[glyphIndex];
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("found unknown glyph:" + glyphIndex);
+                return _glyphs[0]; //return empty glyph?;
+            }             
         }
-       
+
 
         public ushort GetAdvanceWidth(int codepoint)
         {

@@ -30,6 +30,10 @@ namespace Typography.OpenFont
 
 #if DEBUG
             this.dbugId = s_debugTotalId++;
+            if (this.dbugId == 444)
+            {
+
+            }
 #endif
             this.glyphPoints = glyphPoints;
             _contourEndPoints = contourEndPoints;
@@ -156,18 +160,30 @@ namespace Typography.OpenFont
 #if DEBUG
             int src_contour_count = src._contourEndPoints.Length;
 #endif
-
-            ushort org_last_point = (ushort)(dest._contourEndPoints[org_dest_len - 1] + 1); //since start at 0 
-
-            dest.glyphPoints = Utils.ConcatArray(dest.glyphPoints, src.glyphPoints);
-            dest._contourEndPoints = Utils.ConcatArray(dest._contourEndPoints, src._contourEndPoints);
-
-            //offset latest append contour  end points
-            int newlen = dest._contourEndPoints.Length;
-            for (int i = org_dest_len; i < newlen; ++i)
+            if (org_dest_len == 0)
             {
-                dest._contourEndPoints[i] += (ushort)org_last_point;
+                //org is empty glyph
+
+                dest.glyphPoints = Utils.ConcatArray(dest.glyphPoints, src.glyphPoints);
+                dest._contourEndPoints = Utils.ConcatArray(dest._contourEndPoints, src._contourEndPoints);
+
             }
+            else
+            {
+                ushort org_last_point = (ushort)(dest._contourEndPoints[org_dest_len - 1] + 1); //since start at 0 
+
+                dest.glyphPoints = Utils.ConcatArray(dest.glyphPoints, src.glyphPoints);
+                dest._contourEndPoints = Utils.ConcatArray(dest._contourEndPoints, src._contourEndPoints);
+                //offset latest append contour  end points
+                int newlen = dest._contourEndPoints.Length;
+                for (int i = org_dest_len; i < newlen; ++i)
+                {
+                    dest._contourEndPoints[i] += (ushort)org_last_point;
+                }
+            }
+
+
+
             //calculate new bounds
             Bounds destBound = dest.Bounds;
             Bounds srcBound = src.Bounds;
