@@ -153,6 +153,7 @@ namespace Typography.OpenFont
         internal static void AppendGlyph(Glyph dest, Glyph src)
         {
             int org_dest_len = dest._contourEndPoints.Length;
+            if (org_dest_len <= 0) return;
 #if DEBUG
             int src_contour_count = src._contourEndPoints.Length;
 #endif
