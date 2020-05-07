@@ -160,6 +160,7 @@ namespace Typography.OpenFont
 
         public Glyph GetGlyphByName(string glyphName)
         {
+            if (glyphName == null) return null;
             if (_cffTable != null)
             {
                 //early preview ...
@@ -216,7 +217,7 @@ namespace Typography.OpenFont
             {
                 System.Diagnostics.Debug.WriteLine("found unknown glyph:" + glyphIndex);
                 return _glyphs[0]; //return empty glyph?;
-            }             
+            }
         }
 
 
