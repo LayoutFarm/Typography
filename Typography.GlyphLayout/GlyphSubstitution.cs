@@ -74,10 +74,25 @@ namespace Typography.TextLayout
 
             }
         }
+
+        public bool EnableMathFeature
+        {
+            get => _enableMathFeature;
+            set
+            {
+                if (value != _enableMathFeature)
+                {
+                    _mustRebuildTables = true;
+                }
+                _enableMathFeature = value;
+            }
+        }
         readonly string _language;
         bool _enableLigation = true; // enable by default
         bool _enableComposition = true;
         bool _mustRebuildTables = true;
+        bool _enableMathFeature = true;
+
         Typeface _typeface;
 
 
@@ -90,11 +105,8 @@ namespace Typography.TextLayout
             // check if this lang has
             GSUB gsubTable = _typeface.GSUBTable;
             ScriptTable scriptTable = gsubTable.ScriptList[_language];
-            if (scriptTable == null)
-            {
-                //no script table for request lang-> no lookup process here
-                return;
-            }
+            if (scriptTable == null) return;
+
 
             ScriptTable.LangSysTable selectedLang = null;
             if (scriptTable.langSysTables != null && scriptTable.langSysTables.Length > 0)
@@ -122,25 +134,38 @@ namespace Typography.TextLayout
             foreach (ushort featureIndex in selectedLang.featureIndexList)
             {
                 FeatureList.FeatureTable feature = gsubTable.FeatureList.featureTables[featureIndex];
-                bool featureIsNeeded = false;
+                bool includeThisFeature = false;
                 switch (feature.TagName)
                 {
                     case "ccmp": // glyph composition/decomposition 
-                        featureIsNeeded = EnableComposition;
+                        includeThisFeature = EnableComposition;
                         break;
                     case "liga": // Standard Ligatures --enable by default
-                        featureIsNeeded = EnableLigation;
+                        includeThisFeature = EnableLigation;
+                        break;
+
+
+                    //OpenType Layout tags for math processing:
+                    //https://docs.microsoft.com/en-us/typography/opentype/spec/math
+                    //'math', 'ssty','flac','dtls' 	
+                    case "ssty":
+                        includeThisFeature = EnableMathFeature;
+                        break;
+                    case "dlts"://'dtls' 	Dotless Forms 
+                        includeThisFeature = EnableMathFeature;
+                        break;
+                    case "flac": //Flattened Accents over Capitals  
                         break;
                 }
 
-                if (featureIsNeeded)
+                if (includeThisFeature)
                 {
                     foreach (ushort lookupIndex in feature.LookupListIndices)
                     {
                         _lookupTables.Add(gsubTable.LookupList[lookupIndex]);
                     }
                 }
-            }
+            } 
         }
 
         /// <summary>

@@ -4,61 +4,47 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{FDE310C7-9C58-47F9-A6AF-3F518613BC4B}</ProjectGuid>
+    <ProjectGuid>{112196BA-8717-4435-BAF1-5014C2E05CFD}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>PixelFarm.DrawingCore</RootNamespace>
-    <AssemblyName>PixelFarm.DrawingCore</AssemblyName>
+    <RootNamespace>PixelFarm.PrimitiveDrawing</RootNamespace>
+    <AssemblyName>PixelFarm.PrimitiveDrawing</AssemblyName>
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
+    <Deterministic>true</Deterministic>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;PIXEL_FARM,PIXEL_FARM_NET20</DefineConstants>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE;PIXEL_FARM, PIXEL_FARM_NET20</DefineConstants>
+    <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DrawBoard.cs" />
-    <Compile Include="Brushes_Pens.cs" />
-    <Compile Include="CombineMode.cs" />
-    <Compile Include="DashStyle.cs" />
-    <Compile Include="MemMx.cs" />
-    <Compile Include="NativeMemMx.cs" />
-    <Compile Include="Region.cs" />
-    <Compile Include="RenderVx.cs" />
-    <Compile Include="VertexCommandAndOrientation.cs" />
-    <Compile Include="VertexStore.cs" />
+    <Compile Include="AffineMat.cs" />
+    <Compile Include="Color.cs" />
+    <Compile Include="CRC32Calculator.cs" />
     <Compile Include="ExtensionAttribute.cs" />
-    <Compile Include="Painter.cs" />
+    <Compile Include="Image.cs" />
+    <Compile Include="ImageBinder.cs" />
+    <Compile Include="LenAndLenUnit.cs" />
+    <Compile Include="RequestFont.cs" />
+    <Compile Include="TextMeasurement.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="System" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\PixelFarm.PrimitiveDrawing\PixelFarm.PrimitiveDrawing.csproj">
-      <Project>{112196ba-8717-4435-baf1-5014c2e05cfd}</Project>
-      <Name>PixelFarm.PrimitiveDrawing</Name>
-    </ProjectReference>
     <ProjectReference Include="..\PixelFarm.PrimitiveGeo\PixelFarm.PrimitiveGeo.csproj">
       <Project>{b951ff5b-d7a0-4259-880d-cb7a0c001956}</Project>
       <Name>PixelFarm.PrimitiveGeo</Name>

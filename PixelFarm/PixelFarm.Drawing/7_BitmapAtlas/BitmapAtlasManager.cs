@@ -123,8 +123,27 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                 string textureInfoFile = atlasName + ".info";
                 string textureImgFilename = atlasName + ".png";
                 //check if the file exist
-
-                if (StorageService.Provider.DataExists(textureInfoFile) &&
+                if (InMemStorage.TryGetBuffer(textureInfoFile, out byte[] texture_info) &&
+                    InMemStorage.TryGetBuffer(textureImgFilename, out byte[] img_buffer))
+                {
+                    SimpleBitmapAtlasBuilder atlasBuilder = new SimpleBitmapAtlasBuilder();
+                    using (System.IO.Stream fontAtlasTextureInfo = new MemoryStream(texture_info))
+                    using (System.IO.Stream fontImgStream = new MemoryStream(img_buffer))
+                    {
+                        try
+                        {
+                            List<SimpleBitmapAtlas> atlasList = atlasBuilder.LoadAtlasInfo(fontAtlasTextureInfo);
+                            foundAtlas = atlasList[0];
+                            foundAtlas.SetMainBitmap(MemBitmap.LoadBitmap(fontImgStream), true);
+                            _createdAtlases.Add(atlasName, foundAtlas);
+                        }
+                        catch (Exception ex)
+                        {
+                            throw ex;
+                        }
+                    }
+                }
+                else if (StorageService.Provider.DataExists(textureInfoFile) &&
                     StorageService.Provider.DataExists(textureImgFilename))
                 {
                     SimpleBitmapAtlasBuilder atlasBuilder = new SimpleBitmapAtlasBuilder();

@@ -1,12 +1,19 @@
 ﻿//BSD, 2014-present, WinterDev
 //MIT, 2018-present, WinterDev
 using System;
-
 namespace PixelFarm.Drawing
 {
     public delegate void LoadImageFunc(ImageBinder binder);
+    public enum BitmapBufferFormat
+    {
+        BGRA, //eg. System.Drawing.Bitmap
+        BGR, //eg. Native Windows GDI surface
+        RGBA, //eg. OpenGL 
 
-    public class ImageBinder : BitmapBufferProvider
+        RGBO, //my extension, 32 bits RGB ignore Alpha, assume its value= 1
+    }
+
+    public class ImageBinder : Image
     {
 
         /// <summary>
@@ -31,29 +38,17 @@ namespace PixelFarm.Drawing
             _isLocalImgOwner = isMemBmpOwner; //if true=> this binder will release a local cahed img
         }
 
-        public ImageBinder(PixelFarm.CpuBlit.MemBitmap memBmp, bool isMemBmpOwner = false)
+
+        public ImageBinder(PixelFarm.Drawing.Image img, bool isMemBmpOwner = false)
         {
 #if DEBUG
-            if (memBmp == null)
+            if (img == null)
             {
                 throw new NotSupportedException();
             }
 #endif
             //binder to image
-            _localImg = memBmp;
-            _isLocalImgOwner = isMemBmpOwner; //if true=> this binder will release a local cahed img
-            this.State = BinderState.Loaded;
-        }
-        public ImageBinder(PixelFarm.Drawing.Image otherImg, bool isMemBmpOwner = false)
-        {
-#if DEBUG
-            if (otherImg == null)
-            {
-                throw new NotSupportedException();
-            }
-#endif
-            //binder to image
-            _localImg = otherImg;
+            _localImg = img;
             _isLocalImgOwner = isMemBmpOwner; //if true=> this binder will release a local cahed img
             this.State = BinderState.Loaded;
         }
@@ -71,16 +66,13 @@ namespace PixelFarm.Drawing
 
             }
         }
-
-#if DEBUG
-        public override void dbugNotifyUsage()
-        {
-        }
-#endif
-        public override void ReleaseLocalBitmapIfRequired()
+        public virtual void ReleaseLocalBitmapIfRequired()
         {
 
         }
+        public BitmapBufferFormat BitmapFormat { get; set; }
+
+        public virtual bool IsYFlipped { get; set; }
         /// <summary>
         /// preview img size is an expected(assume) img of original img, 
         /// but it may not equal to the actual size after img is loaded.
@@ -107,7 +99,21 @@ namespace PixelFarm.Drawing
         /// read already loaded img
         /// </summary>
         public PixelFarm.Drawing.Image LocalImage => _localImg;
-
+        public override void ReleaseRawBufferHead(IntPtr ptr)
+        {
+            if (_localImg != null)
+            {
+                _localImg.ReleaseRawBufferHead(ptr);
+            }
+        }
+        public override IntPtr GetRawBufferHead()
+        {
+            if (_localImg != null)
+            {
+                return _localImg.GetRawBufferHead();
+            }
+            return IntPtr.Zero;
+        }
         public void ClearLocalImage()
         {
             this.State = BinderState.Unloading;//reset this to unload?
@@ -124,6 +130,7 @@ namespace PixelFarm.Drawing
             //TODO: review here
             this.State = BinderState.Unload;//reset this to unload?
         }
+
         public override void Dispose()
         {
             if (this.State == BinderState.Loaded)
@@ -131,6 +138,7 @@ namespace PixelFarm.Drawing
                 ClearLocalImage();
             }
         }
+
 
         public override int Width => (_localImg != null) ? _localImg.Width : _previewImgWidth; //default?
 
@@ -147,7 +155,7 @@ namespace PixelFarm.Drawing
             {
                 _localImg = image;
                 this.State = BinderState.Loaded;
-               
+
 
                 if (raiseEvent)
                 {
@@ -181,37 +189,27 @@ namespace PixelFarm.Drawing
         {
             _lazyLoadImgFunc?.Invoke(this);
         }
-        public override IntPtr GetRawBufferHead()
-        {
 
-            PixelFarm.CpuBlit.MemBitmap bmp = _localImg as PixelFarm.CpuBlit.MemBitmap;
-            if (bmp != null)
-            {
-                return PixelFarm.CpuBlit.MemBitmap.GetBufferPtr(bmp).Ptr;
-            }
 
-            return IntPtr.Zero;
-        }
-        public override void ReleaseBufferHead()
-        {
+#if DEBUG
+        public void dbugNotifyUsage() { }
+#endif
 
-        }
-
-        public override bool IsYFlipped => false;
         //
         public static readonly ImageBinder NoImage = new NoImageImageBinder();
         public virtual bool IsAtlasImage => false;
+
+        public override bool IsReferenceImage => true;
+
+        public override int ReferenceX => 0;
+
+        public override int ReferenceY => 0;
 
         class NoImageImageBinder : ImageBinder
         {
             public NoImageImageBinder()
             {
                 this.State = BinderState.Blank;
-            }
-            public override IntPtr GetRawBufferHead() => IntPtr.Zero;
-
-            public override void ReleaseBufferHead()
-            {
             }
         }
     }
@@ -226,4 +224,5 @@ namespace PixelFarm.Drawing
         Blank
     }
 
+     
 }

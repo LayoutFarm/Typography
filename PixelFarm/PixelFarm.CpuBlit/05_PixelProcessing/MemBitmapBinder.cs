@@ -4,7 +4,7 @@ using System;
 namespace PixelFarm.Drawing
 {
 
-    public sealed class MemBitmapBinder : BitmapBufferProvider
+    public sealed class MemBitmapBinder : ImageBinder
     {
         PixelFarm.CpuBlit.MemBitmap _memBmp;
         bool _isMemBmpOwner;
@@ -20,25 +20,13 @@ namespace PixelFarm.Drawing
         {
             _releaseLocalBmpIfRequired = true;
         }
-#if DEBUG
-        public override void dbugNotifyUsage()
-        {
-        }
-#endif
+
         //
         public override int Width => _memBmp.Width;
         public override int Height => _memBmp.Height;
         //
         public override bool IsYFlipped => false;
-        //
-        public override IntPtr GetRawBufferHead()
-        {
-            if (_memBmp == null)
-            {
-                return IntPtr.Zero;
-            }
-            return PixelFarm.CpuBlit.MemBitmap.GetBufferPtr(_memBmp).Ptr;
-        }
+        // 
         public override void Dispose()
         {
             if (_memBmp != null)
@@ -50,10 +38,5 @@ namespace PixelFarm.Drawing
                 _memBmp = null;
             }
         }
-        public override void ReleaseBufferHead()
-        {
-
-        }
-
     }
 }
