@@ -1,7 +1,6 @@
 ﻿//BSD, 2014-present, WinterDev
 //MIT, 2018-present, WinterDev
 using System;
-
 namespace PixelFarm.Drawing
 {
     public delegate void LoadImageFunc(ImageBinder binder);
@@ -102,7 +101,7 @@ namespace PixelFarm.Drawing
         public PixelFarm.Drawing.Image LocalImage => _localImg;
         public override void ReleaseRawBufferHead(IntPtr ptr)
         {
-            if(_localImg != null)
+            if (_localImg != null)
             {
                 _localImg.ReleaseRawBufferHead(ptr);
             }
@@ -225,4 +224,5 @@ namespace PixelFarm.Drawing
         Blank
     }
 
+     
 }

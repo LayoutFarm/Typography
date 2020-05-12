@@ -1,7 +1,11 @@
 ﻿//BSD, 2014-present, WinterDev
 //MIT, 2018-present, WinterDev
 using System;
+using System.CodeDom;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
+
 namespace PixelFarm.Platforms
 {
     public abstract class StorageServiceProvider
@@ -33,4 +37,27 @@ namespace PixelFarm.Platforms
         }
         public static StorageServiceProvider Provider => s_provider;
     }
+
+
+
+    public static class InMemStorage
+    {
+        //when T is an owner of module        
+        static Dictionary<string, byte[]> _data = new Dictionary<string, byte[]>();
+
+        public static void AddData(string name, byte[] buffer)
+        {
+            _data.Add(name, buffer);
+        }
+        
+        public static bool TryGetBuffer(string name, out byte[] buffer)
+        {
+            return _data.TryGetValue(name, out buffer);
+        }
+        public static void Clear()
+        {
+            _data.Clear();
+        }
+    }
+
 }
