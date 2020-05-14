@@ -1274,6 +1274,10 @@ namespace Typography.OpenFont.CFF
                     default:
                         {
 
+#if DEBUG
+                            System.Diagnostics.Debug.WriteLine("cff_pri_dic:" + dicEntry._operator.Name);
+#endif
+
                         }
                         break;
                 }
