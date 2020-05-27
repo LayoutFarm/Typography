@@ -43,6 +43,12 @@ namespace Typography.OpenFont.Tables
 
     //from https://docs.microsoft.com/en-us/typography/opentype/spec/cff
     //This table contains a Compact Font Format font representation (also known as a PostScript Type 1, or CIDFont)
+    //and is structured according to
+    //Adobe Technical Note #5176: “The Compact Font Format Specification,” (https://wwwimages2.adobe.com/content/dam/acom/en/devnet/font/pdfs/5176.CFF.pdf)
+    //and 
+    //Adobe Technical Note #5177: “Type 2 Charstring Format.” (https://wwwimages2.adobe.com/content/dam/acom/en/devnet/font/pdfs/5177.Type2.pdf)
+
+
     //...
     // ... glyph data is accessed through the CharStrings INDEX of the CFF table.
 
@@ -51,6 +57,11 @@ namespace Typography.OpenFont.Tables
     //The numGlyphs field in the 'maxp' table must be the same as the number of entries in the CFF's CharStrings INDEX. 
     //The OpenType font glyph index is the same as the CFF glyph index for all glyphs in the font.
 
+    //Note that, in an OpenType font collection file, a single 'CFF ' table can be shared across multiple fonts;
+    //names used by applications must be those provided in the 'name' table, not the Name INDEX entry.
+    //The CFF Top DICT must specify a CharstringType value of 2. 
+    //The numGlyphs field in the 'maxp' table must be the same as the number of entries in the CFF’s CharStrings INDEX.
+    //The OpenType font glyph index is the same as the CFF glyph index for all glyphs in the font.
 
     class CFFTable : TableEntry
     {

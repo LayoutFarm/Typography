@@ -473,14 +473,18 @@ namespace Typography.OpenFont.CFF
         internal List<byte[]> _localSubrRawBufferList;
         internal List<byte[]> _globalSubrRawBufferList;
 
-
-        //internal List<Type2GlyphInstructionList> _localSubrs;
-        //internal List<Type2GlyphInstructionList> _globalSubrs;
-
         internal int _defaultWidthX;
         internal int _nominalWidthX;
 
         Dictionary<string, Glyph> _cachedGlyphDicByName;
+
+#if DEBUG
+        public Cff1Font()
+        {
+        }
+
+#endif
+
         public Glyph GetGlyphByName(string name)
         {
             if (_cachedGlyphDicByName == null)
@@ -646,8 +650,8 @@ namespace Typography.OpenFont.CFF
             //a further restriction on the font name length of 63 characters.
 
             //Note 3
-            //For compatibility with earlier PostSc
-            //ript interpreters, see Technical Note
+            //For compatibility with earlier PostScript
+            //interpreters, see Technical Note
             //#5088, “Font Naming Issues.”
 
             //A font may be deleted from a FontSet without removing its data
