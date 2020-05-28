@@ -65,6 +65,14 @@ namespace Typography.OpenFont
         public bool IsWebFont { get; internal set; }
         public bool IsFontCollection => _ttcfMembers != null;
 
+        public string PostScriptName { get; set; }
+        public string UniqueFontIden { get; set; }
+        public string VersionString { get; set; }
+        public uint UnicodeRange1 { get; set; }
+        public uint UnicodeRange2 { get; set; }
+        public uint UnicodeRange3 { get; set; }
+        public uint UnicodeRange4 { get; set; }
+
         /// <summary>
         /// get font collection's member count
         /// </summary>
@@ -338,7 +346,17 @@ namespace Typography.OpenFont
               nameEntry.TypographicFamilyName,
               nameEntry.TypographyicSubfamilyName,
               os2Table.usWeightClass,
-              Extensions.TypefaceExtensions.TranslatedOS2FontStyle(os2Table));
+              Extensions.TypefaceExtensions.TranslatedOS2FontStyle(os2Table))
+            {
+                PostScriptName = nameEntry.PostScriptName,
+                UniqueFontIden = nameEntry.UniqueFontIden,
+                VersionString = nameEntry.VersionString,
+                UnicodeRange1 = os2Table.ulUnicodeRange1,
+                UnicodeRange2 = os2Table.ulUnicodeRange2,
+                UnicodeRange3 = os2Table.ulUnicodeRange3,
+                UnicodeRange4 = os2Table.ulUnicodeRange4,
+            };
+
         }
         internal Typeface ReadTableEntryCollection(TableEntryCollection tables, BinaryReader input)
         {

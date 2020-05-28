@@ -134,6 +134,9 @@ namespace Typography.OpenFont
 
         public string Name => _nameEntry.FontName;
         public string FontSubFamily => _nameEntry.FontSubFamily;
+        public string PostScriptName => _nameEntry.PostScriptName;
+        public string VersionString => _nameEntry.VersionString;
+        public string UniqueFontIden => _nameEntry.UniqueFontIden;
 
         public int GlyphCount => _glyphs.Length;
 
@@ -440,6 +443,40 @@ namespace Typography.OpenFont
         {
 
 
+            public static bool DoesSupportUnicode(
+                this PreviewFontInfo previewFontInfo,
+                UnicodeLangBits unicodeLangBits)
+            {
+              
+                long bits = (long)unicodeLangBits;
+                int bitpos = (int)(bits >> 32);
+
+                if (bitpos == 0)
+                {
+                    return true; //default
+                }
+                else if (bitpos < 32)
+                {
+                    //use range 1
+                    return (previewFontInfo.UnicodeRange1 & (1 << bitpos)) != 0;
+                }
+                else if (bitpos < 64)
+                {
+                    return (previewFontInfo.UnicodeRange2 & (1 << (bitpos - 32))) != 0;
+                }
+                else if (bitpos < 96)
+                {
+                    return (previewFontInfo.UnicodeRange3 & (1 << (bitpos - 64))) != 0;
+                }
+                else if (bitpos < 128)
+                {
+                    return (previewFontInfo.UnicodeRange4 & (1 << (bitpos - 96))) != 0;
+                }
+                else
+                {
+                    throw new System.NotSupportedException();
+                }
+            }
             public static bool DoesSupportUnicode(
                 this Typeface typeface,
                 UnicodeLangBits unicodeLangBits)
