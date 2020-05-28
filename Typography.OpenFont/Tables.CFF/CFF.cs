@@ -494,6 +494,15 @@ namespace Typography.OpenFont.CFF
 
         Dictionary<string, Glyph> _cachedGlyphDicByName;
 
+        public string Version { get; set; } //CFF SID
+        public string Notice { get; set; }//CFF SID
+        public string CopyRight { get; set; }//CFF SID
+        public string FullName { get; set; }//CFF SID        
+        public string FamilyName { get; set; }//CFF SID
+        public string Weight { get; set; }//CFF SID 
+        public double UnderlinePosition { get; set; }
+        public double UnderlineThickness { get; set; }
+        public double[] FontBBox { get; set; }
 #if DEBUG
         public Cff1Font()
         {
@@ -619,17 +628,20 @@ namespace Typography.OpenFont.CFF
 
 
 
+
         public void ParseAfterHeader(uint cffStartAt, BinaryReader reader)
         {
             _cffStartAt = cffStartAt;
             _cff1FontSet = new Cff1FontSet();
             _cidFontInfo = new CIDFontInfo();
 
+
             _reader = reader;
             //
             ReadNameIndex();
             ReadTopDICTIndex();
             ReadStringIndex();
+            ResolveTopDictInfo();
             ReadGlobalSubrIndex();
 
             //---------------------- 
@@ -729,6 +741,7 @@ namespace Typography.OpenFont.CFF
             //A font is identified by an entry in the Name INDEX and its data
             //is accessed via the corresponding Top DICT
             CffIndexOffset[] offsets = ReadIndexDataOffsets();
+
             //9. Top DICT Data
             //The names of the Top DICT operators shown in 
             //Table 9 are, where possible, the same as the corresponding Type 1 dict key. 
@@ -745,8 +758,6 @@ namespace Typography.OpenFont.CFF
                 //TODO: review here again
                 throw new NotSupportedException();
             }
-
-            //
             for (int i = 0; i < count; ++i)
             {
                 //read DICT data
@@ -756,69 +767,19 @@ namespace Typography.OpenFont.CFF
             }
 
 
-            //translate top-dic***
-
-            foreach (CffDataDicEntry entry in _topDic)
-            {
-                switch (entry._operator.Name)
-                {
-                    default:
-
-                        break;
-                    case "CharStrings":
-                        _charStringsOffset = (int)entry.operands[0]._realNumValue;
-                        break;
-                    case "charset":
-                        _charsetOffset = (int)entry.operands[0]._realNumValue;
-                        break;
-                    case "Encoding":
-                        _encodingOffset = (int)entry.operands[0]._realNumValue;
-                        break;
-                    case "Private":
-                        //private DICT size and offset
-                        _privateDICTLen = (int)entry.operands[0]._realNumValue;
-                        _privateDICTOffset = (int)entry.operands[1]._realNumValue;
-                        break;
-                    case "ROS":
-                        //http://wwwimages.adobe.com/www.adobe.com/content/dam/acom/en/devnet/font/pdfs/5176.CFF.pdf
-                        //A CFF CIDFont has the CIDFontName in the Name INDEX and a corresponding Top DICT. 
-                        //The Top DICT begins with ROS operator which specifies the Registry-Ordering - Supplement for the font.
-                        //This will indicate to a CFF parser that special CID processing should be applied to this font. Specifically:
-
-                        //ROS operator combines the Registry, Ordering, and Supplement keys together.
-
-                        //see Adobe Cmap resource , https://github.com/adobe-type-tools/cmap-resources
-
-                        _cidFontInfo.ROS_0 = (int)entry.operands[0]._realNumValue;
-                        _cidFontInfo.ROS_1 = (int)entry.operands[1]._realNumValue;
-                        break;
-                    case "CIDFontVersion":
-                        _cidFontInfo.CIDFontVersion = entry.operands[0]._realNumValue;
-                        break;
-                    case "CIDCount":
-                        _cidFontInfo.CIDFountCount = (int)entry.operands[0]._realNumValue;
-                        break;
-                    case "FDSelect":
-                        _cidFontInfo.FDSelect = (int)entry.operands[0]._realNumValue;
-                        break;
-                    case "FDArray":
-                        _cidFontInfo.FDArray = (int)entry.operands[0]._realNumValue;
-                        break;
-                }
-            }
         }
 
         string[] _uniqueStringTable;
-
         struct CIDFontInfo
         {
-            public int ROS_0;
-            public int ROS_1;
+            public string ROS_Register;
+            public string ROS_Ordering;
+            public string ROS_Supplement;
+
             public double CIDFontVersion;
             public int CIDFountCount;
             public int FDSelect;
             public int FDArray;
-
 
             public int fdSelectFormat;
             public FDRange3[] fdRanges;
@@ -872,9 +833,8 @@ namespace Typography.OpenFont.CFF
             if (offsets == null) return;
             //
 
-            int count = offsets.Length;
-            _uniqueStringTable = new string[count];
-            for (int i = 0; i < count; ++i)
+            _uniqueStringTable = new string[offsets.Length];
+            for (int i = 0; i < offsets.Length; ++i)
             {
                 CffIndexOffset offset = offsets[i];
                 //TODO: review here again, 
@@ -885,7 +845,118 @@ namespace Typography.OpenFont.CFF
 
             _cff1FontSet._uniqueStringTable = _uniqueStringTable;
         }
+        string GetSid(int sid)
+        {
+            if (sid <= Cff1FontSet.N_STD_STRINGS)
+            {
+                //use standard name
+                //TODO: review here
+                return Cff1FontSet.s_StdStrings[sid];
+            }
+            else
+            {
+                if (sid - Cff1FontSet.N_STD_STRINGS - 1 < _uniqueStringTable.Length)
+                {
+                    return _uniqueStringTable[sid - Cff1FontSet.N_STD_STRINGS - 1];
+                }
+                else
+                {
+                    return null;
+                }
+            }
+        }
 
+        void ResolveTopDictInfo()
+        {
+
+            //translate top-dic***
+            foreach (CffDataDicEntry entry in _topDic)
+            {
+                switch (entry._operator.Name)
+                {
+                    default:
+                        {
+#if DEBUG
+                            System.Diagnostics.Debug.WriteLine("topdic:" + entry._operator.Name);
+#endif
+                        }
+                        break;
+                    case "XUID": break;//nothing
+                    case "version":
+                        _currentCff1Font.Version = GetSid((int)entry.operands[0]._realNumValue);
+                        break;
+                    case "Notice":
+                        _currentCff1Font.Notice = GetSid((int)entry.operands[0]._realNumValue);
+                        break;
+                    case "Copyright":
+                        _currentCff1Font.CopyRight = GetSid((int)entry.operands[0]._realNumValue);
+                        break;
+                    case "FullName":
+                        _currentCff1Font.FullName = GetSid((int)entry.operands[0]._realNumValue);
+                        break;
+                    case "FamilyName":
+                        _currentCff1Font.FamilyName = GetSid((int)entry.operands[0]._realNumValue);
+                        break;
+                    case "Weight":
+                        _currentCff1Font.Weight = GetSid((int)entry.operands[0]._realNumValue);
+                        break;
+                    case "UnderlinePosition":
+                        _currentCff1Font.UnderlinePosition = entry.operands[0]._realNumValue;
+                        break;
+                    case "UnderlineThickness":
+                        _currentCff1Font.UnderlineThickness = entry.operands[0]._realNumValue;
+                        break;
+                    case "FontBBox":
+                        _currentCff1Font.FontBBox = new double[] {
+                            entry.operands[0]._realNumValue,
+                            entry.operands[1]._realNumValue,
+                            entry.operands[2]._realNumValue,
+                            entry.operands[3]._realNumValue};
+                        break;
+                    case "CharStrings":
+                        _charStringsOffset = (int)entry.operands[0]._realNumValue;
+                        break;
+                    case "charset":
+                        _charsetOffset = (int)entry.operands[0]._realNumValue;
+                        break;
+                    case "Encoding":
+                        _encodingOffset = (int)entry.operands[0]._realNumValue;
+                        break;
+                    case "Private":
+                        //private DICT size and offset
+                        _privateDICTLen = (int)entry.operands[0]._realNumValue;
+                        _privateDICTOffset = (int)entry.operands[1]._realNumValue;
+                        break;
+                    case "ROS":
+                        //http://wwwimages.adobe.com/www.adobe.com/content/dam/acom/en/devnet/font/pdfs/5176.CFF.pdf
+                        //A CFF CIDFont has the CIDFontName in the Name INDEX and a corresponding Top DICT. 
+                        //The Top DICT begins with ROS operator which specifies the Registry-Ordering - Supplement for the font.
+                        //This will indicate to a CFF parser that special CID processing should be applied to this font. Specifically:
+
+                        //ROS operator combines the Registry, Ordering, and Supplement keys together.
+
+                        //see Adobe Cmap resource , https://github.com/adobe-type-tools/cmap-resources
+
+                        _cidFontInfo.ROS_Register = GetSid((int)entry.operands[0]._realNumValue);
+                        _cidFontInfo.ROS_Ordering = GetSid((int)entry.operands[1]._realNumValue);
+                        _cidFontInfo.ROS_Supplement = GetSid((int)entry.operands[2]._realNumValue);
+
+                        break;
+                    case "CIDFontVersion":
+                        _cidFontInfo.CIDFontVersion = entry.operands[0]._realNumValue;
+                        break;
+                    case "CIDCount":
+                        _cidFontInfo.CIDFountCount = (int)entry.operands[0]._realNumValue;
+                        break;
+                    case "FDSelect":
+                        _cidFontInfo.FDSelect = (int)entry.operands[0]._realNumValue;
+                        break;
+                    case "FDArray":
+                        _cidFontInfo.FDArray = (int)entry.operands[0]._realNumValue;
+                        break;
+                }
+            }
+        }
         void ReadGlobalSubrIndex()
         {
             //16. Local / Global Subrs INDEXes
@@ -1003,18 +1074,7 @@ namespace Typography.OpenFont.CFF
             int nGlyphs = cff1Glyphs.Length;
             for (int i = 1; i < nGlyphs; ++i)
             {
-
-                ushort sid = _reader.ReadUInt16();
-                if (sid <= Cff1FontSet.N_STD_STRINGS)
-                {
-                    //use standard name
-                    //TODO: review here
-                    cff1Glyphs[i]._cff1GlyphData.Name = Cff1FontSet.s_StdStrings[sid];
-                }
-                else
-                {
-                    cff1Glyphs[i]._cff1GlyphData.Name = _uniqueStringTable[sid - Cff1FontSet.N_STD_STRINGS - 1];
-                }
+                cff1Glyphs[i]._cff1GlyphData.Name = GetSid(_reader.ReadUInt16());
             }
         }
         void ReadCharsetsFormat1()
@@ -1260,7 +1320,7 @@ namespace Typography.OpenFont.CFF
                         case "FontName":
                             name = (int)entry.operands[0]._realNumValue;
                             break;
-                        case "Private": //private dic?
+                        case "Private": //private dic
                             size = (int)entry.operands[0]._realNumValue;
                             offset = (int)entry.operands[1]._realNumValue;
                             break;
