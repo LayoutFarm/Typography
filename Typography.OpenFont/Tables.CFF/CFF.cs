@@ -786,6 +786,9 @@ namespace Typography.OpenFont.CFF
                         //This will indicate to a CFF parser that special CID processing should be applied to this font. Specifically:
 
                         //ROS operator combines the Registry, Ordering, and Supplement keys together.
+
+                        //see Adobe Cmap resource , https://github.com/adobe-type-tools/cmap-resources
+
                         _cidFontInfo.ROS_0 = (int)entry.operands[0]._realNumValue;
                         _cidFontInfo.ROS_1 = (int)entry.operands[1]._realNumValue;
                         break;
