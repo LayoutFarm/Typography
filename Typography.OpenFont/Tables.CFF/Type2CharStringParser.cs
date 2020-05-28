@@ -789,7 +789,7 @@ namespace Typography.OpenFont.CFF
                                 {
                                     ParseType2CharStringBuffer(_currentCff1Font._localSubrRawBufferList[inst.Value + _localSubrBias]);
                                 }
-                                else if (_currentCff1Font._cidFontDict != null)
+                                else if (_currentFontDict != null)
                                 {
                                     //use private dict
                                     ParseType2CharStringBuffer(_currentFontDict.LocalSubr[inst.Value + _localSubrBias]);
