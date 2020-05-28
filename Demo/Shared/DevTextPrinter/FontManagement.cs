@@ -10,7 +10,6 @@ namespace Typography.TextServices
 
     public class InstalledFont
     {
-        PreviewFontInfo _previewFontInfo;
         internal InstalledFont(PreviewFontInfo previewFontInfo, string fontPath)
         {
             FontName = previewFontInfo.Name;
