@@ -86,8 +86,10 @@ namespace Typography.OpenFont.Tables
             switch (version)
             {
                 case 0x00010000: //version 1
-                case 0x00030000: //version3
                     Version = 1;
+                    break;
+                case 0x00030000: //version3
+                    Version = 3;
                     break;
                 case 0x00020000: //version 2
                     {

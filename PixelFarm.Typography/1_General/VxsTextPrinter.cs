@@ -196,6 +196,7 @@ namespace PixelFarm.Drawing
 
         public override void DrawFromGlyphPlans(GlyphPlanSequence seq, int startAt, int len, float left, float top)
         {
+            if (_currentTypeface == null) return;
 
             float baseLine = top;
             switch (TextBaseline)

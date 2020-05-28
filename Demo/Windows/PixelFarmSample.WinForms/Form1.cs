@@ -126,8 +126,7 @@ namespace SampleWinForms
             };
         }
 
-
-        void RenderByGlyphName(string selectedGlyphName)
+        void RenderByGlyphIndex(ushort selectedGlyphIndex)
         {
             //---------------------------------------------
             //this version only render with MiniAgg**
@@ -160,8 +159,7 @@ namespace SampleWinForms
 
             //in this version
             //create a glyph-plan manully
-            ushort selectedGlyphIndex =
-                glyphNameListUserControl1.Typeface.GetGlyphIndexByName(selectedGlyphName);
+
 
             glyphPlanList.Append(
                 new Typography.TextLayout.UnscaledGlyphPlan(0, selectedGlyphIndex, 0, 0, 0));
@@ -185,6 +183,7 @@ namespace SampleWinForms
             _g.Clear(System.Drawing.Color.White);
             _g.DrawImage(_winBmp, new System.Drawing.Point(10, 0));
         }
+        void RenderByGlyphName(string selectedGlyphName) => RenderByGlyphIndex(glyphNameListUserControl1.Typeface.GetGlyphIndexByName(selectedGlyphName));
 
         bool _readyToRender;
 
@@ -250,7 +249,7 @@ namespace SampleWinForms
                 _winBmp = new Bitmap(_destImg.Width, _destImg.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
                 _g = this.CreateGraphics();
 
-                _painter.CurrentFont = new PixelFarm.Drawing.RequestFont("tahoma", 14); 
+                _painter.CurrentFont = new PixelFarm.Drawing.RequestFont("tahoma", 14);
 
                 _textService = new PixelFarm.Drawing.OpenFontTextService();
                 _textService.LoadFontsFromFolder("../../../TestFonts");
@@ -621,11 +620,20 @@ namespace SampleWinForms
             button1.Click += (s, e) => UpdateRenderOutput();
 
             //
-            this.glyphNameListUserControl1.GlyphNameChanged += (s, e) =>
+            this.glyphNameListUserControl1.GlyphChanged += (s, e) =>
             {
                 //test render 
                 //just our convention by add & and ;
-                RenderByGlyphName(glyphNameListUserControl1.SelectedGlyphName);
+
+                if (this.glyphNameListUserControl1.RenderByGlyphName)
+                {
+                    RenderByGlyphName(glyphNameListUserControl1.SelectedGlyphName);
+                }
+                else
+                {
+                    //render by glyph index
+                    RenderByGlyphIndex(glyphNameListUserControl1.SelectedGlyphIndex);
+                } 
             };
             //----------------
             //string inputstr = "ก้า";
