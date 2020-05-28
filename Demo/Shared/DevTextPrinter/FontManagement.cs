@@ -10,20 +10,20 @@ namespace Typography.TextServices
 
     public class InstalledFont
     {
-        internal InstalledFont(string fontName,
-            string fontSubFamily,
-            string typographicFontName,
-            string typographicfontSubFamily,
-            string fontPath,
-            ushort weight)
+        PreviewFontInfo _previewFontInfo;
+        internal InstalledFont(PreviewFontInfo previewFontInfo, string fontPath)
         {
-            FontName = fontName;
-            FontSubFamily = fontSubFamily;
-            TypographicFontName = typographicFontName;
-            TypographicFontSubFamily = typographicfontSubFamily;
-
+            FontName = previewFontInfo.Name;
+            FontSubFamily = previewFontInfo.SubFamilyName;
+            TypographicFontName = previewFontInfo.TypographicFamilyName;
+            TypographicFontSubFamily = previewFontInfo.TypographicSubFamilyName;
+            Weight = previewFontInfo.Weight;
             FontPath = fontPath;
-            Weight = weight;
+
+            UnicodeRange1 = previewFontInfo.UnicodeRange1;
+            UnicodeRange2 = previewFontInfo.UnicodeRange2;
+            UnicodeRange3 = previewFontInfo.UnicodeRange3;
+            UnicodeRange4 = previewFontInfo.UnicodeRange4;
         }
 
         public string FontName { get; internal set; }
@@ -32,10 +32,13 @@ namespace Typography.TextServices
         public string TypographicFontSubFamily { get; internal set; }
 
         public ushort Weight { get; internal set; }
-
         public string FontPath { get; internal set; }
         public int StreamOffset { get; internal set; }
 
+        public uint UnicodeRange1 { get; internal set; }
+        public uint UnicodeRange2 { get; internal set; }
+        public uint UnicodeRange3 { get; internal set; }
+        public uint UnicodeRange4 { get; internal set; }
 #if DEBUG
         public override string ToString()
         {
@@ -265,14 +268,7 @@ namespace Typography.TextServices
                     {
                         PreviewFontInfo member = previewFont.GetMember(i);
 
-                        if (!RegisterFont(new InstalledFont(
-                                            member.Name,
-                                            member.SubFamilyName,
-                                            member.TypographicFamilyName,
-                                            member.TypographicSubFamilyName,
-                                            src.PathName,
-                                            member.Weight)
-                        { StreamOffset = member.ActualStreamOffset }))
+                        if (!RegisterFont(new InstalledFont(member, src.PathName) { StreamOffset = member.ActualStreamOffset }))
                         {
                             passAll = false;
                         }
@@ -282,13 +278,7 @@ namespace Typography.TextServices
                 }
                 else
                 {
-                    return RegisterFont(new InstalledFont(
-                           previewFont.Name,
-                           previewFont.SubFamilyName,
-                           previewFont.TypographicFamilyName,
-                           previewFont.TypographicSubFamilyName,
-                           src.PathName,
-                           previewFont.Weight));
+                    return RegisterFont(new InstalledFont(previewFont, src.PathName));
                 }
 
             }
@@ -296,7 +286,7 @@ namespace Typography.TextServices
         bool RegisterFont(InstalledFont newfont)
         {
             FontGroup selectedFontGroup;
-            string fontsubFamUpperCaseName = newfont.FontSubFamily.ToUpper(); 
+            string fontsubFamUpperCaseName = newfont.FontSubFamily.ToUpper();
             if (!_subFamToFontGroup.TryGetValue(fontsubFamUpperCaseName, out selectedFontGroup))
             {
                 //create new group, we don't known this font group before 
@@ -306,7 +296,7 @@ namespace Typography.TextServices
                 _allFontGroups.Add(selectedFontGroup);
             }
 
-            if(newfont.TypographicFontName != newfont.FontName)
+            if (newfont.TypographicFontName != newfont.FontName)
             {
 
             }
