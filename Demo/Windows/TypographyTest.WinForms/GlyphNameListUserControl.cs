@@ -10,7 +10,7 @@ namespace TypographyTest.WinForms
     public partial class GlyphNameListUserControl : UserControl
     {
         Typeface _selectedTypeface;
-        public event EventHandler GlyphNameChanged;
+        public event EventHandler GlyphChanged;
         List<GlyphNameMapInfo> _allGlyphNameMapList = new List<GlyphNameMapInfo>();
 
 
@@ -21,6 +21,7 @@ namespace TypographyTest.WinForms
             {
                 if (listBox1.SelectedItem != null)
                 {
+                    SelectedGlyphIndex = (ushort)this.listBox1.SelectedIndex;
                     this.textBox1.Text =
                        SelectedGlyphName = ((GlyphNameMapInfo)listBox1.SelectedItem)._glyphNameMap.glyphName;
                 }
@@ -28,10 +29,7 @@ namespace TypographyTest.WinForms
                 if (chkRenderGlyph.Checked)
                 {
                     //render ...
-                    if (GlyphNameChanged != null)
-                    {
-                        GlyphNameChanged(null, EventArgs.Empty);
-                    }
+                    GlyphChanged?.Invoke(null, EventArgs.Empty);
                 }
             };
 
@@ -126,17 +124,13 @@ namespace TypographyTest.WinForms
         {
 
         }
-        public string SelectedGlyphName
-        {
-            get;
-            private set;
-        }
+        public string SelectedGlyphName { get; private set; }
+        public ushort SelectedGlyphIndex { get; private set; }
+        public bool RenderByGlyphName => chkRenderByGlyphName.Checked;
+
         public Typeface Typeface
         {
-            get
-            {
-                return _selectedTypeface;
-            }
+            get => _selectedTypeface;
             set
             {
                 _selectedTypeface = value;

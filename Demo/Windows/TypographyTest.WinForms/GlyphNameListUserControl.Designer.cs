@@ -34,6 +34,7 @@
             this.txtHexUnicode = new System.Windows.Forms.TextBox();
             this.lstUnicodes = new System.Windows.Forms.ListBox();
             this.cmdListAllUnicodes = new System.Windows.Forms.Button();
+            this.chkRenderByGlyphName = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // listBox1
@@ -88,10 +89,21 @@
             this.cmdListAllUnicodes.UseVisualStyleBackColor = true;
             this.cmdListAllUnicodes.Click += new System.EventHandler(this.cmdListAllUnicodes_Click);
             // 
+            // chkRenderByGlyphName
+            // 
+            this.chkRenderByGlyphName.AutoSize = true;
+            this.chkRenderByGlyphName.Location = new System.Drawing.Point(3, 321);
+            this.chkRenderByGlyphName.Name = "chkRenderByGlyphName";
+            this.chkRenderByGlyphName.Size = new System.Drawing.Size(133, 17);
+            this.chkRenderByGlyphName.TabIndex = 6;
+            this.chkRenderByGlyphName.Text = "Render by GlyphName";
+            this.chkRenderByGlyphName.UseVisualStyleBackColor = true;
+            // 
             // GlyphNameListUserControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.chkRenderByGlyphName);
             this.Controls.Add(this.cmdListAllUnicodes);
             this.Controls.Add(this.lstUnicodes);
             this.Controls.Add(this.txtHexUnicode);
@@ -114,5 +126,6 @@
         private System.Windows.Forms.TextBox txtHexUnicode;
         private System.Windows.Forms.ListBox lstUnicodes;
         private System.Windows.Forms.Button cmdListAllUnicodes;
+        private System.Windows.Forms.CheckBox chkRenderByGlyphName;
     }
 }
