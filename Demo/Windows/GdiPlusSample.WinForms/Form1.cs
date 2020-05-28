@@ -80,10 +80,18 @@ namespace SampleWinForms
             //
             _typefaceStore = new TypefaceStore();
             _typefaceStore.FontCollection = installedFontCollection;
+            installedFontCollection.UpdateUnicodeRanges();
+
             //set default font for current text printer
             _currentTextPrinter.Typeface = _typefaceStore.GetTypeface(selectedFF);
             //---------- 
+#if DEBUG
+            //test get font from typeface store
 
+            InstalledFont instFont = installedFontCollection.GetFontByPostScriptName("SourceSansPro-Regular");
+
+
+#endif
 
             if (selected_index < 0) { selected_index = 0; }
             lstFontList.SelectedIndex = selected_index;
@@ -180,7 +188,7 @@ namespace SampleWinForms
         {
             bool flipY = chkFlipY.Checked;
 
-           
+
 
             //set some Gdi+ props... 
             g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
@@ -188,11 +196,11 @@ namespace SampleWinForms
 
             Typography.OpenFont.Typeface typeface = _currentTextPrinter.Typeface;
             Typography.OpenFont.TypefaceExtension2.UpdateAllCffGlyphBounds(typeface);
-            
 
-            float pxscale = typeface.CalculateScaleToPixelFromPointSize(_currentTextPrinter.FontSizeInPoints); 
+
+            float pxscale = typeface.CalculateScaleToPixelFromPointSize(_currentTextPrinter.FontSizeInPoints);
             int lineSpacing = (int)System.Math.Ceiling((double)typeface.CalculateLineSpacing(LineSpacingChoice.TypoMetric) * pxscale);
-            
+
 
             if (flipY)
             {
@@ -211,7 +219,7 @@ namespace SampleWinForms
             _currentTextPrinter.UpdateGlyphLayoutSettings();
 
             //render at specific pos
-            float x_pos = 0, y_pos = lineSpacing * 2; 
+            float x_pos = 0, y_pos = lineSpacing * 2;
 
             char[] textBuffer = txtInputChar.Text.ToCharArray();
 
