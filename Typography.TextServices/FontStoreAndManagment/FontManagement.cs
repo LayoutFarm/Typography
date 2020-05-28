@@ -408,7 +408,14 @@ namespace Typography.FontManagement
             {
                 //in this case, the code above register the typeface with TypographicFamilyName
                 //so we register this typeface with original name too
-                _otherFontNames.Add(newTypeface.FontName.ToUpper(), newTypeface);
+                if (_otherFontNames.ContainsKey(newTypeface.FontName.ToUpper()))
+                {
+                    System.Diagnostics.Debug.WriteLine("duplicated font name?:" + newTypeface.FontName.ToUpper());
+                }
+                else
+                {
+                    _otherFontNames.Add(newTypeface.FontName.ToUpper(), newTypeface);
+                }
             }
 
             return register_result;

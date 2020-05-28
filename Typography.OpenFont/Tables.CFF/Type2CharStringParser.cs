@@ -405,6 +405,8 @@ namespace Typography.OpenFont.CFF
         internal void ChangeFirstInstToGlyphWidthValue()
         {
             //check the first element must be loadint
+            if (_insts.Count == 0) return;
+
             Type2Instruction firstInst = _insts[0];
             if (!firstInst.IsLoadInt) { throw new NotSupportedException(); }
             //the replace
@@ -526,6 +528,7 @@ namespace Typography.OpenFont.CFF
         public void SetCurrentCff1Font(Cff1Font currentCff1Font)
         {
             //this will provide subr buffer for callsubr callgsubr
+            _currentFontDict = null;//reset
             _currentCff1Font = currentCff1Font;
 
             if (_currentCff1Font._globalSubrRawBufferList != null)
@@ -782,7 +785,19 @@ namespace Typography.OpenFont.CFF
                                     _current_integer_count--;
                                 }
                                 //subr_no must be adjusted with proper bias value 
-                                ParseType2CharStringBuffer(_currentCff1Font._localSubrRawBufferList[inst.Value + _localSubrBias]);
+                                if (_currentCff1Font._localSubrRawBufferList != null)
+                                {
+                                    ParseType2CharStringBuffer(_currentCff1Font._localSubrRawBufferList[inst.Value + _localSubrBias]);
+                                }
+                                else if (_currentFontDict != null)
+                                {
+                                    //use private dict
+                                    ParseType2CharStringBuffer(_currentFontDict.LocalSubr[inst.Value + _localSubrBias]);
+                                }
+                                else
+                                {
+                                    throw new NotSupportedException();
+                                }
                             }
                         }
                         break;
@@ -811,6 +826,27 @@ namespace Typography.OpenFont.CFF
 #if DEBUG
         public ushort dbugCurrentGlyphIndex;
 #endif
+        FontDict _currentFontDict;
+        public void SetCidFontDict(FontDict fontdic)
+        {
+#if DEBUG
+            if (fontdic == null)
+            {
+                throw new NotSupportedException();
+            }
+#endif
+
+            _currentFontDict = fontdic;
+            if (fontdic.LocalSubr != null)
+            {
+                _localSubrBias = CalculateBias(_currentFontDict.LocalSubr.Count);
+            }
+            else
+            {
+                _localSubrBias = 0;
+            }
+        }
+
         public Type2GlyphInstructionList ParseType2CharString(byte[] buffer)
         {
             //reset

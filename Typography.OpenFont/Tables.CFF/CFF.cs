@@ -464,23 +464,52 @@ namespace Typography.OpenFont.CFF
             "Semibold"  };//390
 
     }
+
+    class FontDict
+    {
+        public int FontName;
+        public int PrivateDicSize;
+        public int PrivateDicOffset;
+        public List<byte[]> LocalSubr;
+        public FontDict(int dictSize, int dictOffset)
+        {
+            PrivateDicSize = dictSize;
+            PrivateDicOffset = dictOffset;
+        }
+
+    }
+
     public class Cff1Font
     {
         internal string FontName { get; set; }
         internal Glyph[] _glyphs;
-        internal List<CffDataDicEntry> _privateDict;
+
 
         internal List<byte[]> _localSubrRawBufferList;
         internal List<byte[]> _globalSubrRawBufferList;
 
-
-        //internal List<Type2GlyphInstructionList> _localSubrs;
-        //internal List<Type2GlyphInstructionList> _globalSubrs;
-
         internal int _defaultWidthX;
         internal int _nominalWidthX;
+        internal List<FontDict> _cidFontDict;
 
         Dictionary<string, Glyph> _cachedGlyphDicByName;
+
+        public string Version { get; set; } //CFF SID
+        public string Notice { get; set; }//CFF SID
+        public string CopyRight { get; set; }//CFF SID
+        public string FullName { get; set; }//CFF SID        
+        public string FamilyName { get; set; }//CFF SID
+        public string Weight { get; set; }//CFF SID 
+        public double UnderlinePosition { get; set; }
+        public double UnderlineThickness { get; set; }
+        public double[] FontBBox { get; set; }
+#if DEBUG
+        public Cff1Font()
+        {
+        }
+
+#endif
+
         public Glyph GetGlyphByName(string name)
         {
             if (_cachedGlyphDicByName == null)
@@ -497,7 +526,7 @@ namespace Typography.OpenFont.CFF
                     else
                     {
 #if DEBUG
-                        System.Diagnostics.Debug.WriteLine("Cff unknown glyphname");
+                        // System.Diagnostics.Debug.WriteLine("Cff unknown glyphname");
 #endif
                     }
 
@@ -530,6 +559,8 @@ namespace Typography.OpenFont.CFF
         }
 
         public string Name { get; set; }
+        public ushort SIDName { get; set; }
+
         public ushort GlyphIndex { get; set; }
         internal Type2Instruction[] GlyphInstructions { get; set; }
 
@@ -596,27 +627,39 @@ namespace Typography.OpenFont.CFF
         int _charStringsOffset;
         int _charsetOffset;
         int _encodingOffset;
-        int _privateDICTSize;
-        int _privateDICTOffset;
+
+
+
+
         public void ParseAfterHeader(uint cffStartAt, BinaryReader reader)
         {
             _cffStartAt = cffStartAt;
             _cff1FontSet = new Cff1FontSet();
+            _cidFontInfo = new CIDFontInfo();
+
+
             _reader = reader;
             //
             ReadNameIndex();
             ReadTopDICTIndex();
             ReadStringIndex();
+            ResolveTopDictInfo();
             ReadGlobalSubrIndex();
 
-            //----------------------
+            //---------------------- 
+            ReadFDSelect();
+            ReadFDArray();
+
+
             ReadPrivateDict();
+
+
             ReadCharStringsIndex();
             ReadCharsets();
             ReadEncodings();
 
 
-            ReadFDSelect();
+
 
             //...
         }
@@ -646,8 +689,8 @@ namespace Typography.OpenFont.CFF
             //a further restriction on the font name length of 63 characters.
 
             //Note 3
-            //For compatibility with earlier PostSc
-            //ript interpreters, see Technical Note
+            //For compatibility with earlier PostScript
+            //interpreters, see Technical Note
             //#5088, “Font Naming Issues.”
 
             //A font may be deleted from a FontSet without removing its data
@@ -700,6 +743,7 @@ namespace Typography.OpenFont.CFF
             //A font is identified by an entry in the Name INDEX and its data
             //is accessed via the corresponding Top DICT
             CffIndexOffset[] offsets = ReadIndexDataOffsets();
+
             //9. Top DICT Data
             //The names of the Top DICT operators shown in 
             //Table 9 are, where possible, the same as the corresponding Type 1 dict key. 
@@ -716,8 +760,6 @@ namespace Typography.OpenFont.CFF
                 //TODO: review here again
                 throw new NotSupportedException();
             }
-
-            //
             for (int i = 0; i < count; ++i)
             {
                 //read DICT data
@@ -727,37 +769,26 @@ namespace Typography.OpenFont.CFF
             }
 
 
-            //translate top-dic
-            foreach (CffDataDicEntry entry in _topDic)
-            {
-                switch (entry._operator.Name)
-                {
-                    case "CharStrings":
-                        _charStringsOffset = (int)entry.operands[0]._realNumValue;
-                        break;
-                    case "charset":
-                        _charsetOffset = (int)entry.operands[0]._realNumValue;
-                        break;
-                    case "Encoding":
-                        _encodingOffset = (int)entry.operands[0]._realNumValue;
-                        break;
-                    case "Private":
-                        //private DICT size and offset
-                        _privateDICTSize = (int)entry.operands[0]._realNumValue;
-                        _privateDICTOffset = (int)entry.operands[1]._realNumValue;
-                        break;
-                }
-
-
-
-            }
-
-
         }
 
         string[] _uniqueStringTable;
+        struct CIDFontInfo
+        {
+            public string ROS_Register;
+            public string ROS_Ordering;
+            public string ROS_Supplement;
 
+            public double CIDFontVersion;
+            public int CIDFountCount;
+            public int FDSelect;
+            public int FDArray;
 
+            public int fdSelectFormat;
+            public FDRange3[] fdRanges;
+
+        }
+
+        CIDFontInfo _cidFontInfo;
 
         void ReadStringIndex()
         {
@@ -804,9 +835,8 @@ namespace Typography.OpenFont.CFF
             if (offsets == null) return;
             //
 
-            int count = offsets.Length;
-            _uniqueStringTable = new string[count];
-            for (int i = 0; i < count; ++i)
+            _uniqueStringTable = new string[offsets.Length];
+            for (int i = 0; i < offsets.Length; ++i)
             {
                 CffIndexOffset offset = offsets[i];
                 //TODO: review here again, 
@@ -817,7 +847,122 @@ namespace Typography.OpenFont.CFF
 
             _cff1FontSet._uniqueStringTable = _uniqueStringTable;
         }
+        string GetSid(int sid)
+        {
+            if (sid <= Cff1FontSet.N_STD_STRINGS)
+            {
+                //use standard name
+                //TODO: review here
+                return Cff1FontSet.s_StdStrings[sid];
+            }
+            else
+            {
+                if (sid - Cff1FontSet.N_STD_STRINGS - 1 < _uniqueStringTable.Length)
+                {
+                    return _uniqueStringTable[sid - Cff1FontSet.N_STD_STRINGS - 1];
+                }
+                else
+                {
+                    //skip this, 
+                    //eg. found in CID font,
+                    //we should provide this info later
 
+                    return null;
+                }
+            }
+        }
+
+        void ResolveTopDictInfo()
+        {
+
+            //translate top-dic***
+            foreach (CffDataDicEntry entry in _topDic)
+            {
+                switch (entry._operator.Name)
+                {
+                    default:
+                        {
+#if DEBUG
+                            System.Diagnostics.Debug.WriteLine("topdic:" + entry._operator.Name);
+#endif
+                        }
+                        break;
+                    case "XUID": break;//nothing
+                    case "version":
+                        _currentCff1Font.Version = GetSid((int)entry.operands[0]._realNumValue);
+                        break;
+                    case "Notice":
+                        _currentCff1Font.Notice = GetSid((int)entry.operands[0]._realNumValue);
+                        break;
+                    case "Copyright":
+                        _currentCff1Font.CopyRight = GetSid((int)entry.operands[0]._realNumValue);
+                        break;
+                    case "FullName":
+                        _currentCff1Font.FullName = GetSid((int)entry.operands[0]._realNumValue);
+                        break;
+                    case "FamilyName":
+                        _currentCff1Font.FamilyName = GetSid((int)entry.operands[0]._realNumValue);
+                        break;
+                    case "Weight":
+                        _currentCff1Font.Weight = GetSid((int)entry.operands[0]._realNumValue);
+                        break;
+                    case "UnderlinePosition":
+                        _currentCff1Font.UnderlinePosition = entry.operands[0]._realNumValue;
+                        break;
+                    case "UnderlineThickness":
+                        _currentCff1Font.UnderlineThickness = entry.operands[0]._realNumValue;
+                        break;
+                    case "FontBBox":
+                        _currentCff1Font.FontBBox = new double[] {
+                            entry.operands[0]._realNumValue,
+                            entry.operands[1]._realNumValue,
+                            entry.operands[2]._realNumValue,
+                            entry.operands[3]._realNumValue};
+                        break;
+                    case "CharStrings":
+                        _charStringsOffset = (int)entry.operands[0]._realNumValue;
+                        break;
+                    case "charset":
+                        _charsetOffset = (int)entry.operands[0]._realNumValue;
+                        break;
+                    case "Encoding":
+                        _encodingOffset = (int)entry.operands[0]._realNumValue;
+                        break;
+                    case "Private":
+                        //private DICT size and offset
+                        _privateDICTLen = (int)entry.operands[0]._realNumValue;
+                        _privateDICTOffset = (int)entry.operands[1]._realNumValue;
+                        break;
+                    case "ROS":
+                        //http://wwwimages.adobe.com/www.adobe.com/content/dam/acom/en/devnet/font/pdfs/5176.CFF.pdf
+                        //A CFF CIDFont has the CIDFontName in the Name INDEX and a corresponding Top DICT. 
+                        //The Top DICT begins with ROS operator which specifies the Registry-Ordering - Supplement for the font.
+                        //This will indicate to a CFF parser that special CID processing should be applied to this font. Specifically:
+
+                        //ROS operator combines the Registry, Ordering, and Supplement keys together.
+
+                        //see Adobe Cmap resource , https://github.com/adobe-type-tools/cmap-resources
+
+                        _cidFontInfo.ROS_Register = GetSid((int)entry.operands[0]._realNumValue);
+                        _cidFontInfo.ROS_Ordering = GetSid((int)entry.operands[1]._realNumValue);
+                        _cidFontInfo.ROS_Supplement = GetSid((int)entry.operands[2]._realNumValue);
+
+                        break;
+                    case "CIDFontVersion":
+                        _cidFontInfo.CIDFontVersion = entry.operands[0]._realNumValue;
+                        break;
+                    case "CIDCount":
+                        _cidFontInfo.CIDFountCount = (int)entry.operands[0]._realNumValue;
+                        break;
+                    case "FDSelect":
+                        _cidFontInfo.FDSelect = (int)entry.operands[0]._realNumValue;
+                        break;
+                    case "FDArray":
+                        _cidFontInfo.FDArray = (int)entry.operands[0]._realNumValue;
+                        break;
+                }
+            }
+        }
         void ReadGlobalSubrIndex()
         {
             //16. Local / Global Subrs INDEXes
@@ -874,16 +1019,18 @@ namespace Typography.OpenFont.CFF
             byte format = _reader.ReadByte();
             switch (format)
             {
+                default:
+#if DEBUG
+                    System.Diagnostics.Debug.WriteLine("cff_parser_read_encodings:" + format);
+#endif
+                    break;
                 case 0:
-                    {
-                        ReadFormat0Encoding();
-                    }
+                    ReadFormat0Encoding();
                     break;
                 case 1:
-                    {
-                        ReadFormat1Encoding();
-                    }
+                    ReadFormat1Encoding();
                     break;
+
             }
             //TODO: ...
         }
@@ -902,8 +1049,7 @@ namespace Typography.OpenFont.CFF
             byte format = _reader.ReadByte();
             switch (format)
             {
-                default:
-                    throw new NotSupportedException();
+                default: throw new NotSupportedException();
                 case 0:
                     ReadCharsetsFormat0();
                     break;
@@ -934,18 +1080,8 @@ namespace Typography.OpenFont.CFF
             int nGlyphs = cff1Glyphs.Length;
             for (int i = 1; i < nGlyphs; ++i)
             {
-
-                ushort sid = _reader.ReadUInt16();
-                if (sid <= Cff1FontSet.N_STD_STRINGS)
-                {
-                    //use standard name
-                    //TODO: review here
-                    cff1Glyphs[i]._cff1GlyphData.Name = Cff1FontSet.s_StdStrings[sid];
-                }
-                else
-                {
-                    cff1Glyphs[i]._cff1GlyphData.Name = _uniqueStringTable[sid - Cff1FontSet.N_STD_STRINGS - 1];
-                }
+                Cff1GlyphData d = cff1Glyphs[i]._cff1GlyphData;
+                d.Name = GetSid(d.SIDName = _reader.ReadUInt16());
             }
         }
         void ReadCharsetsFormat1()
@@ -976,16 +1112,8 @@ namespace Typography.OpenFont.CFF
                 int count = _reader.ReadByte() + 1;//since it not include first elem
                 do
                 {
-                    if (sid <= Cff1FontSet.N_STD_STRINGS)
-                    {
-                        //use standard name
-                        //TODO: review here
-                        cff1Glyphs[i]._cff1GlyphData.Name = Cff1FontSet.s_StdStrings[sid];
-                    }
-                    else
-                    {
-                        cff1Glyphs[i]._cff1GlyphData.Name = _uniqueStringTable[sid - Cff1FontSet.N_STD_STRINGS - 1];
-                    }
+                    Cff1GlyphData d = cff1Glyphs[i]._cff1GlyphData;
+                    d.Name = GetSid(d.SIDName = (ushort)sid);
 
                     count--;
                     i++;
@@ -1022,29 +1150,8 @@ namespace Typography.OpenFont.CFF
                 int count = _reader.ReadUInt16() + 1;//since it not include first elem
                 do
                 {
-                    if (sid <= Cff1FontSet.N_STD_STRINGS)
-                    {
-                        //use standard name
-                        //TODO: review here
-                        cff1Glyphs[i]._cff1GlyphData.Name = Cff1FontSet.s_StdStrings[sid];
-                    }
-                    else
-                    {
-                        int index = sid - Cff1FontSet.N_STD_STRINGS - 1;
-                        if (index > -1 && index < _uniqueStringTable.Length)
-                        {
-                            cff1Glyphs[i]._cff1GlyphData.Name = _uniqueStringTable[index];
-                        }
-                        else
-                        {
-                            //skip this, 
-                            //eg. found in CID font,
-                            //we should provide this info later
-#if DEBUG
-                            System.Diagnostics.Debug.WriteLine("CFF: found unknow glyph-name");
-#endif
-                        }
-                    }
+                    Cff1GlyphData d = cff1Glyphs[i]._cff1GlyphData;
+                    d.Name = GetSid(d.SIDName = (ushort)sid);
 
                     count--;
                     i++;
@@ -1054,9 +1161,10 @@ namespace Typography.OpenFont.CFF
         }
         void ReadFDSelect()
         {
+            //http://wwwimages.adobe.com/www.adobe.com/content/dam/acom/en/devnet/font/pdfs/5176.CFF.pdf
             //19. FDSelect
 
-            // The FDSelect associates an FD(Font DICT) with a glyph by
+            //The FDSelect associates an FD(Font DICT) with a glyph by
             //specifying an FD index for that glyph. The FD index is used to
             //access one of the Font DICTs stored in the Font DICT INDEX.
 
@@ -1065,7 +1173,246 @@ namespace Typography.OpenFont.CFF
             //identifier byte followed by format-specific data.Two formats
             //are currently defined, as shown in Tables  27 and 28. 
             //TODO: ... 
+
+
+            //FDSelect   12 37  number      –, FDSelect offset
+            if (_cidFontInfo.FDSelect == 0) { return; }
+
+            //
+            //Table 27 Format 0
+            //------------
+            //Type    Name              Description
+            //------------
+            //Card8   format            =0
+            //Card8   fd[nGlyphs]       FD selector array
+
+            //Each element of the fd array(fds) represents the FD index of the corresponding glyph. 
+            //This format should be used when the FD indexes are in a fairly random order.
+            //The number of glyphs(nGlyphs) is the value of the count field in the CharStrings INDEX.
+            //(This format is identical to charset format 0 except that the.notdef glyph is included in this case.)
+
+
+            //Table 28 Format 3
+            //------------
+            //Type    Name              Description
+            //------------
+            //Card8   format            =3
+            //Card16  nRanges           Number of ranges
+            //struct  Range3[nRanges]   Range3 array (see Table 29)
+            //Card16  sentinel          Sentinel GID (see below)
+            //------------
+
+
+            //Table 29 Range3
+            //------------
+            //Type    Name              Description
+            //------------
+            //Card16  first             First glyph index in range
+            //Card8   fd                FD index for all glyphs in range
+
+            //Each Range3 describes a group of sequential GIDs that have the same FD index.
+            //Each range includes GIDs from the ‘first’ GID up to, but not including, 
+            //the ‘first’ GID of the next range element. 
+            //Thus, elements of the Range3 array are ordered by increasing ‘first’ GIDs.
+            //The first range must have a ‘first’ GID of 0.
+            //A sentinel GID follows the last range element and serves to delimit the last range in the array. 
+            //(The sentinel GID is set equal to the number of glyphs in the font. 
+            //That is, its value is 1 greater than the last GID in the font.) 
+            //This format is particularly suited to FD indexes that are well ordered(the usual case).
+
+            _reader.BaseStream.Position = _cffStartAt + _cidFontInfo.FDSelect;
+            byte format = _reader.ReadByte();
+
+            switch (format)
+            {
+                default:
+                    throw new NotSupportedException();
+                case 3:
+                    {
+                        ushort nRanges = _reader.ReadUInt16();
+                        FDRange3[] ranges = new FDRange3[nRanges + 1];
+
+                        _cidFontInfo.fdSelectFormat = 3;
+                        _cidFontInfo.fdRanges = ranges;
+                        for (int i = 0; i < nRanges; ++i)
+                        {
+                            ranges[i] = new FDRange3(_reader.ReadUInt16(), _reader.ReadByte());
+                        }
+
+                        //end with //sentinel
+                        ranges[nRanges] = new FDRange3(_reader.ReadUInt16(), 0);//sentinel
+#if DEBUG
+
+#endif
+
+
+                    }
+                    break;
+            }
         }
+
+        struct FDRange3
+        {
+            public readonly ushort first;
+            public readonly byte fd;
+            public FDRange3(ushort first, byte fd)
+            {
+                this.first = first;
+                this.fd = fd;
+            }
+#if DEBUG
+            public override string ToString()
+            {
+                return "first:" + first + ",fd:" + fd;
+            }
+#endif
+        }
+
+
+
+        void ReadFDArray()
+        {
+            if (_cidFontInfo.FDArray == 0) { return; }
+            _reader.BaseStream.Position = _cffStartAt + _cidFontInfo.FDArray;
+
+            CffIndexOffset[] offsets = ReadIndexDataOffsets();
+
+            List<FontDict> fontDicts = new List<FontDict>();
+            _currentCff1Font._cidFontDict = fontDicts;
+
+            for (int i = 0; i < offsets.Length; ++i)
+            {
+                //read DICT data 
+                List<CffDataDicEntry> dic = ReadDICTData(offsets[i].len);
+                //translate
+
+                int offset = 0;
+                int size = 0;
+                int name = 0;
+
+                foreach (CffDataDicEntry entry in dic)
+                {
+                    switch (entry._operator.Name)
+                    {
+                        default: throw new NotSupportedException();
+                        case "FontName":
+                            name = (int)entry.operands[0]._realNumValue;
+                            break;
+                        case "Private": //private dic
+                            size = (int)entry.operands[0]._realNumValue;
+                            offset = (int)entry.operands[1]._realNumValue;
+                            break;
+                    }
+                }
+
+                FontDict fontdict = new FontDict(size, offset);
+                fontdict.FontName = name;
+                fontDicts.Add(fontdict);
+            }
+            //-----------------
+
+            foreach (FontDict fdict in fontDicts)
+            {
+                _reader.BaseStream.Position = _cffStartAt + fdict.PrivateDicOffset;
+
+                List<CffDataDicEntry> dicData = ReadDICTData(fdict.PrivateDicSize);
+
+                if (dicData.Count > 0)
+                {
+                    //interpret the values of private dict 
+                    foreach (CffDataDicEntry dicEntry in dicData)
+                    {
+                        switch (dicEntry._operator.Name)
+                        {
+                            case "Subrs":
+                                {
+                                    int localSubrsOffset = (int)dicEntry.operands[0]._realNumValue;
+                                    _reader.BaseStream.Position = _cffStartAt + fdict.PrivateDicOffset + localSubrsOffset;
+                                    fdict.LocalSubr = ReadSubrBuffer();
+                                }
+                                break;
+                            case "defaultWidthX":
+
+                                break;
+                            case "nominalWidthX":
+
+                                break;
+                            default:
+                                {
+
+#if DEBUG
+                                    System.Diagnostics.Debug.WriteLine("cff_pri_dic:" + dicEntry._operator.Name);
+#endif
+
+                                }
+                                break;
+                        }
+                    }
+                }
+            }
+        }
+
+        struct FDRangeProvider
+        {
+            //helper class
+
+            FDRange3[] _ranges;
+            ushort _currentGlyphIndex;
+            ushort _endGlyphIndexLim;
+            byte _selectedFdArray;
+            FDRange3 _currentRange;
+            int _currentSelectedRangeIndex;
+
+            public FDRangeProvider(FDRange3[] ranges)
+            {
+                _ranges = ranges;
+                _currentGlyphIndex = 0;
+                _currentSelectedRangeIndex = 0;
+
+                if (ranges != null)
+                {
+                    _currentRange = ranges[0];
+                    _endGlyphIndexLim = ranges[1].first;
+                }
+                else
+                {
+                    //empty
+                    _currentRange = new FDRange3();
+                    _endGlyphIndexLim = 0;
+                }
+                _selectedFdArray = 0;
+            }
+            public byte SelectedFDArray => _selectedFdArray;
+            public void SetCurrentGlyphIndex(ushort index)
+            {
+                //find proper range for selected index
+                if (index >= _currentRange.first && index < _endGlyphIndexLim)
+                {
+                    //ok, in current range
+                    _selectedFdArray = _currentRange.fd;
+                }
+                else
+                {
+                    //move to next range
+                    _currentSelectedRangeIndex++;
+                    _currentRange = _ranges[_currentSelectedRangeIndex];
+
+                    _endGlyphIndexLim = _ranges[_currentSelectedRangeIndex + 1].first;
+                    if (index >= _currentRange.first && index < _endGlyphIndexLim)
+                    {
+                        _selectedFdArray = _currentRange.fd;
+
+                    }
+                    else
+                    {
+                        throw new NotSupportedException();
+                    }
+
+                }
+                _currentGlyphIndex = index;
+            }
+        }
+
         void ReadCharStringsIndex()
         {
             //14. CharStrings INDEX
@@ -1115,6 +1462,12 @@ namespace Typography.OpenFont.CFF
 #if DEBUG
             double total = 0;
 #endif
+
+            //cid font or not
+
+            var fdRangeProvider = new FDRangeProvider(_cidFontInfo.fdRanges);
+            bool isCidFont = _cidFontInfo.fdRanges != null;
+
             for (int i = 0; i < glyphCount; ++i)
             {
                 CffIndexOffset offset = offsets[i];
@@ -1140,6 +1493,14 @@ namespace Typography.OpenFont.CFF
 #if DEBUG
                 type2Parser.dbugCurrentGlyphIndex = glyphData.GlyphIndex;
 #endif
+
+                if (isCidFont)
+                {
+                    //select  proper local private dict 
+                    fdRangeProvider.SetCurrentGlyphIndex((ushort)i);
+                    type2Parser.SetCidFontDict(_currentCff1Font._cidFontDict[fdRangeProvider.SelectedFDArray]);
+                }
+
                 Type2GlyphInstructionList instList = type2Parser.ParseType2CharString(buffer);
                 if (instList != null)
                 {
@@ -1245,39 +1606,51 @@ namespace Typography.OpenFont.CFF
             //Card8     code        Encoding
             //SID       glyph       Name
         }
+
+
+        int _privateDICTOffset;
+        int _privateDICTLen;
         void ReadPrivateDict()
         {
             //per-font 
-            _reader.BaseStream.Position = _cffStartAt + _privateDICTOffset;
-            _currentCff1Font._privateDict = ReadDICTData(_privateDICTSize);
-
-            //interpret the values of private dict
+            if (_privateDICTLen == 0) { return; }
             //
+            _reader.BaseStream.Position = _cffStartAt + _privateDICTOffset;
+            List<CffDataDicEntry> dicData = ReadDICTData(_privateDICTLen);
 
-            foreach (CffDataDicEntry dicEntry in _currentCff1Font._privateDict)
+            if (dicData.Count > 0)
             {
-                switch (dicEntry._operator.Name)
+                //interpret the values of private dict 
+                foreach (CffDataDicEntry dicEntry in dicData)
                 {
-                    case "Subrs":
-                        {
-                            int localSubrsOffset = (int)dicEntry.operands[0]._realNumValue;
-                            _reader.BaseStream.Position = _cffStartAt + _privateDICTOffset + localSubrsOffset;
-                            ReadLocalSubrs();
-                        }
-                        break;
-                    case "defaultWidthX":
-                        _currentCff1Font._defaultWidthX = (int)dicEntry.operands[0]._realNumValue;
-                        break;
-                    case "nominalWidthX":
-                        _currentCff1Font._nominalWidthX = (int)dicEntry.operands[0]._realNumValue;
-                        break;
-                    default:
-                        {
+                    switch (dicEntry._operator.Name)
+                    {
+                        case "Subrs":
+                            {
+                                int localSubrsOffset = (int)dicEntry.operands[0]._realNumValue;
+                                _reader.BaseStream.Position = _cffStartAt + _privateDICTOffset + localSubrsOffset;
+                                ReadLocalSubrs();
+                            }
+                            break;
+                        case "defaultWidthX":
+                            _currentCff1Font._defaultWidthX = (int)dicEntry.operands[0]._realNumValue;
+                            break;
+                        case "nominalWidthX":
+                            _currentCff1Font._nominalWidthX = (int)dicEntry.operands[0]._realNumValue;
+                            break;
+                        default:
+                            {
 
-                        }
-                        break;
+#if DEBUG
+                                System.Diagnostics.Debug.WriteLine("cff_pri_dic:" + dicEntry._operator.Name);
+#endif
+
+                            }
+                            break;
+                    }
                 }
             }
+
         }
 
         List<byte[]> ReadSubrBuffer()
@@ -1498,7 +1871,7 @@ namespace Typography.OpenFont.CFF
             {
                 return _reader.ReadInt32();
             }
-            else if (b0 >= 32 && b0 < 246)
+            else if (b0 >= 32 && b0 <= 246)
             {
                 return b0 - 139;
             }
