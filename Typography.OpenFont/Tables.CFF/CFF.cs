@@ -559,6 +559,8 @@ namespace Typography.OpenFont.CFF
         }
 
         public string Name { get; set; }
+        public ushort SIDName { get; set; }
+
         public ushort GlyphIndex { get; set; }
         internal Type2Instruction[] GlyphInstructions { get; set; }
 
@@ -861,6 +863,10 @@ namespace Typography.OpenFont.CFF
                 }
                 else
                 {
+                    //skip this, 
+                    //eg. found in CID font,
+                    //we should provide this info later
+
                     return null;
                 }
             }
@@ -1074,7 +1080,8 @@ namespace Typography.OpenFont.CFF
             int nGlyphs = cff1Glyphs.Length;
             for (int i = 1; i < nGlyphs; ++i)
             {
-                cff1Glyphs[i]._cff1GlyphData.Name = GetSid(_reader.ReadUInt16());
+                Cff1GlyphData d = cff1Glyphs[i]._cff1GlyphData;
+                d.Name = GetSid(d.SIDName = _reader.ReadUInt16());
             }
         }
         void ReadCharsetsFormat1()
@@ -1105,16 +1112,8 @@ namespace Typography.OpenFont.CFF
                 int count = _reader.ReadByte() + 1;//since it not include first elem
                 do
                 {
-                    if (sid <= Cff1FontSet.N_STD_STRINGS)
-                    {
-                        //use standard name
-                        //TODO: review here
-                        cff1Glyphs[i]._cff1GlyphData.Name = Cff1FontSet.s_StdStrings[sid];
-                    }
-                    else
-                    {
-                        cff1Glyphs[i]._cff1GlyphData.Name = _uniqueStringTable[sid - Cff1FontSet.N_STD_STRINGS - 1];
-                    }
+                    Cff1GlyphData d = cff1Glyphs[i]._cff1GlyphData;
+                    d.Name = GetSid(d.SIDName = (ushort)sid);
 
                     count--;
                     i++;
@@ -1151,29 +1150,8 @@ namespace Typography.OpenFont.CFF
                 int count = _reader.ReadUInt16() + 1;//since it not include first elem
                 do
                 {
-                    if (sid <= Cff1FontSet.N_STD_STRINGS)
-                    {
-                        //use standard name
-                        //TODO: review here
-                        cff1Glyphs[i]._cff1GlyphData.Name = Cff1FontSet.s_StdStrings[sid];
-                    }
-                    else
-                    {
-                        int index = sid - Cff1FontSet.N_STD_STRINGS - 1;
-                        if (index > -1 && index < _uniqueStringTable.Length)
-                        {
-                            cff1Glyphs[i]._cff1GlyphData.Name = _uniqueStringTable[index];
-                        }
-                        else
-                        {
-                            //skip this, 
-                            //eg. found in CID font,
-                            //we should provide this info later
-#if DEBUG
-                            //System.Diagnostics.Debug.WriteLine("CFF: found unknow glyph-name");
-#endif
-                        }
-                    }
+                    Cff1GlyphData d = cff1Glyphs[i]._cff1GlyphData;
+                    d.Name = GetSid(d.SIDName = (ushort)sid);
 
                     count--;
                     i++;
