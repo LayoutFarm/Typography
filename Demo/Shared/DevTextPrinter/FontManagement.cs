@@ -23,12 +23,19 @@ namespace Typography.TextServices
             UnicodeRange2 = previewFontInfo.UnicodeRange2;
             UnicodeRange3 = previewFontInfo.UnicodeRange3;
             UnicodeRange4 = previewFontInfo.UnicodeRange4;
+
+            PostScriptName = previewFontInfo.PostScriptName;
+            UniqueFontIden = previewFontInfo.UniqueFontIden;
         }
 
         public string FontName { get; internal set; }
         public string FontSubFamily { get; internal set; }
         public string TypographicFontName { get; internal set; }
         public string TypographicFontSubFamily { get; internal set; }
+
+        public string PostScriptName { get; internal set; }
+        public string UniqueFontIden { get; internal set; }
+        
 
         public ushort Weight { get; internal set; }
         public string FontPath { get; internal set; }

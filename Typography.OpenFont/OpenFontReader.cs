@@ -66,7 +66,7 @@ namespace Typography.OpenFont
         public bool IsFontCollection => _ttcfMembers != null;
 
         public string PostScriptName { get; set; }
-        public string UniqueFontIdent { get; set; }
+        public string UniqueFontIden { get; set; }
         public string VersionString { get; set; }
         public uint UnicodeRange1 { get; set; }
         public uint UnicodeRange2 { get; set; }
@@ -349,7 +349,7 @@ namespace Typography.OpenFont
               Extensions.TypefaceExtensions.TranslatedOS2FontStyle(os2Table))
             {
                 PostScriptName = nameEntry.PostScriptName,
-                UniqueFontIdent = nameEntry.UniqueFontIden,
+                UniqueFontIden = nameEntry.UniqueFontIden,
                 VersionString = nameEntry.VersionString,
                 UnicodeRange1 = os2Table.ulUnicodeRange1,
                 UnicodeRange2 = os2Table.ulUnicodeRange2,
