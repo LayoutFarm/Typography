@@ -180,10 +180,13 @@ namespace TypographyTest.WinForms
         void ShowGlyphNameList(List<GlyphNameMapInfo> srcList)
         {
             this.listBox1.Items.Clear();
+
+            listBox1.SuspendLayout();
             foreach (GlyphNameMapInfo mapInfo in srcList)
             {
                 listBox1.Items.Add(mapInfo);
             }
+            listBox1.ResumeLayout();
         }
 
         void cmdListAllUnicodes_Click(object sender, EventArgs e)
