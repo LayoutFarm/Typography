@@ -35,7 +35,7 @@ namespace Typography.TextServices
 
         public string PostScriptName { get; internal set; }
         public string UniqueFontIden { get; internal set; }
-        
+
 
         public ushort Weight { get; internal set; }
         public string FontPath { get; internal set; }
@@ -104,7 +104,7 @@ namespace Typography.TextServices
     {
 
         FontNotFoundHandler _fontNotFoundHandler;
-        Dictionary<InstalledFont, Typeface> _loadedTypefaces = new Dictionary<InstalledFont, Typeface>();
+        readonly Dictionary<InstalledFont, Typeface> _loadedTypefaces = new Dictionary<InstalledFont, Typeface>();
         /// <summary>
         /// font collection of the store
         /// </summary>
@@ -291,9 +291,8 @@ namespace Typography.TextServices
         }
         bool RegisterFont(InstalledFont newfont)
         {
-            FontGroup selectedFontGroup;
             string fontsubFamUpperCaseName = newfont.FontSubFamily.ToUpper();
-            if (!_subFamToFontGroup.TryGetValue(fontsubFamUpperCaseName, out selectedFontGroup))
+            if (!_subFamToFontGroup.TryGetValue(fontsubFamUpperCaseName, out FontGroup selectedFontGroup))
             {
                 //create new group, we don't known this font group before 
                 //so we add to 'other group' list
@@ -301,12 +300,12 @@ namespace Typography.TextServices
                 _subFamToFontGroup.Add(fontsubFamUpperCaseName, selectedFontGroup);
                 _allFontGroups.Add(selectedFontGroup);
             }
-
+#if DEBUG
             if (newfont.TypographicFontName != newfont.FontName)
             {
 
             }
-
+#endif
             //
             string fontNameUpper = newfont.FontName.ToUpper();
             if (selectedFontGroup.TryGetValue(fontNameUpper, out InstalledFont found))
@@ -340,8 +339,7 @@ namespace Typography.TextServices
             //find font group 
             if (_subFamToFontGroup.TryGetValue(upperCaseSubFamName, out FontGroup foundFontGroup))
             {
-                InstalledFont foundInstalledFont;
-                foundFontGroup.TryGetValue(upperCaseFontName, out foundInstalledFont);
+                foundFontGroup.TryGetValue(upperCaseFontName, out InstalledFont foundInstalledFont);
                 return foundInstalledFont;
             }
             return null; //not found
@@ -361,69 +359,7 @@ namespace Typography.TextServices
             }
             selectedFontGroup.TryGetValue(fontName.ToUpper(), out InstalledFont _found);
             return _found;
-        }
-        //public FindResult GetFont(string fontName, InstalledFontStyle style, out InstalledFont found)
-        //{
-        //    //request font from installed font
-        //    string upperCaseFontName = fontName.ToUpper();
-        //    FindResult result = FindResult.Matched;
-        //    switch (style)
-        //    {
-        //        case (InstalledFontStyle.Bold | InstalledFontStyle.Italic):
-        //            {
-        //                //check if we have bold & italic 
-        //                //version of this font ?  
-        //                if (!_bold_italic.TryGetValue(upperCaseFontName, out found))
-        //                {
-        //                    //if not found then goto italic 
-        //                    result = FindResult.Nearest;
-        //                    goto case InstalledFontStyle.Italic;
-        //                }
-        //                return result;
-        //            }
-        //        case InstalledFontStyle.Bold:
-        //            {
-
-        //                if (!_bold.TryGetValue(upperCaseFontName, out found))
-        //                {
-        //                    //goto regular
-        //                    result = FindResult.Nearest;
-        //                    goto default;
-        //                }
-        //                return result;
-        //            }
-        //        case InstalledFontStyle.Italic:
-        //            {
-        //                //if not found then choose regular
-        //                if (!_italic.TryGetValue(upperCaseFontName, out found))
-        //                {
-        //                    result = FindResult.Nearest;
-        //                    goto default;
-        //                }
-        //                return result;
-        //            }
-        //        default:
-        //            {
-        //                //we skip gras style ?
-        //                if (!_normal.TryGetValue(upperCaseFontName, out found))
-        //                {
-        //                    if (fontNotFoundHandler != null)
-        //                    {
-        //                        result = FindResult.Nearest;
-        //                        found = fontNotFoundHandler(
-        //                            this,
-        //                            fontName,
-        //                            style);
-        //                        return (found == null) ? FindResult.NotFound : FindResult.Nearest;
-        //                    }
-        //                    return FindResult.NotFound;
-        //                }
-        //                return result;
-        //            }
-        //    }
-        //}
-
-
+        } 
         public IEnumerable<InstalledFont> GetInstalledFontIter()
         {
             foreach (FontGroup fontgroup in _allFontGroups)
