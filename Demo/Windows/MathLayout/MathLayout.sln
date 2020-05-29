@@ -1,0 +1,61 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29926.136
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MathLayout", "MathLayout\MathLayout.csproj", "{298F026D-BD20-4AD3-BE91-113E0D8A27B2}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WpfMath", "..\Refs\wpf-math-master\src\WpfMath\WpfMath.csproj", "{CE91FE9E-E598-46C9-8865-00BE9CC297A4}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WpfMath.Example", "..\Refs\wpf-math-master\src\WpfMath.Example\WpfMath.Example.csproj", "{ACFE5751-9D57-46A9-B32F-119ADF31AC6C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Ref1_WpfMath", "Ref1_WpfMath", "{6780F52F-6FB6-42CD-AE38-9DBE88FD3777}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Ref2_CSharpMath", "Ref2_CSharpMath", "{71C4F6DC-5823-4915-A025-FBDAC53E0650}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CSharpMath", "..\Refs\CSharpMath-master\CSharpMath\CSharpMath.csproj", "{C224104D-97BA-4923-9ED1-79FEBB12A6BB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Dep", "Dep", "{A3EC24E1-9094-4E8F-901B-73F19AEFCDDD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PixelFarm.One.HtmlRenderer", "..\..\..\..\PixelFarm\src\x_autogen2\PixelFarm.One.HtmlRenderer\PixelFarm.One.HtmlRenderer.csproj", "{5C8275A9-C7B6-42AB-9E53-C14B3A88EEE6}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{298F026D-BD20-4AD3-BE91-113E0D8A27B2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{298F026D-BD20-4AD3-BE91-113E0D8A27B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{298F026D-BD20-4AD3-BE91-113E0D8A27B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{298F026D-BD20-4AD3-BE91-113E0D8A27B2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CE91FE9E-E598-46C9-8865-00BE9CC297A4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CE91FE9E-E598-46C9-8865-00BE9CC297A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CE91FE9E-E598-46C9-8865-00BE9CC297A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CE91FE9E-E598-46C9-8865-00BE9CC297A4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ACFE5751-9D57-46A9-B32F-119ADF31AC6C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ACFE5751-9D57-46A9-B32F-119ADF31AC6C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ACFE5751-9D57-46A9-B32F-119ADF31AC6C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ACFE5751-9D57-46A9-B32F-119ADF31AC6C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C224104D-97BA-4923-9ED1-79FEBB12A6BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C224104D-97BA-4923-9ED1-79FEBB12A6BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C224104D-97BA-4923-9ED1-79FEBB12A6BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C224104D-97BA-4923-9ED1-79FEBB12A6BB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5C8275A9-C7B6-42AB-9E53-C14B3A88EEE6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5C8275A9-C7B6-42AB-9E53-C14B3A88EEE6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5C8275A9-C7B6-42AB-9E53-C14B3A88EEE6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5C8275A9-C7B6-42AB-9E53-C14B3A88EEE6}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{CE91FE9E-E598-46C9-8865-00BE9CC297A4} = {6780F52F-6FB6-42CD-AE38-9DBE88FD3777}
+		{ACFE5751-9D57-46A9-B32F-119ADF31AC6C} = {6780F52F-6FB6-42CD-AE38-9DBE88FD3777}
+		{C224104D-97BA-4923-9ED1-79FEBB12A6BB} = {71C4F6DC-5823-4915-A025-FBDAC53E0650}
+		{5C8275A9-C7B6-42AB-9E53-C14B3A88EEE6} = {A3EC24E1-9094-4E8F-901B-73F19AEFCDDD}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {168959F4-81CC-4E3B-AADA-1BBA284341A6}
+	EndGlobalSection
+EndGlobal
