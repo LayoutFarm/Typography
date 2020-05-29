@@ -1,0 +1,50 @@
+﻿<my_math>
+  <math-elem-def-list>
+    <!--Token Elements-->
+    <mi note="identifier"/>
+    <mo note="object"/>
+    <mn note="number"/>
+    <mtext note="text"/>
+    <mspace note="space"/>
+    <ms note="string literal"/>
+    <!--General Layout Schemata-->
+    <mrow note="math row"/>
+    <mfrac note="fraction"/>
+    <msqrt note="square root"/>
+    <mroot note="form a radical with specified index"/>
+    <mstyle note="style change"/>
+    <merror note="enclose a syntax error message from a preprocessor"/>
+    <mpadded note="adjust space around content"/>
+    <mphantom note="make content invisible but preserve its size"/>
+    <mfenced note="surround content with a pair of fences"/>
+    <menclose note="enclose content with a stretching symbol such as a long division sign."/>
+    <!--Script and Limit Schemata-->
+    <msub note="attach a subscript to a base"/>
+    <msup note="attach a superscript to a base"/>
+    <msubsup note="attach a subscript-superscript pair to a base"/>
+    <munder note="attach an underscript to a base"/>
+    <mover note="attach an overscript to a base"/>
+    <munderover note="attach an underscript-overscript pair to a base"/>
+    <mmultiscripts note="attach prescripts and tensor indices to a base"/>
+    <mprescripts note="prescripts"/>
+    
+    <none note="empty element"/>
+    <!--Tables and Matrices-->
+    <mtable note="table or matrix"/>
+    <mlabeledtr note="row in a table or matrix with a label or equation number"/>
+    <mtr note="row in a table or matrix"/>
+    <mtd note="one entry in a table or matrix"/>
+    <maligngroup note="alignment markers"/>
+    <malignmark note="alignment markers"/>
+    <!--Elementary Math Layout-->
+    <mstack note="columns of aligned characters"/>
+    <mlongdiv note="similar to msgroup, with the addition of a divisor and result"/>
+    <msgroup note="a group of rows in an mstack that are shifted by similar amounts"/>
+    <msrow note="a row in an mstack"/>
+    <mscarries note="row in an mstack that whose contents represent carries or borrows"/>
+    <mscarry note="one entry in an mscarries"/>
+    <msline note="horizontal line inside of mstack"/>
+    <!--Enlivening Expressions-->
+    <maction note="bind actions to a sub-expression"/>
+  </math-elem-def-list>
+</my_math>
