@@ -246,6 +246,8 @@ namespace Typography.OpenFont
         public Bounds Bounds => _bounds;
         public ushort UnitsPerEm => _unitsPerEm;
         public Glyph[] Glyphs => _glyphs;
+        public short UnderlinePosition => PostTable.UnderlinePosition;
+
         //
 
         const int pointsPerInch = 72; //TODO: should be configurable
@@ -331,6 +333,7 @@ namespace Typography.OpenFont
 
 
         //---------        
+
         internal PostTable PostTable { get; set; }
         internal bool _evalCffGlyphBounds;
         public bool IsCffFont => _cffTable != null;
@@ -447,7 +450,7 @@ namespace Typography.OpenFont
                 this PreviewFontInfo previewFontInfo,
                 UnicodeLangBits unicodeLangBits)
             {
-              
+
                 long bits = (long)unicodeLangBits;
                 int bitpos = (int)(bits >> 32);
 
