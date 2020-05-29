@@ -312,9 +312,25 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\..\PixelFarm\src\x_autogen2\PixelFarm.One.HtmlRenderer\PixelFarm.One.HtmlRenderer.csproj">
-      <Project>{5c8275a9-c7b6-42ab-9e53-c14b3a88eee6}</Project>
-      <Name>PixelFarm.One.HtmlRenderer</Name>
+    <ProjectReference Include="..\..\..\..\Build\N20\Typography.GlyphLayout\Typography.GlyphLayout.csproj">
+      <Project>{c6807d05-09be-4313-9f8b-bd2d51c55819}</Project>
+      <Name>Typography.GlyphLayout</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Build\N20\Typography.OpenFont\Typography.OpenFont.csproj">
+      <Project>{f7d71e61-9342-4dd7-9afd-69045f2ec98b}</Project>
+      <Name>Typography.OpenFont</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Build\N20\Typography.TextServices\Typography.TextServices.csproj">
+      <Project>{6b0e034b-0ebd-4907-ad7f-437de66d78d4}</Project>
+      <Name>Typography.TextServices</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\PixelFarm.Typography\PixelFarm.Typography.csproj">
+      <Project>{540a2ea6-dae3-4625-8951-b2c3118603a4}</Project>
+      <Name>PixelFarm.Typography</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\x_autogen2\PixelFarm.MiniAgg.One\PixelFarm.MiniAgg.One.csproj">
+      <Project>{ad1703ca-e756-46cc-a4b2-7290ae3659b8}</Project>
+      <Name>PixelFarm.MiniAgg.One</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

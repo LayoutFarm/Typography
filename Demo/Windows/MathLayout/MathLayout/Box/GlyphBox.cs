@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using PixelFarm.CpuBlit.VertexProcessing;
 using MathLayout;
 using Typography.OpenFont.MathGlyphs;
-using LayoutFarm.TextEditing;
+
 
 namespace LayoutFarm.MathLayout
 {
