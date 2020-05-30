@@ -1,9 +1,11 @@
 ﻿//MIT, 2020, Brezza92
 using System;
 using System.Collections.Generic;
+
 using PixelFarm.Drawing;
 using PixelFarm.CpuBlit;
 using PixelFarm.CpuBlit.VertexProcessing;
+
 using MathLayout;
 
 namespace LayoutFarm.MathLayout
@@ -104,7 +106,7 @@ namespace LayoutFarm.MathLayout
             {
                 Painter.Fill(box.CustomVxs, color);
             }
-            
+
             Painter.SetOrigin(ox, oy);//restore
         }
 
@@ -115,7 +117,7 @@ namespace LayoutFarm.MathLayout
 
             Painter.SetOrigin(box.Left + ox, box.Top + oy);
             Paint(box.BaseBox);
-            foreach(Box b in box.NotationBoxs)
+            foreach (Box b in box.NotationBoxs)
             {
                 Paint(b);
             }
@@ -284,7 +286,7 @@ namespace LayoutFarm.MathLayout
             _horizontalHeight.Push(box.Height);
             if (box.Prescripts != null)
             {
-                foreach(Box pre in box.Prescripts)
+                foreach (Box pre in box.Prescripts)
                 {
                     if (pre != null)
                     {
@@ -295,7 +297,7 @@ namespace LayoutFarm.MathLayout
             Paint(box.BaseBox);
             if (box.PostScripts != null)
             {
-                foreach(Box post in box.PostScripts)
+                foreach (Box post in box.PostScripts)
                 {
                     if (post != null)
                     {
@@ -315,7 +317,7 @@ namespace LayoutFarm.MathLayout
             float oy = Painter.OriginY;
 
             Painter.SetOrigin(box.Left + ox, box.Top + oy);
-            for (int i = 0;i < childCount; i++)
+            for (int i = 0; i < childCount; i++)
             {
                 Paint(box.GetChild(i));
             }
@@ -362,7 +364,7 @@ namespace LayoutFarm.MathLayout
                     }
                 }
                 shiftHeight -= box.Height - (float)glyphBound.Height;
-                if (MathMLOperatorTable.IsStretchyPropertyOperator(box.Character+""))
+                if (MathMLOperatorTable.IsStretchyPropertyOperator(box.Character + ""))
                 {
                     float bottom = (float)box.GlyphVxs.GetBoundingRect().Bottom;
                     float top = (float)box.GlyphVxs.GetBoundingRect().Top;
@@ -378,10 +380,10 @@ namespace LayoutFarm.MathLayout
                         shiftHeight -= top;
                     }
                 }
-                
+
                 float x = box.Left + ox + shiftWidth;
                 float y = box.Top + oy + shiftHeight;
-                
+
                 Painter.SetOrigin(box.Left + ox + shiftWidth, box.Top + oy + shiftHeight);
 
                 Painter.Fill(box.GlyphVxs, color);
