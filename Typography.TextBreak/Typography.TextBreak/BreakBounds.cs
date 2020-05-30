@@ -25,7 +25,8 @@ namespace Typography.TextBreak
         //
         Text,
         TextIncomplete,
-        Control
+        Control,
+        SurrogatePair,
     }
     public struct BreakAtInfo
     {
@@ -36,6 +37,12 @@ namespace Typography.TextBreak
             this.breakAt = breakAt;
             this.wordKind = w;
         }
+#if DEBUG
+        public override string ToString()
+        {
+            return breakAt + "," + wordKind;
+        }
+#endif
     }
 
 }

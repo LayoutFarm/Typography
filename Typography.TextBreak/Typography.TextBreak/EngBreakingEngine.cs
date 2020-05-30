@@ -96,7 +96,7 @@ namespace Typography.TextBreak
                                 //
                                 _breakBounds.startIndex += 2;//***
                                 _breakBounds.length = 0;
-
+                                _breakBounds.kind = WordKind.Unknown;
                                 lexState = LexState.Init;
 
                                 i++;
@@ -112,6 +112,7 @@ namespace Typography.TextBreak
                                 //
                                 _breakBounds.length = 0;
                                 _breakBounds.startIndex++;//***
+                                _breakBounds.kind = WordKind.Unknown;
                                 lexState = LexState.Init;
                                 continue;
                             }
@@ -180,6 +181,7 @@ namespace Typography.TextBreak
                                 //
                                 _breakBounds.startIndex += 1;
                                 _breakBounds.length = 0;
+                                _breakBounds.kind = WordKind.Unknown;
                                 lexState = LexState.Init;
                                 continue;
                             }
@@ -214,6 +216,8 @@ namespace Typography.TextBreak
                                     //surrogate pair
                                     _breakBounds.startIndex = i;
                                     _breakBounds.length = 2;
+                                    _breakBounds.kind = WordKind.SurrogatePair;
+
                                     onBreak(_breakBounds);
                                     //-------------------------------
 
@@ -270,6 +274,7 @@ namespace Typography.TextBreak
                                 //
                                 _breakBounds.length = 0;
                                 _breakBounds.startIndex = i;
+                                _breakBounds.kind = WordKind.Unknown;
                                 lexState = LexState.Init;
                                 goto case LexState.Init;
                             }
@@ -325,6 +330,7 @@ namespace Typography.TextBreak
                                 //
                                 _breakBounds.length = 0;
                                 _breakBounds.startIndex = i;
+                                _breakBounds.kind = WordKind.Unknown;
                                 lexState = LexState.Init;
                                 goto case LexState.Init;
                             }
@@ -342,6 +348,7 @@ namespace Typography.TextBreak
                                 //
                                 _breakBounds.length = 0;
                                 _breakBounds.startIndex = i;
+                                _breakBounds.kind = WordKind.Unknown;
                                 lexState = LexState.Init;
                                 goto case LexState.Init;
                             }
