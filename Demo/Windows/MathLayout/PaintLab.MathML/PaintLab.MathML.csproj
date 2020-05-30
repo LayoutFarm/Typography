@@ -34,10 +34,9 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Box\AttributesEnum.cs" />
     <Compile Include="Box\GlyphBox.cs" />
     <Compile Include="Box\StackChild.cs" />
-    <Compile Include="MathMLDom\MathBoxHelper.cs" />
+    <Compile Include="MathMLDom\AttributesEnum.cs" />
     <Compile Include="MathMLDom\MathNode.cs" />
     <Compile Include="Operator Dictionary\OperatorTableAutogen.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

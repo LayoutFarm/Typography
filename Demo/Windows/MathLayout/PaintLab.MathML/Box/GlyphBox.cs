@@ -43,9 +43,9 @@ namespace LayoutFarm.MathLayout
         }
 #endif
         public MathNode MathNode { get => GetMathNode(); set => SetMathNode(value); }
-        internal MathConstants MathConstants { get; set; }
-        internal float PixelScale { get; set; }
-        internal float BaseLineShift { get; set; }
+        public MathConstants MathConstants { get; set; }
+        public float PixelScale { get; set; }
+        public float BaseLineShift { get; set; }
         public float Left { get; set; }
         public float Top { get; set; }
         public float Width { get; set; }
@@ -356,6 +356,20 @@ namespace LayoutFarm.MathLayout
             string accentUnderStr = node.GetAttributeValue("accentunder");
             AccentUnder = AttributeParser.ParseBoolean(accentUnderStr, false);
         }
+        static VertexStore ScaleVertexStoreWidthTo(VertexStore source, float width)
+        {
+            var bound = source.GetBoundingRect();
+            float scale = width / (float)bound.Width;
+
+            VertexStore output = new VertexStore();
+            PixelFarm.CpuBlit.AffineMat mat = PixelFarm.CpuBlit.AffineMat.Iden();
+            mat.Translate(0, 0);
+            mat.Scale(scale, 1);
+
+            mat.TransformToVxs(source, output);
+            return output;
+        }
+
         public override void Layout()
         {
             BaseBox.Layout();
@@ -374,11 +388,11 @@ namespace LayoutFarm.MathLayout
                     {
                         if (BaseBox is GlyphBox baseGlyph)
                         {
-                            gbox.GlyphVxs = MathBoxHelper.ScaleVertexStoreWidthTo(gbox.GlyphVxs, (float)baseGlyph.GlyphVxs.GetBoundingRect().Width);
+                            gbox.GlyphVxs = ScaleVertexStoreWidthTo(gbox.GlyphVxs, (float)baseGlyph.GlyphVxs.GetBoundingRect().Width);
                         }
                         else
                         {
-                            gbox.GlyphVxs = MathBoxHelper.ScaleVertexStoreWidthTo(gbox.GlyphVxs, BaseBox.Width);
+                            gbox.GlyphVxs = ScaleVertexStoreWidthTo(gbox.GlyphVxs, BaseBox.Width);
                         }
                     }
                     var bounding = gbox.GlyphVxs.GetBoundingRect();
@@ -432,11 +446,11 @@ namespace LayoutFarm.MathLayout
                     {
                         if (BaseBox is GlyphBox baseGlyph)
                         {
-                            gbox.GlyphVxs = MathBoxHelper.ScaleVertexStoreWidthTo(gbox.GlyphVxs, (float)baseGlyph.GlyphVxs.GetBoundingRect().Width);
+                            gbox.GlyphVxs = ScaleVertexStoreWidthTo(gbox.GlyphVxs, (float)baseGlyph.GlyphVxs.GetBoundingRect().Width);
                         }
                         else
                         {
-                            gbox.GlyphVxs = MathBoxHelper.ScaleVertexStoreWidthTo(gbox.GlyphVxs, BaseBox.Width);
+                            gbox.GlyphVxs = ScaleVertexStoreWidthTo(gbox.GlyphVxs, BaseBox.Width);
                         }
                     }
 
@@ -445,6 +459,8 @@ namespace LayoutFarm.MathLayout
                     if (MathMLOperatorTable.IsAccentPropertyOperator(gbox.Character + ""))
                     {
                         isAccentChar = true;
+
+                        //TODO: review here, (temp fix for latin-modern?)
                         if (gbox.GlyphIndex == 2256 || gbox.Character == '_')//special condition for overline and lowline
                         {
                             isLowLine = true;
@@ -538,7 +554,8 @@ namespace LayoutFarm.MathLayout
         public int GlyphIndex { get; set; }
         public bool IsInvisible { get; set; }
         private bool _alreadyLayout = false;
-        private VertexStore _glyphVxs;
+
+        VertexStore _glyphVxs;
         public VertexStore GlyphVxs
         {
             get => _glyphVxs;

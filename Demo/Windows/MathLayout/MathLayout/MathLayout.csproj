@@ -43,6 +43,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GlyhBoxPainter.cs" />
+    <Compile Include="MathBoxHelper.cs" />
     <Compile Include="Tools\OpeatorTableCreator.cs" />
     <Compile Include="Tools\OperatorInfoDictionary.cs" />
     <Content Include="Examples\p28.html">
