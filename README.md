@@ -145,3 +145,5 @@ MIT, 2019, master131, https://github.com/master131/BrotliSharpLib
 **Demo**
 
 MIT, 2017, Zou Wei, https://github.com/zwcloud, see more Zou Wei's GUI works at [here](https://zwcloud.net/#project/imgui) and [here](https://github.com/zwcloud/ImGui)
+
+MIT, 2020, brezza92 (https://github.com/brezza92), MathML layout engine
