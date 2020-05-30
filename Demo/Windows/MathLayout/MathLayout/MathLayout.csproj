@@ -42,13 +42,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Box\AttributesEnum.cs" />
-    <Compile Include="Box\GlyhBoxPainter.cs" />
-    <Compile Include="Box\GlyphBox.cs" />
+    <Compile Include="Tools\OpeatorTableCreator.cs" />
+    <Compile Include="Tools\OperatorInfoDictionary.cs" />
     <Content Include="Examples\p28.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Compile Include="Box\StackChild.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -58,12 +56,7 @@
     <Compile Include="MathMLDom\CodeWriter.cs" />
     <Compile Include="MathMLDom\DomAutoGen.cs" />
     <Compile Include="MathMLDom\DomCreator.cs" />
-    <Compile Include="MathMLDom\MathBoxHelper.cs" />
-    <Compile Include="MathMLDom\MathNode.cs" />
     <Compile Include="MathMLDom\MathMLReader.cs" />
-    <Compile Include="Operator Dictionary\OpeatorTableCreator.cs" />
-    <Compile Include="Operator Dictionary\OperatorInfoDictionary.cs" />
-    <Compile Include="Operator Dictionary\OperatorTableAutogen.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Content Include="Examples\p3233_1.html">
@@ -273,9 +266,6 @@
     <Content Include="MathMLDom\DomSpec.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Operator Dictionary\only_ops_table.html">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
@@ -327,6 +317,10 @@
     <ProjectReference Include="..\..\..\..\x_autogen2\PixelFarm.MiniAgg.One\PixelFarm.MiniAgg.One.csproj">
       <Project>{18c5fa8f-8579-4616-a1d0-220003627bf8}</Project>
       <Name>PixelFarm.MiniAgg.One</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PaintLab.MathML\PaintLab.MathML.csproj">
+      <Project>{7cd2a321-4d1d-4c5e-bf3d-5cfb6b423c82}</Project>
+      <Name>PaintLab.MathML</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

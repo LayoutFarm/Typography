@@ -1,10 +1,10 @@
 ﻿//MIT, 2020, Brezza92
-using PixelFarm.Drawing;
 using System.Collections.Generic;
-using PixelFarm.CpuBlit.VertexProcessing;
-using MathLayout;
-using Typography.OpenFont.MathGlyphs;
 
+using MathLayout;
+using PixelFarm.Drawing;
+using PixelFarm.CpuBlit.VertexProcessing;
+using Typography.OpenFont.MathGlyphs;
 
 namespace LayoutFarm.MathLayout
 {
@@ -410,7 +410,7 @@ namespace LayoutFarm.MathLayout
                         OverscriptBox.Top = OverscriptBox.MarginTop + OverscriptBox.Height;
                         sumHeight += OverscriptBox.Height * 2 + OverscriptBox.MarginBottom;
                     }
-                    
+
                 }
 
                 if (OverscriptBox.Width < scriptMaxWidth)//center
@@ -450,7 +450,7 @@ namespace LayoutFarm.MathLayout
                             isLowLine = true;
                         }
                     }
-                        
+
                 }
                 else
                 {
@@ -470,7 +470,7 @@ namespace LayoutFarm.MathLayout
                 UnderscriptBox.Layout();
                 scriptMaxWidth = System.Math.Max(scriptMaxWidth, UnderscriptBox.Width);
                 UnderscriptBox.Top = UnderscriptBox.MarginTop + sumHeight + BaseBox.Depth;
-                float accunder = UnderscriptBox.Height + System.Math.Abs(AccentUnder ? BaseBox.TopAccentAttachmentScale/4f : BaseBox.TopAccentAttachmentScale);
+                float accunder = UnderscriptBox.Height + System.Math.Abs(AccentUnder ? BaseBox.TopAccentAttachmentScale / 4f : BaseBox.TopAccentAttachmentScale);
                 if (isAccentChar && !isLowLine)
                 {
                     float accentH = UnderscriptBox.Height + (System.Math.Abs(BaseBox.TopAccentAttachmentScale) * (AccentUnder ? -1 : 1));
@@ -667,7 +667,7 @@ namespace LayoutFarm.MathLayout
                     {
                         maxFractionLineTop = System.Math.Max(maxFractionLineTop, fbox.FractionLine.Top + fbox.FractionLine.Height);
                     }
-                    
+
                 }
                 else if (b is ContainerBox cbox)
                 {
@@ -678,7 +678,7 @@ namespace LayoutFarm.MathLayout
                     aboveBLS = b.Height - System.Math.Abs(b.BaseLineShift);
                 }
 
-                if(maxAboveBLS < aboveBLS)
+                if (maxAboveBLS < aboveBLS)
                 {
                     maxAboveBLS = aboveBLS;
                     maxAboveIndex = i;
@@ -809,7 +809,7 @@ namespace LayoutFarm.MathLayout
                     underOverBox.MarginTop = this.Height - underOverBox.Height;
                     if (underOverBox.BaseBox is GlyphBox undOvrBase)
                     {
-                        if (MathMLOperatorTable.IsFencePropertyOperator(undOvrBase.Character+""))
+                        if (MathMLOperatorTable.IsFencePropertyOperator(undOvrBase.Character + ""))
                         {
                             underOverBox.Top = underOverBox.MarginTop;
                             continue;
@@ -839,7 +839,7 @@ namespace LayoutFarm.MathLayout
                     if (b.BaseLineShift < 0)
                     {
                         float accent = ((MathConstants.AccentBaseHeight.Value * this.PixelScale) / 2);
-                        float diff = b.BaseLineShift - baseLine  + additionShift;
+                        float diff = b.BaseLineShift - baseLine + additionShift;
                         if (b is ContainerBox cbox)
                         {
                             b.Top = diff + (accent / 2);
@@ -924,7 +924,7 @@ namespace LayoutFarm.MathLayout
         protected override void SetMathNode(MathNode node)
         {
             Bevelled = AttributeParser.ParseBoolean(node.GetAttributeValue("bevelled"), false);
-            
+
             base.SetMathNode(node);
         }
         public override void Layout()
@@ -1133,13 +1133,13 @@ namespace LayoutFarm.MathLayout
             maxH = BaseBox.Height;
             maxW = BaseBox.Width + BaseBox.MarginLeft;
             float beforeBaseBox = 0;
-            foreach(Box b in NotationBoxs)
+            foreach (Box b in NotationBoxs)
             {
                 b.Layout();
             }
             if (beforeBaseBox > 0)
             {
-                foreach(Box b in NotationBoxs)
+                foreach (Box b in NotationBoxs)
                 {
                     if (b is CustomNotationVsxBox customBox)
                     {

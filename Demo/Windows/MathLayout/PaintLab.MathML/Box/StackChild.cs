@@ -1,8 +1,10 @@
 ﻿//MIT, 2020, Brezza92
-using PixelFarm.Drawing;
+
 using System.Collections.Generic;
 using System;
+
 using MathLayout;
+using PixelFarm.Drawing;
 
 namespace LayoutFarm.MathLayout
 {
@@ -17,7 +19,7 @@ namespace LayoutFarm.MathLayout
         }
         public DigitsStructure Structure = new DigitsStructure();
 
-        internal abstract void Construction();
+        internal abstract void Build();
         protected override void SetMathNode(MathNode node)
         {
             Position = AttributeParser.ParseInteger(node.GetAttributeValue("position"), 0);
@@ -444,7 +446,7 @@ namespace LayoutFarm.MathLayout
                 }
                 if (box is StackChild child)
                 {
-                    child.Construction();
+                    child.Build();
                     CombineStructure(child.Structure, StackStructure);
                 }
                 else
@@ -454,7 +456,7 @@ namespace LayoutFarm.MathLayout
             }
             foreach (StackCarries carries1 in temp)
             {
-                carries1.Construction();
+                carries1.Build();
                 DigitInfo last = carries1.Structure.Digits[carries1.Structure.Digits.Count - 1];
                 ReplaceCarriesInfoWith(carries1, StackStructure);
                 CombineStructure(carries1.Structure, StackStructure);
@@ -550,7 +552,7 @@ namespace LayoutFarm.MathLayout
             HorizontalLayout();
         }
 
-        internal override void Construction()
+        internal override void Build()
         {
             Structure.Clear();
             Construction(this);
@@ -674,7 +676,7 @@ namespace LayoutFarm.MathLayout
                 this.TopAccentAttachmentScale = maxTopAccent;
         }
 
-        internal override void Construction()
+        internal override void Build()
         {
             Structure.Clear();
             int count = ChildCount;
@@ -684,7 +686,7 @@ namespace LayoutFarm.MathLayout
                 if (row != null)
                 {
                     row.Position = Position + (i * Shift);
-                    row.Construction();
+                    row.Build();
                     CombineStructure(row.Structure, Structure);
                 }
                 else
@@ -740,7 +742,7 @@ namespace LayoutFarm.MathLayout
             HorizontalLayout();
         }
 
-        internal override void Construction()
+        internal override void Build()
         {
             Structure.Clear();
             Construction(this);
@@ -820,7 +822,7 @@ namespace LayoutFarm.MathLayout
             }
         }
 
-        internal override void Construction()
+        internal override void Build()
         {
             //throw new NotImplementedException();
         }
