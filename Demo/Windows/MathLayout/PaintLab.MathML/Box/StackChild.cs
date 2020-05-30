@@ -367,7 +367,7 @@ namespace LayoutFarm.MathLayout
         }
         public override void Layout()
         {
-            Construction();
+            Build();
 
             int count = ChildCount;
             float left = 0, top = 0;
@@ -423,7 +423,7 @@ namespace LayoutFarm.MathLayout
 
         }
 
-        private void Construction()
+        private void Build()
         {
             StackStructure = new DigitsStructure();
             int count = ChildCount;
