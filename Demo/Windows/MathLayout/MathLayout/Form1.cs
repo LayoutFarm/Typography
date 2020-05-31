@@ -417,7 +417,14 @@ namespace MathLayout
             {
                 boxHelper.FontSize = 40;
                 //boxHelper.FontFile = "Fonts/Asana-Math.otf";
-                boxHelper.FontFile = "Fonts/latinmodern-math.otf";
+                string mathFont = "Fonts/latinmodern-math.otf";
+                using (FileStream fs = new FileStream(mathFont, FileMode.Open))
+                {
+                    OpenFontReader fontReader = new OpenFontReader();
+                    boxHelper.MathTypeface = fontReader.Read(fs);
+                }
+
+                
 
                 math m = resultNodes[0];
                 //Box box = boxHelper.CreateMathBox(m);

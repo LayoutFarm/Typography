@@ -16,43 +16,28 @@ namespace MathLayout
         float _scriptScale = 0.7f;
         float _scriptScriptScale = 0.5f;
         GlyphBox _spaceGlyph;
-
         bool isScriptScript = false;
-
-        string _fontFile = null;
-        public string FontFile
+        public MathBoxTreeBuilderBase()
         {
-            get => _fontFile;
+            FontSize = 20;
+        }
+        public Typeface MathTypeface
+        {
+            get => _typeface;
             set
             {
-                _fontFile = value;
-                _typeface = null;
-                FontChanged();
-            }
-        }
-
-        void LoadFont()
-        {
-            if (_typeface == null && FontFile != null)
-            {
-                using (FileStream fs = new FileStream(FontFile, FileMode.Open))
-                {
-                    OpenFontReader reader = new OpenFontReader();
-                    _typeface = reader.Read(fs);
-                }
+                if (_typeface == value) { return; }
+                //
+                _typeface = value;
                 _mathConstants = _typeface.MathConsts;
                 if (_mathConstants != null)
                 {
                     _scriptScale = _mathConstants.ScriptPercentScaleDown / 100f;
                     _scriptScriptScale = _mathConstants.ScriptScriptPercentScaleDown / 100f;
-                }
+                } 
+                FontChanged(); 
             }
-        }
-        public MathBoxTreeBuilderBase()
-        {
-            FontSize = 20;
-            FontFile = null;
-        }
+        } 
 
         protected abstract GlyphBox NewGlyphBox();
         protected abstract CustomNotationVsxBox NewCustomVxsBox();
@@ -105,7 +90,7 @@ namespace MathLayout
 
         void FontChanged()
         {
-            if (FontFile != null)
+            if (_typeface != null)
             {
                 _spaceGlyph = NewGlyphBox();
                 _spaceGlyph.Character = ' ';
@@ -115,14 +100,12 @@ namespace MathLayout
 
         Box CreateSpaceGlyph()
         {
-            if (FontFile != null)
-            {
-                GlyphBox space = NewGlyphBox();
-                space.Character = ' ';
-                AssignGlyphVxs(space);
-                return space;
-            }
-            return null;
+
+            GlyphBox space = NewGlyphBox();
+            space.Character = ' ';
+            AssignGlyphVxs(space);
+            return space;
+
         }
         public Box CreateMathBoxs(List<math> nodes)
         {
@@ -527,8 +510,7 @@ namespace MathLayout
 
         void AssignGlyphVxs(GlyphBox glyphBox)
         {
-            LoadFont();
-
+          
             char ch = glyphBox.Character;
             if (ch == 0 || glyphBox.HasVxs || MathMLOperatorTable.IsInvicibleCharacter(ch))
             {
@@ -552,7 +534,7 @@ namespace MathLayout
 
         void AssignGlyphVxsByGlyphIndex(GlyphBox glyphBox, ushort glyphIndex)
         {
-            LoadFont();
+           
             float font_size_in_Point = GetCurrentLevelFontSize();
             float px_scale = GetPixelScale();
             if (glyphBox.HasVxs)
