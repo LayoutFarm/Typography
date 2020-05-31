@@ -12,9 +12,8 @@ using Typography.OpenFont.MathGlyphs;
 
 namespace MathLayout
 {
-    public class MathBoxHelper
+    public class MathBoxTreeBuilder
     {
-
 
         Typeface _typeface;
         GlyphMeshStore _glyphMeshStore = new GlyphMeshStore();
@@ -23,13 +22,13 @@ namespace MathLayout
         GlyphBox SpaceGlyph;
         bool isScriptScript = false;
 
-        public MathBoxHelper()
+        public MathBoxTreeBuilder()
         {
             FontSize = 20;
             FontFile = null;
         }
 
-        VxsGlyphBox NewGlyphBox()
+        GlyphBox NewGlyphBox()
         {
             return new VxsGlyphBox();
         }

@@ -34,11 +34,11 @@ namespace MathLayout
         }
         public override void ScaleToFitWidth(float width)
         {
-            GlyphVxs = MathBoxHelper.ScaleVertexStoreWidthTo(GlyphVxs, width);
+            GlyphVxs = MathBoxTreeBuilder.ScaleVertexStoreWidthTo(GlyphVxs, width);
         }
         public override void ScalteToFitHeight(float height)
         {
-            GlyphVxs = MathBoxHelper.ScaleVertexStoreHeightTo(GlyphVxs, height);
+            GlyphVxs = MathBoxTreeBuilder.ScaleVertexStoreHeightTo(GlyphVxs, height);
         }
     }
 

@@ -393,7 +393,7 @@ namespace MathLayout
             creator.ReadDomSpec("MathMLDom/DomSpec.xml");
 
         }
-        MathBoxHelper boxHelper = new MathBoxHelper();
+        MathBoxTreeBuilder boxHelper = new MathBoxTreeBuilder();
         private void button4_Click(object sender, EventArgs e)
         {
 
