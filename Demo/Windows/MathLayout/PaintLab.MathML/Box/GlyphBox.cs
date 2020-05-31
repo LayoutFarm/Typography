@@ -542,14 +542,14 @@ namespace LayoutFarm.MathLayout
 
         public char Character { get; set; }
         public bool Stretched { get; set; }
-        public int GlyphIndex { get; set; }
+        public ushort GlyphIndex { get; set; }
         public bool IsInvisible { get; set; }
 
 
         public abstract void ScaleToFitWidth(float width);
         public abstract void ScalteToFitHeight(float height);
         public abstract Rect GetBoundingRect();
-        
+
         public abstract bool HasVxs { get; }
         public abstract void ClearVxs();
 

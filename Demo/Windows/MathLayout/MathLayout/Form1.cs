@@ -152,11 +152,11 @@ namespace MathLayout
 
                     int advW_s = (int)System.Math.Round(px_scale * advW);
 
-                  
+
                     GlyphBox b1 = NewGlyphBox();
 
                     b1.Character = ch[i];
-                    b1.GlyphIndex = glyphIndex; 
+                    b1.GlyphIndex = glyphIndex;
                     b1.AdvanceWidthScale = advW_s;
                     //b1.SetBounds(0, 0, 10, fontSize*2);
 
@@ -393,7 +393,8 @@ namespace MathLayout
             creator.ReadDomSpec("MathMLDom/DomSpec.xml");
 
         }
-        MathBoxTreeBuilder boxHelper = new MathBoxTreeBuilder();
+
+        VxsMathBoxTreeBuilder boxHelper = new VxsMathBoxTreeBuilder();
         private void button4_Click(object sender, EventArgs e)
         {
 

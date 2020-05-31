@@ -34,12 +34,40 @@ namespace MathLayout
         }
         public override void ScaleToFitWidth(float width)
         {
-            GlyphVxs = MathBoxTreeBuilder.ScaleVertexStoreWidthTo(GlyphVxs, width);
+            GlyphVxs = ScaleVertexStoreWidthTo(GlyphVxs, width);
         }
         public override void ScalteToFitHeight(float height)
         {
-            GlyphVxs = MathBoxTreeBuilder.ScaleVertexStoreHeightTo(GlyphVxs, height);
+            GlyphVxs = ScaleVertexStoreHeightTo(GlyphVxs, height);
         }
+        static VertexStore ScaleVertexStoreWidthTo(VertexStore source, float width)
+        {
+            var bound = source.GetBoundingRect();
+            float scale = width / (float)bound.Width;
+
+            VertexStore output = new VertexStore();
+            AffineMat mat = AffineMat.Iden();
+            mat.Translate(0, 0);
+            mat.Scale(scale, 1);
+
+            mat.TransformToVxs(source, output);
+            return output;
+        }
+
+        static VertexStore ScaleVertexStoreHeightTo(VertexStore source, float height)
+        {
+            var bound = source.GetBoundingRect();
+            float scale = height / (float)bound.Height;
+
+            VertexStore output = new VertexStore();
+            AffineMat mat = AffineMat.Iden();
+            mat.Translate(0, 0);
+            mat.Scale(1, scale);
+
+            mat.TransformToVxs(source, output);
+            return output;
+        }
+
     }
 
     class MyCustomNotationVsxBox : CustomNotationVsxBox

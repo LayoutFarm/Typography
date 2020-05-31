@@ -35,6 +35,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Box\GlyphBox.cs" />
+    <Compile Include="Box\MathBoxTreeBuilderBase.cs" />
     <Compile Include="Box\Points_Rects.cs" />
     <Compile Include="Box\StackChild.cs" />
     <Compile Include="MathMLDom\AttributesEnum.cs" />

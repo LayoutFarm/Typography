@@ -43,8 +43,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Impl\GlyphBoxPainter.cs" />
-    <Compile Include="Impl\MathBoxTreeBuilder.cs" />
     <Compile Include="Impl\GlyphBoxes.cs" />
+    <Compile Include="Impl\VxsMathBoxTreeBuilder.cs" />
     <Compile Include="Tools\OpeatorTableCreator.cs" />
     <Compile Include="Tools\OperatorInfoDictionary.cs" />
     <Content Include="Examples\p28.html">
