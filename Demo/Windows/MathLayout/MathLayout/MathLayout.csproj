@@ -42,9 +42,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Impl\GlyhBoxPainter.cs" />
+    <Compile Include="Impl\GlyphBoxPainter.cs" />
     <Compile Include="Impl\MathBoxHelper.cs" />
-    <Compile Include="Impl\VxsGlyphBox.cs" />
+    <Compile Include="Impl\GlyphBoxes.cs" />
     <Compile Include="Tools\OpeatorTableCreator.cs" />
     <Compile Include="Tools\OperatorInfoDictionary.cs" />
     <Content Include="Examples\p28.html">
