@@ -152,13 +152,20 @@ namespace MathLayout
 
                     int advW_s = (int)System.Math.Round(px_scale * advW);
 
-                    VertexStore v1 = _glyphMeshStore.GetGlyphMesh(glyphIndex);
-                    GlyphBox b1 = new GlyphBox();
+
+                    GlyphBox b1 = NewGlyphBox();
+
                     b1.Character = ch[i];
                     b1.GlyphIndex = glyphIndex;
-                    b1.GlyphVxs = v1;
                     b1.AdvanceWidthScale = advW_s;
                     //b1.SetBounds(0, 0, 10, fontSize*2);
+
+                    if (b1 is VxsGlyphBox vxsGlyphBox)
+                    {
+                        vxsGlyphBox.GlyphVxs = _glyphMeshStore.GetGlyphMesh(glyphIndex);
+                    }
+
+
                     hbox.AddChild(b1);
                 }//*/
             }
@@ -166,7 +173,7 @@ namespace MathLayout
             {
                 for (int i = 0; i < 5; ++i)
                 {
-                    GlyphBox b1 = new GlyphBox();
+                    GlyphBox b1 = NewGlyphBox();
                     b1.SetBounds(0, 0, 10, 20);
                     hbox.AddChild(b1);
                 }
@@ -194,6 +201,8 @@ namespace MathLayout
             return hbox3;
         }
 
+        VxsGlyphBox NewGlyphBox() => new VxsGlyphBox();
+
         Box CreateTestBox4()
         {
             VerticalStackBox vbox1 = new VerticalStackBox();
@@ -202,7 +211,7 @@ namespace MathLayout
             vbox1.Layout();
 
 
-            GlyphBox h_sepBar = new GlyphBox();
+            GlyphBox h_sepBar = NewGlyphBox();
             h_sepBar.SetSize(vbox1.Width, 5);
             vbox1.Insert(1, h_sepBar);
             vbox1.Layout();
@@ -227,11 +236,11 @@ namespace MathLayout
 
             float height = hbox.Height;//set height to cover all blog
 
-            GlyphBox openBar = new GlyphBox();
+            GlyphBox openBar = NewGlyphBox();
             openBar.SetSize(5, height);
             hbox.Insert(0, openBar);
 
-            GlyphBox verticalBar2 = new GlyphBox();
+            GlyphBox verticalBar2 = NewGlyphBox();
             verticalBar2.SetSize(5, height);
             hbox.AddChild(verticalBar2);//add last
             hbox.Layout();
@@ -381,10 +390,12 @@ namespace MathLayout
         {
             //dom autogen
             DomCreator creator = new DomCreator();
-            creator.ReadDomSpec("MathMLDom/DomSpec.xml");
+            creator.ReadDomSpec("Tools/DomSpec.xml");
 
         }
-        MathBoxHelper boxHelper = new MathBoxHelper();
+
+        VxsMathBoxTreeBuilder boxHelper = new VxsMathBoxTreeBuilder();
+        Typeface _mathTypeface;
         private void button4_Click(object sender, EventArgs e)
         {
 
@@ -407,7 +418,18 @@ namespace MathLayout
             {
                 boxHelper.FontSize = 40;
                 //boxHelper.FontFile = "Fonts/Asana-Math.otf";
-                boxHelper.FontFile = "Fonts/latinmodern-math.otf";
+                if (_mathTypeface == null)
+                {
+                    string mathFont = "Fonts/latinmodern-math.otf";
+                    using (FileStream fs = new FileStream(mathFont, FileMode.Open))
+                    {
+                        OpenFontReader fontReader = new OpenFontReader();
+                        _mathTypeface = fontReader.Read(fs);
+                    }
+                }
+                boxHelper.MathTypeface = _mathTypeface;
+
+
 
                 math m = resultNodes[0];
                 //Box box = boxHelper.CreateMathBox(m);
@@ -457,11 +479,15 @@ namespace MathLayout
 
             int advW_s = (int)System.Math.Round(px_scale * advW);
 
-            VertexStore v1 = _glyphMeshStore.GetGlyphMesh(glyphIndex);
-
             glyphBox.GlyphIndex = glyphIndex;
-            glyphBox.GlyphVxs = v1;
             glyphBox.AdvanceWidthScale = advW_s;
+
+            if (glyphBox is VxsGlyphBox vxsGlyphBox)
+            {
+                vxsGlyphBox.GlyphVxs = _glyphMeshStore.GetGlyphMesh(glyphIndex);
+            }
+
+
         }
         Box CreateMathBox(MathNode node)
         {
@@ -491,7 +517,7 @@ namespace MathLayout
                             textSpan.MathNode = node;
                             for (int i = 0; i < text_buff.Length; ++i)
                             {
-                                GlyphBox glyphBox = new GlyphBox();
+                                GlyphBox glyphBox = NewGlyphBox();
                                 glyphBox.Character = text_buff[i];
                                 textSpan.AddChild(glyphBox);
                             }
@@ -501,7 +527,7 @@ namespace MathLayout
                         else
                         {
                             //len=1
-                            GlyphBox glyphBox = new GlyphBox();
+                            GlyphBox glyphBox = NewGlyphBox();
                             glyphBox.MathNode = node;
                             glyphBox.Character = text_buff[0];
                             //return glyphBox;
@@ -594,7 +620,7 @@ namespace MathLayout
             //OperatorInfoDictionary reader = new OperatorInfoDictionary();
             //reader.Read("only_ops_table.html");
             OperatorTableCreator autogen = new OperatorTableCreator();
-            autogen.AutogenFrom("Operator Dictionary\\only_ops_table.html");
+            autogen.AutogenFrom("Tools\\only_ops_table.html");
         }
     }
 }

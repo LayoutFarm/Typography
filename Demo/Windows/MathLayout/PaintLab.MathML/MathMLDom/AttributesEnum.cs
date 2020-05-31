@@ -3,7 +3,7 @@ using System;
 
 namespace LayoutFarm.MathLayout
 {
-    static class AttributeParser
+    public static class AttributeParser
     {
         public static Alignment ParseAlignment(string align, Alignment defaultAlign = Alignment.Default)
         {

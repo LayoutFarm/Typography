@@ -1,4 +1,3 @@
-/*x0*///Autogen,2020-05-28T09:54:49
 /*x1*///-----
 /*x2*///Operator dictionary entries reference https://www.w3.org/TR/MathML3/appendixc.html
 

@@ -47,6 +47,7 @@ This C# project does develop for rendering simple Mathematical Markup Language (
     </html>
     
 Basic MathML Rendering
+
 ![basic MathML rendering](https://user-images.githubusercontent.com/7447159/83210237-86f24200-a184-11ea-9d10-ba407a2915ef.PNG)
  
 

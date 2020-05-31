@@ -7,8 +7,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MathLayout", "MathLayout\Ma
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Dep", "Dep", "{A3EC24E1-9094-4E8F-901B-73F19AEFCDDD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PixelFarm.MiniAgg.One", "..\..\..\x_autogen2\PixelFarm.MiniAgg.One\PixelFarm.MiniAgg.One.csproj", "{AD1703CA-E756-46CC-A4B2-7290AE3659B8}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PixelFarm.Typography", "..\..\..\PixelFarm.Typography\PixelFarm.Typography.csproj", "{540A2EA6-DAE3-4625-8951-B2C3118603A4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Typography.OpenFont", "..\..\..\Build\N20\Typography.OpenFont\Typography.OpenFont.csproj", "{F7D71E61-9342-4DD7-9AFD-69045F2EC98B}"
@@ -17,8 +15,20 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Typography.TextServices", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Typography.GlyphLayout", "..\..\..\Build\N20\Typography.GlyphLayout\Typography.GlyphLayout.csproj", "{C6807D05-09BE-4313-9F8B-BD2D51C55819}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PaintLab.Svg", "..\..\..\PixelFarm\PaintLab.Svg\PaintLab.Svg.csproj", "{466DD2AE-EADC-4E20-82B3-DA6D018006C5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PixelFarm.MiniAgg.One", "..\..\..\x_autogen2\PixelFarm.MiniAgg.One\PixelFarm.MiniAgg.One.csproj", "{18C5FA8F-8579-4616-A1D0-220003627BF8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PaintLab.PaintFx.MiniAgg", "..\..\..\PixelFarm\PaintLab.PaintFx\PaintLab.PaintFx.MiniAgg.csproj", "{A533E1C7-AB74-4BCF-BC7A-12D4DBBFA918}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PaintLab.MathML", "PaintLab.MathML\PaintLab.MathML.csproj", "{7CD2A321-4D1D-4C5E-BF3D-5CFB6B423C82}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		..\..\..\Typography.TextBreak\Typography.TextBreak\Typography.TextBreak.projitems*{6b0e034b-0ebd-4907-ad7f-437de66d78d4}*SharedItemsImports = 4
+		..\..\..\Typography.TextFlow\Typography.TextFlow.projitems*{6b0e034b-0ebd-4907-ad7f-437de66d78d4}*SharedItemsImports = 4
+		..\..\..\Typography.TextServices\Typography.TextServices.projitems*{6b0e034b-0ebd-4907-ad7f-437de66d78d4}*SharedItemsImports = 4
+		..\..\..\PixelFarm\BackEnd.PaintFx\PdnSharedProject\PdnSharedProject.projitems*{a533e1c7-ab74-4bcf-bc7a-12d4dbbfa918}*SharedItemsImports = 4
 		..\..\..\Typography.GlyphLayout\Typography.GlyphLayout.projitems*{c6807d05-09be-4313-9f8b-bd2d51c55819}*SharedItemsImports = 4
 		..\..\..\Typography.OpenFont\Typography.OpenFont.projitems*{f7d71e61-9342-4dd7-9afd-69045f2ec98b}*SharedItemsImports = 4
 	EndGlobalSection
@@ -31,10 +41,6 @@ Global
 		{298F026D-BD20-4AD3-BE91-113E0D8A27B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{298F026D-BD20-4AD3-BE91-113E0D8A27B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{298F026D-BD20-4AD3-BE91-113E0D8A27B2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{AD1703CA-E756-46CC-A4B2-7290AE3659B8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{AD1703CA-E756-46CC-A4B2-7290AE3659B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{AD1703CA-E756-46CC-A4B2-7290AE3659B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{AD1703CA-E756-46CC-A4B2-7290AE3659B8}.Release|Any CPU.Build.0 = Release|Any CPU
 		{540A2EA6-DAE3-4625-8951-B2C3118603A4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{540A2EA6-DAE3-4625-8951-B2C3118603A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{540A2EA6-DAE3-4625-8951-B2C3118603A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -51,16 +57,34 @@ Global
 		{C6807D05-09BE-4313-9F8B-BD2D51C55819}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C6807D05-09BE-4313-9F8B-BD2D51C55819}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C6807D05-09BE-4313-9F8B-BD2D51C55819}.Release|Any CPU.Build.0 = Release|Any CPU
+		{466DD2AE-EADC-4E20-82B3-DA6D018006C5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{466DD2AE-EADC-4E20-82B3-DA6D018006C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{466DD2AE-EADC-4E20-82B3-DA6D018006C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{466DD2AE-EADC-4E20-82B3-DA6D018006C5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{18C5FA8F-8579-4616-A1D0-220003627BF8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{18C5FA8F-8579-4616-A1D0-220003627BF8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{18C5FA8F-8579-4616-A1D0-220003627BF8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{18C5FA8F-8579-4616-A1D0-220003627BF8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A533E1C7-AB74-4BCF-BC7A-12D4DBBFA918}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A533E1C7-AB74-4BCF-BC7A-12D4DBBFA918}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A533E1C7-AB74-4BCF-BC7A-12D4DBBFA918}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A533E1C7-AB74-4BCF-BC7A-12D4DBBFA918}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7CD2A321-4D1D-4C5E-BF3D-5CFB6B423C82}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7CD2A321-4D1D-4C5E-BF3D-5CFB6B423C82}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7CD2A321-4D1D-4C5E-BF3D-5CFB6B423C82}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7CD2A321-4D1D-4C5E-BF3D-5CFB6B423C82}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{AD1703CA-E756-46CC-A4B2-7290AE3659B8} = {A3EC24E1-9094-4E8F-901B-73F19AEFCDDD}
 		{540A2EA6-DAE3-4625-8951-B2C3118603A4} = {A3EC24E1-9094-4E8F-901B-73F19AEFCDDD}
 		{F7D71E61-9342-4DD7-9AFD-69045F2EC98B} = {A3EC24E1-9094-4E8F-901B-73F19AEFCDDD}
 		{6B0E034B-0EBD-4907-AD7F-437DE66D78D4} = {A3EC24E1-9094-4E8F-901B-73F19AEFCDDD}
 		{C6807D05-09BE-4313-9F8B-BD2D51C55819} = {A3EC24E1-9094-4E8F-901B-73F19AEFCDDD}
+		{466DD2AE-EADC-4E20-82B3-DA6D018006C5} = {A3EC24E1-9094-4E8F-901B-73F19AEFCDDD}
+		{18C5FA8F-8579-4616-A1D0-220003627BF8} = {A3EC24E1-9094-4E8F-901B-73F19AEFCDDD}
+		{A533E1C7-AB74-4BCF-BC7A-12D4DBBFA918} = {A3EC24E1-9094-4E8F-901B-73F19AEFCDDD}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {168959F4-81CC-4E3B-AADA-1BBA284341A6}
