@@ -47,7 +47,7 @@ namespace MathLayout
 
             VertexStore output = new VertexStore();
             AffineMat mat = AffineMat.Iden();
-            mat.Translate(0, 0);
+           
             mat.Scale(scale, 1);
 
             mat.TransformToVxs(source, output);
@@ -61,7 +61,7 @@ namespace MathLayout
 
             VertexStore output = new VertexStore();
             AffineMat mat = AffineMat.Iden();
-            mat.Translate(0, 0);
+            
             mat.Scale(1, scale);
 
             mat.TransformToVxs(source, output);

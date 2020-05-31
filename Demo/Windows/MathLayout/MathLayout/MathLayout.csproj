@@ -269,7 +269,7 @@
     <Content Include="Tools\DomSpec.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Operator Dictionary\only_ops_table.html">
+    <Content Include="Tools\only_ops_table.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <EmbeddedResource Include="Form1.resx">
