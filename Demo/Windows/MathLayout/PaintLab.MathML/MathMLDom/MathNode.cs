@@ -3,6 +3,16 @@ using System;
 using System.Collections.Generic;
 namespace MathLayout
 {
+    public class MathStyleSpec : MathNodeSpec
+    {
+        //style node
+        public string RawTextContent { get; set; }
+    }
+    public class MathNodeSpec
+    {
+
+    }
+
     public abstract class MathNode
     {
         List<MathNode> _children = new List<MathNode>();
@@ -11,9 +21,9 @@ namespace MathLayout
         object _controller;
 
         public void SetController(object controller) => _controller = controller;
-
         public static object UnsafeGetController(MathNode elem) => elem._controller;
 
+        public MathNodeSpec ElemSpec { get; set; } //style
 
         public int ChildCount => _children.Count;
         public MathNode GetNode(int index) => _children[index];
