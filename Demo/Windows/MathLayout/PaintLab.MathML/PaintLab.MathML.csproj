@@ -37,7 +37,7 @@
     <Compile Include="Box\StackChild.cs" />
     <Compile Include="MathMLDom\AttributesEnum.cs" />
     <Compile Include="MathMLDom\MathNode.cs" />
-    <Compile Include="Operator Dictionary\OperatorTableAutogen.cs" />
+    <Compile Include="MathMLDom\OperatorTableAutogen.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -45,11 +45,6 @@
       <Project>{f7d71e61-9342-4dd7-9afd-69045f2ec98b}</Project>
       <Name>Typography.OpenFont</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Operator Dictionary\only_ops_table.html">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
