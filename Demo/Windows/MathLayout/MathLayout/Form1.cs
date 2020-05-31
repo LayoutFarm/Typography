@@ -395,6 +395,7 @@ namespace MathLayout
         }
 
         VxsMathBoxTreeBuilder boxHelper = new VxsMathBoxTreeBuilder();
+        Typeface _mathTypeface;
         private void button4_Click(object sender, EventArgs e)
         {
 
@@ -417,14 +418,18 @@ namespace MathLayout
             {
                 boxHelper.FontSize = 40;
                 //boxHelper.FontFile = "Fonts/Asana-Math.otf";
-                string mathFont = "Fonts/latinmodern-math.otf";
-                using (FileStream fs = new FileStream(mathFont, FileMode.Open))
+                if (_mathTypeface == null)
                 {
-                    OpenFontReader fontReader = new OpenFontReader();
-                    boxHelper.MathTypeface = fontReader.Read(fs);
+                    string mathFont = "Fonts/latinmodern-math.otf";
+                    using (FileStream fs = new FileStream(mathFont, FileMode.Open))
+                    {
+                        OpenFontReader fontReader = new OpenFontReader();
+                        _mathTypeface = fontReader.Read(fs);
+                    }
                 }
+                boxHelper.MathTypeface = _mathTypeface;
 
-                
+
 
                 math m = resultNodes[0];
                 //Box box = boxHelper.CreateMathBox(m);
