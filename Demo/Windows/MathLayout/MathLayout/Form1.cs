@@ -390,7 +390,7 @@ namespace MathLayout
         {
             //dom autogen
             DomCreator creator = new DomCreator();
-            creator.ReadDomSpec("MathMLDom/DomSpec.xml");
+            creator.ReadDomSpec("Tools/DomSpec.xml");
 
         }
 
@@ -615,7 +615,7 @@ namespace MathLayout
             //OperatorInfoDictionary reader = new OperatorInfoDictionary();
             //reader.Read("only_ops_table.html");
             OperatorTableCreator autogen = new OperatorTableCreator();
-            autogen.AutogenFrom("Operator Dictionary\\only_ops_table.html");
+            autogen.AutogenFrom("Tools\\only_ops_table.html");
         }
     }
 }

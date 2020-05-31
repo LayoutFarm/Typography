@@ -56,9 +56,9 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
-    <Compile Include="MathMLDom\CodeWriter.cs" />
+    <Compile Include="Tools\CodeWriter.cs" />
     <Compile Include="MathMLDom\DomAutoGen.cs" />
-    <Compile Include="MathMLDom\DomCreator.cs" />
+    <Compile Include="Tools\DomCreator.cs" />
     <Compile Include="MathMLDom\MathMLReader.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -266,7 +266,7 @@
     <Content Include="Examples\p3684_4.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="MathMLDom\DomSpec.xml">
+    <Content Include="Tools\DomSpec.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Operator Dictionary\only_ops_table.html">
