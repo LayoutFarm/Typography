@@ -4,7 +4,6 @@ using System.Collections.Generic;
 
 using PixelFarm.Drawing;
 using PixelFarm.CpuBlit;
-using PixelFarm.CpuBlit.VertexProcessing;
 
 using MathLayout;
 
