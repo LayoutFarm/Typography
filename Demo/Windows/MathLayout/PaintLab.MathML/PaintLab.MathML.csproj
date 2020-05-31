@@ -31,9 +31,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System" />
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="Box\GlyphBox.cs" />
     <Compile Include="Box\MathBoxTreeBuilderBase.cs" />
     <Compile Include="Box\Points_Rects.cs" />
