@@ -77,7 +77,7 @@ namespace LayoutFarm.MathLayout
                     PaintVerticalBox((VerticalStackBox)box);
                     break;
                 case BoxKind.CustomNotationVsx:
-                    PaintCustomVsx((CustomNotationVsxBox)box);
+                    PaintCustomVsx((MyCustomNotationVsxBox)box);
                     break;
             }
 
@@ -92,7 +92,7 @@ namespace LayoutFarm.MathLayout
             Painter.SetOrigin(ox, oy);//restore
         }
 
-        private void PaintCustomVsx(CustomNotationVsxBox box)
+        private void PaintCustomVsx(MyCustomNotationVsxBox box)
         {
             float ox = Painter.OriginX;//***
             float oy = Painter.OriginY;
@@ -346,12 +346,12 @@ namespace LayoutFarm.MathLayout
             float ox = Painter.OriginX;//***
             float oy = Painter.OriginY;
 
-            if (box.GlyphVxs != null)
+            if (box.HasVxs)
             {
                 Color color = Color.Black;
                 float shiftHeight = 0;
                 float shiftWidth = 0;
-                Q1RectD glyphBound = box.GlyphVxs.GetBoundingRect();
+                var glyphBound = box.GetBoundingRect();
 
                 {
                     if (_fromPaintHorizontal.Count > 0 && _fromPaintHorizontal.Peek() && _horizontalHeight.Count > 0)
@@ -366,8 +366,9 @@ namespace LayoutFarm.MathLayout
                 shiftHeight -= box.Height - (float)glyphBound.Height;
                 if (MathMLOperatorTable.IsStretchyPropertyOperator(box.Character + ""))
                 {
-                    float bottom = (float)box.GlyphVxs.GetBoundingRect().Bottom;
-                    float top = (float)box.GlyphVxs.GetBoundingRect().Top;
+                    var bounds = box.GetBoundingRect();
+                    float bottom = (float)bounds.Bottom;
+                    float top = (float)bounds.Top;
                     if (MathMLOperatorTable.IsFencePropertyOperator(box.Character + ""))
                     {
                         if (box.Stretched)
@@ -386,7 +387,12 @@ namespace LayoutFarm.MathLayout
 
                 Painter.SetOrigin(box.Left + ox + shiftWidth, box.Top + oy + shiftHeight);
 
-                Painter.Fill(box.GlyphVxs, color);
+
+                if (box is VxsGlyphBox vxsGlyphBox)
+                {
+                    Painter.Fill(vxsGlyphBox.GlyphVxs, color);
+                }
+
                 Painter.SetOrigin(ox, oy);//restore
             }
             else

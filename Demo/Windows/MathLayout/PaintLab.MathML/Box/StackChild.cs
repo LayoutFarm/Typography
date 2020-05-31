@@ -1,7 +1,6 @@
 ﻿//MIT, 2020, Brezza92
 
 using MathLayout;
-using PixelFarm.Drawing;
 using System;
 using System.Collections.Generic;
 
@@ -781,6 +780,8 @@ namespace LayoutFarm.MathLayout
             this.Height = Carry.Height;
         }
     }
+
+   
 
     public class StackLine : StackChild
     {

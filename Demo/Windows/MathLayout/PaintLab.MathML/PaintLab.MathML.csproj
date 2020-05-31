@@ -35,6 +35,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Box\GlyphBox.cs" />
+    <Compile Include="Box\Points_Rects.cs" />
     <Compile Include="Box\StackChild.cs" />
     <Compile Include="MathMLDom\AttributesEnum.cs" />
     <Compile Include="MathMLDom\MathNode.cs" />
@@ -45,14 +46,6 @@
     <ProjectReference Include="..\..\..\..\Build\N20\Typography.OpenFont\Typography.OpenFont.csproj">
       <Project>{f7d71e61-9342-4dd7-9afd-69045f2ec98b}</Project>
       <Name>Typography.OpenFont</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\PixelFarm.Typography\PixelFarm.Typography.csproj">
-      <Project>{540a2ea6-dae3-4625-8951-b2c3118603a4}</Project>
-      <Name>PixelFarm.Typography</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\x_autogen2\PixelFarm.MiniAgg.One\PixelFarm.MiniAgg.One.csproj">
-      <Project>{18c5fa8f-8579-4616-a1d0-220003627bf8}</Project>
-      <Name>PixelFarm.MiniAgg.One</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
