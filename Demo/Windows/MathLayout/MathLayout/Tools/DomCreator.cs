@@ -37,8 +37,6 @@ namespace MathLayout
             codeWriter.AppendLine();
             //-------------------------------------
             codeWriter.AppendLine("using System;");
-            codeWriter.AppendLine("using System.IO;");
-            codeWriter.AppendLine("using System.Xml;");
             codeWriter.AppendLine("namespace MathLayout{");
             //-------------------------------------
 
