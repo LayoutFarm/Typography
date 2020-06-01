@@ -69,7 +69,7 @@ namespace Typography.OpenFont.Tables
                 //+ (c - startCount[i])
                 //+ &idRangeOffset[i])
 
-                var offset = _idRangeOffset[i] / 2 + (codepoint - _startCode[i]);
+                int offset = _idRangeOffset[i] / 2 + (codepoint - _startCode[i]);
                 // I want to thank Microsoft for this clever pointer trick
                 // TODO: What if the value fetched is inside the _idRangeOffset table?
                 // TODO: e.g. (offset - _idRangeOffset.Length + i < 0)

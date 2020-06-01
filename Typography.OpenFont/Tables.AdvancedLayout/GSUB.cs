@@ -90,16 +90,14 @@ namespace Typography.OpenFont.Tables
         /// </summary>
         public class UnImplementedLookupSubTable : LookupSubTable
         {
-            string _message;
+            readonly string _message;
             public UnImplementedLookupSubTable(string msg)
             {
                 _message = msg;
                 Utils.WarnUnimplemented(msg);
             }
-            public override string ToString()
-            {
-                return _message;
-            }
+            public override string ToString() => _message;
+
             public override bool DoSubstitutionAt(IGlyphIndexList glyphIndices, int pos, int len)
             {
                 return false;

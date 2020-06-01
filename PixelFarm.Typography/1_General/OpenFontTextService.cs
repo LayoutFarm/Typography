@@ -262,16 +262,17 @@ namespace PixelFarm.Drawing
             ResolveTypeface(f);
             return PixelFarm.Drawing.Internal.RequestFontCacheAccess.GetWhitespaceWidth(f, _system_id);
         }
-
-        public GlyphPlanSequence CreateGlyphPlanSeq(in TextBufferSpan textBufferSpan, RequestFont font)
+        public GlyphPlanSequence CreateGlyphPlanSeq(in TextBufferSpan textBufferSpan, Typeface typeface, float sizeInPts)
         {
-
-            Typeface typeface = ResolveTypeface(font);
-            _txtServices.SetCurrentFont(typeface, font.SizeInPoints);
+            _txtServices.SetCurrentFont(typeface, sizeInPts);
 
             _reusableTextBuffer.SetRawCharBuffer(textBufferSpan.GetRawCharBuffer());
 
             return _txtServices.GetUnscaledGlyphPlanSequence(_reusableTextBuffer, textBufferSpan.start, textBufferSpan.len);
+        }
+        public GlyphPlanSequence CreateGlyphPlanSeq(in TextBufferSpan textBufferSpan, RequestFont font)
+        {
+            return CreateGlyphPlanSeq(textBufferSpan, ResolveTypeface(font), font.SizeInPoints);
         }
         public Size MeasureString(in TextBufferSpan textBufferSpan, RequestFont font)
         {
