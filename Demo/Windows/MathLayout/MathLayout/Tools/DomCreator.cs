@@ -2,8 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Xml;
-using System.Text;
+using System.Xml; 
+
 namespace MathLayout
 {
     public class DomCreator
@@ -37,8 +37,6 @@ namespace MathLayout
             codeWriter.AppendLine();
             //-------------------------------------
             codeWriter.AppendLine("using System;");
-            codeWriter.AppendLine("using System.IO;");
-            codeWriter.AppendLine("using System.Xml;");
             codeWriter.AppendLine("namespace MathLayout{");
             //-------------------------------------
 

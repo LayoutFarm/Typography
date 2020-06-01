@@ -1,53 +1,60 @@
 ﻿//MIT, 2020, Brezza92
-using LayoutFarm.MathLayout;
-using PixelFarm.CpuBlit;
-using PixelFarm.CpuBlit.VertexProcessing;
-using PixelFarm.Drawing;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using Typography.Contours;
+
 using Typography.OpenFont;
-using Typography.OpenFont.Extensions;
 using Typography.OpenFont.MathGlyphs;
+using LayoutFarm.MathLayout;
 
 namespace MathLayout
 {
-    public class MathBoxHelper
+
+    public abstract class MathBoxTreeBuilderBase
     {
-        public float FontSize 
-        { 
-            get=>_fontSize;
+        Typeface _typeface;
+        float _scriptScale = 0.7f;
+        float _scriptScriptScale = 0.5f;
+        GlyphBox _spaceGlyph;
+        bool isScriptScript = false;
+        public MathBoxTreeBuilderBase()
+        {
+            FontSize = 20;
+        }
+        public Typeface MathTypeface
+        {
+            get => _typeface;
+            set
+            {
+                if (_typeface == value) { return; }
+                //
+                _typeface = value;
+                _mathConstants = _typeface.MathConsts;
+                if (_mathConstants != null)
+                {
+                    _scriptScale = _mathConstants.ScriptPercentScaleDown / 100f;
+                    _scriptScriptScale = _mathConstants.ScriptScriptPercentScaleDown / 100f;
+                } 
+                FontChanged(); 
+            }
+        } 
+
+        protected abstract GlyphBox NewGlyphBox();
+        protected abstract CustomNotationVsxBox NewCustomVxsBox();
+
+        public int ScriptLevel { get; private set; }
+        float _fontSize = 0;
+        public float FontSize
+        {
+            get => _fontSize;
             set
             {
                 _fontSize = value;
                 FontChanged();
-            } 
+            }
         }
-        private float _fontSize = 0;
-        public string FontFile 
-        { 
-            get => _fontFile;
-            set
-            {
-                _fontFile = value;
-                _latinModernMathFont = null;
-                FontChanged();
-            } 
-        }
-        private string _fontFile = null;
-        Typeface _latinModernMathFont;
-        GlyphMeshStore _glyphMeshStore = new GlyphMeshStore();
-        private float _scriptScale = 0.7f;
-        private float _scriptScriptScale = 0.5f;
-        private GlyphBox SpaceGlyph;
-        public MathBoxHelper()
-        {
-            FontSize = 20;
-            FontFile = null;
-        }
-        public int ScriptLevel { get; private set; }
-        private bool isScriptScript = false;
+
+
         public float GetCurrentLevelFontSize()
         {
             if (ScriptLevel == 0)
@@ -65,7 +72,7 @@ namespace MathLayout
             else
             {
                 float result = FontSize;
-                for(int i = 0; i < ScriptLevel; i++)
+                for (int i = 0; i < ScriptLevel; i++)
                 {
                     if (isScriptScript)
                     {
@@ -80,32 +87,31 @@ namespace MathLayout
             }
         }
 
-        private void FontChanged()
+
+        void FontChanged()
         {
-            if (FontFile != null)
+            if (_typeface != null)
             {
-                SpaceGlyph = new GlyphBox();
-                SpaceGlyph.Character = ' ';
-                AssignGlyphVxs(SpaceGlyph);
+                _spaceGlyph = NewGlyphBox();
+                _spaceGlyph.Character = ' ';
+                AssignGlyphVxs(_spaceGlyph);
             }
         }
 
-        private Box CreateSpaceGlyph()
+        Box CreateSpaceGlyph()
         {
-            if (FontFile != null)
-            {
-                GlyphBox space = new GlyphBox();
-                space.Character = ' ';
-                AssignGlyphVxs(space);
-                return space;
-            }
-            return null;
+
+            GlyphBox space = NewGlyphBox();
+            space.Character = ' ';
+            AssignGlyphVxs(space);
+            return space;
+
         }
         public Box CreateMathBoxs(List<math> nodes)
         {
             VerticalStackBox vbox = new VerticalStackBox();
             int count = nodes.Count;
-            for(int i = 0; i < count; i++)
+            for (int i = 0; i < count; i++)
             {
                 vbox.AddChild(CreateMathBox(nodes[i]));
             }
@@ -257,12 +263,12 @@ namespace MathLayout
                     result.Layout();
                     StretchHeightIfFenceAndStretchable(result, result.Height);
                 }
-                
+
             }
             return result;
         }
 
-        private Box CreateEncloseBox(MathNode node)
+        Box CreateEncloseBox(MathNode node)
         {
             EncloseBox encloseBox = new EncloseBox();
             encloseBox.MathNode = node;
@@ -293,8 +299,8 @@ namespace MathLayout
                 {
                     default:
                         //always symmetric
-                        maxTop = maxBottom = Math.Max(maxTop, over*2);
-                        maxLeft = maxRight = Math.Max(maxLeft, over*2);
+                        maxTop = maxBottom = Math.Max(maxTop, over * 2);
+                        maxLeft = maxRight = Math.Max(maxLeft, over * 2);
                         alwaySymmetric = true;
                         break;
                     case EncloseNotation.updiagonalstrike:
@@ -304,8 +310,8 @@ namespace MathLayout
                         //asymmetric possible
                         maxLeft = Math.Max(maxLeft, over * 2);
                         maxRight = Math.Max(maxRight, over * 2);
-                        maxTop = Math.Max(maxTop, over*2);
-                        maxBottom = Math.Max(maxBottom, under*2);
+                        maxTop = Math.Max(maxTop, over * 2);
+                        maxBottom = Math.Max(maxBottom, under * 2);
                         break;
                     case EncloseNotation.circle:
                         float xRadius = Math.Max((hbox.Width * 1.45f) / 2f, hbox.Width / 2f + _mathConstants.StackDisplayStyleGapMin.Value * GetPixelScale());
@@ -323,7 +329,7 @@ namespace MathLayout
                         maxBottom = Math.Max(maxBottom, under);
                         break;
                     case EncloseNotation.longdiv:
-                        GlyphBox ldiv = new GlyphBox();
+                        GlyphBox ldiv = NewGlyphBox();
                         ldiv.Character = ')';
                         AssignGlyphVxs(ldiv);
                         ldiv.Layout();
@@ -336,7 +342,7 @@ namespace MathLayout
                         maxBottom = Math.Max(maxBottom, under);
                         break;
                     case EncloseNotation.radical:
-                        GlyphBox radical = new GlyphBox();
+                        GlyphBox radical = NewGlyphBox();
                         radical.Character = (char)0x221A;
                         AssignGlyphVxs(radical);
                         radical.Layout();
@@ -363,170 +369,7 @@ namespace MathLayout
             float h = maxTop + hbox.Height + maxBottom;
             for (int i = 0; i < length; i++)
             {
-                EncloseNotation notation = notations[i];
-                //notations that only custom lines
-                using (Tools.BorrowVxs(out VertexStore vsx1, out VertexStore vsx2))
-                using (Tools.BorrowStroke(out Stroke stroke))
-                using (Tools.BorrowPathWriter(vsx1, out PathWriter pathWriter))
-                {
-                    CustomNotationVsxBox customVsxBox = new CustomNotationVsxBox();
-                    stroke.LineJoin = LineJoin.Bevel;
-                    stroke.Width = thickness;
-                    int useVxs = 1;//default = vxs1
-                    switch (notation)
-                    {
-                        default: useVxs = 0;//not match only lines notation
-                            break;
-                        case EncloseNotation.actuarial:
-                            pathWriter.MoveTo(0, 0);
-                            pathWriter.LineTo(w, 0);
-                            pathWriter.LineTo(w, h);
-                            break;
-                        case EncloseNotation.box:
-                            pathWriter.MoveTo(0, 0);
-                            pathWriter.LineTo(0, h);
-                            pathWriter.LineTo(w, h);
-                            pathWriter.LineTo(w, 0);
-                            pathWriter.LineTo(0, 0);
-                            break;
-                        case EncloseNotation.left:
-                            pathWriter.MoveTo(0, 0);
-                            pathWriter.LineTo(0, h);
-                            break;
-                        case EncloseNotation.right:
-                            pathWriter.MoveTo(w, 0);
-                            pathWriter.LineTo(w, h);
-                            break;
-                        case EncloseNotation.top:
-                            pathWriter.MoveTo(0, 0);
-                            pathWriter.LineTo(w, 0);
-                            break;
-                        case EncloseNotation.bottom:
-                            pathWriter.MoveTo(0, h);
-                            pathWriter.LineTo(w, h);
-                            break;
-                        case EncloseNotation.updiagonalstrike:
-                            pathWriter.MoveTo(0, h);
-                            pathWriter.LineTo(w, 0);
-                            break;
-                        case EncloseNotation.downdiagonalstrike:
-                            pathWriter.MoveTo(0, 0);
-                            pathWriter.LineTo(w, h);
-                            break;
-                        case EncloseNotation.verticalstrike:
-                            pathWriter.MoveTo(w / 2f, 0);
-                            pathWriter.LineTo(w / 2f, h);
-                            break;
-                        case EncloseNotation.horizontalstrike:
-                            pathWriter.MoveTo(0, h / 2f);
-                            pathWriter.LineTo(w, h / 2f);
-                            break;
-                        case EncloseNotation.madruwb:
-                            pathWriter.MoveTo(w, 0);
-                            pathWriter.LineTo(w, h);
-                            pathWriter.LineTo(0, h);
-                            break;
-                        case EncloseNotation.updiagonalarrow:
-                            double arrowAngleDegree = Math.Atan(h / w) * 180.0 / Math.PI;
-                            double arrowLength = Math.Sqrt(Math.Pow(h, 2) + Math.Pow(w, 2));//pythagoras
-
-                            float arrowWing = GetPixelScale() * 150;
-                            pathWriter.MoveTo(0, 0);
-                            pathWriter.LineTo(arrowLength, 0);
-                            pathWriter.LineTo(arrowLength - arrowWing, -arrowWing);
-                            pathWriter.LineTo(arrowLength - arrowWing, arrowWing);
-                            pathWriter.LineTo(arrowLength, 0);
-
-                            AffineMat mat = AffineMat.Iden();
-                            mat.RotateDeg(-arrowAngleDegree);
-                            mat.Translate(0, h);
-                            mat.TransformToVxs(vsx1, vsx2);
-
-                            useVxs = 2;
-                            break;
-                        case EncloseNotation.phasorangle:
-                            float angleWidth = 640 * GetPixelScale();//x 637.5
-                            float angleHeight = 1160 * GetPixelScale();//y 1162.5
-                            float shiftH = h - angleHeight;
-                            pathWriter.MoveTo(angleWidth, shiftH);
-                            pathWriter.LineTo(0, angleHeight + shiftH);
-                            pathWriter.LineTo(maxLeft - angleWidth + w, angleHeight + shiftH);
-
-                            customVsxBox.BeforeBaseBox = angleWidth;
-                            break;
-                        case EncloseNotation.longdiv:
-                            GlyphBox ldiv = new GlyphBox();
-                            ldiv.Character = ')';
-                            AssignGlyphVxs(ldiv);
-                            ldiv.Layout();
-
-                            Box actualDiv = StretchHeightIfStretchable(ldiv, hbox.Height + over);
-                            actualDiv.Layout();
-                            customVsxBox.NotationBox = actualDiv;
-                            float shiftLeft = maxLeft - actualDiv.Width;
-                            float shiftTop = maxTop - over;
-                            actualDiv.SetLocation(shiftLeft, -shiftTop - over);
-                            pathWriter.MoveTo(shiftLeft, shiftTop);
-                            pathWriter.LineTo(shiftLeft + hbox.Width + actualDiv.Width + extend, shiftTop);
-                            pathWriter.Stop();
-
-                            customVsxBox.BeforeBaseBox = actualDiv.Width + extend;
-                            break;
-                        case EncloseNotation.radical:
-                            GlyphBox radical = new GlyphBox();
-                            radical.Character = (char)0x221A;
-                            AssignGlyphVxs(radical);
-                            radical.Layout();
-
-                            Box actualRadical = StretchHeightIfStretchable(radical, hbox.Height + over);
-                            actualRadical.Layout();
-                            float shiftLeft1 = maxLeft - actualRadical.Width;
-                            float shiftTop1 = maxTop - over;
-                            actualRadical.SetLocation(shiftLeft1, -shiftTop1-over);
-                            customVsxBox.NotationBox = actualRadical;
-
-                            pathWriter.MoveTo(shiftLeft1 + actualRadical.Width, shiftTop1);
-                            pathWriter.LineTo(shiftLeft1 + actualRadical.Width + hbox.Width + extend, shiftTop1);
-                            pathWriter.Stop();
-
-                            customVsxBox.BeforeBaseBox = actualRadical.Width + extend;
-                            break;
-                        case EncloseNotation.roundedbox:
-                            using (Tools.BorrowRoundedRect(out var roundedRect))
-                            {
-                                roundedRect.SetRadius(over, over, over, over, over, over, over, over);
-                                roundedRect.SetRect(0, 0, w, h);
-                                roundedRect.MakeVxs(vsx1);
-                                customVsxBox.CustomVxs = stroke.CreateTrim(vsx1);
-                            }
-                            customVsxBox.BeforeBaseBox = over;
-                            break;
-                        case EncloseNotation.circle:
-                            using (Tools.BorrowEllipse(out Ellipse ellipse))
-                            {
-                                float xLength = hbox.Width / 2 + maxLeft;
-                                float yLength = hbox.Height / 2 + maxTop;
-
-                                ellipse.Set(xLength, yLength, xLength, yLength);
-                                ellipse.MakeVxs(vsx1);
-                                customVsxBox.CustomVxs = stroke.CreateTrim(vsx1);
-                                customVsxBox.BeforeBaseBox = maxLeft;
-                            }
-                            break;
-                    }
-                    if (useVxs > 0)
-                    {
-                        if (useVxs == 1)
-                        {
-                            customVsxBox.CustomVxs = stroke.CreateTrim(vsx1);
-                        }
-                        else if (useVxs == 2)
-                        {
-                            customVsxBox.CustomVxs = stroke.CreateTrim(vsx2);
-                        }
-                        encloseBox.NotationBoxs.Add(customVsxBox);
-                    }
-                }
+                CreateCustomNotation(notations[i], thickness, w, h, hbox, maxLeft, maxTop, extend, over, encloseBox);
             }
             encloseBox.TopSpace = maxTop;
             encloseBox.BottomSpace = maxBottom;
@@ -536,16 +379,21 @@ namespace MathLayout
             return encloseBox;
         }
 
-        private Box CreateStackLine(MathNode node)
+        protected abstract void CreateCustomNotation(EncloseNotation notation,
+           float thickness, float w, float h,
+           HorizontalStackBox hbox, float maxLeft, float maxTop, float extend, float over,
+           EncloseBox encloseBox);
+
+        Box CreateStackLine(MathNode node)
         {
             StackLine sline = new StackLine();
-            sline.StartPoint = new Point(0, 0);
+            sline.StartPoint = new LayoutFarm.MathLayout.Point();
             sline.StrokeWidth = _mathConstants.UnderbarRuleThickness.Value * GetPixelScale();
 
             return sline;
         }
 
-        private void FillContainerBox(ContainerBox containerBox, MathNode node, bool reverse = false)
+        void FillContainerBox(ContainerBox containerBox, MathNode node, bool reverse = false)
         {
             int child_count = node.ChildCount;
             if (reverse)
@@ -571,18 +419,18 @@ namespace MathLayout
                 }
             }
         }
-        private Box CreateTableBox(MathNode node)
+        Box CreateTableBox(MathNode node)
         {
             TableBox tableBox = new TableBox();
             int childCount = node.ChildCount;
-            for(int i = 0; i < childCount; i++)
+            for (int i = 0; i < childCount; i++)
             {
                 tableBox.AddChild(CreateMathBox(node.GetNode(i)));
             }
             return tableBox;
         }
 
-        private Box CreateFencedBox(MathNode node)
+        Box CreateFencedBox(MathNode node)
         {
             string open = node.GetAttributeValue("open");
             if (open == null)
@@ -605,7 +453,7 @@ namespace MathLayout
             int childCount = node.ChildCount;
             int sepMaxIndex = sepEach.Length - 1;
             hbox.AddChild(CreateGlyphBox(open));
-            for(int i = 0; i < childCount; i++)
+            for (int i = 0; i < childCount; i++)
             {
                 hbox.AddChild(CreateMathBox(node.GetNode(i)));
                 if (i != childCount - 1)
@@ -624,8 +472,8 @@ namespace MathLayout
             return hbox;
         }
 
-        private bool _isPhantom = false;
-        private Box CreatePhantomBox(MathNode node)
+        bool _isPhantom = false;
+        Box CreatePhantomBox(MathNode node)
         {
             HorizontalStackBox hbox = new HorizontalStackBox();
             int childCount = node.ChildCount;
@@ -637,26 +485,10 @@ namespace MathLayout
             _isPhantom = false;
             return hbox;
         }
-        private MathConstants _mathConstants;
-        void LoadFont()
-        {
-            if (_latinModernMathFont == null && FontFile != null)
-            {
-                using (FileStream fs = new FileStream(FontFile, FileMode.Open))
-                {
-                    OpenFontReader reader = new OpenFontReader();
-                    _latinModernMathFont = reader.Read(fs);
-                }
-                _mathConstants = _latinModernMathFont.MathConsts;
-                if (_mathConstants != null)
-                {
-                    _scriptScale = _mathConstants.ScriptPercentScaleDown/100f;
-                    _scriptScriptScale = _mathConstants.ScriptScriptPercentScaleDown / 100f;
-                }
-            }
-        }
+        MathConstants _mathConstants;
 
-        void AssignGlyphVxs(Box box)
+
+        protected void AssignGlyphVxs(Box box)
         {
             if (box is GlyphBox glyphBox)
             {
@@ -672,30 +504,25 @@ namespace MathLayout
             }
         }
 
-        private float GetPixelScale()
-        {
-            return _latinModernMathFont.CalculateScaleToPixelFromPointSize(GetCurrentLevelFontSize());
-        }
-        private float GetPixelFromDesignSize(MathValueRecord value)
-        {
-            float px_scale = GetPixelScale();
-            return value.Value * px_scale;
-        }
+        protected float GetPixelScale() => _typeface.CalculateScaleToPixelFromPointSize(GetCurrentLevelFontSize());
 
-        private void AssignGlyphVxs(GlyphBox glyphBox)
+        float GetPixelFromDesignSize(MathValueRecord value) => value.Value * GetPixelScale();
+
+        void AssignGlyphVxs(GlyphBox glyphBox)
         {
-            LoadFont();
+          
             char ch = glyphBox.Character;
-            if (ch == 0 || glyphBox.GlyphVxs != null || MathMLOperatorTable.IsInvicibleCharacter(ch))
+            if (ch == 0 || glyphBox.HasVxs || MathMLOperatorTable.IsInvicibleCharacter(ch))
             {
                 return;
             }
-            ushort glyphIndex = _latinModernMathFont.GetGlyphIndex((int)ch);
+            ushort glyphIndex = _typeface.GetGlyphIndex((int)ch);
             if (glyphIndex == 0)//glyphindex not found
             {
                 switch ((int)ch)
                 {
-                    case 8254: glyphIndex = 2246;//overline
+                    case 8254:
+                        glyphIndex = 2246;//overline
                         break;
                     default:
                         throw new NotSupportedException();
@@ -704,21 +531,20 @@ namespace MathLayout
             AssignGlyphVxsByGlyphIndex(glyphBox, glyphIndex);
         }
 
-        private void AssignGlyphVxsByGlyphIndex(GlyphBox glyphBox, ushort glyphIndex)
+
+        void AssignGlyphVxsByGlyphIndex(GlyphBox glyphBox, ushort glyphIndex)
         {
-            LoadFont();
+           
             float font_size_in_Point = GetCurrentLevelFontSize();
             float px_scale = GetPixelScale();
-            if (glyphBox.GlyphVxs != null)
+            if (glyphBox.HasVxs)
             {
                 return;
             }
-            _glyphMeshStore.SetFont(_latinModernMathFont, font_size_in_Point);//20= font size
-            _glyphMeshStore.FlipGlyphUpward = true;
 
-            if (_latinModernMathFont.HasMathTable())
+            if (_typeface.HasMathTable())
             {
-                Glyph glyph = _latinModernMathFont.GetGlyph(glyphIndex);
+                Glyph glyph = _typeface.GetGlyph(glyphIndex);
                 if (glyph.MathGlyphInfo != null)
                 {
                     glyphBox.MathGlyphInfo = glyph.MathGlyphInfo;
@@ -732,43 +558,20 @@ namespace MathLayout
                     }
                 }
             }
-            ushort advW = _latinModernMathFont.GetHAdvanceWidthFromGlyphIndex(glyphIndex);//unscale glyph width
+            ushort advW = _typeface.GetHAdvanceWidthFromGlyphIndex(glyphIndex);//unscale glyph width
             int advW_s = (int)System.Math.Round(px_scale * advW);
-            VertexStore v1 = _glyphMeshStore.GetGlyphMesh(glyphIndex);
+
             glyphBox.GlyphIndex = glyphIndex;
-            glyphBox.GlyphVxs = v1;
             glyphBox.AdvanceWidthScale = advW_s;
             glyphBox.MathConstants = _mathConstants;
             glyphBox.PixelScale = px_scale;
+
+            SetGlyphVxs(glyphBox, _typeface, font_size_in_Point);
+
+
         }
 
-        public static VertexStore ScaleVertexStoreWidthTo(VertexStore source, float width)
-        {
-            var bound = source.GetBoundingRect();
-            float scale = width / (float)bound.Width;
-
-            VertexStore output = new VertexStore();
-            AffineMat mat = AffineMat.Iden();
-            mat.Translate(0, 0);
-            mat.Scale(scale, 1);
-
-            mat.TransformToVxs(source, output);
-            return output;
-        }
-
-        public static VertexStore ScaleVertexStoreHeightTo(VertexStore source, float height)
-        {
-            var bound = source.GetBoundingRect();
-            float scale = height / (float)bound.Height;
-
-            VertexStore output = new VertexStore();
-            AffineMat mat = AffineMat.Iden();
-            mat.Translate(0,0);
-            mat.Scale(1, scale);
-
-            mat.TransformToVxs(source, output);
-            return output;
-        }
+        protected abstract void SetGlyphVxs(GlyphBox glyphbox, Typeface typeface, float sizeInPoint);
 
         private Box StretchGlyphHeight(GlyphBox glyphBox, float targetHeight)
         {
@@ -812,13 +615,13 @@ namespace MathLayout
                                     float dif2 = System.Math.Abs(targetHeight - px);
                                     if (dif1 < dif2)//prev is closest
                                     {
-                                        i = i - 1;
+                                        i -= 1;
                                     }
                                 }
 
-                                glyphBox.GlyphVxs = null;
+                                glyphBox.ClearVxs();
                                 AssignGlyphVxsByGlyphIndex(glyphBox, variantRecords[i].VariantGlyph);
-                                glyphBox.GlyphVxs = ScaleVertexStoreHeightTo(glyphBox.GlyphVxs, targetHeight);
+                                glyphBox.ScalteToFitHeight(targetHeight);
                                 glyphBox.Stretched = stretch;
                                 glyphBox.Depth = 0;
                                 scale = true;
@@ -840,7 +643,7 @@ namespace MathLayout
                     VerticalStackBox vbox = new VerticalStackBox();
                     for (int i = partCount - 1; i >= 0; i--)
                     {
-                        GlyphBox gbox = new GlyphBox();
+                        GlyphBox gbox = NewGlyphBox();
                         AssignGlyphVxsByGlyphIndex(gbox, partRecords[i].GlyphId);
                         vbox.AddChild(gbox);
                     }
@@ -853,7 +656,7 @@ namespace MathLayout
                         for (int i = 0; i < stretchPart; i++)
                         {
                             GlyphBox gbox = (GlyphBox)vbox.GetChild((i * 2) + 1);
-                            gbox.GlyphVxs = ScaleVertexStoreHeightTo(gbox.GlyphVxs, gbox.Height + eachPartStrectH);
+                            gbox.ScalteToFitHeight(gbox.Height + eachPartStrectH);
                             gbox.Layout();
                             gbox.Depth = 0;
                         }
@@ -864,7 +667,7 @@ namespace MathLayout
                         for (int i = 0; i < partCount; i++)
                         {
                             GlyphBox gbox = (GlyphBox)vbox.GetChild(i);
-                            gbox.GlyphVxs = ScaleVertexStoreHeightTo(gbox.GlyphVxs, eachPartStrectH);
+                            gbox.ScalteToFitHeight(eachPartStrectH);
                             gbox.Layout();
                             gbox.Depth = 0;
                         }
@@ -882,7 +685,7 @@ namespace MathLayout
             return glyphBox;
         }
 
-        private Box StretchGlyphWidth(GlyphBox glyphBox, float targetWidth)
+        Box StretchGlyphWidth(GlyphBox glyphBox, float targetWidth)
         {
             if (MathMLOperatorTable.IsStretchyPropertyOperator(glyphBox.Character + ""))
             {
@@ -912,13 +715,13 @@ namespace MathLayout
                                     float dif2 = System.Math.Abs(targetWidth - px);
                                     if (dif1 < dif2)//prev is closest
                                     {
-                                        i = i - 1;
+                                        i -= 1;
                                     }
                                 }
 
-                                glyphBox.GlyphVxs = null;
+                                glyphBox.ClearVxs();
                                 AssignGlyphVxsByGlyphIndex(glyphBox, variantRecords[i].VariantGlyph);
-                                glyphBox.GlyphVxs = ScaleVertexStoreWidthTo(glyphBox.GlyphVxs, targetWidth);
+                                glyphBox.ScaleToFitWidth(targetWidth);
                                 scale = true;
                                 break;
                             }
@@ -939,7 +742,7 @@ namespace MathLayout
                     HorizontalStackBox hbox = new HorizontalStackBox();
                     for (int i = 0; i < partCount; i++)
                     {
-                        GlyphBox gbox = new GlyphBox();
+                        GlyphBox gbox = NewGlyphBox();
                         AssignGlyphVxsByGlyphIndex(gbox, partRecords[i].GlyphId);
                         hbox.AddChild(gbox);
                     }
@@ -953,7 +756,7 @@ namespace MathLayout
                         {
                             GlyphBox gbox = (GlyphBox)hbox.GetChild((i * 2) + 1);
                             float newWidth = eachPartStrectH + gbox.Width;
-                            gbox.GlyphVxs = ScaleVertexStoreWidthTo(gbox.GlyphVxs, newWidth);
+                            gbox.ScaleToFitWidth(newWidth);
                             gbox.AdvanceWidthScale = (int)newWidth;
                         }
                     }
@@ -963,7 +766,7 @@ namespace MathLayout
                         for (int i = 0; i < partCount; i++)
                         {
                             GlyphBox gbox = (GlyphBox)hbox.GetChild(i);
-                            gbox.GlyphVxs = ScaleVertexStoreWidthTo(gbox.GlyphVxs, eachPartStrectH);
+                            gbox.ScaleToFitWidth(eachPartStrectH);
                             gbox.AdvanceWidthScale = (int)eachPartStrectH;
                         }
                     }
@@ -980,23 +783,23 @@ namespace MathLayout
             return glyphBox;
         }
 
-        private GlyphBox CreateGlyphBox(char ch)
+        GlyphBox CreateGlyphBox(char ch)
         {
-            GlyphBox glyphBox = new GlyphBox();
+            GlyphBox glyphBox = NewGlyphBox();
             glyphBox.Character = ch;
             glyphBox.IsInvisible = _isPhantom;
             return glyphBox;
         }
 
-        private HorizontalStackBox CreateGlyphBox(string str)
+        HorizontalStackBox CreateGlyphBox(string str)
         {
             if (str != null && str.Length > 0)
             {
                 int length = str.Length;
                 HorizontalStackBox hbox = new HorizontalStackBox();
-                for(int i = 0; i < length; i++)
+                for (int i = 0; i < length; i++)
                 {
-                    GlyphBox glyphBox = new GlyphBox();
+                    GlyphBox glyphBox = NewGlyphBox();
                     glyphBox.Character = str[i];
                     glyphBox.IsInvisible = _isPhantom;
                     hbox.AddChild(glyphBox);
@@ -1005,7 +808,7 @@ namespace MathLayout
             }
             return null;
         }
-        private Box CreateTextBox(MathNode node)
+        Box CreateTextBox(MathNode node)
         {
             if (node.Text == null)
             {
@@ -1024,9 +827,9 @@ namespace MathLayout
                 for (int i = 0; i < text_buff.Length; ++i)
                 {
                     char ch = text_buff[i];
-                    if(!MathMLOperatorTable.IsInvicibleCharacter(ch))
+                    if (!MathMLOperatorTable.IsInvicibleCharacter(ch))
                     {
-                        GlyphBox glyphBox = new GlyphBox();
+                        GlyphBox glyphBox = NewGlyphBox();
                         glyphBox.Character = ch;
                         glyphBox.IsInvisible = _isPhantom;
                         textSpan.AddChild(glyphBox);
@@ -1039,7 +842,7 @@ namespace MathLayout
                 //len=1
                 if (!MathMLOperatorTable.IsInvicibleCharacter(text_buff[0]))
                 {
-                    GlyphBox glyphBox = new GlyphBox();
+                    GlyphBox glyphBox = NewGlyphBox();
                     glyphBox.MathNode = node;
                     glyphBox.Character = text_buff[0];
                     glyphBox.IsInvisible = _isPhantom;
@@ -1049,7 +852,7 @@ namespace MathLayout
             }
         }
 
-        private HorizontalStackBox CreateHorizontalBox(MathNode node, bool reverse = false)
+        HorizontalStackBox CreateHorizontalBox(MathNode node, bool reverse = false)
         {
             HorizontalStackBox hbox = new HorizontalStackBox();
             hbox.MathNode = node;
@@ -1057,7 +860,7 @@ namespace MathLayout
             FillContainerBox(hbox, node, reverse);
             return hbox;
         }
-        private Box StretchHeightIfFenceAndStretchable(Box box, float height)
+        Box StretchHeightIfFenceAndStretchable(Box box, float height)
         {
             if (box is GlyphBox gbox)
             {
@@ -1107,7 +910,7 @@ namespace MathLayout
             return box;
         }
 
-        private Box StretchHeightIfStretchable(Box box, float height)
+        protected Box StretchHeightIfStretchable(Box box, float height)
         {
             if (box is GlyphBox gbox)
             {
@@ -1125,7 +928,7 @@ namespace MathLayout
             return box;
         }
 
-        private Box StretchHeightIfStretchable(GlyphBox gbox, float height)
+        Box StretchHeightIfStretchable(GlyphBox gbox, float height)
         {
             if (MathMLOperatorTable.IsStretchyPropertyOperator(gbox.Character + ""))
             {
@@ -1134,7 +937,7 @@ namespace MathLayout
             return gbox;
         }
 
-        private Box StretchWidthIfStretchable(Box box, float width)
+        Box StretchWidthIfStretchable(Box box, float width)
         {
             if (box is GlyphBox gbox)
             {
@@ -1152,12 +955,12 @@ namespace MathLayout
             return box;
         }
 
-        private Box StretchWidthIfStretchable(GlyphBox gbox, float width)
+        Box StretchWidthIfStretchable(GlyphBox gbox, float width)
         {
             return StretchGlyphWidth(gbox, width);
         }
 
-        private VerticalStackBox CreateVerticalBox(MathNode node, bool reverse = false)
+        VerticalStackBox CreateVerticalBox(MathNode node, bool reverse = false)
         {
             VerticalStackBox vbox = new VerticalStackBox();
             vbox.MathNode = node;
@@ -1166,7 +969,7 @@ namespace MathLayout
             return vbox;
         }
 
-        private Box CreateFractionsBox(MathNode node)
+        Box CreateFractionsBox(MathNode node)
         {
             if (node.ChildCount != 2)//Required argument count
             {
@@ -1217,14 +1020,14 @@ namespace MathLayout
             bool bevelled = AttributeParser.ParseBoolean(node.GetAttributeValue("bevelled"), false);
             if (bevelled)
             {
-                
+
                 LineBox bevelLine = new LineBox();
                 bevelLine.StrokeWidth = thickness;
                 float horGap = _mathConstants.SkewedFractionHorizontalGap.Value * GetPixelScale();
-                float verGap = _mathConstants.SkewedFractionVerticalGap.Value* GetPixelScale();
+                float verGap = _mathConstants.SkewedFractionVerticalGap.Value * GetPixelScale();
                 float maxHeight = Math.Max(numerator.Height, denominator.Height) + verGap;
-                bevelLine.StartPoint = new Point(0, (int)(maxHeight));
-                bevelLine.EndPoint = new Point((int)(horGap), 0);
+                bevelLine.StartPoint = new LayoutFarm.MathLayout.Point(0, (int)(maxHeight));
+                bevelLine.EndPoint = new LayoutFarm.MathLayout.Point((int)(horGap), 0);
 
                 if (numerator.Height < maxHeight)
                 {
@@ -1296,7 +1099,7 @@ namespace MathLayout
             fractionBox.LineThickness = thickness;
             return fractionBox;
         }
-        private Box CreateStoreBoxNewWidth(Box box, float newWidth)
+        Box CreateStoreBoxNewWidth(Box box, float newWidth)
         {
             HorizontalStackBox storeBox = new HorizontalStackBox();
             storeBox.SetSize(newWidth, box.Height);
@@ -1304,7 +1107,7 @@ namespace MathLayout
             return storeBox;
         }
 
-        private Box CreateRadicalBox(MathNode node)
+        Box CreateRadicalBox(MathNode node)
         {
             if (node.ChildCount < 1)
             {
@@ -1312,7 +1115,7 @@ namespace MathLayout
             }
             RadicalBox hbox = new RadicalBox();
             hbox.MathNode = node;
-            GlyphBox radicalChar = new GlyphBox();
+            GlyphBox radicalChar = NewGlyphBox();
             radicalChar.MathNode = node;
             radicalChar.Character = (char)0x221A;//radical character
             AssignGlyphVxs(radicalChar);
@@ -1370,7 +1173,7 @@ namespace MathLayout
             return hbox;
         }
 
-        private Box CreateUnderscriptBox(MathNode node)
+        Box CreateUnderscriptBox(MathNode node)
         {
             if (node.ChildCount != 2)
             {
@@ -1418,7 +1221,7 @@ namespace MathLayout
             return underscriptBox;
         }
 
-        private Box CreateOverscriptBox(MathNode node)
+        Box CreateOverscriptBox(MathNode node)
         {
             if (node.ChildCount != 2)
             {
@@ -1466,7 +1269,7 @@ namespace MathLayout
             return overscriptBox;
         }
 
-        private Box CreateUnderscriptOverscriptBox(MathNode node)
+        Box CreateUnderscriptOverscriptBox(MathNode node)
         {
             if (node.ChildCount != 3)
             {
@@ -1533,7 +1336,7 @@ namespace MathLayout
                 overBox = StretchWidthIfStretchable(overBox, newWidth);
                 ScriptLevel--;
             }
-            
+
             underscriptOverscriptBox.BaseBox = baseBox;
             underscriptOverscriptBox.UnderscriptBox = underBox;
             underscriptOverscriptBox.OverscriptBox = overBox;
@@ -1541,7 +1344,7 @@ namespace MathLayout
             return underscriptOverscriptBox;
         }
 
-        private Box CreateSubscriptBox(MathNode node)
+        Box CreateSubscriptBox(MathNode node)
         {
             if (node.ChildCount != 2)
             {
@@ -1553,7 +1356,7 @@ namespace MathLayout
 
             ScriptLevel++;
             Box subscriptBox = CreateMathBox(node.GetNode(1));
-            
+
             ScriptLevel--;
             if (_mathConstants != null)
             {
@@ -1566,7 +1369,7 @@ namespace MathLayout
             return subscript;
         }
 
-        private Box CreateSuperscriptBox(MathNode node)
+        Box CreateSuperscriptBox(MathNode node)
         {
             if (node.ChildCount != 2)
             {
@@ -1591,7 +1394,7 @@ namespace MathLayout
             return superscript;
         }
 
-        private Box CreateSubscriptSuperscriptBox(MathNode node)
+        Box CreateSubscriptSuperscriptBox(MathNode node)
         {
             if (node.ChildCount != 3)
             {
@@ -1623,7 +1426,7 @@ namespace MathLayout
             return subscriptSuperscriptBox;
         }
 
-        private Box CreateMultiScriptBox(MathNode node)
+        Box CreateMultiScriptBox(MathNode node)
         {
             int count = node.ChildCount;
             if (count < 3)
@@ -1631,11 +1434,11 @@ namespace MathLayout
                 return null;
             }
             MultiScriptBox multiScriptBox = new MultiScriptBox();
-            
+
             Box baseBox = CreateMathBox(node.GetNode(0));
-            
+
             bool isPrescript = false;
-            for(int i = 1; i < count; i++)
+            for (int i = 1; i < count; i++)
             {
                 MathNode mnode = node.GetNode(i);
                 if (mnode.Name == "mprescripts")
@@ -1680,7 +1483,7 @@ namespace MathLayout
             return multiScriptBox;
         }
 
-        private Box CreateStackBox(MathNode node)
+        Box CreateStackBox(MathNode node)
         {
             StackBox stackBox = new StackBox();
             stackBox.MathNode = node;
@@ -1691,7 +1494,7 @@ namespace MathLayout
 
                 int count = stackBox.ChildCount;
                 float maxWidth = stackBox.Width;
-                for(int i = 0; i < count; i++)
+                for (int i = 0; i < count; i++)
                 {
                     Box box = stackBox.GetChild(i);
                     if (box is LineBox lnb)
@@ -1709,8 +1512,8 @@ namespace MathLayout
                         {
                             continue;
                         }
-                        lnb.StartPoint = new Point(0, 0);
-                        lnb.EndPoint = new Point((int)target.Width, 0);
+                        lnb.StartPoint = new LayoutFarm.MathLayout.Point(0, 0);
+                        lnb.EndPoint = new LayoutFarm.MathLayout.Point((int)target.Width, 0);
                         lnb.StrokeWidth = _mathConstants.UnderbarRuleThickness.Value * GetPixelScale();
                         lnb.MarginTop = _mathConstants.FractionNumeratorShiftUp.Value * GetPixelScale();
                         lnb.MarginBottom = _mathConstants.FractionDenominatorShiftDown.Value * GetPixelScale();
@@ -1721,7 +1524,7 @@ namespace MathLayout
             return stackBox;
         }
 
-        private Box CreateStackRow(MathNode node)
+        Box CreateStackRow(MathNode node)
         {
             StackRow stackRow = new StackRow();
             stackRow.MathNode = node;
@@ -1731,7 +1534,7 @@ namespace MathLayout
             return stackRow;
         }
 
-        private Box CreateStackGroup(MathNode node)
+        Box CreateStackGroup(MathNode node)
         {
             StackGroup stackGroup = new StackGroup();
             stackGroup.MathNode = node;
@@ -1741,7 +1544,7 @@ namespace MathLayout
             return stackGroup;
         }
 
-        private Box CreateCarriesBox(MathNode node)
+        Box CreateCarriesBox(MathNode node)
         {
             ScriptLevel++;
             ScriptLevel++;
@@ -1755,7 +1558,7 @@ namespace MathLayout
             return carriesBox;
         }
 
-        private Box CreateCarryBox(MathNode node)
+        Box CreateCarryBox(MathNode node)
         {
             StackCarryBox carryBox = new StackCarryBox();
             carryBox.MathNode = node;

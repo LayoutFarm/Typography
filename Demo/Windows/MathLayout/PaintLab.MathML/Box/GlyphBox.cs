@@ -1,10 +1,8 @@
 ﻿//MIT, 2020, Brezza92
-using PixelFarm.Drawing;
 using System.Collections.Generic;
-using PixelFarm.CpuBlit.VertexProcessing;
+
 using MathLayout;
 using Typography.OpenFont.MathGlyphs;
-
 
 namespace LayoutFarm.MathLayout
 {
@@ -43,9 +41,9 @@ namespace LayoutFarm.MathLayout
         }
 #endif
         public MathNode MathNode { get => GetMathNode(); set => SetMathNode(value); }
-        internal MathConstants MathConstants { get; set; }
-        internal float PixelScale { get; set; }
-        internal float BaseLineShift { get; set; }
+        public MathConstants MathConstants { get; set; }
+        public float PixelScale { get; set; }
+        public float BaseLineShift { get; set; }
         public float Left { get; set; }
         public float Top { get; set; }
         public float Width { get; set; }
@@ -356,6 +354,8 @@ namespace LayoutFarm.MathLayout
             string accentUnderStr = node.GetAttributeValue("accentunder");
             AccentUnder = AttributeParser.ParseBoolean(accentUnderStr, false);
         }
+
+
         public override void Layout()
         {
             BaseBox.Layout();
@@ -368,20 +368,23 @@ namespace LayoutFarm.MathLayout
             if (OverscriptBox != null)
             {
                 bool isAccentBox = false, isTopLine = false;
+
                 if (OverscriptBox is GlyphBox gbox)
                 {
                     if (MathMLOperatorTable.IsStretchyPropertyOperator(gbox.Character + ""))
                     {
                         if (BaseBox is GlyphBox baseGlyph)
                         {
-                            gbox.GlyphVxs = MathBoxHelper.ScaleVertexStoreWidthTo(gbox.GlyphVxs, (float)baseGlyph.GlyphVxs.GetBoundingRect().Width);
+                            gbox.ScaleToFitWidth((float)baseGlyph.GetBoundingRect().Width);
                         }
                         else
                         {
-                            gbox.GlyphVxs = MathBoxHelper.ScaleVertexStoreWidthTo(gbox.GlyphVxs, BaseBox.Width);
+                            gbox.ScaleToFitWidth(BaseBox.Width);
                         }
                     }
-                    var bounding = gbox.GlyphVxs.GetBoundingRect();
+
+                    var bounding = gbox.GetBoundingRect();
+
                     OverscriptBox.MarginTop = -(float)(bounding.Top + bounding.Height);
                     //if (MathMLOperatorTable.IsAccentPropertyOperator(gbox.Character + ""))
                     {
@@ -410,7 +413,7 @@ namespace LayoutFarm.MathLayout
                         OverscriptBox.Top = OverscriptBox.MarginTop + OverscriptBox.Height;
                         sumHeight += OverscriptBox.Height * 2 + OverscriptBox.MarginBottom;
                     }
-                    
+
                 }
 
                 if (OverscriptBox.Width < scriptMaxWidth)//center
@@ -432,32 +435,34 @@ namespace LayoutFarm.MathLayout
                     {
                         if (BaseBox is GlyphBox baseGlyph)
                         {
-                            gbox.GlyphVxs = MathBoxHelper.ScaleVertexStoreWidthTo(gbox.GlyphVxs, (float)baseGlyph.GlyphVxs.GetBoundingRect().Width);
+                            gbox.ScaleToFitWidth((float)baseGlyph.GetBoundingRect().Width);
                         }
                         else
                         {
-                            gbox.GlyphVxs = MathBoxHelper.ScaleVertexStoreWidthTo(gbox.GlyphVxs, BaseBox.Width);
+                            gbox.ScaleToFitWidth(BaseBox.Width);
                         }
                     }
 
-                    var bounding = gbox.GlyphVxs.GetBoundingRect();
+                    var bounding = gbox.GetBoundingRect();
                     UnderscriptBox.MarginTop = (float)(-bounding.Top - bounding.Height);
                     if (MathMLOperatorTable.IsAccentPropertyOperator(gbox.Character + ""))
                     {
                         isAccentChar = true;
+
+                        //TODO: review here, (temp fix for latin-modern?)
                         if (gbox.GlyphIndex == 2256 || gbox.Character == '_')//special condition for overline and lowline
                         {
                             isLowLine = true;
                         }
                     }
-                        
+
                 }
                 else
                 {
                     if (UnderscriptBox is StretchCharBox stretchChar)
                     {
                         isAccentChar = true;
-                        var bounding = stretchChar.OriginalGlyph.GlyphVxs.GetBoundingRect();
+                        var bounding = stretchChar.OriginalGlyph.GetBoundingRect();
                         UnderscriptBox.MarginTop = (float)(-bounding.Top - bounding.Height);
                         //UnderscriptBox.MarginTop = MathConstants.AxisHeight.Value * BaseBox.PixelScale;
                         //UnderscriptBox.MarginTop = 1000;
@@ -470,7 +475,7 @@ namespace LayoutFarm.MathLayout
                 UnderscriptBox.Layout();
                 scriptMaxWidth = System.Math.Max(scriptMaxWidth, UnderscriptBox.Width);
                 UnderscriptBox.Top = UnderscriptBox.MarginTop + sumHeight + BaseBox.Depth;
-                float accunder = UnderscriptBox.Height + System.Math.Abs(AccentUnder ? BaseBox.TopAccentAttachmentScale/4f : BaseBox.TopAccentAttachmentScale);
+                float accunder = UnderscriptBox.Height + System.Math.Abs(AccentUnder ? BaseBox.TopAccentAttachmentScale / 4f : BaseBox.TopAccentAttachmentScale);
                 if (isAccentChar && !isLowLine)
                 {
                     float accentH = UnderscriptBox.Height + (System.Math.Abs(BaseBox.TopAccentAttachmentScale) * (AccentUnder ? -1 : 1));
@@ -530,30 +535,27 @@ namespace LayoutFarm.MathLayout
 
         }
     }
-    public class GlyphBox : Box
+    public abstract class GlyphBox : Box
     {
         public override BoxKind Kind => BoxKind.GlyphBox;
+        public GlyphBox() { }
+
         public char Character { get; set; }
         public bool Stretched { get; set; }
-        public int GlyphIndex { get; set; }
+        public ushort GlyphIndex { get; set; }
         public bool IsInvisible { get; set; }
-        private bool _alreadyLayout = false;
-        private VertexStore _glyphVxs;
-        public VertexStore GlyphVxs
-        {
-            get => _glyphVxs;
-            set
-            {
-                _glyphVxs = value;
-                _alreadyLayout = false;
-            }
-        }
+
+
+        public abstract void ScaleToFitWidth(float width);
+        public abstract void ScalteToFitHeight(float height);
+        public abstract Rect GetBoundingRect();
+
+        public abstract bool HasVxs { get; }
+        public abstract void ClearVxs();
+
         public MathGlyphInfo MathGlyphInfo { get; set; }
         public int AdvanceWidthScale { get; set; }
-        public GlyphBox()
-        {
-            IsInvisible = false;
-        }
+        protected bool _alreadyLayout = false;
         public override void Layout()
         {
 #if DEBUG
@@ -566,15 +568,15 @@ namespace LayoutFarm.MathLayout
             {
                 return;
             }
-            if (GlyphVxs != null)
+            if (HasVxs)
             {
-                var bound = GlyphVxs.GetBoundingRect();
+                var bounds = GetBoundingRect();
                 if (MathMLOperatorTable.IsLargeOpPropertyOperator(Character + ""))
                 {
-                    this.Depth = (float)bound.Top;
+                    this.Depth = (float)bounds.Top;
                 }
                 this.Width = AdvanceWidthScale;
-                this.Height = (float)bound.Height;
+                this.Height = (float)bounds.Height;
                 _alreadyLayout = true;
             }
         }
@@ -667,7 +669,7 @@ namespace LayoutFarm.MathLayout
                     {
                         maxFractionLineTop = System.Math.Max(maxFractionLineTop, fbox.FractionLine.Top + fbox.FractionLine.Height);
                     }
-                    
+
                 }
                 else if (b is ContainerBox cbox)
                 {
@@ -678,7 +680,7 @@ namespace LayoutFarm.MathLayout
                     aboveBLS = b.Height - System.Math.Abs(b.BaseLineShift);
                 }
 
-                if(maxAboveBLS < aboveBLS)
+                if (maxAboveBLS < aboveBLS)
                 {
                     maxAboveBLS = aboveBLS;
                     maxAboveIndex = i;
@@ -809,7 +811,7 @@ namespace LayoutFarm.MathLayout
                     underOverBox.MarginTop = this.Height - underOverBox.Height;
                     if (underOverBox.BaseBox is GlyphBox undOvrBase)
                     {
-                        if (MathMLOperatorTable.IsFencePropertyOperator(undOvrBase.Character+""))
+                        if (MathMLOperatorTable.IsFencePropertyOperator(undOvrBase.Character + ""))
                         {
                             underOverBox.Top = underOverBox.MarginTop;
                             continue;
@@ -839,7 +841,7 @@ namespace LayoutFarm.MathLayout
                     if (b.BaseLineShift < 0)
                     {
                         float accent = ((MathConstants.AccentBaseHeight.Value * this.PixelScale) / 2);
-                        float diff = b.BaseLineShift - baseLine  + additionShift;
+                        float diff = b.BaseLineShift - baseLine + additionShift;
                         if (b is ContainerBox cbox)
                         {
                             b.Top = diff + (accent / 2);
@@ -924,7 +926,7 @@ namespace LayoutFarm.MathLayout
         protected override void SetMathNode(MathNode node)
         {
             Bevelled = AttributeParser.ParseBoolean(node.GetAttributeValue("bevelled"), false);
-            
+
             base.SetMathNode(node);
         }
         public override void Layout()
@@ -1006,7 +1008,7 @@ namespace LayoutFarm.MathLayout
         public override BoxKind Kind => BoxKind.TableBox;
         public override void Layout()
         {
-            List<float> columnsWidth = new List<float>();
+            List<float> columnsWidths = new List<float>();
             int row = ChildCount;
             float top = 0;
             float latestMarginBottom = 0;
@@ -1038,27 +1040,27 @@ namespace LayoutFarm.MathLayout
                     for (int colIndex = 0; colIndex < col; colIndex++)
                     {
                         Box hboxChild = hbox.GetChild(colIndex);
-                        if (columnsWidth.Count >= colIndex + 1)
+                        if (columnsWidths.Count >= colIndex + 1)
                         {
-                            float maxWidth = System.Math.Max(hboxChild.Width, columnsWidth[colIndex]);
-                            columnsWidth[0] = maxWidth;
+                            float maxWidth = System.Math.Max(hboxChild.Width, columnsWidths[colIndex]);
+                            columnsWidths[0] = maxWidth;
                         }
                         else
                         {
-                            columnsWidth.Add(hboxChild.Width);
+                            columnsWidths.Add(hboxChild.Width);
                         }
                     }
                 }
                 else
                 {
-                    if (columnsWidth.Count > 0)
+                    if (columnsWidths.Count > 0)
                     {
-                        float maxWidth = System.Math.Max(box.Width, columnsWidth[0]);
-                        columnsWidth[0] = maxWidth;
+                        float maxWidth = System.Math.Max(box.Width, columnsWidths[0]);
+                        columnsWidths[0] = maxWidth;
                     }
                     else
                     {
-                        columnsWidth.Add(box.Width);
+                        columnsWidths.Add(box.Width);
                     }
                 }
             }
@@ -1072,7 +1074,7 @@ namespace LayoutFarm.MathLayout
                     int col = hbox.ChildCount;
                     for (int colIndex = 0; colIndex < col; colIndex++)
                     {
-                        float colMaxWidth = columnsWidth[colIndex];
+                        float colMaxWidth = columnsWidths[colIndex];
                         Box hboxChild = hbox.GetChild(colIndex);
                         if (hboxChild.Width < colMaxWidth)
                         {
@@ -1089,7 +1091,7 @@ namespace LayoutFarm.MathLayout
                 }
                 else
                 {
-                    float colMaxWidth = columnsWidth[0];
+                    float colMaxWidth = columnsWidths[0];
                     if (box.Width < colMaxWidth)
                     {
                         HorizontalStackBox storageBox = new HorizontalStackBox();
@@ -1103,9 +1105,20 @@ namespace LayoutFarm.MathLayout
                     }
                 }
             }
-            this.Width = (float)columnsWidth.Sum((v) => v);
+
+            this.Width = Sum(columnsWidths);
             this.Height = top;
             this.PixelScale = maxPixelScale;
+        }
+        static float Sum(List<float> list)
+        {
+            int j = list.Count;
+            float sum = 0;
+            for (int i = 0; i < j; ++i)
+            {
+                sum += list[i];
+            }
+            return sum;
         }
     }
 
@@ -1133,13 +1146,13 @@ namespace LayoutFarm.MathLayout
             maxH = BaseBox.Height;
             maxW = BaseBox.Width + BaseBox.MarginLeft;
             float beforeBaseBox = 0;
-            foreach(Box b in NotationBoxs)
+            foreach (Box b in NotationBoxs)
             {
                 b.Layout();
             }
             if (beforeBaseBox > 0)
             {
-                foreach(Box b in NotationBoxs)
+                foreach (Box b in NotationBoxs)
                 {
                     if (b is CustomNotationVsxBox customBox)
                     {
@@ -1159,30 +1172,12 @@ namespace LayoutFarm.MathLayout
         }
     }
 
-    public class CustomNotationVsxBox : Box
+    public abstract class CustomNotationVsxBox : Box
     {
         public override BoxKind Kind => BoxKind.CustomNotationVsx;
         public float BeforeBaseBox { get; set; }
-        public VertexStore CustomVxs { get; set; }
+
         public Box NotationBox { get; set; }
-        public override void Layout()
-        {
-            float maxH = 0;
-            float maxW = 0;
-            if (NotationBox != null)
-            {
-                NotationBox.Layout();
-                maxH = System.Math.Max(maxH, NotationBox.Height);
-                maxW = System.Math.Max(maxW, NotationBox.Width);
-            }
-            if (CustomVxs != null)
-            {
-                var bounding = CustomVxs.GetBoundingRect();
-                maxH = System.Math.Max(maxH, (float)bounding.Height);
-                maxW = System.Math.Max(maxW, (float)bounding.Width);
-            }
-            this.Height = maxH;
-            this.Width = maxW;
-        }
+
     }
 }
