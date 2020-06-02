@@ -138,10 +138,7 @@ namespace Typography.OpenFont.Tables
                 get => _subTables;
                 internal set => _subTables = value;
             }
-#if DEBUG
-            public string dbugAssocReason { get; set; }
-            public override string ToString() => dbugAssocReason ?? "";
-#endif
+ 
             //
             public bool DoSubstitutionAt(IGlyphIndexList inputGlyphs, int pos, int len)
             {
