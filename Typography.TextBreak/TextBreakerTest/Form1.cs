@@ -6,6 +6,9 @@ using System.Windows.Forms;
 using Typography.TextBreak;
 using Typography.TextBreak.ICU;
 
+
+using Typography.TextBreak.SheenBidi;
+
 namespace TextBreakerTest
 {
     public partial class Form1 : Form
@@ -197,7 +200,64 @@ namespace TextBreakerTest
             }
         }
 
+        private void cmdBidiTest_Click(object sender, EventArgs e)
+        {
+            {
+                //string text = "hello مرحبا a123"; 
+                //string text = "مرحبا "; //hello
+                //string text = "حب"; //love                 
+                string text = "شمس";//sun
+                //string text = "یہ ایک (car) ہے۔"; //this is a car
 
+                char[] buffer = text.ToCharArray();
+                Line line1 = new Line(text);
+
+                RunAdapter runAdapter = new RunAdapter();
+                RunAgent agent = runAdapter.Agent;
+                runAdapter.LoadLine(line1);
+
+                while (runAdapter.MoveNext())
+                {
+                    int offset = agent.Offset;
+                    byte level = agent.Level;
+                    int len = agent.Length;
+                    bool rtl = agent.IsRightToLeft;
+                    //iter each run-span
+
+                    string tt = new string(buffer, offset, len);
+                    System.Diagnostics.Debug.WriteLine(tt);
+                }
+
+                //static RunAdapter runAdapter = new RunAdapter();
+                //static MirrorLocator mirrorLocator = new MirrorLocator();
+
+                //static void Main(string[] args)
+                //{
+                //    string text = "یہ ایک (car) ہے۔";
+                //    Paragraph paragraph = new Paragraph(text, BaseDirection.AutoLeftToRight);
+                //    Line line = new Line(paragraph, 0, text.Length);
+
+                //    runAdapter.LoadLine(line);
+                //    foreach (RunAgent agent in runAdapter)
+                //    {
+                //        Console.WriteLine("Run Level: " + agent.Level);
+                //        Console.WriteLine("Run Offset: " + agent.Offset);
+                //        Console.WriteLine("Run Length: " + agent.Length);
+                //        Console.WriteLine("Run Direction: " + (agent.IsRightToLeft ? "RTL" : "LTR"));
+                //        Console.WriteLine();
+                //    }
+
+                //    mirrorLocator.LoadLine(line);
+                //    foreach (MirrorAgent agent in mirrorLocator)
+                //    {
+                //        Console.WriteLine("Mirror Location: " + agent.Index);
+                //        Console.WriteLine("Mirror Unicode: " + agent.Mirror);
+                //        Console.WriteLine();
+                //    }
+                //}
+            }
+
+        }
     }
 }
 

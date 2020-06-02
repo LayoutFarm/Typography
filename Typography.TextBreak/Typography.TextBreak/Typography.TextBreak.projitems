@@ -9,6 +9,30 @@
     <Import_RootNamespace>Typography.TextBreak</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)SheenBidi\BaseDirection.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SheenBidi\Collections\BidiChain.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SheenBidi\Collections\BidiLink.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SheenBidi\Collections\BracketPair.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SheenBidi\Collections\BracketQueue.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SheenBidi\Collections\IsolatingRun.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SheenBidi\Collections\LevelRun.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SheenBidi\Collections\RunQueue.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SheenBidi\Collections\StatusStack.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SheenBidi\Data\BracketType.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SheenBidi\Data\CharType.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SheenBidi\Data\CharTypeData.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SheenBidi\Data\CharTypeLookup.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SheenBidi\Data\PairingData.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SheenBidi\Data\PairingLookup.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SheenBidi\Level.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SheenBidi\Line.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SheenBidi\MirrorAgent.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SheenBidi\MirrorLocator.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SheenBidi\Paragraph.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SheenBidi\RunAdapter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SheenBidi\RunAgent.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SheenBidi\Text\UnicodeAgent.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SheenBidi\Text\UnicodeLocator.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BreakBounds.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BreakEngine.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BreakingEngine.cs" />
