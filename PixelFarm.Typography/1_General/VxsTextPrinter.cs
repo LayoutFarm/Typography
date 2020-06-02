@@ -294,7 +294,7 @@ namespace PixelFarm.Drawing
                     {
                         len = seqLen;
                     }
-
+ 
                     var snapToPx = new GlyphPlanSequenceSnapPixelScaleLayout(seq, startAt, len, scale);
                     while (snapToPx.Read())
                     {
@@ -373,11 +373,13 @@ namespace PixelFarm.Drawing
             UpdateGlyphLayoutSettings();
             //unscale layout, with design unit scale
             var buffSpan = new TextBufferSpan(textBuffer, startAt, len);
+
+            //a single string may be broken into many glyph-plan-seq
+
+
             GlyphPlanSequence glyphPlanSeq = _textServices.CreateGlyphPlanSeq(buffSpan, _currentTypeface, FontSizeInPoints);
             DrawFromGlyphPlans(glyphPlanSeq, x, y);
         }
-
-
     }
 
 

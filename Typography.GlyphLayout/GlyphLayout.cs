@@ -48,11 +48,12 @@ namespace Typography.TextLayout
         void Append(UnscaledGlyphPlan glyphPlan);
         int Count { get; }
         UnscaledGlyphPlan this[int index] { get; }
+
     }
 
     public class UnscaledGlyphPlanList : IUnscaledGlyphPlanList
     {
-        List<UnscaledGlyphPlan> _list = new List<UnscaledGlyphPlan>();
+        readonly List<UnscaledGlyphPlan> _list = new List<UnscaledGlyphPlan>();
         float _accumAdvanceX;
 
         public int Count => _list.Count;
@@ -69,6 +70,7 @@ namespace Typography.TextLayout
             _accumAdvanceX += glyphPlan.AdvanceX;
         }
         public float AccumAdvanceX => _accumAdvanceX;
+
     }
 
     /// <summary>
@@ -79,28 +81,34 @@ namespace Typography.TextLayout
         //
         public static GlyphPlanSequence Empty = new GlyphPlanSequence();
         //
-        readonly IUnscaledGlyphPlanList _glyphBuffer;
+        readonly IUnscaledGlyphPlanList _glyphPlanList;
         internal readonly int startAt;
         internal readonly ushort len;
-        public GlyphPlanSequence(IUnscaledGlyphPlanList glyphBuffer)
+
+        readonly bool _isRTL;
+        public GlyphPlanSequence(IUnscaledGlyphPlanList glyphPlanList, bool isRTL = false)
         {
-            _glyphBuffer = glyphBuffer;
+            _glyphPlanList = glyphPlanList;
             this.startAt = 0;
-            this.len = (ushort)glyphBuffer.Count;
+            this.len = (ushort)glyphPlanList.Count;
+            _isRTL = isRTL;
         }
-        public GlyphPlanSequence(IUnscaledGlyphPlanList glyphBuffer, int startAt, int len)
+        public GlyphPlanSequence(IUnscaledGlyphPlanList glyphPlanList, int startAt, int len, bool isRTL = false)
         {
-            _glyphBuffer = glyphBuffer;
+            _glyphPlanList = glyphPlanList;
             this.startAt = startAt;
             this.len = (ushort)len;
+            _isRTL = isRTL;
         }
+        public bool IsRightToLeft => _isRTL;
+
         public UnscaledGlyphPlan this[int index]
         {
             get
             {
                 if (index >= 0 && index < (startAt + len))
                 {
-                    return _glyphBuffer[startAt + index];
+                    return _glyphPlanList[startAt + index];
                 }
                 else
                 {
@@ -109,13 +117,13 @@ namespace Typography.TextLayout
             }
         }
         //
-        public int Count => (_glyphBuffer != null) ? len : 0;
+        public int Count => (_glyphPlanList != null) ? len : 0;
         //
         public float CalculateWidth()
         {
-            if (_glyphBuffer == null) return 0;
+            if (_glyphPlanList == null) return 0;
             //
-            IUnscaledGlyphPlanList plans = _glyphBuffer;
+            IUnscaledGlyphPlanList plans = _glyphPlanList;
             int end = startAt + len;
             float width = 0;
             for (int i = startAt; i < end; ++i)
@@ -124,7 +132,7 @@ namespace Typography.TextLayout
             }
             return width;
         }
-        public bool IsEmpty() => _glyphBuffer == null;
+        public bool IsEmpty() => _glyphPlanList == null;
 
     }
 
@@ -252,7 +260,7 @@ namespace Typography.TextLayout
 
         public bool EnableLigature { get; set; }
         public bool EnableComposition { get; set; }
-         
+
         public Typeface Typeface
         {
             get => _typeface;
@@ -400,7 +408,7 @@ namespace Typography.TextLayout
             {
                 //TODO: review perf here
                 _gsub.EnableLigation = this.EnableLigature;
-                _gsub.EnableComposition = this.EnableComposition; 
+                _gsub.EnableComposition = this.EnableComposition;
                 _gsub.DoSubstitution(glyphs);
             }
 

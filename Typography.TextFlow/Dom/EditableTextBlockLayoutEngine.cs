@@ -125,13 +125,12 @@ namespace Typography.TextLayout
 
                 for (int r = 0; r < runCount; ++r)
                 {
-                    TextRun tt = runList[r] as TextRun;
-                    if (tt == null) continue;
+                    if (!(runList[r] is TextRun tt)) continue;
                     //this is text run
                     if (tt.IsMeasured) continue;
                     //
 
-                    TextRunFontStyle fontStyle = tt.FontStyle;
+                    //TextRunFontStyle fontStyle = tt.FontStyle;
                     //resolve to actual font face
                     TextBuffer buffer = tt.TextBuffer;
                     char[] rawBuffer = buffer.UnsafeGetInternalBuffer();
