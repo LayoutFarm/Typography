@@ -38,6 +38,12 @@ The FreeType Project LICENSE (3-clauses BSD style),2003-2016, David Turner, Robe
 
 Apache2, 2018, Apache/PDFBox Authors,  https://github.com/apache/pdfbox
 
+
+**Text Processing**
+
+Apache2, 2014 , Muhammad Tayyab Akram, https://sheenbidi.codeplex.com/
+
+
 **Platforms**
 
 MIT, 2015-2015, Xamarin, Inc., https://github.com/mono/SkiaSharp
