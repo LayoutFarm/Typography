@@ -79,7 +79,7 @@ namespace Typography.TextBreak
         //
         public bool IsEnd => _currentIndex >= _endIndex;
         //
-
+        public bool IsRlt { get; private set; }
         public string CopyCurrentSpanString()
         {
             return new string(_buffer, LatestSpanStartAt, LatestSpanLen);
@@ -88,7 +88,8 @@ namespace Typography.TextBreak
 #if DEBUG
         //int dbugAddSteps;
 #endif
-        internal void AddWordBreakAt(int index, WordKind wordKind)
+
+        internal void AddWordBreakAt(int index, WordKind wordKind, bool isRtl = false)
         {
 
 #if DEBUG
@@ -108,6 +109,7 @@ namespace Typography.TextBreak
             _latestBreakAt = index;
 
             this.LatestWordKind = wordKind;
+            IsRlt = isRtl;
             _newWordBreakHandler(this);
 
 #if DEBUG

@@ -24,9 +24,14 @@ namespace Typography.TextBreak.SheenBidi
 
         internal class Run
         {
-            public int offset;
+            public readonly byte level;
+            public readonly int offset;
             public int length;
-            public byte level;
+            public Run(int offset, byte level)
+            {
+                this.offset = offset;
+                this.level = level;
+            }
         }
 
         #endregion
@@ -160,10 +165,7 @@ namespace Typography.TextBreak.SheenBidi
 
         private byte DetermineRuns(byte[] levels)
         {
-            Run priorRun = new Run()
-            {
-                level = levels[0]
-            };
+            Run priorRun = new Run(0, levels[0]);
             _runs.Add(priorRun);
 
             byte maxLevel = 0;
@@ -182,11 +184,7 @@ namespace Typography.TextBreak.SheenBidi
                 {
                     priorRun.length = index - priorRun.offset;
 
-                    Run run = new Run()
-                    {
-                        offset = index,
-                        level = level
-                    };
+                    Run run = new Run(index, level);
                     _runs.Add(run);
 
                     priorRun = run;

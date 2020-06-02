@@ -1,7 +1,9 @@
 ﻿//MIT, 2016-2017, WinterDev
 using System;
+//MIT, 2014-present, WinterDev
 using System.IO;
 using System.Text;
+using System.Collections.Generic;
 using System.Windows.Forms;
 using Typography.TextBreak;
 using Typography.TextBreak.ICU;
@@ -46,8 +48,10 @@ namespace TextBreakerTest
             //string test1 = "ສາທາລະນະລັດ ປະຊາທິປະໄຕ ປະຊາຊົນລາວ";
             string test1 = "ABCD1234567890ສາທາລະນະລັດ ປະຊາທິປະໄຕ ປະຊາຊົນລາວ ผู้ใหญ่หาผ้าใหม่ให้สะใภ้ใช้คล้องคอ" +
             "ใฝ่ใจเอาใส่ห่อมิหลงใหลใครขอดูจะใคร่ลงเรือใบดูน้ำใสและปลาปูสิ่งใดอยู่ในตู้มิใช่อยู่ใต้ตั่งเตียงบ้าใบถือใยบัวหูตามัวมาใกล้เคียงเล่าท่องอย่าละเลี่ยงยี่สิบม้วนจำจงดี";
-            //----------------
-            this.textBox1.Text = test1;
+            //this.textBox1.Text = test1;
+
+            string test2 = "یہ ایک (car) ہے۔"; 
+            this.textBox1.Text = test1 + test2;
 
         }
 
@@ -257,6 +261,44 @@ namespace TextBreakerTest
             //}
 
 
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            //char[] test = this.textBox1.Text.ToCharArray(); 
+            //string test_str = "حب";
+
+            this.listBox1.Items.Clear();
+
+            string test_str = "یہ ایک (car) ہے۔";
+            char[] test = test_str.ToCharArray();
+
+            var dicProvider = new IcuSimpleTextFileDictionaryProvider() { DataDir = "../../../icu58/brkitr_src" };
+            CustomBreakerBuilder.Setup(dicProvider);
+            CustomBreaker breaker1 = CustomBreakerBuilder.NewCustomBreaker();
+
+            breaker1.SetNewBreakHandler(vis =>
+            {
+                BreakSpan span = vis.GetBreakSpan();
+                string s = new string(test, span.startAt, span.len);
+                this.listBox1.Items.Add(span.startAt + " " + s);
+
+
+            }); //just break, do nothing about result 
+
+
+
+            breaker1.BreakWords(test);
+
+
+            //for (int i = 0; i < outputList.Count - 1; i++)
+            //{
+            //    Assert.AreEqual
+            //    (
+            //        output[i],
+            //        input.Substring(outputList[i], outputList[i + 1] - outputList[i])
+            //    );
+            //}
         }
     }
 }
