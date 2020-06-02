@@ -6,6 +6,9 @@ using System.Windows.Forms;
 using Typography.TextBreak;
 using Typography.TextBreak.ICU;
 
+
+using Typography.TextBreak.SheenBidi;
+
 namespace TextBreakerTest
 {
     public partial class Form1 : Form
@@ -197,7 +200,36 @@ namespace TextBreakerTest
             }
         }
 
+        private void cmdBidiTest_Click(object sender, EventArgs e)
+        {
+            {
+                //string text = "hello مرحبا a123"; 
 
+                //string text = "مرحبا "; //hello
+                //string text = "حب"; //love                 
+                string text = "شمس";//sun
+
+                char[] buffer = text.ToCharArray();
+                Line line1 = new Line(text);
+
+                RunAdapter runAdapter = new RunAdapter();
+                RunAgent agent = runAdapter.Agent;
+                runAdapter.LoadLine(line1);
+
+                while (runAdapter.MoveNext())
+                {
+                    int offset = agent.Offset;
+                    byte level = agent.Level;
+                    int len = agent.Length;
+                    bool rtl = agent.IsRightToLeft;
+                    //iter each run-span
+
+                    string tt = new string(buffer, offset, len);
+                    System.Diagnostics.Debug.WriteLine(tt);
+                }
+            }
+
+        }
     }
 }
 

@@ -34,6 +34,7 @@
             this.cmdManagedBreaker = new System.Windows.Forms.Button();
             this.cmdIcuTest = new System.Windows.Forms.Button();
             this.cmdPerformace1 = new System.Windows.Forms.Button();
+            this.cmdBidiTest = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // listBox1
@@ -92,11 +93,22 @@
             this.cmdPerformace1.UseVisualStyleBackColor = true;
             this.cmdPerformace1.Click += new System.EventHandler(this.cmdPerformace1_Click);
             // 
+            // cmdBidiTest
+            // 
+            this.cmdBidiTest.Location = new System.Drawing.Point(652, 399);
+            this.cmdBidiTest.Name = "cmdBidiTest";
+            this.cmdBidiTest.Size = new System.Drawing.Size(130, 35);
+            this.cmdBidiTest.TabIndex = 7;
+            this.cmdBidiTest.Text = "Test Bidi";
+            this.cmdBidiTest.UseVisualStyleBackColor = true;
+            this.cmdBidiTest.Click += new System.EventHandler(this.cmdBidiTest_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(675, 507);
+            this.ClientSize = new System.Drawing.Size(1100, 507);
+            this.Controls.Add(this.cmdBidiTest);
             this.Controls.Add(this.cmdPerformace1);
             this.Controls.Add(this.cmdIcuTest);
             this.Controls.Add(this.cmdManagedBreaker);
@@ -119,6 +131,7 @@
         private System.Windows.Forms.Button cmdManagedBreaker;
         private System.Windows.Forms.Button cmdIcuTest;
         private System.Windows.Forms.Button cmdPerformace1;
+        private System.Windows.Forms.Button cmdBidiTest;
     }
 }
 
