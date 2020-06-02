@@ -18,7 +18,7 @@ namespace PixelFarm.Drawing
         /// target canvas
         /// </summary>
         Painter _painter;
-        RequestFont _reqFont;
+
         Typeface _currentTypeface;
         GlyphMeshStore _glyphMeshStore;
         float _currentFontSizePxScale;
@@ -50,8 +50,7 @@ namespace PixelFarm.Drawing
 
         public void ChangeFont(RequestFont font)
         {
-            //1.  resolve actual font file
-            _reqFont = font;
+            //1.  resolve actual font file             
             this.Typeface = _textServices.ResolveTypeface(font); //resolve for 'actual' font 
             this.FontSizeInPoints = font.SizeInPoints;
         }
@@ -79,7 +78,6 @@ namespace PixelFarm.Drawing
                 this.FontDescedingPx = currentTypeface.Descender * pointToPixelScale;
                 this.FontLineGapPx = currentTypeface.LineGap * pointToPixelScale;
                 this.FontLineSpacingPx = FontAscendingPx - FontDescedingPx + FontLineGapPx;
-
 
             }
 
@@ -119,15 +117,16 @@ namespace PixelFarm.Drawing
 
         public void UpdateGlyphLayoutSettings()
         {
-
-
-            if (_reqFont == null)
-            {
-                //this.ScriptLang = canvasPainter.CurrentFont.GetOpenFontScriptLang();
-                ChangeFont(_painter.CurrentFont);
-            }
-            //2.1              
             if (Typeface == null) return;
+
+            //if (_reqFont == null)
+            //{
+            //    //this.ScriptLang = canvasPainter.CurrentFont.GetOpenFontScriptLang();
+            //    ChangeFont(_painter.CurrentFont);
+            //}
+
+            //2.1              
+
             _glyphMeshStore.SetHintTechnique(this.HintTechnique);
             _currentFontSizePxScale = Typeface.CalculateScaleToPixelFromPointSize(FontSizeInPoints);
             _textServices.CurrentScriptLang = this.ScriptLang;
@@ -277,7 +276,7 @@ namespace PixelFarm.Drawing
                     if (glyphBmp != null)
                     {
                         _painter.DrawImage(glyphBmp.Bitmap);
-                    }                    
+                    }
                 }
             }
             else
@@ -374,7 +373,7 @@ namespace PixelFarm.Drawing
             UpdateGlyphLayoutSettings();
             //unscale layout, with design unit scale
             var buffSpan = new TextBufferSpan(textBuffer, startAt, len);
-            GlyphPlanSequence glyphPlanSeq = _textServices.CreateGlyphPlanSeq(buffSpan, _reqFont);
+            GlyphPlanSequence glyphPlanSeq = _textServices.CreateGlyphPlanSeq(buffSpan, _currentTypeface, FontSizeInPoints);
             DrawFromGlyphPlans(glyphPlanSeq, x, y);
         }
 

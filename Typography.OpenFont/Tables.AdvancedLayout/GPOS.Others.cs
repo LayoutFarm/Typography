@@ -666,6 +666,7 @@ namespace Typography.OpenFont.Tables
                     _ligatures[i] = LigatureAttachTable.ReadFrom(reader, classCount);
                 }
             }
+            public LigatureAttachTable GetLigatureAttachTable(int index) => _ligatures[index];
         }
         class LigatureAttachTable
         {
@@ -688,6 +689,7 @@ namespace Typography.OpenFont.Tables
                 }
                 return table;
             }
+            public ComponentRecord GetComponentRecord(int index) => _records[index];
         }
         struct ComponentRecord
         {
@@ -695,7 +697,7 @@ namespace Typography.OpenFont.Tables
             //Value         Type                          Description
             //Offset16      LigatureAnchor[ClassCount]    Array of offsets(one per class) to Anchor tables-from beginning of LigatureAttach table-ordered by class-NULL if a component does not have an attachment for a class-zero-based array
 
-            public ushort[] offsets;
+            public readonly ushort[] offsets;
             public ComponentRecord(ushort[] offsets)
             {
                 this.offsets = offsets;
