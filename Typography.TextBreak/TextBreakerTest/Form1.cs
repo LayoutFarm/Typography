@@ -50,8 +50,9 @@ namespace TextBreakerTest
             "ใฝ่ใจเอาใส่ห่อมิหลงใหลใครขอดูจะใคร่ลงเรือใบดูน้ำใสและปลาปูสิ่งใดอยู่ในตู้มิใช่อยู่ใต้ตั่งเตียงบ้าใบถือใยบัวหูตามัวมาใกล้เคียงเล่าท่องอย่าละเลี่ยงยี่สิบม้วนจำจงดี";
             //this.textBox1.Text = test1;
 
-            string test2 = "یہ ایک (car) ہے۔"; 
+            string test2 = "یہ ایک (car) ہے۔";
             this.textBox1.Text = test1 + test2;
+            //this.textBox1.Text = test2;
 
         }
 
@@ -168,7 +169,13 @@ namespace TextBreakerTest
             stopWatch.Stop();
             long ms2 = stopWatch.ElapsedMilliseconds;
             //----------------------------
-            MessageBox.Show("Managed: " + ms1.ToString() + "ms, Native Icu: " + ms2.ToString() + "ms");
+
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine("Managed: " + ms1.ToString() + "ms, Native Icu: " + ms2.ToString() + "ms");
+            sb.AppendLine("Managed(Avg): " + (ms1 / (float)ntimes).ToString() + "ms, Native Icu (Avg): " + (ms2 / (float)ntimes).ToString() + "ms");
+
+            MessageBox.Show(sb.ToString());
+
         }
         void ParseWithManaged(int ntimes)
         {
