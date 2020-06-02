@@ -390,13 +390,13 @@ namespace PixelFarm.Drawing
                 //
                 ILineSegment line_seg = result[i];
                 TextBufferSpan buff = new TextBufferSpan(textBuffer, line_seg.StartAt, line_seg.Length);
-                if (buff.isRightToLeft = line_seg.RightToLeft)
+                if (line_seg.RightToLeft)
                 {
                     needRightToLeftArr = true;
                 }
 
                 GlyphPlanSequence glyphPlanSeq = _textServices.CreateGlyphPlanSeq(buff, _currentTypeface, FontSizeInPoints);
-                glyphPlanSeq.IsRightToLeft = buff.isRightToLeft;
+                glyphPlanSeq.IsRightToLeft = line_seg.RightToLeft;
                 _tmpGlyphPlanSeqs.Add(glyphPlanSeq);
             }
 
