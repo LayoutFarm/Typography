@@ -1,6 +1,6 @@
 ﻿//MIT, 2016-present, WinterDev, Sam Hocevar
 using System;
-
+using System.Collections.Generic;
 using PixelFarm.CpuBlit.BitmapAtlas;
 
 using Typography.Contours;
@@ -380,21 +380,51 @@ namespace PixelFarm.Drawing
 
             float xpos = x;
             float ypos = y;
+
+            _tmpGlyphPlanSeqs.Clear();
+
+            bool needRightToLeftArr = false;
+
             for (int i = 0; i < count; ++i)
             {
                 //
-                ILineSegment lineseg = result[i];
-                TextBufferSpan buff = new TextBufferSpan(textBuffer, lineseg.StartAt, lineseg.Length);
-                buff.isRightToLeft = lineseg.RightToLeft;
+                ILineSegment line_seg = result[i];
+                TextBufferSpan buff = new TextBufferSpan(textBuffer, line_seg.StartAt, line_seg.Length);
+                if (buff.isRightToLeft = line_seg.RightToLeft)
+                {
+                    needRightToLeftArr = true;
+                }
 
                 GlyphPlanSequence glyphPlanSeq = _textServices.CreateGlyphPlanSeq(buff, _currentTypeface, FontSizeInPoints);
                 glyphPlanSeq.IsRightToLeft = buff.isRightToLeft;
-                DrawFromGlyphPlans(glyphPlanSeq, xpos, y);
-
-                xpos += (glyphPlanSeq.CalculateWidth() * _currentFontSizePxScale);
+                _tmpGlyphPlanSeqs.Add(glyphPlanSeq);
             }
 
+            if (needRightToLeftArr)
+            {
+                //special arr left-to-right
+                for (int i = count - 1; i >= 0; --i)
+                {
+                    GlyphPlanSequence glyphPlanSeq = _tmpGlyphPlanSeqs[i];
+                    DrawFromGlyphPlans(glyphPlanSeq, xpos, y);
+                    xpos += (glyphPlanSeq.CalculateWidth() * _currentFontSizePxScale);
+                }
+            }
+            else
+            {
+                for (int i = 0; i < count; ++i)
+                {
+                    GlyphPlanSequence glyphPlanSeq = _tmpGlyphPlanSeqs[i];
+                    DrawFromGlyphPlans(glyphPlanSeq, xpos, y);
+                    xpos += (glyphPlanSeq.CalculateWidth() * _currentFontSizePxScale);
+                }
+            }
+
+
+            _tmpGlyphPlanSeqs.Clear();
         }
+
+        List<GlyphPlanSequence> _tmpGlyphPlanSeqs = new List<GlyphPlanSequence>();
     }
 
 
