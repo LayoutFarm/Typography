@@ -153,7 +153,8 @@ namespace Typography.TextBreak
             {
                 startAt = vis.LatestSpanStartAt,
                 len = vis.LatestSpanLen,
-                wordKind = vis.LatestWordKind
+                wordKind = vis.LatestWordKind,
+                RightToLeft = vis.IsRlt
             };
         }
     }

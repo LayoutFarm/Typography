@@ -12,8 +12,8 @@ namespace Typography.TextLayout
         //TODO: review here again***
         public int startAt;
         public ushort len;
-        public short flags;
-        public ScriptLang scLang;
+        public short flags; 
+        public bool RightToLeft;
     }
 }
 
@@ -32,13 +32,12 @@ namespace Typography.TextServices
         Dictionary<TextShapingContextKey, GlyphPlanCacheForTypefaceAndScriptLang> _registerShapingContexts = new Dictionary<TextShapingContextKey, GlyphPlanCacheForTypefaceAndScriptLang>();
         GlyphLayout _glyphLayout;
 
-        Typeface _currentTypeface;
+
         float _fontSizeInPts;
         ScriptLang _defaultScriptLang;
         ActiveTypefaceCache _typefaceStore;
         InstalledTypefaceCollection _installedTypefaceCollection;
         ScriptLang _scLang;
-
 
         public TextServices()
         {
@@ -76,7 +75,7 @@ namespace Typography.TextServices
                 _currentGlyphPlanSeqCache = shapingContext;
             }
 
-            _currentTypeface = _glyphLayout.Typeface = typeface;
+            _glyphLayout.Typeface = typeface;
             _fontSizeInPts = fontSizeInPts;
 
             //_glyphLayout.FontSizeInPoints = _fontSizeInPts = fontSizeInPts;
@@ -143,45 +142,45 @@ namespace Typography.TextServices
                 //we assume that 1 break span 
                 //has 1 script lang, and we examine it
                 //with sample char
-                char sample = str[sp.startAt];
+                //char sample = str[sp.startAt];
 
-                ScriptLang selectedScriptLang;
-                if (sample == ' ')
-                {
-                    //whitespace
-                    selectedScriptLang = _defaultScriptLang;
-                }
-                else if (char.IsWhiteSpace(sample))
-                {
-                    //other whitespace
-                    selectedScriptLang = _defaultScriptLang;
-                }
-                else
-                {
-                    //
-                    Typography.OpenFont.ScriptLang scLang;
-                    if (Typography.OpenFont.ScriptLangs.TryGetScriptLang(sample, out scLang))
-                    {
-                        //we should decide to use
-                        //current typeface
-                        //or ask for alternate typeface 
-                        //if  the current type face is not support the request scriptLang
-                        // 
-                        selectedScriptLang = scLang;
-                    }
-                    else
-                    {
-                        //not found
-                        //use default
-                        selectedScriptLang = _defaultScriptLang;
-                    }
-                }
+                //ScriptLang selectedScriptLang;
+                //if (sample == ' ')
+                //{
+                //    //whitespace
+                //    selectedScriptLang = _defaultScriptLang;
+                //}
+                //else if (char.IsWhiteSpace(sample))
+                //{
+                //    //other whitespace
+                //    selectedScriptLang = _defaultScriptLang;
+                //}
+                //else
+                //{
+                //    //
+                //    if (Typography.OpenFont.ScriptLangs.TryGetScriptLang(sample, out ScriptLang scLang))
+                //    {
+                //        //we should decide to use
+                //        //current typeface
+                //        //or ask for alternate typeface 
+                //        //if  the current type face is not support the request scriptLang
+                //        // 
+                //        selectedScriptLang = scLang;
+                //    }
+                //    else
+                //    {
+                //        //not found
+                //        //use default
+                //        selectedScriptLang = _defaultScriptLang;
+                //    }
+                //}
 
-                Typography.TextLayout.BreakSpan breakspan = new Typography.TextLayout.BreakSpan();
-                breakspan.startAt = sp.startAt;
-                breakspan.len = sp.len;
-                breakspan.scLang = selectedScriptLang;
-                yield return breakspan;
+                yield return new Typography.TextLayout.BreakSpan
+                {
+                    startAt = sp.startAt,
+                    len = sp.len, 
+                    RightToLeft = sp.RightToLeft
+                };
             }
         }
 
@@ -309,8 +308,7 @@ namespace Typography.TextServices
                 {
                     _cacheSeqCollection2 = new Dictionary<int, GlyphPlanSeqCollection>();
                 }
-                GlyphPlanSeqCollection seqCol;
-                if (!_cacheSeqCollection2.TryGetValue(len, out seqCol))
+                if (!_cacheSeqCollection2.TryGetValue(len, out GlyphPlanSeqCollection seqCol))
                 {
                     //new one if not exist
                     seqCol = new GlyphPlanSeqCollection(len);
@@ -321,16 +319,11 @@ namespace Typography.TextServices
         }
     }
 
-
-
-
     /// <summary>
     /// glyph-cache based on typeface and script-lang with specific gsub/gpos features
     /// </summary>
     class GlyphPlanCacheForTypefaceAndScriptLang
     {
-
-
         Typeface _typeface;
         ScriptLang _scLang;
         GlyphPlanSeqSet _glyphPlanSeqSet;
@@ -366,12 +359,13 @@ namespace Typography.TextServices
             //and create glyph list 
             //check if we have the string cache in specific value 
             //---------
+#if DEBUG
             if (seqLen > _glyphPlanSeqSet.MaxCacheLen)
             {
                 //layout string is too long to be cache
                 //it need to split into small buffer 
             }
-
+#endif
             GlyphPlanSequence planSeq = GlyphPlanSequence.Empty;
             GlyphPlanSeqCollection seqCol = _glyphPlanSeqSet.GetSeqCollectionOrCreateIfNotExist(seqLen);
 
@@ -396,8 +390,7 @@ namespace Typography.TextServices
                 glyphLayout.GenerateUnscaledGlyphPlans(_reusableGlyphPlanList);
 
                 int post_count = _reusableGlyphPlanList.Count;
-                planSeq = new GlyphPlanSequence(_reusableGlyphPlanList, pre_count, post_count - pre_count);
-                //
+                planSeq = new GlyphPlanSequence(_reusableGlyphPlanList, pre_count, post_count - pre_count);//**                //
 
 #if DEBUG
                 if (!dbug_disableCache)
@@ -460,7 +453,7 @@ namespace Typography.TextServices
         public Typeface GetTypeface(InstalledTypeface installedFont)
         {
             return GetTypefaceOrCreateNew(installedFont);
-        } 
+        }
 
         Typeface GetTypefaceOrCreateNew(InstalledTypeface installedFont)
         {
