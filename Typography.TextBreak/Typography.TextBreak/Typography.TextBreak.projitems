@@ -9,6 +9,7 @@
     <Import_RootNamespace>Typography.TextBreak</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)BidiBreakEngine.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SheenBidi\BaseDirection.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SheenBidi\Collections\BidiChain.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SheenBidi\Collections\BidiLink.cs" />

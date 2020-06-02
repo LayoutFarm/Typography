@@ -1,7 +1,9 @@
 ﻿//MIT, 2016-2017, WinterDev
 using System;
+//MIT, 2014-present, WinterDev
 using System.IO;
 using System.Text;
+using System.Collections.Generic;
 using System.Windows.Forms;
 using Typography.TextBreak;
 using Typography.TextBreak.ICU;
@@ -46,8 +48,11 @@ namespace TextBreakerTest
             //string test1 = "ສາທາລະນະລັດ ປະຊາທິປະໄຕ ປະຊາຊົນລາວ";
             string test1 = "ABCD1234567890ສາທາລະນະລັດ ປະຊາທິປະໄຕ ປະຊາຊົນລາວ ผู้ใหญ่หาผ้าใหม่ให้สะใภ้ใช้คล้องคอ" +
             "ใฝ่ใจเอาใส่ห่อมิหลงใหลใครขอดูจะใคร่ลงเรือใบดูน้ำใสและปลาปูสิ่งใดอยู่ในตู้มิใช่อยู่ใต้ตั่งเตียงบ้าใบถือใยบัวหูตามัวมาใกล้เคียงเล่าท่องอย่าละเลี่ยงยี่สิบม้วนจำจงดี";
-            //----------------
-            this.textBox1.Text = test1;
+            //this.textBox1.Text = test1;
+
+            string test2 = "یہ ایک (car) ہے۔";
+            this.textBox1.Text = test1 + test2;
+            //this.textBox1.Text = test2;
 
         }
 
@@ -164,7 +169,13 @@ namespace TextBreakerTest
             stopWatch.Stop();
             long ms2 = stopWatch.ElapsedMilliseconds;
             //----------------------------
-            MessageBox.Show("Managed: " + ms1.ToString() + "ms, Native Icu: " + ms2.ToString() + "ms");
+
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine("Managed: " + ms1.ToString() + "ms, Native Icu: " + ms2.ToString() + "ms");
+            sb.AppendLine("Managed(Avg): " + (ms1 / (float)ntimes).ToString() + "ms, Native Icu (Avg): " + (ms2 / (float)ntimes).ToString() + "ms");
+
+            MessageBox.Show(sb.ToString());
+
         }
         void ParseWithManaged(int ntimes)
         {
@@ -202,61 +213,99 @@ namespace TextBreakerTest
 
         private void cmdBidiTest_Click(object sender, EventArgs e)
         {
+
+            //string text = "hello مرحبا a123"; 
+            //string text = "مرحبا "; //hello
+            //string text = "حب"; //love                 
+            string text = "شمس";//sun
+                                //string text = "یہ ایک (car) ہے۔"; //this is a car
+
+            char[] buffer = text.ToCharArray();
+            Line line1 = new Line(text);
+
+            RunAdapter runAdapter = new RunAdapter();
+            RunAgent agent = runAdapter.Agent;
+            runAdapter.LoadLine(line1);
+
+            while (runAdapter.MoveNext())
             {
-                //string text = "hello مرحبا a123"; 
-                //string text = "مرحبا "; //hello
-                //string text = "حب"; //love                 
-                string text = "شمس";//sun
-                //string text = "یہ ایک (car) ہے۔"; //this is a car
+                int offset = agent.Offset;
+                byte level = agent.Level;
+                int len = agent.Length;
+                bool rtl = agent.IsRightToLeft;
+                //iter each run-span
 
-                char[] buffer = text.ToCharArray();
-                Line line1 = new Line(text);
-
-                RunAdapter runAdapter = new RunAdapter();
-                RunAgent agent = runAdapter.Agent;
-                runAdapter.LoadLine(line1);
-
-                while (runAdapter.MoveNext())
-                {
-                    int offset = agent.Offset;
-                    byte level = agent.Level;
-                    int len = agent.Length;
-                    bool rtl = agent.IsRightToLeft;
-                    //iter each run-span
-
-                    string tt = new string(buffer, offset, len);
-                    System.Diagnostics.Debug.WriteLine(tt);
-                }
-
-                //static RunAdapter runAdapter = new RunAdapter();
-                //static MirrorLocator mirrorLocator = new MirrorLocator();
-
-                //static void Main(string[] args)
-                //{
-                //    string text = "یہ ایک (car) ہے۔";
-                //    Paragraph paragraph = new Paragraph(text, BaseDirection.AutoLeftToRight);
-                //    Line line = new Line(paragraph, 0, text.Length);
-
-                //    runAdapter.LoadLine(line);
-                //    foreach (RunAgent agent in runAdapter)
-                //    {
-                //        Console.WriteLine("Run Level: " + agent.Level);
-                //        Console.WriteLine("Run Offset: " + agent.Offset);
-                //        Console.WriteLine("Run Length: " + agent.Length);
-                //        Console.WriteLine("Run Direction: " + (agent.IsRightToLeft ? "RTL" : "LTR"));
-                //        Console.WriteLine();
-                //    }
-
-                //    mirrorLocator.LoadLine(line);
-                //    foreach (MirrorAgent agent in mirrorLocator)
-                //    {
-                //        Console.WriteLine("Mirror Location: " + agent.Index);
-                //        Console.WriteLine("Mirror Unicode: " + agent.Mirror);
-                //        Console.WriteLine();
-                //    }
-                //}
+                string tt = new string(buffer, offset, len);
+                System.Diagnostics.Debug.WriteLine(tt);
             }
 
+            //static RunAdapter runAdapter = new RunAdapter();
+            //static MirrorLocator mirrorLocator = new MirrorLocator();
+
+            //static void Main(string[] args)
+            //{
+            //    string text = "یہ ایک (car) ہے۔";
+            //    Paragraph paragraph = new Paragraph(text, BaseDirection.AutoLeftToRight);
+            //    Line line = new Line(paragraph, 0, text.Length);
+
+            //    runAdapter.LoadLine(line);
+            //    foreach (RunAgent agent in runAdapter)
+            //    {
+            //        Console.WriteLine("Run Level: " + agent.Level);
+            //        Console.WriteLine("Run Offset: " + agent.Offset);
+            //        Console.WriteLine("Run Length: " + agent.Length);
+            //        Console.WriteLine("Run Direction: " + (agent.IsRightToLeft ? "RTL" : "LTR"));
+            //        Console.WriteLine();
+            //    }
+
+            //    mirrorLocator.LoadLine(line);
+            //    foreach (MirrorAgent agent in mirrorLocator)
+            //    {
+            //        Console.WriteLine("Mirror Location: " + agent.Index);
+            //        Console.WriteLine("Mirror Unicode: " + agent.Mirror);
+            //        Console.WriteLine();
+            //    }
+            //}
+
+
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            //char[] test = this.textBox1.Text.ToCharArray(); 
+            //string test_str = "حب";
+
+            this.listBox1.Items.Clear();
+
+            string test_str = "یہ ایک (car) ہے۔";
+            char[] test = test_str.ToCharArray();
+
+            var dicProvider = new IcuSimpleTextFileDictionaryProvider() { DataDir = "../../../icu58/brkitr_src" };
+            CustomBreakerBuilder.Setup(dicProvider);
+            CustomBreaker breaker1 = CustomBreakerBuilder.NewCustomBreaker();
+
+            breaker1.SetNewBreakHandler(vis =>
+            {
+                BreakSpan span = vis.GetBreakSpan();
+                string s = new string(test, span.startAt, span.len);
+                this.listBox1.Items.Add(span.startAt + " " + s);
+
+
+            }); //just break, do nothing about result 
+
+
+
+            breaker1.BreakWords(test);
+
+
+            //for (int i = 0; i < outputList.Count - 1; i++)
+            //{
+            //    Assert.AreEqual
+            //    (
+            //        output[i],
+            //        input.Substring(outputList[i], outputList[i + 1] - outputList[i])
+            //    );
+            //}
         }
     }
 }
