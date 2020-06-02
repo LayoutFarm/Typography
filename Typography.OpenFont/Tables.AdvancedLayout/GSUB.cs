@@ -40,12 +40,15 @@ namespace Typography.OpenFont.Tables
                                                 ushort lookupType, ushort lookupFlags,
                                                 ushort[] subTableOffsets, ushort markFilteringSet)
         {
-            LookupTable lookupTable = new LookupTable(lookupType, lookupFlags, markFilteringSet);
-            foreach (long subTableOffset in subTableOffsets)
+            LookupTable lookupTable = new LookupTable(lookupFlags, markFilteringSet);
+            LookupSubTable[] subTables = new LookupSubTable[subTableOffsets.Length];
+            lookupTable.SubTables = subTables;
+
+            for (int i = 0; i < subTableOffsets.Length; ++i)
             {
-                LookupSubTable subTable = lookupTable.ReadSubTable(reader, lookupTablePos + subTableOffset);
+                LookupSubTable subTable = LookupTable.ReadSubTable(lookupType, reader, lookupTablePos + subTableOffsets[i]);
                 subTable.OwnerGSub = this;
-                lookupTable.SubTables.Add(subTable);
+                subTables[i] = subTable;
             }
 
 #if DEBUG
@@ -119,19 +122,26 @@ namespace Typography.OpenFont.Tables
             public int dbugLkIndex;
 #endif
             //--------------------------
-            public ushort lookupType { get; internal set; }
+
             public readonly ushort lookupFlags;
             public readonly ushort markFilteringSet;
             //--------------------------
-            List<LookupSubTable> _subTables = new List<LookupSubTable>();
-            public LookupTable(ushort lookupType, ushort lookupFlags, ushort markFilteringSet)
+            LookupSubTable[] _subTables;
+            public LookupTable(ushort lookupFlags, ushort markFilteringSet)
             {
-                this.lookupType = lookupType;
                 this.lookupFlags = lookupFlags;
                 this.markFilteringSet = markFilteringSet;
             }
             //
-            public IList<LookupSubTable> SubTables => _subTables;
+            public LookupSubTable[] SubTables
+            {
+                get => _subTables;
+                internal set => _subTables = value;
+            }
+#if DEBUG
+            public string dbugAssocReason { get; set; }
+            public override string ToString() => dbugAssocReason ?? "";
+#endif
             //
             public bool DoSubstitutionAt(IGlyphIndexList inputGlyphs, int pos, int len)
             {
@@ -162,14 +172,8 @@ namespace Typography.OpenFont.Tables
                     subTable.CollectAssociatedSubtitutionGlyphs(outputAssocGlyphs);
                 }
             }
-#if DEBUG
-            public override string ToString()
-            {
-                return lookupType.ToString();
-            }
-#endif
 
-            public LookupSubTable ReadSubTable(BinaryReader reader, long subTableStartAt)
+            public static LookupSubTable ReadSubTable(int lookupType, BinaryReader reader, long subTableStartAt)
             {
                 switch (lookupType)
                 {
@@ -182,7 +186,6 @@ namespace Typography.OpenFont.Tables
                     case 7: return ReadLookupType7(reader, subTableStartAt);
                     case 8: return ReadLookupType8(reader, subTableStartAt);
                 }
-
 
                 return new UnImplementedLookupSubTable(string.Format("GSUB Lookup Type {0}", lookupType));
             }
@@ -236,8 +239,8 @@ namespace Typography.OpenFont.Tables
                 /// <summary>
                 /// It provides an array of output glyph indices (Substitute) explicitly matched to the input glyph indices specified in the Coverage table
                 /// </summary>
-                public ushort[] SubstituteGlyphs { get; private set; }
-                public CoverageTable CoverageTable { get; private set; }
+                public ushort[] SubstituteGlyphs { get; }
+                public CoverageTable CoverageTable { get; }
                 public override bool DoSubstitutionAt(IGlyphIndexList glyphIndices, int pos, int len)
                 {
                     int foundAt = CoverageTable.FindPosition(glyphIndices[pos]);
@@ -266,7 +269,7 @@ namespace Typography.OpenFont.Tables
             /// LookupType 1: Single Substitution Subtable
             /// </summary>
             /// <param name="reader"></param>
-            LookupSubTable ReadLookupType1(BinaryReader reader, long subTableStartAt)
+            static LookupSubTable ReadLookupType1(BinaryReader reader, long subTableStartAt)
             {
                 //---------------------
                 //LookupType 1: Single Substitution Subtable
@@ -351,8 +354,10 @@ namespace Typography.OpenFont.Tables
                     if (foundPos > -1)
                     {
                         SequenceTable seqTable = SeqTables[foundPos];
-                        //replace current glyph index with new seq#if DEBUG
+                        //replace current glyph index with new seq
+#if DEBUG
                         int new_seqCount = seqTable.substituteGlyphs.Length;
+#endif
                         glyphIndices.Replace(pos, seqTable.substituteGlyphs);
                         return true;
                     }
@@ -386,7 +391,7 @@ namespace Typography.OpenFont.Tables
             /// LookupType 2: Multiple Substitution Subtable
             /// </summary>
             /// <param name="reader"></param>
-            LookupSubTable ReadLookupType2(BinaryReader reader, long subTableStartAt)
+            static LookupSubTable ReadLookupType2(BinaryReader reader, long subTableStartAt)
             {
                 //LookupType 2: Multiple Substitution Subtable 
                 //A Multiple Substitution (MultipleSubst) subtable replaces a single glyph with more than one glyph, 
@@ -475,7 +480,7 @@ namespace Typography.OpenFont.Tables
             /// LookupType 3: Alternate Substitution Subtable 
             /// </summary>
             /// <param name="reader"></param>
-            LookupSubTable ReadLookupType3(BinaryReader reader, long subTableStartAt)
+            static LookupSubTable ReadLookupType3(BinaryReader reader, long subTableStartAt)
             {
                 //LookupType 3: Alternate Substitution Subtable
 
@@ -680,7 +685,7 @@ namespace Typography.OpenFont.Tables
             /// LookupType 4: Ligature Substitution Subtable
             /// </summary>
             /// <param name="reader"></param>
-            LookupSubTable ReadLookupType4(BinaryReader reader, long subTableStartAt)
+            static LookupSubTable ReadLookupType4(BinaryReader reader, long subTableStartAt)
             {
                 //LookupType 4: Ligature Substitution Subtable
 
@@ -769,7 +774,7 @@ namespace Typography.OpenFont.Tables
             /// LookupType 5: Contextual Substitution Subtable
             /// </summary>
             /// <param name="reader"></param>
-            LookupSubTable ReadLookupType5(BinaryReader reader, long subTableStartAt)
+            static LookupSubTable ReadLookupType5(BinaryReader reader, long subTableStartAt)
             {
                 return new UnImplementedLookupSubTable("Lookup Subtable Type 5");
             }
@@ -1088,7 +1093,7 @@ namespace Typography.OpenFont.Tables
             /// LookupType 6: Chaining Contextual Substitution Subtable
             /// </summary>
             /// <param name="reader"></param>
-            LookupSubTable ReadLookupType6(BinaryReader reader, long subTableStartAt)
+            static LookupSubTable ReadLookupType6(BinaryReader reader, long subTableStartAt)
             {
                 //LookupType 6: Chaining Contextual Substitution Subtable
                 //A Chaining Contextual Substitution subtable (ChainContextSubst) describes glyph substitutions in context with an ability to look back and/or look ahead
@@ -1205,7 +1210,7 @@ namespace Typography.OpenFont.Tables
             /// LookupType 7: Extension Substitution
             /// </summary>
             /// <param name="reader"></param>
-            LookupSubTable ReadLookupType7(BinaryReader reader, long subTableStartAt)
+            static LookupSubTable ReadLookupType7(BinaryReader reader, long subTableStartAt)
             {
                 //LookupType 7: Extension Substitution
                 //https://www.microsoft.com/typography/otspec/gsub.htm#ES
@@ -1247,19 +1252,15 @@ namespace Typography.OpenFont.Tables
                 {
                     throw new NotSupportedException();
                 }
-                // Simply read the lookup table again with updated offsets
-                lookupType = extensionLookupType;
-                LookupSubTable subTable = ReadSubTable(reader, subTableStartAt + extensionOffset);
-                // FIXME: this is a bit hackish, try to find a better construct
-                lookupType = 7;
-                return subTable;
+                // Simply read the lookup table again with updated offsets 
+                return ReadSubTable(extensionLookupType, reader, subTableStartAt + extensionOffset);
             }
 
             /// <summary>
             /// LookupType 8: Reverse Chaining Contextual Single Substitution Subtable
             /// </summary>
             /// <param name="reader"></param>
-            LookupSubTable ReadLookupType8(BinaryReader reader, long subTableStartAt)
+            static LookupSubTable ReadLookupType8(BinaryReader reader, long subTableStartAt)
             {
                 throw new NotImplementedException();
             }

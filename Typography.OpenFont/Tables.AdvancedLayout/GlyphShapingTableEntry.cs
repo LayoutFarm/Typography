@@ -162,7 +162,8 @@ namespace Typography.OpenFont.Tables
             //0x0002  ignoreBaseGlyphs        If set, skips over base glyphs
             //0x0004  ignoreLigatures         If set, skips over ligatures
             //0x0008  ignoreMarks             If set, skips over all combining marks
-            //0x0010  useMarkFilteringSet     If set, indicates that the lookup table structure is followed by a MarkFilteringSet field.The layout engine skips over all mark glyphs not in the mark filtering set indicated.
+            //0x0010  useMarkFilteringSet     If set, indicates that the lookup table structure is followed by a MarkFilteringSet field.
+            //                                The layout engine skips over all mark glyphs not in the mark filtering set indicated.
             //0x00E0  reserved                For future use(Set to zero)
             //0xFF00  markAttachmentType      If not zero, skips over all marks of attachment type different from specified.
             // --------------------------------
