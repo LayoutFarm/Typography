@@ -85,22 +85,26 @@ namespace Typography.TextLayout
         internal readonly int startAt;
         internal readonly ushort len;
 
-        readonly bool _isRTL;
-        public GlyphPlanSequence(IUnscaledGlyphPlanList glyphPlanList, bool isRTL = false)
+        bool _isRTL;
+        public GlyphPlanSequence(IUnscaledGlyphPlanList glyphPlanList)
         {
             _glyphPlanList = glyphPlanList;
             this.startAt = 0;
             this.len = (ushort)glyphPlanList.Count;
-            _isRTL = isRTL;
+            _isRTL = false;
         }
-        public GlyphPlanSequence(IUnscaledGlyphPlanList glyphPlanList, int startAt, int len, bool isRTL = false)
+        public GlyphPlanSequence(IUnscaledGlyphPlanList glyphPlanList, int startAt, int len)
         {
             _glyphPlanList = glyphPlanList;
             this.startAt = startAt;
             this.len = (ushort)len;
-            _isRTL = isRTL;
+            _isRTL = false;
         }
-        public bool IsRightToLeft => _isRTL;
+        public bool IsRightToLeft
+        {
+            get => _isRTL;
+            set => _isRTL = value;
+        }
 
         public UnscaledGlyphPlan this[int index]
         {

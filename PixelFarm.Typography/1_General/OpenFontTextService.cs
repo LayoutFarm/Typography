@@ -262,7 +262,7 @@ namespace PixelFarm.Drawing
             ResolveTypeface(f);
             return PixelFarm.Drawing.Internal.RequestFontCacheAccess.GetWhitespaceWidth(f, _system_id);
         }
-         
+
 
 
         public GlyphPlanSequence CreateGlyphPlanSeq(in TextBufferSpan textBufferSpan, Typeface typeface, float sizeInPts)
@@ -308,12 +308,14 @@ namespace PixelFarm.Drawing
             readonly int _startAt;
             readonly int _len;
             internal ScriptLang scriptLang;
-            public MyLineSegment(int startAt, int len)
+            public MyLineSegment(int startAt, int len, bool rightToLeft)
             {
                 _startAt = startAt;
                 _len = len;
                 this.scriptLang = null;
+                RightToLeft = rightToLeft;
             }
+            public bool RightToLeft { get; set; }
             public int Length => _len;
             public int StartAt => _startAt;
         }
@@ -388,9 +390,7 @@ namespace PixelFarm.Drawing
             MyLineSegmentList lineSegments = MyLineSegmentList.GetFreeLineSegmentList();
             foreach (BreakSpan breakSpan in _txtServices.BreakToLineSegments(str, textBufferSpan.start, textBufferSpan.len))
             {
-                MyLineSegment lineSeg = new MyLineSegment(breakSpan.startAt, breakSpan.len);
-                lineSeg.scriptLang = breakSpan.scLang;
-                lineSegments.AddLineSegment(lineSeg);
+                lineSegments.AddLineSegment(new MyLineSegment(breakSpan.startAt, breakSpan.len, breakSpan.RightToLeft));
             }
             return lineSegments;
         }
@@ -421,5 +421,5 @@ namespace PixelFarm.Drawing
 
     }
 
-     
+
 }

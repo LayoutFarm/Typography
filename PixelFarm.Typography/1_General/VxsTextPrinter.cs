@@ -294,7 +294,7 @@ namespace PixelFarm.Drawing
                     {
                         len = seqLen;
                     }
- 
+
                     var snapToPx = new GlyphPlanSequenceSnapPixelScaleLayout(seq, startAt, len, scale);
                     while (snapToPx.Read())
                     {
@@ -375,10 +375,25 @@ namespace PixelFarm.Drawing
             var buffSpan = new TextBufferSpan(textBuffer, startAt, len);
 
             //a single string may be broken into many glyph-plan-seq
+            ILineSegmentList result = _textServices.BreakToLineSegments(buffSpan);
+            int count = result.Count;
 
+            float xpos = x;
+            float ypos = y;
+            for (int i = 0; i < count; ++i)
+            {
+                //
+                ILineSegment lineseg = result[i];
+                TextBufferSpan buff = new TextBufferSpan(textBuffer, lineseg.StartAt, lineseg.Length);
+                buff.isRightToLeft = lineseg.RightToLeft;
 
-            GlyphPlanSequence glyphPlanSeq = _textServices.CreateGlyphPlanSeq(buffSpan, _currentTypeface, FontSizeInPoints);
-            DrawFromGlyphPlans(glyphPlanSeq, x, y);
+                GlyphPlanSequence glyphPlanSeq = _textServices.CreateGlyphPlanSeq(buff, _currentTypeface, FontSizeInPoints);
+                glyphPlanSeq.IsRightToLeft = buff.isRightToLeft;
+                DrawFromGlyphPlans(glyphPlanSeq, xpos, y);
+
+                xpos += (glyphPlanSeq.CalculateWidth() * _currentFontSizePxScale);
+            }
+
         }
     }
 
