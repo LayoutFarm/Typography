@@ -619,7 +619,7 @@ namespace Typography.FontManagement
             {
                 foreach (UnicodeLangBits unicodeLangBit in s_unicodeLangs)
                 {
-                    RegisterUnicodeSupprt(unicodeLangBit, instFont);
+                    RegisterUnicodeSupport(unicodeLangBit, instFont);
                 }
             }
         }
@@ -819,7 +819,7 @@ namespace Typography.FontManagement
 
 
         readonly Dictionary<UnicodeLangBits, List<InstalledTypeface>> _registeredWithUniCodeLangBits = new Dictionary<UnicodeLangBits, List<InstalledTypeface>>();
-        void RegisterUnicodeSupprt(UnicodeLangBits langBit, InstalledTypeface instFont)
+        void RegisterUnicodeSupport(UnicodeLangBits langBit, InstalledTypeface instFont)
         {
             if (instFont.DoesSupportUnicode(langBit))
             {
