@@ -23,14 +23,13 @@ namespace PixelFarm.Drawing
         //
         public static ScriptLang DefaultScriptLang { get; set; }
 
-        public OpenFontTextService(ScriptLang scLang = null)
+        public OpenFontTextService()
         {
             _system_id = PixelFarm.Drawing.Internal.RequestFontCacheAccess.GetNewCacheSystemId();
 
             //set up typography text service
             _txtServices = new TextServices();
             //default, user can set this later
-
             _txtServices.InstalledFontCollection = InstalledTypefaceCollection.GetSharedTypefaceCollection(collection =>
             {
                 collection.SetFontNameDuplicatedHandler((f0, f1) => FontNameDuplicatedDecision.Skip);
@@ -50,35 +49,29 @@ namespace PixelFarm.Drawing
 
 
             //set script-lang 
-            if (scLang == null)
-            {
-                //use default
-                scLang = DefaultScriptLang;
-            }
-            // if not default then try guess
+            ScriptLang scLang = DefaultScriptLang;
+            //---------------
+            //if not default then try guess
+            //
             if (scLang == null &&
                 !TryGetScriptLangFromCurrentThreadCultureInfo(out scLang))
             {
                 //TODO: handle error here
+
+                throw new NotSupportedException();
             }
+
 
             _txtServices.SetDefaultScriptLang(scLang);
             _txtServices.CurrentScriptLang = scLang;
-
-            // ... or specific the scriptlang manully, eg. ...
-            //_shapingServices.SetDefaultScriptLang(scLang);
-            //_shapingServices.SetCurrentScriptLang(scLang);
-            //--------------- 
-        }
-        public void LoadSystemFonts()
-        {
-            _txtServices.InstalledFontCollection.LoadSystemFonts();
         }
 
-        public void LoadFontsFromFolder(string folder)
-        {
-            _txtServices.InstalledFontCollection.LoadFontsFromFolder(folder);
-        }
+        public void LoadSystemFonts() => _txtServices.InstalledFontCollection.LoadSystemFonts();
+
+        public void LoadFontsFromFolder(string folder) => _txtServices.InstalledFontCollection.LoadFontsFromFolder(folder);
+
+        public void UpdateUnicodeRanges() => _txtServices.InstalledFontCollection.UpdateUnicodeRanges();
+
         static bool TryGetScriptLangFromCurrentThreadCultureInfo(out Typography.OpenFont.ScriptLang scLang)
         {
             var currentCulture = System.Threading.Thread.CurrentThread.CurrentCulture;
