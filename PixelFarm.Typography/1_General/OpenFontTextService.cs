@@ -8,9 +8,34 @@ using Typography.OpenFont.Extensions;
 using Typography.TextLayout;
 using Typography.TextServices;
 using Typography.FontManagement;
+using Typography.TextBreak;
 
 namespace PixelFarm.Drawing
 {
+
+    public interface ITextService
+    {
+
+        float MeasureWhitespace(RequestFont f);
+        float MeasureBlankLineHeight(RequestFont f);
+        //
+        bool SupportsWordBreak { get; }
+        //
+        Size MeasureString(in TextBufferSpan textBufferSpan, RequestFont font);
+
+        void MeasureString(in TextBufferSpan textBufferSpan, RequestFont font, int maxWidth, out int charFit, out int charFitWidth);
+
+        void CalculateUserCharGlyphAdvancePos(in TextBufferSpan textBufferSpan,
+                RequestFont font,
+                ref TextSpanMeasureResult result);
+
+
+
+        ILineSegmentList BreakToLineSegments(in TextBufferSpan textBufferSpan);
+        void CalculateUserCharGlyphAdvancePos(in TextBufferSpan textBufferSpan, ILineSegmentList lineSegs,
+               RequestFont font,
+              ref TextSpanMeasureResult result);
+    }
 
     public class OpenFontTextService : ITextService
     {
@@ -18,7 +43,7 @@ namespace PixelFarm.Drawing
         /// instance of Typography lib's text service
         /// </summary>
         TextServices _txtServices;
-        Dictionary<int, Typeface> _resolvedTypefaceCache = new Dictionary<int, Typeface>();
+        Dictionary<int, Typeface> _resolvedTypefaceCache = new Dictionary<int, Typeface>(); //similar to TypefaceStore
         readonly int _system_id;
         //
         public static ScriptLang DefaultScriptLang { get; set; }
@@ -96,6 +121,19 @@ namespace PixelFarm.Drawing
             return false;
         }
 
+
+        public bool TryGetAlternativeTypefaceFromChar(char c, out Typeface found)
+        {
+            //find a typeface that supported input char c
+            if (_txtServices.InstalledFontCollection.TryGetAlternativeTypefaceFromChar(c, out List<InstalledTypeface> installedTypefaceList))
+            {
+                InstalledTypeface selected = installedTypefaceList[0];
+                found = _txtServices.GetTypeface(selected.FontName, TypefaceStyle.Regular);
+                return true;
+            }
+            found = null;
+            return false;
+        }
         //
         public ScriptLang CurrentScriptLang
         {
@@ -142,8 +180,10 @@ namespace PixelFarm.Drawing
             {
                 //get each segment
                 MyLineSegment lineSeg = (MyLineSegment)mylineSegs.GetSegment(i);
+
                 //each line seg may has different script lang
-                _txtServices.CurrentScriptLang = lineSeg.scriptLang;
+
+                //_txtServices.CurrentScriptLang = lineSeg.scriptLang;
                 //
                 //CACHING ...., reduce number of GSUB/GPOS
                 //
@@ -300,17 +340,32 @@ namespace PixelFarm.Drawing
         {
             readonly int _startAt;
             readonly int _len;
-            internal ScriptLang scriptLang;
-            public MyLineSegment(int startAt, int len, bool rightToLeft)
+            public readonly SpanLayoutInfo spanLayoutInfo;
+            public MyLineSegment(int startAt, int len, SpanLayoutInfo spanLayoutInfo)
             {
                 _startAt = startAt;
                 _len = len;
-                this.scriptLang = null;
-                RightToLeft = rightToLeft;
+
+#if DEBUG
+                if (spanLayoutInfo == null)
+                {
+
+                }
+#endif
+                this.spanLayoutInfo = spanLayoutInfo;
+
+
             }
-            public bool RightToLeft { get; set; }
             public int Length => _len;
             public int StartAt => _startAt;
+            public SpanLayoutInfo SpanLayoutInfo => spanLayoutInfo;
+
+#if DEBUG
+            public override string ToString()
+            {
+                return _startAt + ":" + _len + (spanLayoutInfo.RightToLeft ? "(rtl)" : "");
+            }
+#endif
         }
 
         class MyLineSegmentList : ILineSegmentList
@@ -370,8 +425,6 @@ namespace PixelFarm.Drawing
             }
         }
 
-
-
         public ILineSegmentList BreakToLineSegments(in TextBufferSpan textBufferSpan)
         {
             //a text buffer span is separated into multiple line segment list 
@@ -383,7 +436,21 @@ namespace PixelFarm.Drawing
             MyLineSegmentList lineSegments = MyLineSegmentList.GetFreeLineSegmentList();
             foreach (BreakSpan breakSpan in _txtServices.BreakToLineSegments(str, textBufferSpan.start, textBufferSpan.len))
             {
-                lineSegments.AddLineSegment(new MyLineSegment(breakSpan.startAt, breakSpan.len, breakSpan.RightToLeft));
+                SpanLayoutInfo spLayoutInfo = breakSpan.spanLayoutInfo;
+
+                if (!(spLayoutInfo.ResolvedScriptLang is Typography.OpenFont.ScriptLang scLang))
+                {
+                    if (!Typography.OpenFont.ScriptLangs.TryGetScriptLang((char)spLayoutInfo.SampleCodePoint, out scLang))
+                    {
+
+                    }
+                    else
+                    {
+                        spLayoutInfo.ResolvedScriptLang = scLang;
+                    }
+                }
+
+                lineSegments.AddLineSegment(new MyLineSegment(breakSpan.startAt, breakSpan.len, spLayoutInfo));
             }
             return lineSegments;
         }
@@ -411,6 +478,7 @@ namespace PixelFarm.Drawing
             return s_onMac = (System.Environment.OSVersion.Platform == System.PlatformID.MacOSX);
 #endif
         }
+
 
     }
 
