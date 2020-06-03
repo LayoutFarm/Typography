@@ -166,16 +166,6 @@ namespace Typography.TextBreak
     }
 
 
-
-    public struct BreakSpan
-    {
-        public int startAt;
-        public ushort len;
-        public WordKind wordKind;
-        public bool RightToLeft;
-        public int SampleCodePoint;
-    }
-
     class DevelopingWordGroup
     {
         List<WordSpan> _wordSpanList = new List<WordSpan>();

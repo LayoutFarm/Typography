@@ -8,6 +8,7 @@ using Typography.OpenFont.Extensions;
 using Typography.TextLayout;
 using Typography.TextServices;
 using Typography.FontManagement;
+using Typography.TextBreak;
 
 namespace PixelFarm.Drawing
 {
@@ -315,18 +316,19 @@ namespace PixelFarm.Drawing
         {
             readonly int _startAt;
             readonly int _len;
-
-            public MyLineSegment(int startAt, int len, bool rightToLeft, int sampleCodePoint)
+            public readonly Typography.TextBreak.SpanLayoutInfo spanLayoutInfo;
+            public MyLineSegment(int startAt, int len, Typography.TextBreak.SpanLayoutInfo spanLayoutInfo)
             {
                 _startAt = startAt;
                 _len = len;
-                RightToLeft = rightToLeft;
-                SampleCodePoint = sampleCodePoint;
+                this.spanLayoutInfo = spanLayoutInfo;
             }
             public int Length => _len;
             public int StartAt => _startAt;
-            public bool RightToLeft { get; set; }
-            public int SampleCodePoint { get; set; }
+            public bool RightToLeft => spanLayoutInfo.RightToleft;
+            public int Unicode => spanLayoutInfo.SampleCodePoint;
+            public int SampleCodePoint => spanLayoutInfo.SampleCodePoint;
+
 #if DEBUG
             public override string ToString()
             {
@@ -401,9 +403,9 @@ namespace PixelFarm.Drawing
 #endif
 
             MyLineSegmentList lineSegments = MyLineSegmentList.GetFreeLineSegmentList();
-            foreach (BreakSpan breakSpan in _txtServices.BreakToLineSegments(str, textBufferSpan.start, textBufferSpan.len))
+            foreach (Typography.TextBreak.BreakSpan breakSpan in _txtServices.BreakToLineSegments(str, textBufferSpan.start, textBufferSpan.len))
             {
-                lineSegments.AddLineSegment(new MyLineSegment(breakSpan.startAt, breakSpan.len, breakSpan.RightToLeft, breakSpan.SampleCodePoint));
+                lineSegments.AddLineSegment(new MyLineSegment(breakSpan.startAt, breakSpan.len, breakSpan.spanLayoutInfo));
             }
             return lineSegments;
         }

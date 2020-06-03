@@ -11,7 +11,7 @@ namespace PixelFarm.Drawing
         //
         bool SupportsWordBreak { get; }
 
-        ILineSegmentList BreakToLineSegments(in TextBufferSpan textBufferSpan);
+        //ILineSegmentList BreakToLineSegments(in TextBufferSpan textBufferSpan);
         //
         Size MeasureString(in TextBufferSpan textBufferSpan, RequestFont font);
 
@@ -20,22 +20,11 @@ namespace PixelFarm.Drawing
         void CalculateUserCharGlyphAdvancePos(in TextBufferSpan textBufferSpan,
                 RequestFont font,
                 ref TextSpanMeasureResult result);
-        void CalculateUserCharGlyphAdvancePos(in TextBufferSpan textBufferSpan, ILineSegmentList lineSegs,
-                RequestFont font,
-                ref TextSpanMeasureResult result);
+        //void CalculateUserCharGlyphAdvancePos(in TextBufferSpan textBufferSpan, ILineSegmentList lineSegs,
+        //        RequestFont font,
+        //        ref TextSpanMeasureResult result);
     }
-    public interface ILineSegmentList : System.IDisposable
-    {
-        int Count { get; }
-        ILineSegment this[int index] { get; }
-    }
-    public interface ILineSegment
-    {
-        int Length { get; }
-        int StartAt { get; }
-        bool RightToLeft { get; }
-        int SampleCodePoint { get; }
-    }
+ 
 
     public struct TextBufferSpan
     {

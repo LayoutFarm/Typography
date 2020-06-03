@@ -5,18 +5,7 @@ using Typography.OpenFont;
 using Typography.FontManagement;
 using System.IO;
 
-namespace Typography.TextLayout
-{
-    public struct BreakSpan
-    {
-        //TODO: review here again***
-        public int startAt;
-        public ushort len;
 
-        public bool RightToLeft;
-        public int SampleCodePoint;
-    }
-}
 
 namespace Typography.TextServices
 {
@@ -106,7 +95,7 @@ namespace Typography.TextServices
         CustomBreaker _textBreaker;
         List<TextBreak.BreakSpan> _breakSpans = new List<TextBreak.BreakSpan>();
 
-        public IEnumerable<Typography.TextLayout.BreakSpan> BreakToLineSegments(char[] str, int startAt, int len)
+        public IEnumerable<Typography.TextBreak.BreakSpan> BreakToLineSegments(char[] str, int startAt, int len)
         {
             //user must setup the CustomBreakerBuilder before use      
             if (_textBreaker == null)
@@ -136,14 +125,8 @@ namespace Typography.TextServices
             _textBreaker.BreakWords(str, cur_startAt, len);//break and store into _breakSpans
 
             foreach (TextBreak.BreakSpan sp in _breakSpans)
-            {   
-                yield return new Typography.TextLayout.BreakSpan
-                {
-                    startAt = sp.startAt,
-                    len = sp.len,
-                    RightToLeft = sp.RightToLeft,
-                    SampleCodePoint = sp.SampleCodePoint,
-                };
+            {
+                yield return sp;
             }
         }
 

@@ -7,6 +7,7 @@ using Typography.Contours;
 using Typography.OpenFont;
 using Typography.OpenFont.Extensions;
 using Typography.TextLayout;
+using Typography.TextBreak;
 
 namespace PixelFarm.Drawing
 {

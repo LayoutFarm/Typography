@@ -25,6 +25,7 @@ namespace Typography.TextBreak
 
 
         BreakBounds _breakBounds = new BreakBounds();
+        readonly SpanLayoutInfo _spLayoutInfo = new SpanLayoutInfo(false, 'A');
         public EngBreakingEngine()
         {
 
@@ -32,7 +33,7 @@ namespace Typography.TextBreak
         internal override void BreakWord(WordVisitor visitor, char[] charBuff, int startAt, int len)
         {
             visitor.State = VisitorState.Parsing;
-            visitor.SampleCodePoint = 'A';
+            visitor.SpanLayoutInfo = _spLayoutInfo;
 
             DoBreak(visitor, charBuff, startAt, len, bb =>
             {
