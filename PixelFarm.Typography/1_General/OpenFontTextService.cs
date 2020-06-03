@@ -13,6 +13,30 @@ using Typography.TextBreak;
 namespace PixelFarm.Drawing
 {
 
+    public interface ITextService
+    {
+
+        float MeasureWhitespace(RequestFont f);
+        float MeasureBlankLineHeight(RequestFont f);
+        //
+        bool SupportsWordBreak { get; }
+        //
+        Size MeasureString(in TextBufferSpan textBufferSpan, RequestFont font);
+
+        void MeasureString(in TextBufferSpan textBufferSpan, RequestFont font, int maxWidth, out int charFit, out int charFitWidth);
+
+        void CalculateUserCharGlyphAdvancePos(in TextBufferSpan textBufferSpan,
+                RequestFont font,
+                ref TextSpanMeasureResult result);
+
+
+
+        ILineSegmentList BreakToLineSegments(in TextBufferSpan textBufferSpan);
+        void CalculateUserCharGlyphAdvancePos(in TextBufferSpan textBufferSpan, ILineSegmentList lineSegs,
+               RequestFont font,
+              ref TextSpanMeasureResult result);
+    }
+  
     public class OpenFontTextService : ITextService
     {
         /// <summary>
@@ -434,6 +458,7 @@ namespace PixelFarm.Drawing
 #endif
         }
 
+       
     }
 
 
