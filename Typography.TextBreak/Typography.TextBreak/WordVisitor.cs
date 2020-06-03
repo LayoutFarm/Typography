@@ -27,6 +27,7 @@ namespace Typography.TextBreak
         public ushort len;
         public WordKind wordKind;
         public SpanLayoutInfo spanLayoutInfo;
+
     }
 
     public class SpanLayoutInfo
@@ -110,7 +111,7 @@ namespace Typography.TextBreak
         //
         public char Char => _currentChar;
         //
-        public bool IsEnd => _currentIndex >= _endIndex; 
+        public bool IsEnd => _currentIndex >= _endIndex;
 
         public string CopyCurrentSpanString()
         {
@@ -138,8 +139,8 @@ namespace Typography.TextBreak
 
             LatestSpanLen = (ushort)(index - LatestBreakAt);
             LatestSpanStartAt = _latestBreakAt;
-            _latestBreakAt = index; 
-            this.LatestWordKind = wordKind; 
+            _latestBreakAt = index;
+            this.LatestWordKind = wordKind;
             _newWordBreakHandler(this);
 
 #if DEBUG
@@ -183,8 +184,7 @@ namespace Typography.TextBreak
                 startAt = vis.LatestSpanStartAt,
                 len = vis.LatestSpanLen,
                 wordKind = vis.LatestWordKind,
-                //RightToLeft = vis.IsRlt,
-                //SampleCodePoint = vis.SampleCodePoint,
+                spanLayoutInfo = vis.SpanLayoutInfo,
             };
         }
     }

@@ -36,7 +36,7 @@ namespace PixelFarm.Drawing
                RequestFont font,
               ref TextSpanMeasureResult result);
     }
-  
+
     public class OpenFontTextService : ITextService
     {
         /// <summary>
@@ -340,11 +340,18 @@ namespace PixelFarm.Drawing
         {
             readonly int _startAt;
             readonly int _len;
-            public readonly Typography.TextBreak.SpanLayoutInfo spanLayoutInfo;
-            public MyLineSegment(int startAt, int len, Typography.TextBreak.SpanLayoutInfo spanLayoutInfo)
+            public readonly SpanLayoutInfo spanLayoutInfo;
+            public MyLineSegment(int startAt, int len, SpanLayoutInfo spanLayoutInfo)
             {
                 _startAt = startAt;
                 _len = len;
+
+#if DEBUG
+                if (spanLayoutInfo == null)
+                {
+
+                }
+#endif
                 this.spanLayoutInfo = spanLayoutInfo;
             }
             public int Length => _len;
@@ -427,7 +434,7 @@ namespace PixelFarm.Drawing
 #endif
 
             MyLineSegmentList lineSegments = MyLineSegmentList.GetFreeLineSegmentList();
-            foreach (Typography.TextBreak.BreakSpan breakSpan in _txtServices.BreakToLineSegments(str, textBufferSpan.start, textBufferSpan.len))
+            foreach (BreakSpan breakSpan in _txtServices.BreakToLineSegments(str, textBufferSpan.start, textBufferSpan.len))
             {
                 lineSegments.AddLineSegment(new MyLineSegment(breakSpan.startAt, breakSpan.len, breakSpan.spanLayoutInfo));
             }
@@ -458,7 +465,7 @@ namespace PixelFarm.Drawing
 #endif
         }
 
-       
+
     }
 
 

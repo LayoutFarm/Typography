@@ -19,7 +19,11 @@ namespace Typography.TextBreak
         readonly SpanLayoutInfo _spanLayoutInfo;
         public DictionaryBreakingEngine()
         {
-            _spanLayoutInfo = new SpanLayoutInfo(false, FirstUnicodeChar);
+            _spanLayoutInfo = GetSpanLayoutInfo();
+        }
+        protected virtual SpanLayoutInfo GetSpanLayoutInfo()
+        {
+            return new SpanLayoutInfo(false, FirstUnicodeChar);
         }
         public abstract char FirstUnicodeChar { get; }
         public abstract char LastUnicodeChar { get; }
