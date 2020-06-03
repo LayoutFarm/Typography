@@ -9,7 +9,6 @@
     <Import_RootNamespace>DrawingGL.Common</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)DevTextPrinter\FontManagement.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DrawingGL.Text\TextBaseline.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DrawingGL\Color.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DrawingGL\Shaders.cs" />
@@ -39,6 +38,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Tesselate\mesh.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="$(MSBuildThisFileDirectory)DevTextPrinter\" />
     <Folder Include="$(MSBuildThisFileDirectory)Tesselate\" />
   </ItemGroup>
 </Project>

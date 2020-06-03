@@ -7,38 +7,75 @@ using Typography.OpenFont;
 
 namespace Typography.FontManagement
 {
-
     public class InstalledTypeface
     {
-        internal InstalledTypeface(string fontName,
-            string fontSubFamily,
-            string tFamilyName,
-            string tSubFamilyName,
-            string fontPath,
-            TypefaceStyle typefaceStyle,
-            ushort weight)
+        internal InstalledTypeface(PreviewFontInfo previewFontInfo, TypefaceStyle style, string fontPath)
         {
-            FontName = fontName;
-            FontSubFamily = fontSubFamily;
-
-            TypographicFamilyName = tFamilyName;
-            TypographicFontSubFamily = tSubFamilyName;
-
+            FontName = previewFontInfo.Name;
+            FontSubFamily = previewFontInfo.SubFamilyName;
+            TypographicFamilyName = previewFontInfo.TypographicFamilyName;
+            TypographicFontSubFamily = previewFontInfo.TypographicSubFamilyName;
+            Weight = previewFontInfo.Weight;
             FontPath = fontPath;
-            TypefaceStyle = typefaceStyle;
-            Weight = weight;
+
+            PostScriptName = previewFontInfo.PostScriptName;
+            UniqueFontIden = previewFontInfo.UniqueFontIden;
+
+            UnicodeRange1 = previewFontInfo.UnicodeRange1;
+            UnicodeRange2 = previewFontInfo.UnicodeRange2;
+            UnicodeRange3 = previewFontInfo.UnicodeRange3;
+            UnicodeRange4 = previewFontInfo.UnicodeRange4;
+
+            TypefaceStyle = style;
         }
 
         public string FontName { get; internal set; }
         public string FontSubFamily { get; internal set; }
         public string TypographicFamilyName { get; internal set; }
         public string TypographicFontSubFamily { get; internal set; }
+        public string PostScriptName { get; internal set; }
+        public string UniqueFontIden { get; internal set; }
+
         public TypefaceStyle TypefaceStyle { get; internal set; }
         public ushort Weight { get; internal set; }
-
+        public uint UnicodeRange1 { get; internal set; }
+        public uint UnicodeRange2 { get; internal set; }
+        public uint UnicodeRange3 { get; internal set; }
+        public uint UnicodeRange4 { get; internal set; }
         public string FontPath { get; internal set; }
         public int ActualStreamOffset { get; internal set; }
+        public bool DoesSupportUnicode(UnicodeLangBits unicodeLangBits)
+        {
 
+            long bits = (long)unicodeLangBits;
+            int bitpos = (int)(bits >> 32);
+
+            if (bitpos == 0)
+            {
+                return true; //default
+            }
+            else if (bitpos < 32)
+            {
+                //use range 1
+                return (UnicodeRange1 & (1 << bitpos)) != 0;
+            }
+            else if (bitpos < 64)
+            {
+                return (UnicodeRange2 & (1 << (bitpos - 32))) != 0;
+            }
+            else if (bitpos < 96)
+            {
+                return (UnicodeRange3 & (1 << (bitpos - 64))) != 0;
+            }
+            else if (bitpos < 128)
+            {
+                return (UnicodeRange4 & (1 << (bitpos - 96))) != 0;
+            }
+            else
+            {
+                throw new System.NotSupportedException();
+            }
+        }
         public override string ToString()
         {
             return FontName + " " + FontSubFamily;
@@ -136,7 +173,7 @@ namespace Typography.FontManagement
         FontNotFoundHandler _fontNotFoundHandler;
 
         Dictionary<string, InstalledTypeface> _otherFontNames = new Dictionary<string, InstalledTypeface>();
-
+        Dictionary<string, InstalledTypeface> _postScriptNames = new Dictionary<string, InstalledTypeface>();
 
         public InstalledTypefaceCollection()
         {
@@ -242,13 +279,9 @@ namespace Typography.FontManagement
                 }
             }
             return Register(new InstalledTypeface(
-                previewFont.Name,
-                previewFont.SubFamilyName,
-                previewFont.TypographicFamilyName,
-                previewFont.TypographicSubFamilyName,
-                srcPath,
+                previewFont,
                 typefaceStyle,
-                previewFont.Weight)
+                srcPath)
             { ActualStreamOffset = previewFont.ActualStreamOffset });
         }
         public bool AddFontStreamSource(IFontStreamSource src)
@@ -418,10 +451,30 @@ namespace Typography.FontManagement
                 }
             }
 
+            //register font
+            if (newTypeface.PostScriptName != null)
+            {
+                string postScriptName = newTypeface.PostScriptName.ToUpper();
+                if (!_postScriptNames.ContainsKey(postScriptName))
+                {
+                    _postScriptNames.Add(postScriptName, newTypeface);
+                }
+                else
+                {
+#if DEBUG
+                    System.Diagnostics.Debug.WriteLine("duplicated postscriptname:" + postScriptName);
+#endif
+                }
+            }
+
             return register_result;
 
         }
-
+        public InstalledTypeface GetFontByPostScriptName(string postScriptName)
+        {
+            _postScriptNames.TryGetValue(postScriptName.ToUpper(), out InstalledTypeface found);
+            return found;
+        }
         public InstalledTypeface GetInstalledTypeface(string fontName, string subFamName)
         {
             string upperCaseFontName = fontName.ToUpper();
@@ -558,6 +611,227 @@ namespace Typography.FontManagement
                 }
             }
         }
+
+        public void UpdateUnicodeRanges()
+        {
+            _registeredWithUniCodeLangBits.Clear();
+            foreach (InstalledTypeface instFont in GetInstalledFontIter())
+            {
+                foreach (UnicodeLangBits unicodeLangBit in s_unicodeLangs)
+                {
+                    RegisterUnicodeSupprt(unicodeLangBit, instFont);
+                }
+            }
+        }
+
+        static readonly UnicodeLangBits[] s_unicodeLangs = new UnicodeLangBits[]
+        {   
+                    //TODO: autogen???
+                    //alternative=> use reflection technique
+
+                    UnicodeLangBits.Aegean_Numbers,
+                    UnicodeLangBits.Alphabetic_Presentation_Forms,
+                    UnicodeLangBits.Ancient_Greek_Musical_Notation,
+                    UnicodeLangBits.Ancient_Greek_Numbers,
+                    UnicodeLangBits.Ancient_Symbols,
+                    UnicodeLangBits.Arabic,
+                    UnicodeLangBits.ArabicSupplement,
+                    UnicodeLangBits.Arabic_Presentation_Forms_A,
+                    UnicodeLangBits.Arabic_Presentation_Forms_B,
+                    UnicodeLangBits.Armenian,
+                    UnicodeLangBits.Arrows,
+
+                    UnicodeLangBits.Balinese,
+                    UnicodeLangBits.BasicLatin,
+                    UnicodeLangBits.Bengali,
+                    UnicodeLangBits.Block_Elements,
+                    UnicodeLangBits.Bopomofo,
+                    UnicodeLangBits.Bopomofo_Extended,
+                    UnicodeLangBits.Box_Drawing,
+                    UnicodeLangBits.Braille_Patterns,
+                    UnicodeLangBits.Buginese,
+                    UnicodeLangBits.Buhid,
+                    UnicodeLangBits.Byzantine_Musical_Symbols,
+
+                    UnicodeLangBits.Carian,
+                    UnicodeLangBits.Cham,
+                    UnicodeLangBits.Cherokee,
+                    UnicodeLangBits.CJK_Compatibility,
+                    UnicodeLangBits.CJK_Compatibility_Forms,
+                    UnicodeLangBits.CJK_Compatibility_Ideographs,
+                    UnicodeLangBits.CJK_Compatibility_Ideographs_Supplement,
+                    UnicodeLangBits.CJK_Radicals_Supplement,
+                    UnicodeLangBits.CJK_Strokes,
+                    UnicodeLangBits.CJK_Symbols_And_unctuation,
+                    UnicodeLangBits.CJK_Unified_Ideographs,
+                    UnicodeLangBits.CJK_Unified_Ideographs_Extension_A,
+                    UnicodeLangBits.CJK_Unified_Ideographs_Extension_B,
+                    UnicodeLangBits.CombiningDiacriticalMarks,
+                    UnicodeLangBits.CombiningDiacriticalMarksSupplement,
+                    UnicodeLangBits.Combining_Diacritical_Marks_For_Symbols,
+                    UnicodeLangBits.Combining_Half_Marks,
+                    UnicodeLangBits.Control_Pictures,
+                    UnicodeLangBits.Coptic,
+                    UnicodeLangBits.Counting_Rod_Numerals,
+                    UnicodeLangBits.Cuneiform,
+                    UnicodeLangBits.Cuneiform_Numbers_and_Punctuation,
+                    UnicodeLangBits.Currency_Symbols,
+                    UnicodeLangBits.Cypriot_Syllabary,
+                    UnicodeLangBits.CyrillicExtendedA,
+                    UnicodeLangBits.CyrillicExtendedB,
+
+                    UnicodeLangBits.Deseret,
+                    UnicodeLangBits.Devanagari,
+                    UnicodeLangBits.Dingbats,
+                    UnicodeLangBits.Domino_Tiles,
+
+                    UnicodeLangBits.Enclosed_CJK_Letters_And_Months,
+                    UnicodeLangBits.Enclose_Alphanumerics,
+                    UnicodeLangBits.Ethiopic,
+                    UnicodeLangBits.Ethiopic_Extended,
+                    UnicodeLangBits.Ethiopic_Supplement,
+
+                    UnicodeLangBits.GeneralPunctuation,
+                    UnicodeLangBits.Geometric_Shapes,
+                    UnicodeLangBits.Georgian,
+                    UnicodeLangBits.GeorgianSupplement,
+                    UnicodeLangBits.Glagolitic,
+                    UnicodeLangBits.Gothic,
+                    UnicodeLangBits.GreekAndCoptic,
+                    UnicodeLangBits.GreekExtended,
+                    UnicodeLangBits.Gujarati,
+                    UnicodeLangBits.Gurmukhi,
+
+                    UnicodeLangBits.Halfwidth_And_Fullwidth_Forms,
+                    UnicodeLangBits.HangulJamo,
+                    UnicodeLangBits.Hangul_Compatibility_Jamo,
+                    UnicodeLangBits.Hangul_Syllables,
+                    UnicodeLangBits.Hanunoo,
+                    UnicodeLangBits.Hebrew,
+                    UnicodeLangBits.Hiragana,
+
+                    UnicodeLangBits.Ideographic_Description_Characters,
+                    UnicodeLangBits.IPAExtensions,
+
+                    UnicodeLangBits.Kanbun,
+                    UnicodeLangBits.Kangxi_Radicals,
+                    UnicodeLangBits.Kannada,
+                    UnicodeLangBits.Katakana,
+                    UnicodeLangBits.Katakana_Phonetic_Extensions,
+                    UnicodeLangBits.Kayah_Li,
+                    UnicodeLangBits.Kharoshthi,
+                    UnicodeLangBits.Khmer,
+                    UnicodeLangBits.Khmer_Symbols,
+
+                    UnicodeLangBits.Lao,
+                    UnicodeLangBits.Latin1Supplement,
+                    UnicodeLangBits.LatinExtendedA,
+                    UnicodeLangBits.LatinExtendedAdditional,
+                    UnicodeLangBits.LatinExtendedAdditionalC,
+                    UnicodeLangBits.LatinExtendedAdditionalD,
+                    UnicodeLangBits.LatinExtendedB,
+                    UnicodeLangBits.Lepcha,
+                    UnicodeLangBits.Letterlike_Symbols,
+                    UnicodeLangBits.Limbu,
+                    UnicodeLangBits.Linear_B_Ideograms,
+                    UnicodeLangBits.Linear_B_Syllabary,
+                    UnicodeLangBits.Lycian,
+                    UnicodeLangBits.Lydian,
+
+                    UnicodeLangBits.Mahjong_Tiles,
+                    UnicodeLangBits.Malayalam,
+                    UnicodeLangBits.Mathematical_Alphanumeric_Symbols,
+                    UnicodeLangBits.Mathematical_Operators,
+                    UnicodeLangBits.Miscellaneous_Mathematical_Symbols_A,
+                    UnicodeLangBits.Miscellaneous_Mathematical_Symbols_B,
+                    UnicodeLangBits.Miscellaneous_Symbols,
+                    UnicodeLangBits.Miscellaneous_Symbols_and_Arrows,
+                    UnicodeLangBits.Miscellaneous_Technical,
+                    UnicodeLangBits.ModifierToneLetters,
+                    UnicodeLangBits.Mongolian,
+                    UnicodeLangBits.Musical_Symbols,
+                    UnicodeLangBits.Myanmar,
+
+                    UnicodeLangBits.New_Tai_Lue,
+                    UnicodeLangBits.NKo,
+                    UnicodeLangBits.Non_Plane_0,
+                    UnicodeLangBits.Number_Forms,
+
+                    UnicodeLangBits.Ogham,
+                    UnicodeLangBits.Old_Italic,
+                    UnicodeLangBits.Old_Persian,
+                    UnicodeLangBits.Ol_Chiki,
+                    UnicodeLangBits.Optical_Character_Recognition,
+                    UnicodeLangBits.Oriya,
+                    UnicodeLangBits.Osmanya,
+
+                    UnicodeLangBits.Phags_pa,
+                    UnicodeLangBits.Phaistos_Disc,
+                    UnicodeLangBits.Phoenician,
+                    UnicodeLangBits.PhoneticExtensions,
+                    UnicodeLangBits.PhoneticExtensionsSupplement,
+                    UnicodeLangBits.Private_Use_Area_Plane0,
+                    UnicodeLangBits.Private_Use_plane15,
+                    UnicodeLangBits.Private_Use_plane16,
+
+                    UnicodeLangBits.Rejang,
+                    UnicodeLangBits.Runic,
+
+                    UnicodeLangBits.Saurashtra,
+                    UnicodeLangBits.Shavian,
+                    UnicodeLangBits.Sinhala,
+                    UnicodeLangBits.Small_Form_Variants,
+                    UnicodeLangBits.SpacingModifierLetters,
+                    UnicodeLangBits.Specials,
+                    UnicodeLangBits.Sundanese,
+                    UnicodeLangBits.Superscripts_And_Subscripts,
+                    UnicodeLangBits.Supplemental_Arrows_A,
+                    UnicodeLangBits.Supplemental_Arrows_B,
+                    UnicodeLangBits.Supplemental_Mathematical_Operators,
+                    UnicodeLangBits.SupplementPunctuation,
+                    UnicodeLangBits.Syloti_Nagri,
+                    UnicodeLangBits.Syriac,
+
+                    UnicodeLangBits.Tagalog,
+                    UnicodeLangBits.Tagbanwa,
+                    UnicodeLangBits.Tags,
+                    UnicodeLangBits.Tai_Le,
+                    UnicodeLangBits.Tai_Xuan_Jing_Symbols,
+                    UnicodeLangBits.Tamil,
+                    UnicodeLangBits.Telugu,
+                    UnicodeLangBits.Thaana,
+                    UnicodeLangBits.Thai,
+                    UnicodeLangBits.Tibetan,
+
+                    UnicodeLangBits.Ugaritic,
+                    UnicodeLangBits.Unified_Canadian_Aboriginal_Syllabics,
+
+                    UnicodeLangBits.Vai,
+                    UnicodeLangBits.Variation_Selectors,
+                    UnicodeLangBits.Variation_Selectors_Supplement,
+                    UnicodeLangBits.Vertical_Forms,
+
+                    UnicodeLangBits.Yijing_Hexagram_Symbols,
+                    UnicodeLangBits.Yi_Radicals,
+                    UnicodeLangBits.Yi_Syllables,
+
+        };
+
+
+        readonly Dictionary<UnicodeLangBits, List<InstalledTypeface>> _registeredWithUniCodeLangBits = new Dictionary<UnicodeLangBits, List<InstalledTypeface>>();
+        void RegisterUnicodeSupprt(UnicodeLangBits langBit, InstalledTypeface instFont)
+        {
+            if (instFont.DoesSupportUnicode(langBit))
+            {
+                if (!_registeredWithUniCodeLangBits.TryGetValue(langBit, out List<InstalledTypeface> found))
+                {
+                    found = new List<InstalledTypeface>();
+                    _registeredWithUniCodeLangBits.Add(langBit, found);
+                }
+
+                found.Add(instFont);
+            }
+        } 
 
     }
 

@@ -7,7 +7,7 @@ using System.Windows.Forms;
 using Typography.OpenFont;
 using Typography.TextLayout;
 using Typography.Contours;
-using Typography.TextServices;
+using Typography.FontManagement;
 
 
 namespace SampleWinForms
@@ -19,7 +19,7 @@ namespace SampleWinForms
         //create text printer env for developer.
         DevGdiTextPrinter _currentTextPrinter = new DevGdiTextPrinter();
         SampleWinForms.UI.SampleTextBoxControllerForGdi _textBoxControllerForGdi = new UI.SampleTextBoxControllerForGdi();
-        InstalledFontCollection installedFontCollection;
+        InstalledTypefaceCollection _installedFontCollection;
         TypefaceStore _typefaceStore;
         public Form2()
         {
@@ -60,25 +60,25 @@ namespace SampleWinForms
             //---------- 
             txtInputChar.TextChanged += (s, e) => UpdateRenderOutput();
             //1. create font collection             
-            installedFontCollection = new InstalledFontCollection();
+            _installedFontCollection = new InstalledTypefaceCollection();
             //set some essential handler
-            installedFontCollection.SetFontNameDuplicatedHandler((f1, f2) => FontNameDuplicatedDecision.Skip);
+            _installedFontCollection.SetFontNameDuplicatedHandler((f1, f2) => FontNameDuplicatedDecision.Skip);
             foreach (string file in Directory.GetFiles("../../../TestFonts", "*.ttf"))
             {
                 //eg. this is our custom font folder  
-                installedFontCollection.AddFont(new FontFileStreamProvider(file));
+                _installedFontCollection.AddFontStreamSource(new FontFileStreamProvider(file));
             }
             //
             _typefaceStore = new TypefaceStore();
-            _typefaceStore.FontCollection = installedFontCollection;
+            _typefaceStore.FontCollection = _installedFontCollection;
 
             //---------- 
             //show result
-            InstalledFont selectedFF = null;
+            InstalledTypeface selectedFF = null;
             int selected_index = 0;
             int ffcount = 0;
             bool found = false;
-            foreach (InstalledFont ff in installedFontCollection.GetInstalledFontIter())
+            foreach (InstalledTypeface ff in _installedFontCollection.GetInstalledFontIter())
             {
                 if (!found && ff.FontName == "Source Sans Pro")
                 {
@@ -97,8 +97,7 @@ namespace SampleWinForms
             lstFontList.SelectedIndex = selected_index;
             lstFontList.SelectedIndexChanged += (s, e) =>
             {
-                InstalledFont ff = lstFontList.SelectedItem as InstalledFont;
-                if (ff != null)
+                if (lstFontList.SelectedItem is InstalledTypeface ff)
                 {
                     //direct set
                     _currentTextPrinter.Typeface = _typefaceStore.GetTypeface(ff);
