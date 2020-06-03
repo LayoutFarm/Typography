@@ -35,6 +35,8 @@ namespace Typography.TextBreak
             char c_first = this.FirstUnicodeChar;
             char c_last = this.LastUnicodeChar;
             int endAt = startAt + len;
+            
+            visitor.SampleCodePoint = c_first;
 
             Stack<int> candidateBreakList = visitor.GetTempCandidateBreaks();
             bool breakPeroidInTextSpan = BreakPeroidInTextSpan;

@@ -80,6 +80,8 @@ namespace Typography.TextBreak
         public bool IsEnd => _currentIndex >= _endIndex;
         //
         public bool IsRlt { get; private set; }
+        public int SampleCodePoint { get; set; }
+
         public string CopyCurrentSpanString()
         {
             return new string(_buffer, LatestSpanStartAt, LatestSpanLen);
@@ -154,7 +156,8 @@ namespace Typography.TextBreak
                 startAt = vis.LatestSpanStartAt,
                 len = vis.LatestSpanLen,
                 wordKind = vis.LatestWordKind,
-                RightToLeft = vis.IsRlt
+                RightToLeft = vis.IsRlt,
+                SampleCodePoint = vis.SampleCodePoint,
             };
         }
     }

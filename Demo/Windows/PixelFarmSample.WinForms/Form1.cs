@@ -253,6 +253,7 @@ namespace SampleWinForms
 
                 _textService = new PixelFarm.Drawing.OpenFontTextService();
                 _textService.LoadFontsFromFolder("../../../TestFonts");
+                _textService.UpdateUnicodeRanges();
 
                 _devVxsTextPrinter = new PixelFarm.Drawing.VxsTextPrinter(_painter, _textService);
                 _devVxsTextPrinter.SetSvgBmpBuilderFunc(ParseAndRenderSvg);

@@ -32,6 +32,8 @@ namespace Typography.TextBreak
         internal override void BreakWord(WordVisitor visitor, char[] charBuff, int startAt, int len)
         {
             visitor.State = VisitorState.Parsing;
+            visitor.SampleCodePoint = 'A';
+
             DoBreak(visitor, charBuff, startAt, len, bb =>
             {
                 visitor.AddWordBreakAt(bb.startIndex + bb.length, bb.kind);

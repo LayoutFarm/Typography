@@ -34,6 +34,7 @@ namespace PixelFarm.Drawing
         int Length { get; }
         int StartAt { get; }
         bool RightToLeft { get; }
+        int SampleCodePoint { get; }
     }
 
     public struct TextBufferSpan
@@ -57,13 +58,17 @@ namespace PixelFarm.Drawing
             _rawString = rawCharBuffer;
         }
 
+        public char GetChar(int localOffset) => _rawString[start + localOffset];
+        public char[] GetRawCharBuffer() => _rawString;
+
+#if DEBUG
         public override string ToString()
         {
             return start + ":" + len;
         }
+#endif
 
 
-        public char[] GetRawCharBuffer() => _rawString;
     }
 
     public struct TextSpanMeasureResult

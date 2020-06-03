@@ -173,6 +173,7 @@ namespace Typography.TextBreak
         public ushort len;
         public WordKind wordKind;
         public bool RightToLeft;
+        public int SampleCodePoint;
     }
 
     class DevelopingWordGroup

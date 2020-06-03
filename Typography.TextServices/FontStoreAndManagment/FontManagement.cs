@@ -76,10 +76,12 @@ namespace Typography.FontManagement
                 throw new System.NotSupportedException();
             }
         }
+#if DEBUG
         public override string ToString()
         {
             return FontName + " " + FontSubFamily;
         }
+#endif
     }
     [Flags]
     public enum TypefaceStyle
@@ -481,13 +483,12 @@ namespace Typography.FontManagement
             string upperCaseSubFamName = subFamName.ToUpper();
 
             InstalledTypeface foundInstalledFont;
+
             //find font group  
-            if (_subFamToFontGroup.TryGetValue(upperCaseSubFamName, out InstalledTypefaceGroup foundFontGroup))
+            if (_subFamToFontGroup.TryGetValue(upperCaseSubFamName, out InstalledTypefaceGroup foundFontGroup) &&
+                foundFontGroup.TryGetValue(upperCaseFontName, out foundInstalledFont))
             {
-                if (foundFontGroup.TryGetValue(upperCaseFontName, out foundInstalledFont))
-                {
-                    return foundInstalledFont;
-                }
+                return foundInstalledFont;
             }
 
             //
@@ -623,7 +624,24 @@ namespace Typography.FontManagement
                 }
             }
         }
-
+        public bool TryGetAlternativeTypefaceFromChar(char c, out List<InstalledTypeface> found)
+        {
+            //find a typeface that supported input char c
+            if (OpenFont.ScriptLangs.TryGetScriptLang(c, out ScriptLang foundScriptLang) && foundScriptLang.unicodeLangs != null)
+            {
+                foreach (UnicodeLangBits langBits in foundScriptLang.unicodeLangs)
+                {
+                    if (_registeredWithUniCodeLangBits.TryGetValue(langBits, out List<InstalledTypeface> typefaceList) && typefaceList.Count > 0)
+                    {
+                        //select a proper typeface                        
+                        found = typefaceList;
+                        return true;
+                    }
+                }
+            }
+            found = null;
+            return false;
+        }
         static readonly UnicodeLangBits[] s_unicodeLangs = new UnicodeLangBits[]
         {   
                     //TODO: autogen???
@@ -831,7 +849,7 @@ namespace Typography.FontManagement
 
                 found.Add(instFont);
             }
-        } 
+        }
 
     }
 

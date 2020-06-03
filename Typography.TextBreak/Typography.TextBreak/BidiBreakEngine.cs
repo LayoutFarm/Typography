@@ -69,6 +69,8 @@ namespace Typography.TextBreak
 
             int arabic_len = 0;
             int lim = startAt + len;
+
+            
             for (int i = startAt; i < lim; ++i)
             {
                 char c = charBuff[i];
@@ -88,6 +90,10 @@ namespace Typography.TextBreak
                 return;
             }
 
+
+            visitor.SampleCodePoint = 0x0600; //arabic char
+
+
             //only collect char
             Line line1 = new Line(new string(charBuff, startAt, arabic_len));
             _runAdapter.LoadLine(line1);
@@ -101,6 +107,8 @@ namespace Typography.TextBreak
 
                 if (rtl)
                 {
+                    //temp fix
+                    
                     visitor.AddWordBreakAt(startAt + sp_len, WordKind.Text, true);
                     visitor.SetCurrentIndex(startAt + sp_len);
                 }
