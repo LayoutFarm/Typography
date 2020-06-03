@@ -35,21 +35,11 @@ namespace SampleWinForms
             FillColor = Color.Black;
             OutlineColor = Color.Green;
         }
-
-
-        public override GlyphLayout GlyphLayoutMan
-        {
-            get
-            {
-                return _glyphLayout;
-            }
-        }
+        public override GlyphLayout GlyphLayoutMan => _glyphLayout;
         public override Typeface Typeface
         {
-            get
-            {
-                return _currentTypeface;
-            }
+            get => _currentTypeface;
+
             set
             {
                 //check if we change it or not
@@ -93,10 +83,7 @@ namespace SampleWinForms
         public Color OutlineColor { get; set; }
         public Graphics TargetGraphics { get; set; }
 
-        //public override void DrawCaret(float x, float y)
-        //{
-        //    this.TargetGraphics.DrawLine(Pens.Red, x, y, x, y + this.FontAscendingPx);
-        //}
+
         UnscaledGlyphPlanList _reusableUnscaledGlyphPlanList = new UnscaledGlyphPlanList();
         public override void DrawString(char[] textBuffer, int startAt, int len, float x, float y)
         {

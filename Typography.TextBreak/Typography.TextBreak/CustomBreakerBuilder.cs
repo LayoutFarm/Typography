@@ -93,7 +93,7 @@ namespace Typography.TextBreak
             breaker.AddBreakingEngine(laoBreak);
 
             //
-            var bidiBreak = new BidiBreakEngine();
+            var bidiBreak = new TextBreak.BidiBreakEngine();
             breaker.AddBreakingEngine(bidiBreak);
             return breaker;
         }

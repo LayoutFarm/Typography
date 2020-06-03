@@ -18,7 +18,10 @@ namespace Typography.TextBreak
         {
             throw new System.NotImplementedException();
         }
-
+        protected override SpanLayoutInfo GetSpanLayoutInfo()
+        {
+            throw new System.NotImplementedException();
+        }
         protected override WordGroup GetWordGroupForFirstChar(char c)
         {
             throw new System.NotImplementedException();

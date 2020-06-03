@@ -57,11 +57,12 @@ namespace Typography.TextBreak
         public override bool CanHandle(char c) => IsArabicChar(c);
 
         RunAdapter _runAdapter = new RunAdapter();
+        readonly SpanLayoutInfo _spanLayoutInfo = new SpanLayoutInfo(true, 0x0600, "arab");
 
         internal override void BreakWord(WordVisitor visitor, char[] charBuff, int startAt, int len)
         {
             //use custom parsing
-
+             
             visitor.State = VisitorState.Parsing;
             RunAgent agent = _runAdapter.Agent;
 
@@ -69,6 +70,8 @@ namespace Typography.TextBreak
 
             int arabic_len = 0;
             int lim = startAt + len;
+
+
             for (int i = startAt; i < lim; ++i)
             {
                 char c = charBuff[i];
@@ -88,6 +91,9 @@ namespace Typography.TextBreak
                 return;
             }
 
+
+            visitor.SpanLayoutInfo = _spanLayoutInfo;
+
             //only collect char
             Line line1 = new Line(new string(charBuff, startAt, arabic_len));
             _runAdapter.LoadLine(line1);
@@ -101,7 +107,8 @@ namespace Typography.TextBreak
 
                 if (rtl)
                 {
-                    visitor.AddWordBreakAt(startAt + sp_len, WordKind.Text, true);
+                    //temp fix
+                    visitor.AddWordBreakAt(startAt + sp_len, WordKind.Text);
                     visitor.SetCurrentIndex(startAt + sp_len);
                 }
                 else

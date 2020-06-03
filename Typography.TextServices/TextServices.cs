@@ -5,17 +5,7 @@ using Typography.OpenFont;
 using Typography.FontManagement;
 using System.IO;
 
-namespace Typography.TextLayout
-{
-    public struct BreakSpan
-    {
-        //TODO: review here again***
-        public int startAt;
-        public ushort len;
-        public short flags; 
-        public bool RightToLeft;
-    }
-}
+
 
 namespace Typography.TextServices
 {
@@ -104,83 +94,39 @@ namespace Typography.TextServices
 
         CustomBreaker _textBreaker;
         List<TextBreak.BreakSpan> _breakSpans = new List<TextBreak.BreakSpan>();
-        public IEnumerable<Typography.TextLayout.BreakSpan> BreakToLineSegments(char[] str, int startAt, int len)
+
+        public IEnumerable<Typography.TextBreak.BreakSpan> BreakToLineSegments(char[] str, int startAt, int len)
         {
             //user must setup the CustomBreakerBuilder before use      
             if (_textBreaker == null)
             {
                 _textBreaker = Typography.TextBreak.CustomBreakerBuilder.NewCustomBreaker();
                 _textBreaker.SetNewBreakHandler(vis => _breakSpans.Add(vis.GetBreakSpan()));
-
-#if DEBUG
-                if (_textBreaker == null)
-                {
-
-                }
-#endif
+                //setup 
             }
 
-#if DEBUG
-
-#endif
             _breakSpans.Clear();
             //
             if (len < 1)
             {
                 yield break;
             }
+
+
+#if DEBUG
+            if (len > 2)
+            {
+
+            }
+#endif
             //----------------------------
             int cur_startAt = startAt;
 
-            _textBreaker.BreakWords(str, cur_startAt, len);
+            _textBreaker.BreakWords(str, cur_startAt, len);//break and store into _breakSpans
 
             foreach (TextBreak.BreakSpan sp in _breakSpans)
             {
-                //our service select a proper script lang info and add to the breakspan
-
-                //at this point
-                //we assume that 1 break span 
-                //has 1 script lang, and we examine it
-                //with sample char
-                //char sample = str[sp.startAt];
-
-                //ScriptLang selectedScriptLang;
-                //if (sample == ' ')
-                //{
-                //    //whitespace
-                //    selectedScriptLang = _defaultScriptLang;
-                //}
-                //else if (char.IsWhiteSpace(sample))
-                //{
-                //    //other whitespace
-                //    selectedScriptLang = _defaultScriptLang;
-                //}
-                //else
-                //{
-                //    //
-                //    if (Typography.OpenFont.ScriptLangs.TryGetScriptLang(sample, out ScriptLang scLang))
-                //    {
-                //        //we should decide to use
-                //        //current typeface
-                //        //or ask for alternate typeface 
-                //        //if  the current type face is not support the request scriptLang
-                //        // 
-                //        selectedScriptLang = scLang;
-                //    }
-                //    else
-                //    {
-                //        //not found
-                //        //use default
-                //        selectedScriptLang = _defaultScriptLang;
-                //    }
-                //}
-
-                yield return new Typography.TextLayout.BreakSpan
-                {
-                    startAt = sp.startAt,
-                    len = sp.len, 
-                    RightToLeft = sp.RightToLeft
-                };
+                yield return sp;
             }
         }
 
