@@ -25,7 +25,7 @@ namespace Typography.TextBreak
 
 
         BreakBounds _breakBounds = new BreakBounds();
-        readonly SpanLayoutInfo _spLayoutInfo = new SpanLayoutInfo(false, 'A');
+        readonly SpanLayoutInfo _spLayoutInfo = new SpanLayoutInfo(false, 'A', "latin");
         public EngBreakingEngine()
         {
 

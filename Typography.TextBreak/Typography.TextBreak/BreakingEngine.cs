@@ -21,10 +21,8 @@ namespace Typography.TextBreak
         {
             _spanLayoutInfo = GetSpanLayoutInfo();
         }
-        protected virtual SpanLayoutInfo GetSpanLayoutInfo()
-        {
-            return new SpanLayoutInfo(false, FirstUnicodeChar);
-        }
+        protected abstract SpanLayoutInfo GetSpanLayoutInfo(); 
+   
         public abstract char FirstUnicodeChar { get; }
         public abstract char LastUnicodeChar { get; }
         public override bool CanHandle(char c)

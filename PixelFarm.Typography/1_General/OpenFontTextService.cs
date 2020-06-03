@@ -353,17 +353,17 @@ namespace PixelFarm.Drawing
                 }
 #endif
                 this.spanLayoutInfo = spanLayoutInfo;
+
+
             }
             public int Length => _len;
             public int StartAt => _startAt;
-            public bool RightToLeft => spanLayoutInfo.RightToleft;
-            public int Unicode => spanLayoutInfo.SampleCodePoint;
-            public int SampleCodePoint => spanLayoutInfo.SampleCodePoint;
+            public SpanLayoutInfo SpanLayoutInfo => spanLayoutInfo;
 
 #if DEBUG
             public override string ToString()
             {
-                return _startAt + ":" + _len + (RightToLeft ? "(rtl)" : "");
+                return _startAt + ":" + _len + (spanLayoutInfo.RightToLeft ? "(rtl)" : "");
             }
 #endif
         }
@@ -436,7 +436,21 @@ namespace PixelFarm.Drawing
             MyLineSegmentList lineSegments = MyLineSegmentList.GetFreeLineSegmentList();
             foreach (BreakSpan breakSpan in _txtServices.BreakToLineSegments(str, textBufferSpan.start, textBufferSpan.len))
             {
-                lineSegments.AddLineSegment(new MyLineSegment(breakSpan.startAt, breakSpan.len, breakSpan.spanLayoutInfo));
+                SpanLayoutInfo spLayoutInfo = breakSpan.spanLayoutInfo;
+
+                if (!(spLayoutInfo.ResolvedScriptLang is Typography.OpenFont.ScriptLang scLang))
+                {
+                    if (!Typography.OpenFont.ScriptLangs.TryGetScriptLang((char)spLayoutInfo.SampleCodePoint, out scLang))
+                    {
+
+                    }
+                    else
+                    {
+                        spLayoutInfo.ResolvedScriptLang = scLang;
+                    }
+                }
+
+                lineSegments.AddLineSegment(new MyLineSegment(breakSpan.startAt, breakSpan.len, spLayoutInfo));
             }
             return lineSegments;
         }

@@ -15,6 +15,10 @@ namespace Typography.TextBreak
         {
             _customDic = customDic;
         }
+        protected override SpanLayoutInfo GetSpanLayoutInfo()
+        {
+            return new SpanLayoutInfo(false, FirstChar, "lao");
+        }
         //
         protected override CustomDic CurrentCustomDic => _customDic;
         //

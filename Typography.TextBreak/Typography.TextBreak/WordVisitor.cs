@@ -17,8 +17,7 @@ namespace Typography.TextBreak
     {
         int Length { get; }
         int StartAt { get; }
-        bool RightToLeft { get; }
-        int SampleCodePoint { get; }
+        SpanLayoutInfo SpanLayoutInfo { get; }
     }
     public struct BreakSpan
     {
@@ -32,13 +31,17 @@ namespace Typography.TextBreak
 
     public class SpanLayoutInfo
     {
-        public SpanLayoutInfo(bool isRightToLeft, int sampleCodePoint)
+        public SpanLayoutInfo(bool isRightToLeft, int sampleCodePoint, string scriptLang)
         {
-            RightToleft = isRightToLeft;
+            RightToLeft = isRightToLeft;
             SampleCodePoint = sampleCodePoint;
+            ScriptLang = scriptLang;
         }
         public int SampleCodePoint { get; }
-        public bool RightToleft { get; }
+        public bool RightToLeft { get; }
+        public string ScriptLang { get; }
+
+        public object ResolvedScriptLang { get; set; }
     }
 
     public enum VisitorState
