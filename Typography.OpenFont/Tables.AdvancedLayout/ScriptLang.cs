@@ -7,6 +7,7 @@ namespace Typography.OpenFont
         public readonly string fullname;
         public readonly string shortname;
         public readonly int internalName;
+        public UnicodeLangBits[] unicodeLangs;
         internal ScriptLang(string fullname, string shortname, int internalName)
         {
             this.fullname = fullname;
@@ -17,6 +18,7 @@ namespace Typography.OpenFont
         {
             return this.fullname;
         }
+
     }
     public static class UnicodeLangBitsExtension
     {
@@ -634,9 +636,6 @@ namespace Typography.OpenFont
         Yi = _("Yi", "yi", UnicodeLangBits.Yi_Syllables)
         //
         ;
-
-
-
         static ScriptLang _(string fullname, string shortname, params UnicodeLangBits[] langBits)
         {
 
@@ -647,7 +646,7 @@ namespace Typography.OpenFont
                     //***
                     //Hiragana and Katakana 
                     //both have same short name "kana"                     
-                    return new ScriptLang(fullname, shortname, s_registerNames[shortname]);
+                    return new ScriptLang(fullname, shortname, s_registerNames[shortname]) { unicodeLangs = langBits };
                 }
                 else
                 {
@@ -659,7 +658,7 @@ namespace Typography.OpenFont
             {
                 int internalName = s_registerNames.Count;
                 s_registerNames[shortname] = internalName;
-                var scriptLang = new ScriptLang(fullname, shortname, internalName);
+                var scriptLang = new ScriptLang(fullname, shortname, internalName) { unicodeLangs = langBits };
                 s_registeredScriptTags.Add(shortname, scriptLang);
                 //                 
                 s_registerScriptFromFullNames[fullname] = scriptLang;

@@ -16,6 +16,13 @@ namespace Typography.TextBreak
     }
     public abstract class DictionaryBreakingEngine : BreakingEngine
     {
+        readonly SpanLayoutInfo _spanLayoutInfo;
+        public DictionaryBreakingEngine()
+        {
+            _spanLayoutInfo = GetSpanLayoutInfo();
+        }
+        protected abstract SpanLayoutInfo GetSpanLayoutInfo(); 
+   
         public abstract char FirstUnicodeChar { get; }
         public abstract char LastUnicodeChar { get; }
         public override bool CanHandle(char c)
@@ -29,6 +36,7 @@ namespace Typography.TextBreak
 
 
         public bool DontMergeLastIncompleteWord { get; set; }
+
         internal override void BreakWord(WordVisitor visitor, char[] charBuff, int startAt, int len)
         {
             visitor.State = VisitorState.Parsing;
@@ -36,12 +44,14 @@ namespace Typography.TextBreak
             char c_last = this.LastUnicodeChar;
             int endAt = startAt + len;
 
+            visitor.SpanLayoutInfo = _spanLayoutInfo;
+
             Stack<int> candidateBreakList = visitor.GetTempCandidateBreaks();
             bool breakPeroidInTextSpan = BreakPeroidInTextSpan;
 
             for (int i = startAt; i < endAt;)
             {
-                ENTER_LOOP:
+            ENTER_LOOP:
 
                 //find proper start words;
                 char c = charBuff[i];
