@@ -10,7 +10,7 @@ namespace Typography.Contours
     /// </summary>
     public abstract class TextPrinterBase
     {
-        HintTechnique _hintTech;
+       
         public TextPrinterBase()
         {
             FontSizeInPoints = 14;//
