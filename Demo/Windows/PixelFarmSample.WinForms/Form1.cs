@@ -249,7 +249,7 @@ namespace SampleWinForms
                 _winBmp = new Bitmap(_destImg.Width, _destImg.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
                 _g = this.CreateGraphics();
 
-                _painter.CurrentFont = new PixelFarm.Drawing.RequestFont("tahoma", 14);
+                _painter.CurrentFont = new PixelFarm.Drawing.RequestFont("Source Sans Pro", 10);
 
                 _textService = new PixelFarm.Drawing.OpenFontTextService();
                 _textService.LoadFontsFromFolder("../../../TestFonts");

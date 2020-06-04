@@ -32,7 +32,7 @@ namespace Typography.TextLayout
         /// </summary>
         public short OffsetY { get; private set; }
 
-        public bool AdvanceMoveForward { get { return this.AdvanceX > 0; } }
+        public bool AdvanceMoveForward => this.AdvanceX > 0;
 
 #if DEBUG
         public override string ToString()

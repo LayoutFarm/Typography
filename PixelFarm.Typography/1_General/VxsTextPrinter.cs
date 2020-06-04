@@ -411,8 +411,7 @@ namespace PixelFarm.Drawing
                     //each line segment may have different unicode range 
                     //and the current typeface may not support that range
                     //so we need to ensure that we get a proper typeface,
-                    //if not => alternative typeface               
-
+                    //if not => alternative typeface
 
                     ushort glyphIndex = curTypeface.GetGlyphIndex(spLayoutInfo.SampleCodePoint);
                     if (glyphIndex == 0)

@@ -250,13 +250,17 @@ namespace SampleWinForms
                   x_pos,
                   y_pos
              );
-
+            //--------------------------------------------------
             //Example 3: MeasureString    
-            UnscaledGlyphPlanList glyphPlans = new UnscaledGlyphPlanList();
-            _currentTextPrinter.GlyphLayoutMan.GenerateUnscaledGlyphPlans(glyphPlans);
+
             MeasuredStringBox strBox = _currentTextPrinter.GlyphLayoutMan.LayoutAndMeasureString(
               textBuffer, 0, textBuffer.Length,
               _currentTextPrinter.FontSizeInPoints);
+
+            UnscaledGlyphPlanList glyphPlans = new UnscaledGlyphPlanList();
+            _currentTextPrinter.GlyphLayoutMan.GenerateUnscaledGlyphPlans(glyphPlans);
+
+            
 
             int j = glyphPlans.Count;
             float backup_xpos = x_pos;
