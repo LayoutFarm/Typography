@@ -169,11 +169,13 @@ namespace Typography.TextLayout
         /// <returns></returns>
         public GlyphLayoutPlanContext GetPlanOrCreate(Typeface typeface, ScriptLang scriptLang)
         {
-            if (!s_scriptLangKeys.TryGetValue(scriptLang.scriptTag, out int key1))
+            string key_string = scriptLang.ToString();
+            if (!s_scriptLangKeys.TryGetValue(key_string, out int key1))
             {
                 key1 = s_scriptLangKeys.Count + 1;
-                s_scriptLangKeys.Add(scriptLang.scriptTag, key1);
+                s_scriptLangKeys.Add(key_string, key1);
             }
+
             GlyphLayoutPlanKey key = new GlyphLayoutPlanKey(typeface, key1);
 
             if (!_collection.TryGetValue(key, out GlyphLayoutPlanContext context))
