@@ -384,15 +384,14 @@ namespace Typography.TextLayout
 
 namespace Typography.OpenFont
 {
-    using Typography.TextLayout;
+
     public static class TypefaceExtension5
     {
         public static void CollectAdditionalGlyphIndices(this Typeface typeface, List<ushort> outputGlyphs, ScriptLang scLang)
         {
             if (typeface.GSUBTable != null)
             {
-                var g_sub = new GlyphSubstitution(typeface, scLang.scriptTag, scLang.sysLangTag);
-                g_sub.CollectAdditionalSubstitutionGlyphIndices(outputGlyphs);
+                (new Typography.TextLayout.GlyphSubstitution(typeface, scLang.scriptTag, scLang.sysLangTag)).CollectAdditionalSubstitutionGlyphIndices(outputGlyphs);
             }
         }
     }
