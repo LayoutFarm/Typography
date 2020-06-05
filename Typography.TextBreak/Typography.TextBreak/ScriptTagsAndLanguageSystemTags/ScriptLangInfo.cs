@@ -94,7 +94,7 @@ namespace Typography.OpenFont
         Adlam = _("Adlam", "adlm"),
         Anatolian_Hieroglyphs = _("Anatolian Hieroglyphs", "hluw"),
         Arabic = _("Arabic", "arab", UnicodeLangBits.Arabic,
-            UnicodeLangBits.ArabicSupplement,
+            UnicodeLangBits.Arabic_Supplement,
             UnicodeLangBits.Arabic_Presentation_Forms_A,
             UnicodeLangBits.Arabic_Presentation_Forms_B),
         Armenian = _("Armenian", "armn", UnicodeLangBits.Armenian),
@@ -128,7 +128,7 @@ namespace Typography.OpenFont
             ),
         Coptic = _("Coptic", "copt", UnicodeLangBits.Coptic),
         Cypriot_Syllabary = _("Cypriot Syllabary", "cprt", UnicodeLangBits.Cypriot_Syllabary),
-        Cyrillic = _("Cyrillic", "cyrl", UnicodeLangBits.Cyrillic, UnicodeLangBits.CyrillicExtendedA, UnicodeLangBits.CyrillicExtendedB),
+        Cyrillic = _("Cyrillic", "cyrl", UnicodeLangBits.Cyrillic, UnicodeLangBits.Cyrillic_Extended_A, UnicodeLangBits.Cyrillic_Extended_B),
         ////
         Default = _("Default", "DFLT"),
         Deseret = _("Deseret", "dsrt", UnicodeLangBits.Deseret),
@@ -140,18 +140,18 @@ namespace Typography.OpenFont
         Elbasan = _("Elbasan", "elba"),
         Ethiopic = _("Ethiopic", "ethi", UnicodeLangBits.Ethiopic, UnicodeLangBits.Ethiopic_Extended, UnicodeLangBits.Ethiopic_Supplement),
         //// 
-        Georgian = _("Georgian", "geor", UnicodeLangBits.Georgian, UnicodeLangBits.GeorgianSupplement),
+        Georgian = _("Georgian", "geor", UnicodeLangBits.Georgian, UnicodeLangBits.Georgian_Supplement),
         Glagolitic = _("Glagolitic", "glag", UnicodeLangBits.Glagolitic),
         Gothic = _("Gothic", "goth", UnicodeLangBits.Gothic),
         Grantha = _("Grantha", "gran"),
-        Greek = _("Greek", "grek", UnicodeLangBits.GreekAndCoptic, UnicodeLangBits.GreekExtended),
+        Greek = _("Greek", "grek", UnicodeLangBits.Greek_and_Coptic, UnicodeLangBits.Greek_Extended),
         Gujarati = _("Gujarati", "gujr", UnicodeLangBits.Gujarati),
         Gujarati_v_2 = _("Gujarati v.2", "gjr2", UnicodeLangBits.Gujarati),
         Gurmukhi = _("Gurmukhi", "guru", UnicodeLangBits.Gurmukhi),
         Gurmukhi_v_2 = _("Gurmukhi v.2", "gur2", UnicodeLangBits.Gurmukhi),
         //// 
         Hangul = _("Hangul", "hang", UnicodeLangBits.Hangul_Syllables),
-        Hangul_Jamo = _("Hangul Jamo", "jamo", UnicodeLangBits.HangulJamo),
+        Hangul_Jamo = _("Hangul Jamo", "jamo", UnicodeLangBits.Hangul_Jamo),
         Hanunoo = _("Hanunoo", "hano", UnicodeLangBits.Hanunoo),
         Hatran = _("Hatran", "hatr"),
         Hebrew = _("Hebrew", "hebr", UnicodeLangBits.Hebrew),
@@ -175,10 +175,10 @@ namespace Typography.OpenFont
         //// 
         Lao = _("Lao", "lao", UnicodeLangBits.Lao),
         Latin = _("Latin", "latn",
-            UnicodeLangBits.BasicLatin, UnicodeLangBits.Latin1Supplement,
-            UnicodeLangBits.LatinExtendedA, UnicodeLangBits.LatinExtendedAdditional,
-            UnicodeLangBits.LatinExtendedAdditionalC, UnicodeLangBits.LatinExtendedAdditionalD,
-            UnicodeLangBits.LatinExtendedB),
+            UnicodeLangBits.Basic_Latin, UnicodeLangBits.Latin_1_Supplement,
+            UnicodeLangBits.Latin_Extended_A, UnicodeLangBits.Latin_Extended_Additional,
+            UnicodeLangBits.Latin_Extended_B, UnicodeLangBits.Latin_Extended_C,
+            UnicodeLangBits.Latin_Extended_D),
 
         Lepcha = _("Lepcha", "lepc", UnicodeLangBits.Lepcha),
         Limbu = _("Limbu", "limb", UnicodeLangBits.Limbu),
@@ -1060,6 +1060,6 @@ namespace Typography.OpenFont
     Chinese_Traditional_ZHT = _("Chinese Traditional", "ZHT", "zho"),
     Zande_ZND = _("Zande", "ZND", "zne"),
     Zulu_ZUL = _("Zulu", "ZUL", "zul"),
-    Zazaki_ZZA = _("Zazaki", "ZZA", "zza"); 
+    Zazaki_ZZA = _("Zazaki", "ZZA", "zza");
     }
 }

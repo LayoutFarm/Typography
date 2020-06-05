@@ -157,15 +157,26 @@ namespace Tools
 
             //generate unicode langs bits
             //generate cs code for this
-            StringBuilder sb = new StringBuilder();
-
-            foreach (UnicodeRangeInfo unicodeRangeInfo in unicodeRanges)
             {
-                string field_name = GetProperFieldName(unicodeRangeInfo.LangName);
+                StringBuilder sb = new StringBuilder();
+                foreach (UnicodeRangeInfo unicodeRangeInfo in unicodeRanges)
+                {
+                    string field_name = GetProperFieldName(unicodeRangeInfo.LangName);
 
-                sb.AppendLine(field_name + "= (" + unicodeRangeInfo.BitPlane + "L<<32) | (0x" + unicodeRangeInfo.StartCodePoint + " << 16)|0x" + unicodeRangeInfo.EndCodePoint + ",");
+                    sb.AppendLine(field_name + "= (" + unicodeRangeInfo.BitPlane + "L<<32) | (0x" + unicodeRangeInfo.StartCodePoint + " << 16)|0x" + unicodeRangeInfo.EndCodePoint + ",");
+                }
+                File.WriteAllText("unicode5.1.gen.txt", sb.ToString());
             }
-
+            {
+                //enum iter
+                StringBuilder sb = new StringBuilder();
+                foreach (UnicodeRangeInfo unicodeRangeInfo in unicodeRanges)
+                {
+                    string field_name = GetProperFieldName(unicodeRangeInfo.LangName);
+                    sb.AppendLine("UnicodeLangBits." + field_name + ", ");
+                }
+                File.WriteAllText("unicode5.1.enum.gen.txt", sb.ToString());
+            }
         }
 
         string[] ParseCodePointRanges(string codepoint_range) => codepoint_range.Split('-');
