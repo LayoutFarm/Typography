@@ -12,6 +12,7 @@ using PixelFarm.CpuBlit;
 using Typography.OpenFont;
 using Typography.OpenFont.Extensions;
 using PixelFarm.CpuBlit.BitmapAtlas;
+using Typography.FontManagement;
 
 namespace SampleWinForms
 {
@@ -67,7 +68,7 @@ namespace SampleWinForms
             this.flowLayoutPanel1.Controls.Clear();
             _availableScripts.Clear();
 
-            foreach (ScriptLang scriptLang in ScriptLangs.GetRegiteredScriptLangIter())
+            foreach (ScriptLangInfo scriptLang in ScriptLangs.GetRegiteredScriptLangIter())
             {
                 if (ScriptLangs.TryGetUnicodeLangBitsArray(scriptLang.shortname, out UnicodeLangBits[] unicodeLangs))
                 {

@@ -39,7 +39,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\..\..\PixelFarm.Typography\3_Typography_Contours\GlyphMeshCollection.cs">
-      <Link>DevTextPrinter\GlyphMeshCollection.cs</Link>
+      <Link>TextServices\GlyphMeshCollection.cs</Link>
     </Compile>
     <Compile Include="..\..\..\PixelFarm.Typography\3_Typography_Contours\GlyphOutlineBuilderBase.cs">
       <Link>GlyphPathBuilder\GlyphOutlineBuilderBase.cs</Link>
@@ -50,8 +50,14 @@
     <Compile Include="..\..\..\PixelFarm\PixelFarm.Painter\Drawing\TextBaseline.cs">
       <Link>DevTextPrinter\TextBaseline.cs</Link>
     </Compile>
+    <Compile Include="..\..\..\Typography.TextBreak\Typography.TextBreak\ScriptTagsAndLanguageSystemTags\ScriptLangInfo.cs">
+      <Link>TextServices\ScriptLangInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\Typography.TextBreak\Typography.TextBreak\ScriptTagsAndLanguageSystemTags\UnicodeLangBits.cs">
+      <Link>TextServices\UnicodeLangBits.cs</Link>
+    </Compile>
     <Compile Include="..\..\..\Typography.TextServices\FontStoreAndManagment\FontManagement.cs">
-      <Link>DevTextPrinter\FontManagement.cs</Link>
+      <Link>TextServices\FontManagement.cs</Link>
     </Compile>
     <Compile Include="..\..\Shared\GlyphOutlineBuilder\GlyphOutlineBuilder.cs">
       <Link>GlyphPathBuilder\GlyphOutlineBuilder.cs</Link>

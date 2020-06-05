@@ -38,7 +38,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Tesselate\mesh.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="$(MSBuildThisFileDirectory)DevTextPrinter\" />
     <Folder Include="$(MSBuildThisFileDirectory)Tesselate\" />
   </ItemGroup>
 </Project>
