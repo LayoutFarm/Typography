@@ -3,10 +3,150 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Typography.OpenFont;
+using Typography.OpenFont.Tables;
+
+namespace Typography.OpenFont
+{
+    public static class TypefaceExtension3
+    {
+        public static ScriptLang GetScriptLang(this ScriptLangInfo scLangInfo)
+        {
+            return new ScriptLang(scLangInfo.shortname, "");
+        }
+
+        public static bool DoesSupportUnicode(
+               this PreviewFontInfo previewFontInfo,
+               UnicodeLangBits unicodeLangBits)
+        {
+
+            long bits = (long)unicodeLangBits;
+            int bitpos = (int)(bits >> 32);
+
+            if (bitpos == 0)
+            {
+                return true; //default
+            }
+            else if (bitpos < 32)
+            {
+                //use range 1
+                return (previewFontInfo.UnicodeRange1 & (1 << bitpos)) != 0;
+            }
+            else if (bitpos < 64)
+            {
+                return (previewFontInfo.UnicodeRange2 & (1 << (bitpos - 32))) != 0;
+            }
+            else if (bitpos < 96)
+            {
+                return (previewFontInfo.UnicodeRange3 & (1 << (bitpos - 64))) != 0;
+            }
+            else if (bitpos < 128)
+            {
+                return (previewFontInfo.UnicodeRange4 & (1 << (bitpos - 96))) != 0;
+            }
+            else
+            {
+                throw new System.NotSupportedException();
+            }
+        }
+
+        public static bool DoesSupportUnicode(
+            this Typeface typeface,
+            UnicodeLangBits unicodeLangBits)
+        {
+
+            //-----------------------------
+            long bits = (long)unicodeLangBits;
+            int bitpos = (int)(bits >> 32);
+
+            if (bitpos == 0)
+            {
+                return true; //default
+            }
+            else if (bitpos < 32)
+            {
+                //use range 1
+                return (typeface.UnicodeRange1 & (1 << bitpos)) != 0;
+            }
+            else if (bitpos < 64)
+            {
+                return (typeface.UnicodeRange2 & (1 << (bitpos - 32))) != 0;
+            }
+            else if (bitpos < 96)
+            {
+                return (typeface.UnicodeRange3 & (1 << (bitpos - 64))) != 0;
+            }
+            else if (bitpos < 128)
+            {
+                return (typeface.UnicodeRange4 & (1 << (bitpos - 96))) != 0;
+            }
+            else
+            {
+                throw new System.NotSupportedException();
+            }
+        }
+
+        static UnicodeLangBits[] FilterOnlySelectedRange(UnicodeLangBits[] inputRanges, UnicodeLangBits[] userSpecificRanges)
+        {
+            List<UnicodeLangBits> selectedRanges = new List<UnicodeLangBits>();
+            foreach (UnicodeLangBits range in inputRanges)
+            {
+                int foundAt = System.Array.IndexOf(userSpecificRanges, range);
+                if (foundAt > 0)
+                {
+                    selectedRanges.Add(range);
+                }
+            }
+            return selectedRanges.ToArray();
+        }
+        public static void CollectAllAssociateGlyphIndex(this Typeface typeface, List<ushort> outputGlyphIndexList, ScriptLang scLang, UnicodeLangBits[] selectedRangs = null)
+        {
+            //-----------
+            //general glyph index in the unicode range
+
+            //if user dose not specific the unicode lanf bit ranges
+            //the we try to select it ourself. 
+
+            if (ScriptLangs.TryGetUnicodeLangBitsArray(scLang.scriptTag, out UnicodeLangBits[] unicodeLangBitsRanges))
+            {
+                //one lang may contains may ranges
+                if (selectedRangs != null)
+                {
+                    //select only in range 
+                    unicodeLangBitsRanges = FilterOnlySelectedRange(unicodeLangBitsRanges, selectedRangs);
+                }
+
+                foreach (UnicodeLangBits unicodeLangBits in unicodeLangBitsRanges)
+                {
+                    UnicodeRangeInfo rngInfo = unicodeLangBits.ToUnicodeRangeInfo();
+                    int endAt = rngInfo.EndAt;
+                    for (int codePoint = rngInfo.StartAt; codePoint <= endAt; ++codePoint)
+                    {
+
+                        ushort glyphIndex = typeface.GetGlyphIndex(codePoint);
+                        if (glyphIndex > 0)
+                        {
+                            //add this glyph index
+                            outputGlyphIndexList.Add(glyphIndex);
+                        }
+                    }
+                }
+            }
+
+            typeface.CollectAdditionalGlyphIndices(outputGlyphIndexList, scLang);
+
+
+        }
+
+    }
+
+}
 
 
 namespace Typography.FontManagement
 {
+
+
+
     public class InstalledTypeface
     {
         internal InstalledTypeface(PreviewFontInfo previewFontInfo, TypefaceStyle style, string fontPath)
@@ -26,6 +166,9 @@ namespace Typography.FontManagement
             UnicodeRange3 = previewFontInfo.UnicodeRange3;
             UnicodeRange4 = previewFontInfo.UnicodeRange4;
 
+            GsubScriptList = previewFontInfo.GsubScriptList;
+            GposScriptList = previewFontInfo.GposScriptList;
+
             TypefaceStyle = style;
         }
 
@@ -42,6 +185,10 @@ namespace Typography.FontManagement
         public uint UnicodeRange2 { get; internal set; }
         public uint UnicodeRange3 { get; internal set; }
         public uint UnicodeRange4 { get; internal set; }
+
+        public ScriptList GsubScriptList { get; internal set; }
+        public ScriptList GposScriptList { get; internal set; }
+
         public string FontPath { get; internal set; }
         public int ActualStreamOffset { get; internal set; }
         public bool DoesSupportUnicode(UnicodeLangBits unicodeLangBits)
@@ -618,7 +765,7 @@ namespace Typography.FontManagement
             _registeredWithUniCodeLangBits.Clear();
             foreach (InstalledTypeface instFont in GetInstalledFontIter())
             {
-                foreach (UnicodeLangBits unicodeLangBit in s_unicodeLangs)
+                foreach (UnicodeLangBits unicodeLangBit in instFont.GetSupportedUnicodeLangBitIter())
                 {
                     RegisterUnicodeSupport(unicodeLangBit, instFont);
                 }
@@ -627,7 +774,7 @@ namespace Typography.FontManagement
         public bool TryGetAlternativeTypefaceFromChar(char c, out List<InstalledTypeface> found)
         {
             //find a typeface that supported input char c
-            if (OpenFont.ScriptLangs.TryGetScriptLang(c, out ScriptLang foundScriptLang) && foundScriptLang.unicodeLangs != null)
+            if (OpenFont.ScriptLangs.TryGetScriptLang(c, out ScriptLangInfo foundScriptLang) && foundScriptLang.unicodeLangs != null)
             {
                 foreach (UnicodeLangBits langBits in foundScriptLang.unicodeLangs)
                 {
@@ -642,6 +789,107 @@ namespace Typography.FontManagement
             found = null;
             return false;
         }
+
+
+        readonly Dictionary<UnicodeLangBits, List<InstalledTypeface>> _registeredWithUniCodeLangBits = new Dictionary<UnicodeLangBits, List<InstalledTypeface>>();
+        void RegisterUnicodeSupport(UnicodeLangBits langBit, InstalledTypeface instFont)
+        {
+
+            if (!_registeredWithUniCodeLangBits.TryGetValue(langBit, out List<InstalledTypeface> found))
+            {
+                found = new List<InstalledTypeface>();
+                _registeredWithUniCodeLangBits.Add(langBit, found);
+            }
+            found.Add(instFont);
+        }
+
+    }
+
+
+    public static class InstalledTypefaceCollectionExtensions
+    {
+
+        public delegate R MyFunc<T1, T2, R>(T1 t1, T2 t2);
+        public delegate R MyFunc<T, R>(T t);
+
+        public static Action<InstalledTypefaceCollection> CustomSystemFontListLoader;
+
+        public static MyFunc<string, Stream> CustomFontStreamLoader;
+        public static void LoadFontsFromFolder(this InstalledTypefaceCollection fontCollection, string folder, bool recursive = false)
+        {
+            if (!Directory.Exists(folder))
+            {
+#if DEBUG
+
+                System.Diagnostics.Debug.WriteLine("LoadFontsFromFolder, not found folder:" + folder);
+
+#endif
+                return;
+            }
+            //-------------------------------------
+
+            // 1. font dir
+            foreach (string file in Directory.GetFiles(folder))
+            {
+                //eg. this is our custom font folder
+                string ext = Path.GetExtension(file).ToLower();
+                switch (ext)
+                {
+                    default: break;
+                    case ".ttc":
+                    case ".otc":
+                    case ".ttf":
+                    case ".otf":
+                    case ".woff":
+                    case ".woff2":
+                        fontCollection.AddFontStreamSource(new FontFileStreamProvider(file));
+                        break;
+                }
+            }
+
+            //2. browse recursively; on Linux, fonts are organised in subdirectories
+            if (recursive)
+            {
+                foreach (string subfolder in Directory.GetDirectories(folder))
+                {
+                    LoadFontsFromFolder(fontCollection, subfolder, recursive);
+                }
+            }
+        }
+        public static void LoadSystemFonts(this InstalledTypefaceCollection fontCollection, bool recursive = false)
+        {
+
+            if (CustomSystemFontListLoader != null)
+            {
+                CustomSystemFontListLoader(fontCollection);
+                return;
+            }
+            // Windows system fonts
+            LoadFontsFromFolder(fontCollection, "c:\\Windows\\Fonts");
+            // These are reasonable places to look for fonts on Linux
+            LoadFontsFromFolder(fontCollection, "/usr/share/fonts", true);
+            LoadFontsFromFolder(fontCollection, "/usr/share/wine/fonts", true);
+            LoadFontsFromFolder(fontCollection, "/usr/share/texlive/texmf-dist/fonts", true);
+            LoadFontsFromFolder(fontCollection, "/usr/share/texmf/fonts", true);
+
+            // OS X system fonts (https://support.apple.com/en-us/HT201722)
+
+            LoadFontsFromFolder(fontCollection, "/System/Library/Fonts");
+            LoadFontsFromFolder(fontCollection, "/Library/Fonts");
+
+        }
+
+        public static IEnumerable<UnicodeLangBits> GetSupportedUnicodeLangBitIter(this InstalledTypeface instTypeface)
+        {
+            foreach (UnicodeLangBits unicodeLangBit in s_unicodeLangs)
+            {
+                if (instTypeface.DoesSupportUnicode(unicodeLangBit))
+                {
+                    yield return unicodeLangBit;
+                }
+            }
+        }
+
         static readonly UnicodeLangBits[] s_unicodeLangs = new UnicodeLangBits[]
         {   
                     //TODO: autogen???
@@ -835,99 +1083,6 @@ namespace Typography.FontManagement
 
         };
 
-
-        readonly Dictionary<UnicodeLangBits, List<InstalledTypeface>> _registeredWithUniCodeLangBits = new Dictionary<UnicodeLangBits, List<InstalledTypeface>>();
-        void RegisterUnicodeSupport(UnicodeLangBits langBit, InstalledTypeface instFont)
-        {
-            if (instFont.DoesSupportUnicode(langBit))
-            {
-                if (!_registeredWithUniCodeLangBits.TryGetValue(langBit, out List<InstalledTypeface> found))
-                {
-                    found = new List<InstalledTypeface>();
-                    _registeredWithUniCodeLangBits.Add(langBit, found);
-                }
-
-                found.Add(instFont);
-            }
-        }
-
-    }
-
-
-    public static class InstalledTypefaceCollectionExtensions
-    {
-
-        public delegate R MyFunc<T1, T2, R>(T1 t1, T2 t2);
-        public delegate R MyFunc<T, R>(T t);
-
-        public static Action<InstalledTypefaceCollection> CustomSystemFontListLoader;
-
-        public static MyFunc<string, Stream> CustomFontStreamLoader;
-
-
-        public static void LoadFontsFromFolder(this InstalledTypefaceCollection fontCollection, string folder, bool recursive = false)
-        {
-            if (!Directory.Exists(folder))
-            {
-#if DEBUG
-
-                System.Diagnostics.Debug.WriteLine("LoadFontsFromFolder, not found folder:" + folder);
-
-#endif
-                return;
-            }
-            //-------------------------------------
-
-            // 1. font dir
-            foreach (string file in Directory.GetFiles(folder))
-            {
-                //eg. this is our custom font folder
-                string ext = Path.GetExtension(file).ToLower();
-                switch (ext)
-                {
-                    default: break;
-                    case ".ttc":
-                    case ".otc":
-                    case ".ttf":
-                    case ".otf":
-                    case ".woff":
-                    case ".woff2":
-                        fontCollection.AddFontStreamSource(new FontFileStreamProvider(file));
-                        break;
-                }
-            }
-
-            //2. browse recursively; on Linux, fonts are organised in subdirectories
-            if (recursive)
-            {
-                foreach (string subfolder in Directory.GetDirectories(folder))
-                {
-                    LoadFontsFromFolder(fontCollection, subfolder, recursive);
-                }
-            }
-        }
-        public static void LoadSystemFonts(this InstalledTypefaceCollection fontCollection, bool recursive = false)
-        {
-
-            if (CustomSystemFontListLoader != null)
-            {
-                CustomSystemFontListLoader(fontCollection);
-                return;
-            }
-            // Windows system fonts
-            LoadFontsFromFolder(fontCollection, "c:\\Windows\\Fonts");
-            // These are reasonable places to look for fonts on Linux
-            LoadFontsFromFolder(fontCollection, "/usr/share/fonts", true);
-            LoadFontsFromFolder(fontCollection, "/usr/share/wine/fonts", true);
-            LoadFontsFromFolder(fontCollection, "/usr/share/texlive/texmf-dist/fonts", true);
-            LoadFontsFromFolder(fontCollection, "/usr/share/texmf/fonts", true);
-
-            // OS X system fonts (https://support.apple.com/en-us/HT201722)
-
-            LoadFontsFromFolder(fontCollection, "/System/Library/Fonts");
-            LoadFontsFromFolder(fontCollection, "/Library/Fonts");
-
-        }
 
         //for Windows , how to find Windows' Font Directory from Windows Registry
         //        string[] localMachineFonts = Registry.LocalMachine.OpenSubKey("Software\\Microsoft\\Windows NT\\CurrentVersion\\Fonts", false).GetValueNames();
