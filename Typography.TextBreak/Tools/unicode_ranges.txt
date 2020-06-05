@@ -6,12 +6,6 @@ Letters of the Latin-1 Supplement,00C0,00FF
 Latin Extended-A,0100,017F
 Latin Extended-B,0180,024F
 IPA Extensions,0250,02AF
-Phonetic Extensions,1D00,1DBF
-Combining Diacritical Marks Supplement,1DC0,1DFF
-Latin Extended Additional,1E00,1EFF
-Latin Extended-C,2C60,2C7F
-Latin Extended-D,A720,A7FF
-Latin Extended-E,AB30,AB6F
 Spacing Midifier Letters,02B0,02FF
 Combining Diacritical Marks,0300,036F
 Greek and Coptic,0370,03FF
@@ -23,7 +17,7 @@ Arabic,0600,06FF
 Syriac,0700,074F
 Arabic Supplement,0750,077F
 Thaana,0780,07BF
-NKo,07C0,07FF
+N'Ko,07C0,07FF
 Samaritan,0800,083F
 Mandaic,0840,085F
 Syriac Supplement,0860,086F
@@ -73,8 +67,12 @@ Cyrillic Extended-C,1C80,1C8F
 Georgian Extended,1C90,1CBF
 Sundanese Supplement,1CC0,1CCF
 Vedic Extensions,1CD0,1CFF
+Phonetic Extensions,1D00,1DBF
+Combining Diacritical Marks Supplement,1DC0,1DFF
+Latin Extended Additional,1E00,1EFF
 Greek Extended,1F00,1FFF
 General Punctuation,2000,206F
+Deprecated Format Characters,206A,206F
 Superscripts and Subscripts,2070,209F
 Currency Symbols,20A0,20CF
 Combining Diacritical Marks for Symbols,20D0,20FF
@@ -99,6 +97,7 @@ Miscellaneous Mathematical Symbols-B,2980,29FF
 Supplemental Mathematical Operators,2A00,2AFF
 Miscellaneous Symbols and Arrows,2B00,2BFF
 Glagolitic,2C00,2C5F
+Latin Extended-C,2C60,2C7F
 Coptic,2C80,2CFF
 Georgian Supplement,2D00,2D2F
 Tifinagh,2D30,2D7F
@@ -106,8 +105,8 @@ Ethiopic Extended,2D80,2DDF
 Cyrillic Extended-A,2DE0,2DFF
 Supplemental Punctuation,2E00,2E7F
 CJK Radicals Supplement,2E80,2EFF
-Kangxi radical,2F00,2FDF
-Ideographic Description Characters,2FF0,2FFF
+Kangxi radical,2F00,2FD5
+Ideographic Description Characters,2FF0,2FFB
 CJK Symbols and Punctuation,3000,303F
 Hiragana,3040,309F
 Katakana,30A0,30FF
@@ -129,6 +128,7 @@ Vai,A500,A63F
 Cyrillic Extended-B,A640,A69F
 Bamum,A6A0,A6FF
 Modifier Tone Letters,A700,A71F
+Latin Extended-D,A720,A7FF
 Syloti Nagri,A800,A82F
 Common Indic Number Forms,A830,A83F
 Phags-pa,A840,A87F
@@ -142,18 +142,21 @@ Myanmar Extended-B,A9E0,A9FF
 Cham,AA00,AA5F
 Myanmar Extended-A,AA60,AA7F
 Tai Viet,AA80,AADF
-Meetei Mayek Extensions,AAE0,AAFF
+Meetei Mayek Extensions,AAE0,AAF6
 Ethiopic Extended-A,AB00,AB2F
+Latin Extended-E,AB30,AB6F
 Cherokee Supplement,AB70,ABBF
 Meetei Mayek,ABC0,ABFF
-Hangul Syllables,AC00,D7AF
+Hangul Syllables,AC00,D7A3
 Hangul Jamo Extended-B,D7B0,D7FF
-High Surrogates,D800,DB7F
+High Surrogates,D800,DBFF
 High Private Use Surrogates,DB80,DBFF
 Low Surrogates,DC00,DFFF
 Private Use Area,E000,F8FF
 CJK Compatibility Ideographs,F900,FAFF
-Alphabetic Presentation Forms,FB00,FB4F
+Latin Ligatures,FB00,FB06
+Armenian Ligatures,FB13,FB17
+Alphabetic Presentation Forms,FB1D,FB4F
 Arabic Presentation Forms-A,FB50,FDFF
 Variation Selectors,FE00,FE0F
 Vertical Forms,FE10,FE1F
@@ -162,7 +165,10 @@ CJK Compatibility Forms,FE30,FE4F
 Small Form Variants,FE50,FE6F
 Arabic Presentation Forms-B,FE70,FEFF
 Halfwidth and Fullwidth Forms,FF00,FFEF
-Specials,FFF0,FFFF
+Specials,FFF0,FFF8
+Annotation Characters,FFF9,FFFB
+Replacement Characters,FFFC,FFFD
+Noncharacters,FFFE,FFFF
 Linear B Syllabary,10000,1007F
 Linear B Ideograms,10080,100FF
 Aegean Numbers,10100,1013F
@@ -210,7 +216,7 @@ Old Sogdian,10F00,10F2F
 Sogdian,10F30,10F6F
 Chorasmian,10FB0,10FDF
 Elymaic,10FE0,10FFF
-Brahmi,11000,1107F
+Brahmi,11000,1106F
 Kaithi,11080,110CF
 Sora Sompeng,110D0,110FF
 Chakma,11100,1114F
@@ -268,8 +274,8 @@ Shorthand Format Controls,1BCA0,1BCAF
 Byzantine Musical Symbols,1D000,1D0FF
 Musical Symbols,1D100,1D1FF
 Ancient Greek Musical Notation,1D200,1D24F
-Mayan Numerals,1D2E0,1D2FF
-Tai Xuan Jing Symbols,1D300,1D35F
+Mayan Numerals,1D2E0,1D2F3
+Tai Xuan Jing Symbols,1D300,1D356
 Counting Rod Numerals,1D360,1D37F
 Mathematical Alphanumeric Symbols,1D400,1D7FF
 Sutton SignWriting,1D800,1DAAF
