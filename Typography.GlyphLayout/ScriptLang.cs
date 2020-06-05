@@ -3,7 +3,7 @@
 namespace Typography.OpenFont
 {
     /// <summary>
-    /// script tag and syslang tag for GSUB, GPOS
+    /// script tag and syslang tag request for GSUB, GPOS
     /// </summary>
     public sealed class ScriptLang
     {
@@ -24,8 +24,6 @@ namespace Typography.OpenFont
         public override string ToString()
         {
             return this.scriptTag + ":" + scriptTag;
-
         }
-
     }
 }
