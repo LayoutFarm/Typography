@@ -68,9 +68,9 @@
 48	CJK Symbols And Punctuation	3000-303F
 49	Hiragana	3040-309F
 50	Katakana	30A0-30FF
-	Katakana Phonetic Extensions	31F0-31FF
+50	Katakana Phonetic Extensions	31F0-31FF
 51	Bopomofo	3100-312F
-	Bopomofo Extended	31A0-31BF
+51	Bopomofo Extended	31A0-31BF
 52	Hangul Compatibility Jamo	3130-318F
 53	Phags-pa	A840-A87F
 54	Enclosed CJK Letters And Months	3200-32FF
@@ -93,7 +93,7 @@
 63	Arabic Presentation Forms-A	FB50-FDFF
 64	Combining Half Marks	FE20-FE2F
 65	Vertical Forms	FE10-FE1F
-	CJK Compatibility Forms	FE30-FE4F
+65	CJK Compatibility Forms	FE30-FE4F
 66	Small Form Variants	FE50-FE6F
 67	Arabic Presentation Forms-B	FE70-FEFF
 68	Halfwidth And Fullwidth Forms	FF00-FFEF
@@ -168,3 +168,8 @@
 121	Lydian	10920-1093F
 122	Domino Tiles	1F030-1F09F
 122	Mahjong Tiles	1F000-1F02F
+123	Reserved123	0-0
+124	Reserved124	0-0
+125	Reserved125	0-0
+126	Reserved126	0-0
+127	Reserved127	0-0

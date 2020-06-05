@@ -154,6 +154,18 @@ namespace Tools
                     EndCodePoint = codePointRanges[1]
                 });
             }
+
+            //generate unicode langs bits
+            //generate cs code for this
+            StringBuilder sb = new StringBuilder();
+
+            foreach (UnicodeRangeInfo unicodeRangeInfo in unicodeRanges)
+            {
+                string field_name = GetProperFieldName(unicodeRangeInfo.LangName);
+
+                sb.AppendLine(field_name + "= (" + unicodeRangeInfo.BitPlane + "L<<32) | (0x" + unicodeRangeInfo.StartCodePoint + " << 16)|0x" + unicodeRangeInfo.EndCodePoint + ",");
+            }
+
         }
 
         string[] ParseCodePointRanges(string codepoint_range) => codepoint_range.Split('-');
