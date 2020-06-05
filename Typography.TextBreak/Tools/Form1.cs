@@ -180,7 +180,54 @@ namespace Tools
         }
 
         string[] ParseCodePointRanges(string codepoint_range) => codepoint_range.Split('-');
+        class ScriptNameAndTag
+        {
+            public string ScriptName { get; set; }
+            public string ScriptTag { get; set; }
+
+            public override string ToString()
+            {
+                return ScriptTag + ":" + ScriptName;
+            }
+        }
+        private void button4_Click(object sender, EventArgs e)
+        {
+            //https://docs.microsoft.com/en-us/typography/opentype/spec/scripttags
+            //script_tags.txt
+
+            string[] allLines = File.ReadAllLines("script_tags.txt");
+            //skip 1st line           
+
+            List<ScriptNameAndTag> scNameAndTags = new List<ScriptNameAndTag>();
+            for (int i = 1; i < allLines.Length; ++i)
+            {
+                string[] fields = allLines[i].Split('\t');
+
+                if (fields.Length != 2)
+                {
+                    throw new NotSupportedException();
+                }
+
+                string scName = fields[0].Trim();
+                string scTag = fields[1].Replace("'", "").Trim();
+
+                scNameAndTags.Add(new ScriptNameAndTag { ScriptName = scName, ScriptTag = scTag });
+                 
+            }
+
+            {
+                //enum iter
+                StringBuilder sb = new StringBuilder();
+                foreach (ScriptNameAndTag scNameAndTag in scNameAndTags)
+                {
+                    string field_name = GetProperFieldName(scNameAndTag.ScriptName);
+                    sb.AppendLine(field_name + "=_(\"" + scNameAndTag.ScriptTag + "\",\"" + scNameAndTag.ScriptName + "\"),");
+                }
+
+                File.WriteAllText("script_tags.gen.txt", sb.ToString());
+            }
 
 
+        }
     }
 }
