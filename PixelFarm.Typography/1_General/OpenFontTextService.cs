@@ -445,7 +445,7 @@ namespace PixelFarm.Drawing
 
                 if (!(spLayoutInfo.ResolvedScriptLang is Typography.OpenFont.ScriptLang scLang))
                 {
-                    if (!Typography.OpenFont.ScriptLangs.TryGetScriptLang((char)spLayoutInfo.SampleCodePoint, out var scLang1))
+                    if (!Typography.OpenFont.ScriptLangs.TryGetScriptLang((char)spLayoutInfo.SampleCodePoint, out ScriptLangInfo scLang1))
                     {
 
                     }
