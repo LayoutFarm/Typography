@@ -6,6 +6,7 @@ using Typography.OpenFont;
 using Typography.OpenFont.Extensions;
 using Typography.TextLayout;
 using Typography.Contours;
+using Typography.FontManagement;
 
 namespace PixelFarm.CpuBlit.BitmapAtlas
 {

@@ -10,11 +10,11 @@ namespace Typography.Contours
     /// </summary>
     public abstract class TextPrinterBase
     {
-       
+
         public TextPrinterBase()
         {
             FontSizeInPoints = 14;//
-            ScriptLang = ScriptLangs.Latin;//default? 
+            ScriptLang = ScriptLangs.Latin.GetScriptLang();
         }
 
 
