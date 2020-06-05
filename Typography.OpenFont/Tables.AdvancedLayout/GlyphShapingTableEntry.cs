@@ -37,6 +37,10 @@ namespace Typography.OpenFont.Tables
         public ScriptList ScriptList { get; private set; }
         public FeatureList FeatureList { get; private set; }
 
+        /// <summary>
+        /// read script_list, feature_list, and skip look up table
+        /// </summary>
+        public bool OnlyScriptList { get; set; } //
 
         protected override void ReadContentFrom(BinaryReader reader)
         {
@@ -78,10 +82,14 @@ namespace Typography.OpenFont.Tables
             //-----------------------
             //1. scriptlist
             ScriptList = ScriptList.CreateFrom(reader, tableStartAt + scriptListOffset);
+
+            if (OnlyScriptList) return; //for preview script-list and feature list only
+
             //-----------------------
             //2. feature list
+
             FeatureList = FeatureList.CreateFrom(reader, tableStartAt + featureListOffset);
-            //-----------------------
+
             //3. lookup list
             ReadLookupListTable(reader, tableStartAt + lookupListOffset);
 

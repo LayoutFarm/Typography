@@ -4,9 +4,7 @@ using System.Collections.Generic;
 using Typography.OpenFont;
 using Typography.FontManagement;
 using System.IO;
-
-
-
+ 
 namespace Typography.TextServices
 {
     using Typography.TextBreak;

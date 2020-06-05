@@ -12,9 +12,10 @@
     <Compile Include="$(MSBuildThisFileDirectory)GlyphIndexList.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PixelScaleLayoutExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GlyphLayout.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)GlyphPosition.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GlyphSetPosition.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GlyphSubstitution.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MeasureStringBox.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ScriptLang.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UserCharToGlyphIndexMap.cs" />
   </ItemGroup>
 </Project>

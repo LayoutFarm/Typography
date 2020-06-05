@@ -27,13 +27,13 @@ namespace SampleWinForms
         public bool Selected => chkSelected.Checked;
 
         public Typography.Contours.HintTechnique HintTechnique => (Typography.Contours.HintTechnique)cmbHintTech.SelectedItem;
-        public void SetInfo(Typography.OpenFont.ScriptLang scriptLang, UnicodeLangBits langBits)
-        {
-            _scriptLang = scriptLang;
-            _langBits = langBits;
-            this.label1.Text = _scriptLang.fullname + "," + _scriptLang.shortname + "," + langBits.ToString();
-        }
 
+        public void SetInfo(Typography.OpenFont.ScriptLangInfo scriptLang, UnicodeLangBits langBits)
+        {
+            _scriptLang = new ScriptLang(scriptLang.shortname, "");
+            _langBits = langBits;
+            this.label1.Text = _scriptLang.scriptTag + "," + langBits.ToString();
+        }
 
     }
 }

@@ -1,9 +1,14 @@
 ﻿//MIT, 2017-present, WinterDev
 using System;
 using System.Windows.Forms;
+using System.IO;
 
 using Typography.TextLayout;
 using Typography.FontManagement;
+using Typography.OpenFont;
+using System.Collections.Generic;
+using Typography.OpenFont.Tables;
+
 namespace TypographyTest.WinForms
 {
 
@@ -27,7 +32,7 @@ namespace TypographyTest.WinForms
             //
             _options.LoadFontList();
             //
-            SetupScriptLangComboBox();
+            SetupScriptLangBoxes();
             SetupFontList();
             SetupFontsList2();
             SetupFontSizeList();
@@ -91,9 +96,8 @@ namespace TypographyTest.WinForms
             lstFontNameList.Click += delegate
             {
                 lstFontStyle.Items.Clear();
-                string fontName = lstFontNameList.SelectedItem as string;
 
-                if (fontName != null)
+                if (lstFontNameList.SelectedItem is string fontName)
                 {
                     foreach (InstalledTypeface installedTypeface in _options.InstallTypefaceCollection.GetInstalledTypefaceIter(fontName))
                     {
@@ -105,16 +109,83 @@ namespace TypographyTest.WinForms
             lstFontStyle.Click += (s, e) => ChangeSelectedTypeface(lstFontStyle.SelectedItem as InstalledTypeface);
 
         }
-        void ChangeSelectedTypeface(InstalledTypeface typeface)
+        void ChangeSelectedTypeface(InstalledTypeface installedTypeface)
         {
-            if (typeface == null) return;
+            if (installedTypeface == null) return;
             //
-            _options.InstalledTypeface = typeface;
+            _options.InstalledTypeface = installedTypeface;
             _options.InvokeAttachEvents();
-            _txtTypefaceInfo.Text = "file: " + typeface.FontPath + "\r\n" + "weight:" + typeface.Weight;
+            _txtTypefaceInfo.Text = "file: " + installedTypeface.FontPath + "\r\n" + "weight:" + installedTypeface.Weight;
 
+            //
+            ShowSupportedScripts(installedTypeface);
         }
 
+        static void CollectScriptTable(Typography.OpenFont.Tables.ScriptList scList, Dictionary<string, ScriptLang> output)
+        {
+            if (scList == null) { return; }
+            //
+            foreach (var kv in scList)
+            {
+
+                ScriptTable scTable = kv.Value;
+                //default and others
+                {
+                    ScriptTable.LangSysTable langSys = scTable.defaultLang;
+                    ScriptLang sclang = new ScriptLang(scTable.ScriptTagName, langSys.LangSysTagIdenString);
+                    string key = sclang.ToString();
+                    if (!output.ContainsKey(key))
+                    {
+                        output.Add(key, sclang);
+                    }
+                }
+                //
+                if (scTable.langSysTables != null && scTable.langSysTables.Length > 0)
+                {
+                    foreach (ScriptTable.LangSysTable langSys in scTable.langSysTables)
+                    {
+                        var pair = new ScriptLang(scTable.ScriptTagName, langSys.LangSysTagIdenString);
+                        string key = pair.ToString();
+                        if (!output.ContainsKey(key))
+                        {
+                            output.Add(key, pair);
+                        }
+                    }
+                }
+            }
+        }
+        void ShowSupportedScripts(InstalledTypeface installedTypeface)
+        {
+            //show supported lang
+
+            lstScriptLangs.Items.Clear();
+
+            Dictionary<string, ScriptLang> dic = new Dictionary<string, ScriptLang>();
+            CollectScriptTable(installedTypeface.GposScriptList, dic);
+            CollectScriptTable(installedTypeface.GsubScriptList, dic);
+
+            foreach (var kv in dic)
+            {
+                ScriptLang s = kv.Value;
+                if (s.sysLangTag != "" && LanguageSystemNames.TryGetLangSystem(s.sysLangTag, out LangSys found))
+                {
+
+                }
+                else
+                {
+
+                }
+                lstScriptLangs.Items.Add(s);
+            }
+
+
+            lstSupportedUnicodeLangs.Items.Clear();
+
+            foreach (UnicodeLangBits unicodeLangBit in installedTypeface.GetSupportedUnicodeLangBitIter())
+            {
+                lstSupportedUnicodeLangs.Items.Add(unicodeLangBit.ToString());
+            }
+        }
 
         void SetupFontSizeList()
         {
@@ -140,34 +211,41 @@ namespace TypographyTest.WinForms
 
         //
         int _defaultScriptLangComboBoxIndex = 0;
-        void SetupScriptLangComboBox()
+        EventHandler _scriptLangIndexChanged;
+        void SetupScriptLangBoxes()
         {
 
             //for debug, set default script lang here
+            _options.ScriptLang = ScriptLangs.Latin.GetScriptLang();
 
+            //list only scripts that are support by current typeface 
+            //show all scripts
+            ////
+            //int index = 0;
+            //foreach (Typography.OpenFont.ScriptLang scriptLang in Typography.OpenFont.ScriptLangs.GetRegiteredScriptLangIter())
+            //{
 
-            _options.ScriptLang = Typography.OpenFont.ScriptLangs.Latin;
-            //
-            int index = 0;
-            foreach (Typography.OpenFont.ScriptLang scriptLang in Typography.OpenFont.ScriptLangs.GetRegiteredScriptLangIter())
+            //    this.lstScriptLangs.Items.Add(scriptLang);
+
+            //    if (scriptLang == _options.ScriptLang)
+            //    {
+            //        //found default script lang
+            //        _defaultScriptLangComboBoxIndex = index;
+            //    }
+            //    index++;
+            //} 
+            //lstScriptLangs.SelectedIndex = 0; //default
+
+            _scriptLangIndexChanged = (s, e) =>
             {
-                this.cmbScriptLangs.Items.Add(scriptLang);
-                //
-                if (scriptLang == _options.ScriptLang)
+                if (this.lstScriptLangs.SelectedItem is ScriptLang sclang)
                 {
-                    //found default script lang
-                    _defaultScriptLangComboBoxIndex = index;
+                    _options.ScriptLang = sclang;
+                    _options.InvokeAttachEvents();
                 }
-                index++;
-            }
-
-            this.cmbScriptLangs.SelectedIndex = _defaultScriptLangComboBoxIndex; //set before** attach event
-
-            this.cmbScriptLangs.SelectedIndexChanged += (s, e) =>
-            {
-                _options.ScriptLang = (Typography.OpenFont.ScriptLang)this.cmbScriptLangs.SelectedItem;
-                _options.InvokeAttachEvents();
             };
+
+            this.lstScriptLangs.SelectedIndexChanged += _scriptLangIndexChanged;
         }
 
 

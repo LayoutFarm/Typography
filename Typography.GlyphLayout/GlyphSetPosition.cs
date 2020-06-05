@@ -18,38 +18,59 @@ namespace Typography.TextLayout
 
         readonly GPOS _gposTable;
         internal List<GPOS.LookupTable> _lookupTables;
-        public GlyphSetPosition(Typeface typeface, string lang)
+
+        readonly uint _langTagCode;
+
+        public GlyphSetPosition(Typeface typeface, string scriptTag, string langTag)
         {
-            this.Lang = lang;
+            this.ScriptTag = scriptTag; //script tag
+            this.LangTag = langTag; //lang tag
+            _langTagCode = TagUtils.StringToTag(langTag);
 
             //check if this lang has 
             _gposTable = typeface.GPOSTable;
 
             if (_gposTable == null) { return; }
 
-            ScriptTable scriptTable = _gposTable.ScriptList[lang];
-
+            ScriptTable scriptTable = _gposTable.ScriptList[scriptTag];
             if (scriptTable == null) { return; }   // early exit if no lookup tables 
 
-            ScriptTable.LangSysTable defaultLang = scriptTable.defaultLang;
-            if (defaultLang == null) { return; }   // early exit if no default language
+
+
+            ScriptTable.LangSysTable selectedLang = scriptTable.defaultLang;
+            if (selectedLang == null) return; //no default
+
+            if (_langTagCode != 0 && scriptTable.langSysTables != null)//use default
+            {
+                //find matching lang
+                for (int i = 0; i < scriptTable.langSysTables.Length; ++i)
+                {
+                    if (scriptTable.langSysTables[i].langSysTagIden == _langTagCode)
+                    {
+                        //found
+                        selectedLang = scriptTable.langSysTables[i];
+                        break;
+                    }
+                }
+            }
 
 #if DEBUG
             dbugTypeface = typeface;
-            if (defaultLang.HasRequireFeature)
+            if (selectedLang.HasRequireFeature)
             {
-
+                System.Diagnostics.Debugger.Break();
             }
 #endif
             //other feature
-            if (defaultLang.featureIndexList == null) { return; }// early exit
+            if (selectedLang.featureIndexList == null) { return; }// early exit
 
             //---------
             //get features 
             _lookupTables = new List<GPOS.LookupTable>();
-            for (int i = 0; i < defaultLang.featureIndexList.Length; ++i)
+
+            for (int i = 0; i < selectedLang.featureIndexList.Length; ++i)
             {
-                FeatureList.FeatureTable feature = _gposTable.FeatureList.featureTables[defaultLang.featureIndexList[i]];
+                FeatureList.FeatureTable feature = _gposTable.FeatureList.featureTables[selectedLang.featureIndexList[i]];
                 bool includeThisFeature = false;
                 switch (feature.TagName)
                 {
@@ -81,7 +102,8 @@ namespace Typography.TextLayout
                 }
             }
         }
-        public string Lang { get; private set; }
+        public string ScriptTag { get; }
+        public string LangTag { get; }
         public void DoGlyphPosition(IGlyphPositions glyphPositions)
         {
             //early exit if no lookup tables

@@ -106,15 +106,20 @@ namespace PixelFarm.Drawing
                  currentCulture.ThreeLetterISOLanguageName,
                  out string langFullName))
             {
-                scLang = Typography.OpenFont.ScriptLangs.GetRegisteredScriptLangFromLanguageName(langFullName);
-                if (scLang == null)
+                Typography.OpenFont.ScriptLangInfo scLang1 = Typography.OpenFont.ScriptLangs.GetRegisteredScriptLangFromLanguageName(langFullName);
+                if (scLang1 == null)
                 {
                     //not found -> use default latin
                     //use default lang
 #if DEBUG
                     System.Diagnostics.Debug.WriteLine(langFullName + " :use latin");
 #endif
-                    scLang = ScriptLangs.Latin;
+                    scLang = ScriptLangs.Latin.GetScriptLang();
+                    return true;
+                }
+                else
+                {
+                    scLang = scLang1.GetScriptLang();
                     return true;
                 }
             }
@@ -440,13 +445,13 @@ namespace PixelFarm.Drawing
 
                 if (!(spLayoutInfo.ResolvedScriptLang is Typography.OpenFont.ScriptLang scLang))
                 {
-                    if (!Typography.OpenFont.ScriptLangs.TryGetScriptLang((char)spLayoutInfo.SampleCodePoint, out scLang))
+                    if (!Typography.OpenFont.ScriptLangs.TryGetScriptLang((char)spLayoutInfo.SampleCodePoint, out var scLang1))
                     {
 
                     }
                     else
                     {
-                        spLayoutInfo.ResolvedScriptLang = scLang;
+                        spLayoutInfo.ResolvedScriptLang = scLang1.GetScriptLang();
                     }
                 }
 

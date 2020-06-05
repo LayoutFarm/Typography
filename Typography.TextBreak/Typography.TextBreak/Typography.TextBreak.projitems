@@ -10,6 +10,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)BidiBreakEngine.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ScriptTagsAndLanguageSystemTags\ScriptLangInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ScriptTagsAndLanguageSystemTags\UnicodeLangBits.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SheenBidi\BaseDirection.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SheenBidi\Collections\BidiChain.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SheenBidi\Collections\BidiLink.cs" />
@@ -47,8 +49,5 @@
     <Compile Include="$(MSBuildThisFileDirectory)DictionaryBasedBreakingEngine\LaoDictionaryBreakingEngine.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DictionaryBasedBreakingEngine\ThaiDictionaryBreakingEngine.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)WordVisitor.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="$(MSBuildThisFileDirectory)LanguageSystemTags\" />
   </ItemGroup>
 </Project>

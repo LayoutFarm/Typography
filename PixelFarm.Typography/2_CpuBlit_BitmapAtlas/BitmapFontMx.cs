@@ -49,12 +49,12 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             if (s_default == null)
             {
                 SetDefaultDetails(new GlyphTextureBuildDetail[] {
-                    new GlyphTextureBuildDetail{ ScriptLang= ScriptLangs.Latin,   HintTechnique = Typography.Contours.HintTechnique.TrueTypeInstruction_VerticalOnly },
-                    new GlyphTextureBuildDetail{ ScriptLang= ScriptLangs.Thai,  HintTechnique = Typography.Contours.HintTechnique.None},
+                    new GlyphTextureBuildDetail{ ScriptLang= ScriptLangs.Latin.GetScriptLang(),   HintTechnique = Typography.Contours.HintTechnique.TrueTypeInstruction_VerticalOnly },
+                    new GlyphTextureBuildDetail{ ScriptLang= ScriptLangs.Latin.GetScriptLang(),  HintTechnique = Typography.Contours.HintTechnique.None},
                 });
             }
             //
-        
+
 
         }
         public static void SetDefaultDetails(GlyphTextureBuildDetail[] defaultDetails)

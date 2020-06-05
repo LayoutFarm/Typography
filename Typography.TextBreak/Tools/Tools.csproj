@@ -1,16 +1,16 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{0DABB64B-3D8C-4447-A129-619390ED0E87}</ProjectGuid>
+    <ProjectGuid>{69158085-7D63-45B8-9BD7-B6D580ACB5DA}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>GdiPlusSample.WinForms</RootNamespace>
-    <AssemblyName>GdiPlusSample.WinForms</AssemblyName>
+    <RootNamespace>Tools</RootNamespace>
+    <AssemblyName>Tools</AssemblyName>
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -21,7 +21,6 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -34,45 +33,21 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\..\PixelFarm.Typography\3_Typography_Contours\GlyphMeshCollection.cs">
-      <Link>TextServices\GlyphMeshCollection.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\PixelFarm.Typography\3_Typography_Contours\GlyphOutlineBuilderBase.cs">
-      <Link>GlyphPathBuilder\GlyphOutlineBuilderBase.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\PixelFarm.Typography\3_Typography_Contours\TextPrinterBase.cs">
-      <Link>DevTextPrinter\TextPrinterBase.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\PixelFarm\PixelFarm.Painter\Drawing\TextBaseline.cs">
-      <Link>DevTextPrinter\TextBaseline.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\Typography.TextBreak\Typography.TextBreak\ScriptTagsAndLanguageSystemTags\ScriptLangInfo.cs">
-      <Link>TextServices\ScriptLangInfo.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\Typography.TextBreak\Typography.TextBreak\ScriptTagsAndLanguageSystemTags\UnicodeLangBits.cs">
-      <Link>TextServices\UnicodeLangBits.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\Typography.TextServices\FontStoreAndManagment\FontManagement.cs">
-      <Link>TextServices\FontManagement.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Shared\GlyphOutlineBuilder\GlyphOutlineBuilder.cs">
-      <Link>GlyphPathBuilder\GlyphOutlineBuilder.cs</Link>
-    </Compile>
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
-    <Compile Include="GdiPlus\DevGdiTextPrinter.cs" />
-    <Compile Include="GdiPlus\GlyphTranslatorToGdiPath.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TypefaceStore.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
@@ -84,7 +59,6 @@
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
-      <DesignTime>True</DesignTime>
     </Compile>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -97,21 +71,10 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Build\N20\Typography.GlyphLayout\Typography.GlyphLayout.csproj">
-      <Project>{c6807d05-09be-4313-9f8b-bd2d51c55819}</Project>
-      <Name>Typography.GlyphLayout</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\Build\N20\Typography.OpenFont\Typography.OpenFont.csproj">
-      <Project>{f7d71e61-9342-4dd7-9afd-69045f2ec98b}</Project>
-      <Name>Typography.OpenFont</Name>
-    </ProjectReference>
+    <Content Include="lang_system_1.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="unicode_ranges.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>

@@ -26,7 +26,7 @@ namespace SampleWinForms
 
             //choose Thai script for 'complex script' testing.
             //you can change this to test other script.
-            _currentTextPrinter.ScriptLang = Typography.OpenFont.ScriptLangs.Thai;
+            _currentTextPrinter.ScriptLang = Typography.OpenFont.ScriptLangs.Thai.GetScriptLang();
             //----------
             button1.Click += (s, e) => UpdateRenderOutput();
             //simple load test fonts from local test dir
@@ -260,7 +260,7 @@ namespace SampleWinForms
             UnscaledGlyphPlanList glyphPlans = new UnscaledGlyphPlanList();
             _currentTextPrinter.GlyphLayoutMan.GenerateUnscaledGlyphPlans(glyphPlans);
 
-            
+
 
             int j = glyphPlans.Count;
             float backup_xpos = x_pos;

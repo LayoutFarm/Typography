@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Typography.OpenFont;
 
+
 namespace Typography.TextLayout
 {
 
@@ -153,9 +154,13 @@ namespace Typography.TextLayout
         OpenFont,
     }
 
+
+
     class GlyphLayoutPlanCollection
     {
         Dictionary<GlyphLayoutPlanKey, GlyphLayoutPlanContext> _collection = new Dictionary<GlyphLayoutPlanKey, GlyphLayoutPlanContext>();
+
+        static readonly Dictionary<string, int> s_scriptLangKeys = new Dictionary<string, int>();
         /// <summary>
         /// get glyph layout plan or create if not exists
         /// </summary>
@@ -164,13 +169,18 @@ namespace Typography.TextLayout
         /// <returns></returns>
         public GlyphLayoutPlanContext GetPlanOrCreate(Typeface typeface, ScriptLang scriptLang)
         {
-            GlyphLayoutPlanKey key = new GlyphLayoutPlanKey(typeface, scriptLang.internalName);
+            if (!s_scriptLangKeys.TryGetValue(scriptLang.scriptTag, out int key1))
+            {
+                key1 = s_scriptLangKeys.Count + 1;
+                s_scriptLangKeys.Add(scriptLang.scriptTag, key1);
+            }
+            GlyphLayoutPlanKey key = new GlyphLayoutPlanKey(typeface, key1);
 
             if (!_collection.TryGetValue(key, out GlyphLayoutPlanContext context))
             {
-                var glyphSubstitution = (typeface.GSUBTable != null) ? new GlyphSubstitution(typeface, scriptLang.shortname) : null;
-                var glyphPosition = (typeface.GPOSTable != null) ? new GlyphSetPosition(typeface, scriptLang.shortname) : null;
-                _collection.Add(key, context = new GlyphLayoutPlanContext(glyphSubstitution, glyphPosition));
+                var g_sub = (typeface.GSUBTable != null) ? new GlyphSubstitution(typeface, scriptLang.scriptTag, scriptLang.sysLangTag) : null;
+                var g_pos = (typeface.GPOSTable != null) ? new GlyphSetPosition(typeface, scriptLang.scriptTag, scriptLang.sysLangTag) : null;
+                _collection.Add(key, context = new GlyphLayoutPlanContext(g_sub, g_pos));
             }
             return context;
         }
@@ -235,13 +245,14 @@ namespace Typography.TextLayout
         GlyphIndexList _inputGlyphs = new GlyphIndexList();//reusable input glyph
         GlyphPosStream _glyphPositions = new GlyphPosStream();
 
+        static ScriptLang s_latin = new ScriptLang("latn");
 
         public GlyphLayout()
         {
             PositionTechnique = PositionTechnique.OpenFont;
             EnableLigature = true;
             EnableComposition = true;
-            ScriptLang = ScriptLangs.Latin;
+            ScriptLang = s_latin;
         }
 
 
