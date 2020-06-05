@@ -51,27 +51,65 @@ namespace Typography.TextLayout
     }
 
 
+    static class TagUtils
+    {
+        static byte GetByte(char c)
+        {
+            if (c >= 0 && c < 256)
+            {
+                return (byte)c;
+            }
+            return 0;
+        }
+        public static uint StringToTag(string str)
+        {
+            if (string.IsNullOrEmpty(str) || str.Length != 4)
+            {
+                return 0;
+            }
+
+            char[] buff = str.ToCharArray();
+            byte b0 = GetByte(buff[0]);
+            byte b1 = GetByte(buff[1]);
+            byte b2 = GetByte(buff[2]);
+            byte b3 = GetByte(buff[3]);
+
+            return (uint)((b0 << 24) | (b1 << 16) | (b2 << 8) | b3);
+        }
+    }
+
+
     /// <summary>
     /// glyph substitution manager
     /// </summary>
     class GlyphSubstitution
     {
-        readonly string _language;
+
         bool _enableLigation = true; // enable by default
         bool _enableComposition = true;
         bool _mustRebuildTables = true;
         bool _enableMathFeature = true;
 
         readonly Typeface _typeface;
-        readonly uint _langSysTagIden;
-        public GlyphSubstitution(Typeface typeface, string lang, uint langSysTagIden = 0)
+
+        readonly uint _langTagCode;
+        public GlyphSubstitution(Typeface typeface, string scriptTag, string langSysIden)
         {
-            _language = lang;
+            LangTag = langSysIden;
+            ScriptTag = scriptTag;
+
             _typeface = typeface;
             _mustRebuildTables = true;
-            _langSysTagIden = langSysTagIden;
+
+            _langTagCode = TagUtils.StringToTag(langSysIden);
         }
 
+        static string TagToString(uint tag)
+        {
+            byte[] bytes = BitConverter.GetBytes(tag);
+            Array.Reverse(bytes);
+            return System.Text.Encoding.UTF8.GetString(bytes, 0, bytes.Length);
+        }
         public void DoSubstitution(IGlyphIndexList glyphIndexList)
         {
             // Rebuild tables if configuration changed
@@ -101,7 +139,10 @@ namespace Typography.TextLayout
                 }
             }
         }
-        public string Lang => _language;
+
+        public string ScriptTag { get; }
+        public string LangTag { get; }
+
         /// <summary>
         /// enable GSUB type 4, ligation (liga)
         /// </summary>
@@ -156,19 +197,19 @@ namespace Typography.TextLayout
 
             // check if this lang has
             GSUB gsubTable = _typeface.GSUBTable;
-            ScriptTable scriptTable = gsubTable.ScriptList[_language];
+            ScriptTable scriptTable = gsubTable.ScriptList[ScriptTag];
             if (scriptTable == null) return;
 
             //-------
             ScriptTable.LangSysTable selectedLang = null;
-            if (_langSysTagIden == 0)
+            if (LangTag == null)
             {
                 //use default
                 selectedLang = scriptTable.defaultLang;
             }
             else
             {
-                if (_langSysTagIden == scriptTable.defaultLang.langSysTagIden)
+                if (_langTagCode == scriptTable.defaultLang.langSysTagIden)
                 {
                     //found
                     selectedLang = scriptTable.defaultLang;
@@ -180,7 +221,7 @@ namespace Typography.TextLayout
                     for (int i = 0; i < scriptTable.langSysTables.Length; ++i)
                     {
                         ScriptTable.LangSysTable s = scriptTable.langSysTables[i];
-                        if (s.langSysTagIden == _langSysTagIden)
+                        if (s.langSysTagIden == _langTagCode)
                         {
                             //found
                             selectedLang = s;
@@ -339,66 +380,21 @@ namespace Typography.TextLayout
         }
     }
 
-
-    public static class TypefaceExtensions
-    {
-
-        static UnicodeLangBits[] FilterOnlySelectedRange(UnicodeLangBits[] inputRanges, UnicodeLangBits[] userSpecificRanges)
-        {
-            List<UnicodeLangBits> selectedRanges = new List<UnicodeLangBits>();
-            foreach (UnicodeLangBits range in inputRanges)
-            {
-                int foundAt = System.Array.IndexOf(userSpecificRanges, range);
-                if (foundAt > 0)
-                {
-                    selectedRanges.Add(range);
-                }
-            }
-            return selectedRanges.ToArray();
-        }
-        public static void CollectAllAssociateGlyphIndex(this Typeface typeface, List<ushort> outputGlyphIndexList, ScriptLang scLang, UnicodeLangBits[] selectedRangs = null)
-        {
-            //-----------
-            //general glyph index in the unicode range
-
-            //if user dose not specific the unicode lanf bit ranges
-            //the we try to select it ourself. 
-
-            if (ScriptLangs.TryGetUnicodeLangBitsArray(scLang.shortname, out UnicodeLangBits[] unicodeLangBitsRanges))
-            {
-                //one lang may contains may ranges
-                if (selectedRangs != null)
-                {
-                    //select only in range 
-                    unicodeLangBitsRanges = FilterOnlySelectedRange(unicodeLangBitsRanges, selectedRangs);
-                }
-
-                foreach (UnicodeLangBits unicodeLangBits in unicodeLangBitsRanges)
-                {
-                    UnicodeRangeInfo rngInfo = unicodeLangBits.ToUnicodeRangeInfo();
-                    int endAt = rngInfo.EndAt;
-                    for (int codePoint = rngInfo.StartAt; codePoint <= endAt; ++codePoint)
-                    {
-
-                        ushort glyphIndex = typeface.GetGlyphIndex(codePoint);
-                        if (glyphIndex > 0)
-                        {
-                            //add this glyph index
-                            outputGlyphIndexList.Add(glyphIndex);
-                        }
-                    }
-                }
-            }
-
-            //-----------
-            if (typeface.GSUBTable != null)
-            {
-                var gsub = new GlyphSubstitution(typeface, scLang.shortname);
-                gsub.CollectAdditionalSubstitutionGlyphIndices(outputGlyphIndexList);
-            }
-        }
-
-    }
 }
 
+namespace Typography.OpenFont
+{
+    using Typography.TextLayout;
+    public static class TypefaceExtension5
+    {
+        public static void CollectAdditionalGlyphIndices(this Typeface typeface, List<ushort> outputGlyphs, ScriptLang scLang)
+        {
+            if (typeface.GSUBTable != null)
+            {
+                var g_sub = new GlyphSubstitution(typeface, scLang.scriptTag, scLang.sysLangTag);
+                g_sub.CollectAdditionalSubstitutionGlyphIndices(outputGlyphs);
+            }
+        }
+    }
+}
 
