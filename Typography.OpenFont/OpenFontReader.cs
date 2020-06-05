@@ -3,10 +3,10 @@
 
 using System;
 using System.IO;
-using System.Collections.Generic;
 
 using Typography.OpenFont.IO;
 using Typography.OpenFont.Tables;
+
 namespace Typography.OpenFont
 {
     [Flags]
@@ -352,7 +352,7 @@ namespace Typography.OpenFont
             //for preview, read ONLY  script list from gsub and gpos (set OnlyScriptList).
 
             GSUB gsub = ReadTableIfExists(tables, input, new GSUB() { OnlyScriptList = true });
-            GPOS gpos = ReadTableIfExists(tables, input, new GPOS() { OnlyScriptList = true }); 
+            GPOS gpos = ReadTableIfExists(tables, input, new GPOS() { OnlyScriptList = true });
 
             return new PreviewFontInfo(
               nameEntry.FontName,
@@ -614,5 +614,5 @@ namespace Typography.OpenFont
     }
 
 
-   
+
 }

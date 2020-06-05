@@ -50,7 +50,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             {
                 SetDefaultDetails(new GlyphTextureBuildDetail[] {
                     new GlyphTextureBuildDetail{ ScriptLang= ScriptLangs.Latin.GetScriptLang(),   HintTechnique = Typography.Contours.HintTechnique.TrueTypeInstruction_VerticalOnly },
-                    new GlyphTextureBuildDetail{ ScriptLang= ScriptLangs.Latin.GetScriptLang(),  HintTechnique = Typography.Contours.HintTechnique.None},
+                    new GlyphTextureBuildDetail{ ScriptLang= ScriptLangs.Thai.GetScriptLang(),  HintTechnique = Typography.Contours.HintTechnique.None},
                 });
             }
             //

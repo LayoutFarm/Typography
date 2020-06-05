@@ -4,9 +4,7 @@ using System.Collections.Generic;
 
 using Typography.OpenFont;
 using Typography.OpenFont.Extensions;
-using Typography.TextLayout;
 using Typography.Contours;
-using Typography.FontManagement;
 
 namespace PixelFarm.CpuBlit.BitmapAtlas
 {
@@ -22,7 +20,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
     {
 
         public delegate void OnEachGlyph(BitmapAtlasItemSource glyphImage);
-         
+
         /// <summary>
         /// version of msdf generator
         /// </summary>
