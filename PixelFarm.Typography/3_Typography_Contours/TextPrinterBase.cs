@@ -14,7 +14,7 @@ namespace Typography.Contours
         public TextPrinterBase()
         {
             FontSizeInPoints = 14;//
-            ScriptLang = ScriptLangs.Latin.GetScriptLang();
+            ScriptLang = new ScriptLang(ScriptTagDefs.Latin.Tag, "");
         }
 
 
