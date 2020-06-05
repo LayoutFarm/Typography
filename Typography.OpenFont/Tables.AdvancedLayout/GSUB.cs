@@ -35,6 +35,10 @@ namespace Typography.OpenFont.Tables
     {
         public const string _N = "GSUB";
         public override string Name => _N;
+
+#if DEBUG
+        public GSUB() { }
+#endif
         //
         protected override void ReadLookupTable(BinaryReader reader, long lookupTablePos,
                                                 ushort lookupType, ushort lookupFlags,
@@ -138,7 +142,7 @@ namespace Typography.OpenFont.Tables
                 get => _subTables;
                 internal set => _subTables = value;
             }
- 
+
             //
             public bool DoSubstitutionAt(IGlyphIndexList inputGlyphs, int pos, int len)
             {

@@ -299,7 +299,10 @@ namespace Typography.OpenFont
 
         //-------------------------------------------------------
 
-
+        public uint UnicodeRange1 => OS2Table.ulUnicodeRange1;
+        public uint UnicodeRange2 => OS2Table.ulUnicodeRange2;
+        public uint UnicodeRange3 => OS2Table.ulUnicodeRange3;
+        public uint UnicodeRange4 => OS2Table.ulUnicodeRange4;
 
         //experiment
         internal void LoadOpenFontLayoutInfo(GDEF gdefTable, GSUB gsubTable, GPOS gposTable, BASE baseTable, COLR colrTable, CPAL cpalTable)
@@ -439,6 +442,8 @@ namespace Typography.OpenFont
         }
     }
 
+   
+
     namespace Extensions
     {
 
@@ -446,79 +451,7 @@ namespace Typography.OpenFont
         {
 
 
-            public static bool DoesSupportUnicode(
-                this PreviewFontInfo previewFontInfo,
-                UnicodeLangBits unicodeLangBits)
-            {
-
-                long bits = (long)unicodeLangBits;
-                int bitpos = (int)(bits >> 32);
-
-                if (bitpos == 0)
-                {
-                    return true; //default
-                }
-                else if (bitpos < 32)
-                {
-                    //use range 1
-                    return (previewFontInfo.UnicodeRange1 & (1 << bitpos)) != 0;
-                }
-                else if (bitpos < 64)
-                {
-                    return (previewFontInfo.UnicodeRange2 & (1 << (bitpos - 32))) != 0;
-                }
-                else if (bitpos < 96)
-                {
-                    return (previewFontInfo.UnicodeRange3 & (1 << (bitpos - 64))) != 0;
-                }
-                else if (bitpos < 128)
-                {
-                    return (previewFontInfo.UnicodeRange4 & (1 << (bitpos - 96))) != 0;
-                }
-                else
-                {
-                    throw new System.NotSupportedException();
-                }
-            }
-            public static bool DoesSupportUnicode(
-                this Typeface typeface,
-                UnicodeLangBits unicodeLangBits)
-            {
-                if (typeface.OS2Table == null)
-                {
-                    return false;
-                }
-                //-----------------------------
-                long bits = (long)unicodeLangBits;
-                int bitpos = (int)(bits >> 32);
-
-                if (bitpos == 0)
-                {
-                    return true; //default
-                }
-                else if (bitpos < 32)
-                {
-                    //use range 1
-                    return (typeface.OS2Table.ulUnicodeRange1 & (1 << bitpos)) != 0;
-                }
-                else if (bitpos < 64)
-                {
-                    return (typeface.OS2Table.ulUnicodeRange2 & (1 << (bitpos - 32))) != 0;
-                }
-                else if (bitpos < 96)
-                {
-                    return (typeface.OS2Table.ulUnicodeRange3 & (1 << (bitpos - 64))) != 0;
-                }
-                else if (bitpos < 128)
-                {
-                    return (typeface.OS2Table.ulUnicodeRange4 & (1 << (bitpos - 96))) != 0;
-                }
-                else
-                {
-                    throw new System.NotSupportedException();
-                }
-            }
-
+           
             public static bool RecommendToUseTypoMetricsForLineSpacing(this Typeface typeface)
             {
                 //https://www.microsoft.com/typography/otspec/os2.htm
@@ -826,6 +759,7 @@ namespace Typography.OpenFont
                 return typeface.OS2Table.usWinAscent + typeface.OS2Table.usWinDescent;
             }
 
+            
         }
         public enum LineSpacingChoice
         {

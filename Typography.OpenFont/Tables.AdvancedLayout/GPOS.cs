@@ -11,7 +11,10 @@ namespace Typography.OpenFont.Tables
     {
         public const string _N = "GPOS";
         public override string Name => _N;
-        //
+
+#if DEBUG
+        public GPOS() { }
+#endif
         protected override void ReadLookupTable(BinaryReader reader, long lookupTablePos,
                                                 ushort lookupType, ushort lookupFlags,
                                                 ushort[] subTableOffsets, ushort markFilteringSet)

@@ -13,10 +13,8 @@ namespace Typography.OpenFont.Tables
         // Language system tables reference features, which are defined in the FeatureList.
         // Each feature table references the lookup data defined in the LookupList that describes how, when, and where to implement the feature.
         private ScriptList() { }
-        public new ScriptTable this[string tagName]
-        {
-            get { return TryGetValue(tagName, out ScriptTable ret) ? ret : null; }
-        }
+        public new ScriptTable this[string tagName] => TryGetValue(tagName, out ScriptTable ret) ? ret : null;
+
 
         public static ScriptList CreateFrom(BinaryReader reader, long beginAt)
         {
