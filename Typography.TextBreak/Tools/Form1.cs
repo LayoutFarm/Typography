@@ -193,7 +193,16 @@ namespace Tools
         private void button4_Click(object sender, EventArgs e)
         {
             //https://docs.microsoft.com/en-us/typography/opentype/spec/scripttags
-            //script_tags.txt
+
+            //Script tags generally correspond to a Unicode script. 
+            //However, the associations between them may not always be one - to - one,
+            //and the OpenType script tags are not guaranteed to be the same as Unicode Script property-value aliases or 
+            //ISO 15924 script IDs. 
+            //Since the development of OpenType script tags predates the ISO 15924 or Unicode Script property, 
+            //the rules for script tags defined in this document may not always be the same as rules for ISO 15924 script IDs.
+            //The OpenType script tags can also correlate with a particular OpenType Layout implementation,
+            //with the result that more than one script tag may be registered for a given Unicode script(e.g. 'deva' and 'dev2').
+
 
             string[] allLines = File.ReadAllLines("script_tags.txt");
             //skip 1st line           
@@ -212,7 +221,7 @@ namespace Tools
                 string scTag = fields[1].Replace("'", "").Trim();
 
                 scNameAndTags.Add(new ScriptNameAndTag { ScriptName = scName, ScriptTag = scTag });
-                 
+
             }
 
             {
