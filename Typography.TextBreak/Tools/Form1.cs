@@ -89,5 +89,75 @@ namespace Tools
             }
         }
 
+        private void button2_Click(object sender, EventArgs e)
+        {
+            //https://www.unicode.org/versions/Unicode13.0.0/UnicodeStandard-13.0.pdf
+            //generate unicode ranges
+            string[] allLines = File.ReadAllLines("unicode13_ranges.txt");
+            //skip 1st line
+            List<UnicodeRangeInfo> unicodeRanges = new List<UnicodeRangeInfo>();
+
+            for (int i = 1; i < allLines.Length; ++i)
+            {
+                string[] fields = allLines[i].Split(',');
+                if (fields.Length != 3)
+                {
+                    throw new NotSupportedException();
+                }
+                unicodeRanges.Add(new UnicodeRangeInfo { LangName = fields[0].Trim(), StartCodePoint = fields[1].Trim(), EndCodePoint = fields[2].Trim() });
+            }
+        }
+
+        class UnicodeRangeInfo
+        {
+            public string BitPlane { get; set; }
+            public string LangName { get; set; }
+            public string StartCodePoint { get; set; }
+            public string EndCodePoint { get; set; }
+            public override string ToString()
+            {
+                if (BitPlane == null)
+                {
+                    return LangName + "," + StartCodePoint + "," + EndCodePoint;
+                }
+                else
+                {
+                    return BitPlane + "," + LangName + "," + StartCodePoint + "," + EndCodePoint;
+                }
+
+            }
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+
+            //https://docs.microsoft.com/en-us/typography/opentype/spec/os2#ulunicoderange1-bits-031ulunicoderange2-bits-3263ulunicoderange3-bits-6495ulunicoderange4-bits-96127
+
+            string[] allLines = File.ReadAllLines("opentype_unicode5.1_ranges.txt");
+            //skip 1st line
+            List<UnicodeRangeInfo> unicodeRanges = new List<UnicodeRangeInfo>();
+
+            for (int i = 1; i < allLines.Length; ++i)
+            {
+                string[] fields = allLines[i].Split('\t');
+                if (fields.Length != 3)
+                {
+                    throw new NotSupportedException();
+                }
+
+                string[] codePointRanges = ParseCodePointRanges(fields[2].Trim());
+                unicodeRanges.Add(new UnicodeRangeInfo
+                {
+                    BitPlane = fields[0].Trim(),
+                    LangName = fields[1].Trim(),
+                    StartCodePoint = codePointRanges[0],
+                    EndCodePoint = codePointRanges[1]
+                });
+            }
+        }
+
+        string[] ParseCodePointRanges(string codepoint_range) => codepoint_range.Split('-');
+
+
     }
 }

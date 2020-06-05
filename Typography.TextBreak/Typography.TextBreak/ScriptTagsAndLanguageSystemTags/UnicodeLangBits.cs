@@ -6,7 +6,7 @@ namespace Typography.OpenFont
     public enum UnicodeLangBits : long
     {
 
-        //https://docs.microsoft.com/en-us/typography/opentype/spec/os2#ur
+        //https://docs.microsoft.com/en-us/typography/opentype/spec/os2#ulunicoderange1-bits-031ulunicoderange2-bits-3263ulunicoderange3-bits-6495ulunicoderange4-bits-96127
 
         Unset = 0,
 
