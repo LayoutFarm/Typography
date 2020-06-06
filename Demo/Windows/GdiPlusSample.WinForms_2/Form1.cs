@@ -30,7 +30,7 @@ namespace SampleWinForms
 
             //choose Thai script for 'complex script' testing.
             //you can change this to test other script.
-            _currentTextPrinter.ScriptLang = new ScriptLang(Typography.OpenFont.ScriptLangs.Thai.shortname);
+            _currentTextPrinter.ScriptLang = new ScriptLang(ScriptTagDefs.Thai.Tag);
             //----------
             button1.Click += (s, e) => UpdateRenderOutput();
             //simple load test fonts from local test dir
@@ -85,7 +85,7 @@ namespace SampleWinForms
             TypefaceStore store = new TypefaceStore();//caching loaded typeface/helper
             //set default font for current text printer
             store.FontCollection = _installedFontCollection;
-            _typefaceStore = store; 
+            _typefaceStore = store;
             _currentTextPrinter.Typeface = store.GetTypeface(selectedFF);
             //---------- 
 

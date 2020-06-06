@@ -216,8 +216,8 @@ namespace TypographyTest.WinForms
         {
 
             //for debug, set default script lang here
-            _options.ScriptLang = ScriptLangs.Latin.GetScriptLang();
-
+            _options.ScriptLang = new ScriptLang(ScriptTagDefs.Latin.Tag);
+            
             //list only scripts that are support by current typeface 
             //show all scripts
             ////

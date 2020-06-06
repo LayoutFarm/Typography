@@ -97,6 +97,8 @@ namespace PixelFarm.Drawing
 
         public void UpdateUnicodeRanges() => _txtServices.InstalledFontCollection.UpdateUnicodeRanges();
 
+
+        static readonly ScriptLang s_latin = new ScriptLang(ScriptTagDefs.Latin.Tag);
         static bool TryGetScriptLangFromCurrentThreadCultureInfo(out Typography.OpenFont.ScriptLang scLang)
         {
             var currentCulture = System.Threading.Thread.CurrentThread.CurrentCulture;
@@ -114,7 +116,7 @@ namespace PixelFarm.Drawing
 #if DEBUG
                     System.Diagnostics.Debug.WriteLine(langFullName + " :use latin");
 #endif
-                    scLang = ScriptLangs.Latin.GetScriptLang();
+                    scLang = s_latin;
                     return true;
                 }
                 else
