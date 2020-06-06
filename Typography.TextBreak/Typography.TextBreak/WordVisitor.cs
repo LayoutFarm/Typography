@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 namespace Typography.TextBreak
 {
-   
+
     public enum VisitorState
     {
         Init,
@@ -17,7 +17,7 @@ namespace Typography.TextBreak
         End,
     }
 
-   
+
 
     public delegate void NewWordBreakHandlerDelegate(WordVisitor vistor);
     //
@@ -27,6 +27,7 @@ namespace Typography.TextBreak
 
 #if DEBUG
         List<BreakAtInfo> dbugBreakAtList = new List<BreakAtInfo>();
+        bool dbugCollectBreakAtList;
 #endif
         char[] _buffer;
 
@@ -110,10 +111,15 @@ namespace Typography.TextBreak
             LatestSpanStartAt = _latestBreakAt;
             _latestBreakAt = index;
             this.LatestWordKind = wordKind;
+
             _newWordBreakHandler(this);
 
 #if DEBUG
-            dbugBreakAtList.Add(new BreakAtInfo(index, wordKind));
+            if (dbugCollectBreakAtList)
+            {
+                dbugBreakAtList.Add(new BreakAtInfo(index, wordKind));
+            }
+
 #endif
         }
         internal void AddWordBreakAtCurrentIndex(WordKind wordKind = WordKind.Text)
