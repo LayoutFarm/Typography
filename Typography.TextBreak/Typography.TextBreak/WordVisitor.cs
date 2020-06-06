@@ -39,7 +39,7 @@ namespace Typography.TextBreak
         int _latestBreakAt;
 
 
-        NewWordBreakHandlerDelegate _newWordBreakHandler;
+        readonly NewWordBreakHandlerDelegate _newWordBreakHandler;
 
         Stack<int> _tempCandidateBreaks = new Stack<int>();
         internal WordVisitor(NewWordBreakHandlerDelegate newWordBreakHandler)
