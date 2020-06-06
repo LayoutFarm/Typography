@@ -40,7 +40,7 @@ namespace Typography.OpenFont.Tables
         /// <summary>
         /// read script_list, feature_list, and skip look up table
         /// </summary>
-        public bool OnlyScriptList { get; set; } //
+        internal bool OnlyScriptList { get; set; } //
 
         protected override void ReadContentFrom(BinaryReader reader)
         {
