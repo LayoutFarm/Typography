@@ -4,6 +4,7 @@ using System.Windows.Forms;
 using System.Text;
 using System.IO;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 
 namespace Tools
 {
@@ -91,14 +92,20 @@ namespace Tools
 
 
         List<UnicodeRangeInfo> _unicode13Ranges;
+        Dictionary<string, UnicodeRangeInfo> _unicode13Dic;
         private void button2_Click(object sender, EventArgs e)
         {
+            LoadUnicode13Ranges();
+        }
+        void LoadUnicode13Ranges()
+        {
+
             //https://www.unicode.org/versions/Unicode13.0.0/UnicodeStandard-13.0.pdf
             //generate unicode ranges
             string[] allLines = File.ReadAllLines("unicode13_ranges.txt");
-
             //skip 1st line
             _unicode13Ranges = new List<UnicodeRangeInfo>();
+            _unicode13Dic = new Dictionary<string, UnicodeRangeInfo>();
             for (int i = 1; i < allLines.Length; ++i)
             {
                 string[] fields = allLines[i].Split(',');
@@ -106,10 +113,17 @@ namespace Tools
                 {
                     throw new NotSupportedException();
                 }
-                _unicode13Ranges.Add(new UnicodeRangeInfo { LangName = fields[0].Trim(), StartCodePoint = fields[1].Trim(), EndCodePoint = fields[2].Trim() });
-            }
-        }
 
+
+                var rangeInfo = new UnicodeRangeInfo { LangName = fields[0].Trim(), StartCodePoint = fields[1].Trim(), EndCodePoint = fields[2].Trim() };
+
+                _unicode13Ranges.Add(rangeInfo);
+
+                _unicode13Dic.Add(rangeInfo.LangName, rangeInfo);
+            }
+
+
+        }
         class UnicodeRangeInfo
         {
             public string BitPlane { get; set; }
@@ -311,34 +325,66 @@ namespace Tools
 
 
             //---------------------------------
+            LoadUnicode13Ranges();
             //try mapping exact lang and script
             Dictionary<string, MappingLangAndScript> mappingLangAndScripts = new Dictionary<string, MappingLangAndScript>();
             //since we have script < lang, so 
             //match name
-            List<string> notFounds = new List<string>();
+            List<string> notFoundList = new List<string>();
             foreach (var kv in script_to_short)
             {
-                string fullLang = kv.Key;
+                string script_name = kv.Key;
                 string script_tag = kv.Value;
 
-                if (lang_to_short.TryGetValue(fullLang, out string lang_short))
+                if (lang_to_short.TryGetValue(script_name, out string lang_short))
                 {
+                    //try map script name with lang
                     //found
-                    mappingLangAndScripts.Add(fullLang, new MappingLangAndScript()
+                    mappingLangAndScripts.Add(script_name, new MappingLangAndScript()
                     {
-                        FullLangName = fullLang,
+                        FullLangName = script_name,
                         ShortScript = script_tag,
                         ShortLang = lang_short
                     });
                 }
                 else
                 {
-                    //not found
-                    notFounds.Add(fullLang);
+
+                    if (_unicode13Dic.TryGetValue(script_name, out UnicodeRangeInfo rangeInfo))
+                    {
+                        mappingLangAndScripts.Add(script_name, new MappingLangAndScript()
+                        {
+                            FullLangName = rangeInfo.LangName,
+                            ShortScript = script_tag,
+                            ShortLang = "?"
+                        });
+                    }
+                    else
+                    {
+                        //not found
+                        notFoundList.Add(script_name);
+                    }
                 }
             }
+            //---------------------------------
 
 
+
+            //---------------------------------
+            //write notFoundList
+            {
+                 
+                using (FileStream fs = new FileStream("not_found_langs.txt", FileMode.Create))
+                using (StreamWriter w = new StreamWriter(fs))
+                {
+                    foreach (string notFoundLang in notFoundList)
+                    {
+                        w.WriteLine(notFoundLang);
+                    }
+                    w.Close();
+                }
+
+            }
         }
     }
 }

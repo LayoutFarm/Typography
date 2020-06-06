@@ -81,6 +81,7 @@
     <Content Include="script_tags.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="script_tags02.txt" />
     <Content Include="unicode13_ranges.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
