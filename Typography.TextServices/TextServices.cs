@@ -4,11 +4,13 @@ using System.Collections.Generic;
 using Typography.OpenFont;
 using Typography.FontManagement;
 using System.IO;
- 
+
 namespace Typography.TextServices
 {
     using Typography.TextBreak;
     using Typography.TextLayout;
+
+
     public class TextServices
     {
         //user can do text shaping by their own
@@ -18,7 +20,8 @@ namespace Typography.TextServices
 
         GlyphPlanCacheForTypefaceAndScriptLang _currentGlyphPlanSeqCache;
         Dictionary<TextShapingContextKey, GlyphPlanCacheForTypefaceAndScriptLang> _registerShapingContexts = new Dictionary<TextShapingContextKey, GlyphPlanCacheForTypefaceAndScriptLang>();
-        GlyphLayout _glyphLayout;
+
+        readonly GlyphLayout _glyphLayout;
 
 
         float _fontSizeInPts;

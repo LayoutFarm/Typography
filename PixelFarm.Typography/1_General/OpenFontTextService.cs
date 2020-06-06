@@ -150,10 +150,13 @@ namespace PixelFarm.Drawing
         //
         public void CalculateUserCharGlyphAdvancePos(in TextBufferSpan textBufferSpan, RequestFont font, ref TextSpanMeasureResult measureResult)
         {
-            CalculateUserCharGlyphAdvancePos(textBufferSpan,
-                this.BreakToLineSegments(textBufferSpan),
+            using (ILineSegmentList lineSegList = this.BreakToLineSegments(textBufferSpan))
+            {
+                CalculateUserCharGlyphAdvancePos(textBufferSpan,
+                lineSegList,
                 font,
                 ref measureResult);
+            }
         }
         //
         ReusableTextBuffer _reusableTextBuffer = new ReusableTextBuffer();
