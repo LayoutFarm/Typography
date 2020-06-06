@@ -89,14 +89,16 @@ namespace Tools
             }
         }
 
+
+        List<UnicodeRangeInfo> _unicode13Ranges;
         private void button2_Click(object sender, EventArgs e)
         {
             //https://www.unicode.org/versions/Unicode13.0.0/UnicodeStandard-13.0.pdf
             //generate unicode ranges
             string[] allLines = File.ReadAllLines("unicode13_ranges.txt");
-            //skip 1st line
-            List<UnicodeRangeInfo> unicodeRanges = new List<UnicodeRangeInfo>();
 
+            //skip 1st line
+            _unicode13Ranges = new List<UnicodeRangeInfo>();
             for (int i = 1; i < allLines.Length; ++i)
             {
                 string[] fields = allLines[i].Split(',');
@@ -104,7 +106,7 @@ namespace Tools
                 {
                     throw new NotSupportedException();
                 }
-                unicodeRanges.Add(new UnicodeRangeInfo { LangName = fields[0].Trim(), StartCodePoint = fields[1].Trim(), EndCodePoint = fields[2].Trim() });
+                _unicode13Ranges.Add(new UnicodeRangeInfo { LangName = fields[0].Trim(), StartCodePoint = fields[1].Trim(), EndCodePoint = fields[2].Trim() });
             }
         }
 
@@ -128,6 +130,7 @@ namespace Tools
             }
         }
 
+        List<UnicodeRangeInfo> _unicode5_1Ranges;
         private void button3_Click(object sender, EventArgs e)
         {
 
@@ -135,7 +138,7 @@ namespace Tools
 
             string[] allLines = File.ReadAllLines("opentype_unicode5.1_ranges.txt");
             //skip 1st line
-            List<UnicodeRangeInfo> unicodeRanges = new List<UnicodeRangeInfo>();
+            _unicode5_1Ranges = new List<UnicodeRangeInfo>();
 
             for (int i = 1; i < allLines.Length; ++i)
             {
@@ -146,7 +149,7 @@ namespace Tools
                 }
 
                 string[] codePointRanges = ParseCodePointRanges(fields[2].Trim());
-                unicodeRanges.Add(new UnicodeRangeInfo
+                _unicode5_1Ranges.Add(new UnicodeRangeInfo
                 {
                     BitPlane = fields[0].Trim(),
                     LangName = fields[1].Trim(),
@@ -159,7 +162,7 @@ namespace Tools
             //generate cs code for this
             {
                 StringBuilder sb = new StringBuilder();
-                foreach (UnicodeRangeInfo unicodeRangeInfo in unicodeRanges)
+                foreach (UnicodeRangeInfo unicodeRangeInfo in _unicode5_1Ranges)
                 {
                     string field_name = GetProperFieldName(unicodeRangeInfo.LangName);
 
@@ -170,7 +173,7 @@ namespace Tools
             {
                 //enum iter
                 StringBuilder sb = new StringBuilder();
-                foreach (UnicodeRangeInfo unicodeRangeInfo in unicodeRanges)
+                foreach (UnicodeRangeInfo unicodeRangeInfo in _unicode5_1Ranges)
                 {
                     string field_name = GetProperFieldName(unicodeRangeInfo.LangName);
                     sb.AppendLine("UnicodeLangBits." + field_name + ", ");
@@ -190,6 +193,8 @@ namespace Tools
                 return ScriptTag + ":" + ScriptName;
             }
         }
+
+        List<ScriptNameAndTag> _scNameAndTags;
         private void button4_Click(object sender, EventArgs e)
         {
             //https://docs.microsoft.com/en-us/typography/opentype/spec/scripttags
@@ -203,11 +208,12 @@ namespace Tools
             //The OpenType script tags can also correlate with a particular OpenType Layout implementation,
             //with the result that more than one script tag may be registered for a given Unicode script(e.g. 'deva' and 'dev2').
 
+            _scNameAndTags = new List<ScriptNameAndTag>();
 
             string[] allLines = File.ReadAllLines("script_tags.txt");
             //skip 1st line           
 
-            List<ScriptNameAndTag> scNameAndTags = new List<ScriptNameAndTag>();
+
             for (int i = 1; i < allLines.Length; ++i)
             {
                 string[] fields = allLines[i].Split('\t');
@@ -220,20 +226,116 @@ namespace Tools
                 string scName = fields[0].Trim();
                 string scTag = fields[1].Replace("'", "").Trim();
 
-                scNameAndTags.Add(new ScriptNameAndTag { ScriptName = scName, ScriptTag = scTag });
+                _scNameAndTags.Add(new ScriptNameAndTag { ScriptName = scName, ScriptTag = scTag });
 
             }
 
             {
                 //enum iter
                 StringBuilder sb = new StringBuilder();
-                foreach (ScriptNameAndTag scNameAndTag in scNameAndTags)
+                foreach (ScriptNameAndTag scNameAndTag in _scNameAndTags)
                 {
                     string field_name = GetProperFieldName(scNameAndTag.ScriptName);
                     sb.AppendLine(field_name + "=_(\"" + scNameAndTag.ScriptTag + "\",\"" + scNameAndTag.ScriptName + "\"),");
                 }
 
                 File.WriteAllText("script_tags.gen.txt", sb.ToString());
+            }
+
+
+        }
+
+        class MappingLangAndScript
+        {
+            public string FullLangName;
+            public string ShortLang;
+            public string ShortScript;
+
+            public override string ToString()
+            {
+                return FullLangName + "(" + ShortLang + ", script=>" + ShortScript + ")";
+            }
+        }
+        private void button5_Click(object sender, EventArgs e)
+        {
+            //read some part of icu data 
+
+            IcuDataParser icuDataParser = new IcuDataParser();
+
+            Dictionary<string, string> short_to_lang = new Dictionary<string, string>();
+            Dictionary<string, string> lang_to_short = new Dictionary<string, string>();
+            //-------
+            Dictionary<string, string> short_to_script = new Dictionary<string, string>();
+            Dictionary<string, string> script_to_short = new Dictionary<string, string>();
+
+            using (FileStream fs = new FileStream("icu_data/data/lang/en.txt", FileMode.Open))
+            {
+                icuDataParser.ParseData(fs);
+                IcuDataTree tree = icuDataParser.ResultTree;
+                IcuDataNode node = tree.RootNode;
+                {
+                    //lang node
+                    IcuDataNode langNode = node?.GetFirstChildNode("Languages");
+                    if (langNode != null)
+                    {
+                        //now we can get data from the node
+                        //get all lang
+                        //collect all data to 
+
+                        int count = langNode.ChildCount;
+                        for (int i = 0; i < count; ++i)
+                        {
+                            IcuDataNode childNode = langNode.GetNode(i);
+                            short_to_lang.Add(childNode.Name, childNode.TextValue);
+                            lang_to_short.Add(childNode.TextValue, childNode.Name);
+                        }
+
+                    }
+                }
+                {
+                    //script node
+                    IcuDataNode scriptNode = node?.GetFirstChildNode("Scripts");
+                    if (scriptNode != null)
+                    {
+                        int count = scriptNode.ChildCount;
+                        for (int i = 0; i < count; ++i)
+                        {
+                            IcuDataNode childNode = scriptNode.GetNode(i);
+                            short_to_script.Add(childNode.Name, childNode.TextValue);
+                            script_to_short.Add(childNode.TextValue, childNode.Name);
+                        }
+                    }
+                }
+            }
+
+
+
+            //---------------------------------
+            //try mapping exact lang and script
+            Dictionary<string, MappingLangAndScript> mappingLangAndScripts = new Dictionary<string, MappingLangAndScript>();
+            //since we have script < lang, so 
+            //match name
+            List<string> notFounds = new List<string>();
+            foreach (var kv in script_to_short)
+            {
+                string fullLang = kv.Key;
+                string script_tag = kv.Value;
+
+                if (lang_to_short.TryGetValue(fullLang, out string lang_short))
+                {
+                    //found
+                    mappingLangAndScripts.Add(fullLang, new MappingLangAndScript()
+                    {
+                        FullLangName = fullLang,
+                        ShortScript = script_tag,
+                        ShortLang = lang_short
+                    });
+                }
+                else
+                {
+                    //not found
+                    notFounds.Add(fullLang);
+                }
             }
 
 
