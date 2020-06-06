@@ -2,9 +2,12 @@
 
 namespace Typography.OpenFont
 {
-    
+
     //https://docs.microsoft.com/en-us/typography/opentype/spec/os2#ulunicoderange1-bits-031ulunicoderange2-bits-3263ulunicoderange3-bits-6495ulunicoderange4-bits-96127
 
+    /// <summary>
+    /// unicode 5.1
+    /// </summary>
     public enum UnicodeLangBits : long
     {
         Unset = 0,

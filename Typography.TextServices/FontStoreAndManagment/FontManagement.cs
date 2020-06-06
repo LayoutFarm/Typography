@@ -133,10 +133,7 @@ namespace Typography.OpenFont
             }
 
             typeface.CollectAdditionalGlyphIndices(outputGlyphIndexList, scLang);
-
-
         }
-
     }
 
 }
@@ -144,7 +141,6 @@ namespace Typography.OpenFont
 
 namespace Typography.FontManagement
 {
-
 
 
     public class InstalledTypeface
@@ -774,7 +770,9 @@ namespace Typography.FontManagement
         public bool TryGetAlternativeTypefaceFromChar(char c, out List<InstalledTypeface> found)
         {
             //find a typeface that supported input char c
-            if (OpenFont.ScriptLangs.TryGetScriptLang(c, out ScriptLangInfo foundScriptLang) && foundScriptLang.unicodeLangs != null)
+            //1. unicode to lang=> to script
+            //2. then find typeface the support it
+            if (ScriptLangs.TryGetScriptLang(c, out ScriptLangInfo foundScriptLang) && foundScriptLang.unicodeLangs != null)
             {
                 foreach (UnicodeLangBits langBits in foundScriptLang.unicodeLangs)
                 {
