@@ -101,9 +101,10 @@ namespace Typography.TextServices
             //user must setup the CustomBreakerBuilder before use      
             if (_textBreaker == null)
             {
+                //setup 
                 _textBreaker = Typography.TextBreak.CustomBreakerBuilder.NewCustomBreaker();
                 _textBreaker.SetNewBreakHandler(vis => _breakSpans.Add(vis.GetBreakSpan()));
-                //setup 
+                
             }
 
             _breakSpans.Clear();
@@ -129,47 +130,7 @@ namespace Typography.TextServices
             {
                 yield return sp;
             }
-        }
-
-        /// <summary>
-        /// expandable list of glyph plan
-        /// </summary>
-        class UnscaledGlyphPlanList : IUnscaledGlyphPlanList
-        {
-            List<UnscaledGlyphPlan> _glyphPlans = new List<UnscaledGlyphPlan>();
-
-
-            public void Clear()
-            {
-                _glyphPlans.Clear();
-            }
-            public void Append(UnscaledGlyphPlan glyphPlan)
-            {
-                _glyphPlans.Add(glyphPlan);
-            }
-            public UnscaledGlyphPlan this[int index]
-            {
-                get
-                {
-                    return _glyphPlans[index];
-                }
-            }
-            public int Count
-            {
-                get
-                {
-                    return _glyphPlans.Count;
-                }
-            }
-
-
-#if DEBUG
-            public UnscaledGlyphPlanList()
-            {
-
-            }
-#endif
-        }
+        } 
         public void MeasureString(char[] str, int startAt, int len, out int w, out int h)
         {
             //measure string 
