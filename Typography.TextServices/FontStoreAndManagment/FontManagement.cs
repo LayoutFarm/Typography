@@ -98,6 +98,7 @@ namespace Typography.OpenFont
             }
             return selectedRanges.ToArray();
         }
+
         public static void CollectAllAssociateGlyphIndex(this Typeface typeface, List<ushort> outputGlyphIndexList, ScriptLang scLang, UnicodeLangBits[] selectedRangs = null)
         {
             //-----------
@@ -106,7 +107,7 @@ namespace Typography.OpenFont
             //if user dose not specific the unicode lanf bit ranges
             //the we try to select it ourself. 
 
-            if (ScriptLangs.TryGetUnicodeLangBitsArray(scLang.scriptTag, out UnicodeLangBits[] unicodeLangBitsRanges))
+            if (ScriptLangs.TryGetUnicodeLangBitsArray(scLang.GetScriptTagString(), out UnicodeLangBits[] unicodeLangBitsRanges))
             {
                 //one lang may contains may ranges
                 if (selectedRangs != null)

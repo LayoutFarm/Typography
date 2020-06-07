@@ -267,16 +267,11 @@ namespace Typography.TextLayout
             get => _scriptLang;
             set
             {
-#if DEBUG
-                if (value == null)
-                {
-                    throw new NotSupportedException();
-                }
-#endif
-                if (_scriptLang != value)
+
+                if (_scriptLang.scriptTag != value.scriptTag || _scriptLang.sysLangTag != value.sysLangTag)
                 {
                     _needPlanUpdate = true;
-                } 
+                }
 
                 _scriptLang = value;
             }

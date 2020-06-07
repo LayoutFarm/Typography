@@ -78,7 +78,7 @@ namespace PixelFarm.Drawing
             //---------------
             //if not default then try guess
             //
-            if (scLang == null &&
+            if (scLang.scriptTag == 0 &&
                 !TryGetScriptLangFromCurrentThreadCultureInfo(out scLang))
             {
                 //TODO: handle error here
@@ -102,7 +102,7 @@ namespace PixelFarm.Drawing
         static bool TryGetScriptLangFromCurrentThreadCultureInfo(out Typography.OpenFont.ScriptLang scLang)
         {
             var currentCulture = System.Threading.Thread.CurrentThread.CurrentCulture;
-            scLang = null;
+
             if (Typography.TextBreak.IcuData.TryGetFullLanguageNameFromLangCode(
                  currentCulture.TwoLetterISOLanguageName,
                  currentCulture.ThreeLetterISOLanguageName,
@@ -124,6 +124,10 @@ namespace PixelFarm.Drawing
                     scLang = scLang1.GetScriptLang();
                     return true;
                 }
+            }
+            else
+            {
+                scLang = default;
             }
             return false;
         }

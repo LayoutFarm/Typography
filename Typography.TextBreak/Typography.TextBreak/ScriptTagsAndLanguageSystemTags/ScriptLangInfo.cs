@@ -1029,9 +1029,7 @@ Zanabazar_Square__Zanabazarin_Dörböljin_Useg__Xewtee_Dörböljin_Bicig__Horizo
                 if (langBits.Length > 0)
                 {
                     s_registeredScriptTagsToUnicodeLangBits.Add(shortname, langBits);
-                }
-
-
+                } 
                 return scriptLang;
             }
         }
