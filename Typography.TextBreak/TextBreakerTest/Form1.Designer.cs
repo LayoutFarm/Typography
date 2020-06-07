@@ -36,6 +36,7 @@
             this.cmdPerformace1 = new System.Windows.Forms.Button();
             this.cmdBidiTest = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
+            this.chkUseUnicodeRangeBreaker = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // listBox1
@@ -114,11 +115,22 @@
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
+            // chkUseUnicodeRangeBreaker
+            // 
+            this.chkUseUnicodeRangeBreaker.AutoSize = true;
+            this.chkUseUnicodeRangeBreaker.Location = new System.Drawing.Point(13, 21);
+            this.chkUseUnicodeRangeBreaker.Name = "chkUseUnicodeRangeBreaker";
+            this.chkUseUnicodeRangeBreaker.Size = new System.Drawing.Size(157, 17);
+            this.chkUseUnicodeRangeBreaker.TabIndex = 9;
+            this.chkUseUnicodeRangeBreaker.Text = "Use UnicodeRangeBreaker";
+            this.chkUseUnicodeRangeBreaker.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1100, 507);
+            this.Controls.Add(this.chkUseUnicodeRangeBreaker);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.cmdBidiTest);
             this.Controls.Add(this.cmdPerformace1);
@@ -145,6 +157,7 @@
         private System.Windows.Forms.Button cmdPerformace1;
         private System.Windows.Forms.Button cmdBidiTest;
         private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.CheckBox chkUseUnicodeRangeBreaker;
     }
 }
 
