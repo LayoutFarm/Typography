@@ -446,21 +446,21 @@ namespace PixelFarm.Drawing
             MyLineSegmentList lineSegments = MyLineSegmentList.GetFreeLineSegmentList();
             foreach (BreakSpan breakSpan in _txtServices.BreakToLineSegments(str, textBufferSpan.start, textBufferSpan.len))
             {
-                SpanBreakInfo breakInfo = breakSpan.SpanBreakInfo;
+                SpanBreakInfo spBreakInfo = breakSpan.SpanBreakInfo;
 
-                if (!(breakInfo.ResolvedScriptLang is Typography.OpenFont.ScriptLang scLang))
+                if (!(spBreakInfo.ResolvedScriptLang is Typography.OpenFont.ScriptLang scLang))
                 {
-                    if (!Typography.OpenFont.ScriptLangs.TryGetScriptLang((char)breakInfo.SampleCodePoint, out ScriptLangInfo scLang1))
+                    if (!Typography.OpenFont.ScriptLangs.TryGetScriptLang((char)spBreakInfo.SampleCodePoint, out ScriptLangInfo scLang1))
                     {
 
                     }
                     else
                     {
-                        breakInfo.ResolvedScriptLang = scLang1.GetScriptLang();
+                        spBreakInfo.ResolvedScriptLang = scLang1.GetScriptLang();
                     }
                 }
 
-                lineSegments.AddLineSegment(new MyLineSegment(breakSpan.startAt, breakSpan.len, breakInfo));
+                lineSegments.AddLineSegment(new MyLineSegment(breakSpan.startAt, breakSpan.len, spBreakInfo));
             }
             return lineSegments;
         }

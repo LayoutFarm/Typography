@@ -80,14 +80,13 @@ namespace PixelFarm.Drawing
                 this.FontDescedingPx = currentTypeface.Descender * pointToPixelScale;
                 this.FontLineGapPx = currentTypeface.LineGap * pointToPixelScale;
                 this.FontLineSpacingPx = FontAscendingPx - FontDescedingPx + FontLineGapPx;
-
             }
-
         }
         public override GlyphLayout GlyphLayoutMan
         {
             get
             {
+                //TODO: review here
                 throw new NotSupportedException();
             }
         }
@@ -401,10 +400,10 @@ namespace PixelFarm.Drawing
                     {
                         //
                         ILineSegment line_seg = result[i];
-                        SpanBreakInfo breakInfo = line_seg.SpanBreakInfo;
+                        SpanBreakInfo spBreakInfo = line_seg.SpanBreakInfo;
 
                         TextBufferSpan buff = new TextBufferSpan(textBuffer, line_seg.StartAt, line_seg.Length);
-                        if (breakInfo.RightToLeft)
+                        if (spBreakInfo.RightToLeft)
                         {
                             needRightToLeftArr = true;
                         }
@@ -414,12 +413,12 @@ namespace PixelFarm.Drawing
                         //so we need to ensure that we get a proper typeface,
                         //if not => alternative typeface
 
-                        ushort glyphIndex = curTypeface.GetGlyphIndex(breakInfo.SampleCodePoint);
+                        ushort glyphIndex = curTypeface.GetGlyphIndex(spBreakInfo.SampleCodePoint);
                         if (glyphIndex == 0)
                         {
                             //not found then => find other typeface                    
                             //we need more information about line seg layout
-                            if (_textServices.TryGetAlternativeTypefaceFromChar((char)breakInfo.SampleCodePoint, out Typeface alternative))
+                            if (_textServices.TryGetAlternativeTypefaceFromChar((char)spBreakInfo.SampleCodePoint, out Typeface alternative))
                             {
                                 curTypeface = alternative;
                                 _tmpTypefaces.Add(alternative);
@@ -434,10 +433,10 @@ namespace PixelFarm.Drawing
                             _tmpTypefaces.Add(curTypeface);
                         }
 
-                        _textServices.CurrentScriptLang = (ScriptLang)breakInfo.ResolvedScriptLang;
+                        _textServices.CurrentScriptLang = (ScriptLang)spBreakInfo.ResolvedScriptLang;
 
                         GlyphPlanSequence glyphPlanSeq = _textServices.CreateGlyphPlanSeq(buff, curTypeface, FontSizeInPoints);
-                        glyphPlanSeq.IsRightToLeft = breakInfo.RightToLeft;
+                        glyphPlanSeq.IsRightToLeft = spBreakInfo.RightToLeft;
 
                         _tmpGlyphPlanSeqs.Add(glyphPlanSeq);
 
