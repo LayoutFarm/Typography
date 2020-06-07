@@ -6,6 +6,7 @@
 
 
 using System;
+using Typography.OpenFont;
 
 namespace Typography.TextBreak
 {
@@ -31,7 +32,8 @@ namespace Typography.TextBreak
             public WordKind kind;
         }
 
-        readonly SpanBreakInfo _breakInfo = new SpanBreakInfo(false, 'A', "latin");
+        readonly SpanBreakInfo s_latin = new SpanBreakInfo(false, 'A', ScriptTagDefs.Latin.Tag);
+
         public EngBreakingEngine()
         {
 
@@ -39,7 +41,7 @@ namespace Typography.TextBreak
         internal override void BreakWord(WordVisitor visitor, char[] charBuff, int startAt, int len)
         {
             visitor.State = VisitorState.Parsing;
-            visitor.SpanBreakInfo = _breakInfo;
+            visitor.SpanBreakInfo = s_latin;
 
             DoBreak(visitor, charBuff, startAt, len);
 
@@ -59,7 +61,7 @@ namespace Typography.TextBreak
         //
 
         static void OnBreak(WordVisitor vis, in BreakBounds bb) => vis.AddWordBreak_AndSetCurrentIndex(bb.startIndex + bb.length, bb.kind);
-         
+
 
         static void CollectConsecutiveUnicodeRange(char[] input, ref int start, int len, out SpanBreakInfo spanBreakInfo)
         {
@@ -107,12 +109,11 @@ namespace Typography.TextBreak
             bb.startIndex = start;
 
             bool enableUnicodeRangeBreaker = EnableUnicodeRangeBreaker;
+            bool breakPeroidInTextSpan = BreakPeroidInTextSpan;
 
-
+            visitor.SpanBreakInfo = s_latin;
             const char first = (char)0;
             const char last = (char)255;
-
-            bool breakPeroidInTextSpan = BreakPeroidInTextSpan;
 
             for (int i = start; i < endBefore; ++i)
             {
@@ -186,8 +187,11 @@ namespace Typography.TextBreak
                                         if (bb.length > 0)
                                         {
                                             visitor.SpanBreakInfo = spBreakInfo;
-                                            OnBreak(visitor, bb);
+
+                                            OnBreak(visitor, bb); //flush
+
                                             bb.length = 0;
+                                            visitor.SpanBreakInfo = s_latin;
                                         }
                                         else
                                         {
@@ -330,7 +334,10 @@ namespace Typography.TextBreak
                                     if (bb.length > 0)
                                     {
                                         visitor.SpanBreakInfo = spBreakInfo;
-                                        OnBreak(visitor, bb);
+
+                                        OnBreak(visitor, bb);//flush
+
+                                        visitor.SpanBreakInfo = s_latin;
                                         bb.length = 0;
                                     }
                                     else
@@ -408,7 +415,10 @@ namespace Typography.TextBreak
                                         if (bb.length > 0)
                                         {
                                             visitor.SpanBreakInfo = spBreakInfo;
-                                            OnBreak(visitor, bb);
+
+                                            OnBreak(visitor, bb); //flush
+
+                                            visitor.SpanBreakInfo = s_latin;
                                             bb.length = 0;
                                         }
                                         else

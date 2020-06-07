@@ -5,6 +5,8 @@
 
 
 
+using Typography.OpenFont;
+
 namespace Typography.TextBreak
 {
 
@@ -18,7 +20,7 @@ namespace Typography.TextBreak
         }
         protected override SpanBreakInfo GetSpanBreakInfo()
         {
-            return new SpanBreakInfo(false, FirstChar, "thai");
+            return new SpanBreakInfo(false, FirstChar, ScriptTagDefs.Thai.Tag);
         }
         //
         protected override CustomDic CurrentCustomDic => _customDic;

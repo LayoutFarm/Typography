@@ -10,13 +10,13 @@ namespace Typography.TextBreak
     {
         //TODO: review this again, with AUTOGEN code
 
-        static SpanBreakInfo s_thai = new SpanBreakInfo(false, (char)0x0E00, "thai");
-        static SpanBreakInfo s_loa = new SpanBreakInfo(false, (char)0x0E80, "loa");
+        static SpanBreakInfo s_thai = new SpanBreakInfo(false, (char)0x0E00, ScriptTagDefs.Thai.Tag);
+        static SpanBreakInfo s_lao = new SpanBreakInfo(false, (char)0x0E80, ScriptTagDefs.Lao.Tag);
 
-        static SpanBreakInfo s_arabic = new SpanBreakInfo(true, (char)0x0600, "arab");
-        static SpanBreakInfo s_arabic_supplement = new SpanBreakInfo(true, (char)0x0750, "arab");
-        static SpanBreakInfo s_arabic_presentation_form_a = new SpanBreakInfo(true, (char)0xFB50, "arab");
-        static SpanBreakInfo s_arabic_presentation_form_b = new SpanBreakInfo(true, (char)0xFE70, "arab");
+        static SpanBreakInfo s_arabic = new SpanBreakInfo(true, (char)0x0600, ScriptTagDefs.Arabic.Tag);
+        static SpanBreakInfo s_arabic_supplement = new SpanBreakInfo(true, (char)0x0750, ScriptTagDefs.Arabic.Tag);
+        static SpanBreakInfo s_arabic_presentation_form_a = new SpanBreakInfo(true, (char)0xFB50, ScriptTagDefs.Arabic.Tag);
+        static SpanBreakInfo s_arabic_presentation_form_b = new SpanBreakInfo(true, (char)0xFE70, ScriptTagDefs.Arabic.Tag);
 
         public static bool GetUniCodeRangeFor(char c1, out int startCodePoint, out int endCodePoint, out SpanBreakInfo spanBreakInfo)
         {
@@ -34,7 +34,7 @@ namespace Typography.TextBreak
                     return true;
                 }
             }
-            //Loa
+            //Lao
             {
                 const char s_firstChar = (char)0x0E80;
                 const char s_lastChar = (char)0x0EFF;
@@ -42,7 +42,7 @@ namespace Typography.TextBreak
                 {
                     startCodePoint = s_firstChar;
                     endCodePoint = s_lastChar;
-                    spanBreakInfo = s_loa;
+                    spanBreakInfo = s_lao;
                     return true;
                 }
             }

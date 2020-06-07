@@ -4,6 +4,8 @@
 // License & terms of use: http://www.unicode.org/copyright.html#License
 
 
+using Typography.OpenFont;
+
 namespace Typography.TextBreak
 {
 
@@ -17,7 +19,7 @@ namespace Typography.TextBreak
         }
         protected override SpanBreakInfo GetSpanBreakInfo()
         {
-            return new SpanBreakInfo(false, FirstChar, "lao");
+            return new SpanBreakInfo(false, FirstChar, ScriptTagDefs.Lao.Tag);
         }
         //
         protected override CustomDic CurrentCustomDic => _customDic;

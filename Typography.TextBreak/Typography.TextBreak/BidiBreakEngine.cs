@@ -1,6 +1,7 @@
 ﻿//MIT, 2016-present, WinterDev
 //some code from ICU project with BSD license
 
+using Typography.OpenFont;
 using Typography.TextBreak.SheenBidi;
 
 namespace Typography.TextBreak
@@ -57,7 +58,7 @@ namespace Typography.TextBreak
         public override bool CanHandle(char c) => IsArabicChar(c);
 
         RunAdapter _runAdapter = new RunAdapter();
-        readonly SpanBreakInfo _breakInfo = new SpanBreakInfo(true, 0x0600, "arab");
+        readonly SpanBreakInfo _breakInfo = new SpanBreakInfo(true, 0x0600, ScriptTagDefs.Arabic.Tag);
 
         internal override void BreakWord(WordVisitor visitor, char[] charBuff, int startAt, int len)
         {
@@ -108,7 +109,7 @@ namespace Typography.TextBreak
                 if (rtl)
                 {
                     //temp fix
-                    visitor.AddWordBreak_AndSetCurrentIndex(startAt + sp_len, WordKind.Text); 
+                    visitor.AddWordBreak_AndSetCurrentIndex(startAt + sp_len, WordKind.Text);
                 }
                 else
                 {
