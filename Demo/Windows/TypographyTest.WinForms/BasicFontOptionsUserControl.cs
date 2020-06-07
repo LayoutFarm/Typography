@@ -37,14 +37,23 @@ namespace TypographyTest.WinForms
             SetupFontsList2();
             SetupFontSizeList();
             SetupRenderOptions();
-            //
+
             this.lstFontSizes.SelectedIndex = 0;// lstFontSizes.Items.Count - 3;
             if (lstFontList.SelectedItem is InstalledTypeface instTypeface)
             {
                 _options.InstalledTypeface = instTypeface;
             }
             SetupPositionTechniqueList();
+            chkEnableMultiTypefaces.CheckedChanged += ChkEnableMultiTypefaces_CheckedChanged;
+
         }
+
+        private void ChkEnableMultiTypefaces_CheckedChanged(object sender, EventArgs e)
+        {
+            _options.EnableMultiTypefaces = chkEnableMultiTypefaces.Checked;
+            _options.InvokeAttachEvents();
+        }
+
         void SetupFontList()
         {
 

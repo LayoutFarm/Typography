@@ -42,11 +42,10 @@ namespace TypographyTest
                 (f0, f1) => FontNameDuplicatedDecision.Skip);
 
         }
-        public RenderChoice RenderChoice
-        {
-            get;
-            set;
-        }
+        public RenderChoice RenderChoice { get; set; }
+
+        public bool EnableMultiTypefaces { get; set; }
+
         public void LoadFontList()
         {
             PositionTech = PositionTechnique.OpenFont;
@@ -126,7 +125,8 @@ namespace TypographyTest
         }
         public IEnumerable<InstalledTypeface> GetInstalledTypefaceIter() => _textServices.InstalledFontCollection.GetInstalledFontIter();
         public InstalledTypefaceCollection InstallTypefaceCollection => _textServices.InstalledFontCollection;
-        public void InvokeAttachEvents()
+        
+        public void InvokeAttachEvents()        
         {
             if (TypefaceChanged != null && _typefaceChanged)
             {

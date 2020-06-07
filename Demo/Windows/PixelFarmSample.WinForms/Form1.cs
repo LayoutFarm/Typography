@@ -144,7 +144,7 @@ namespace SampleWinForms
 
             _selectedTextPrinter.HintTechnique = _glyphRenderOptions.HintTechnique;
             _selectedTextPrinter.EnableLigature = _glyphRenderOptions.EnableLigature;
-
+            _selectedTextPrinter.EnableMultiTypefaces = _basicOptions.EnableMultiTypefaces;
             //test print 3 lines
 #if DEBUG
             DynamicOutline.dbugTestNewGridFitting = _contourAnalysisOpts.EnableGridFit;
@@ -305,6 +305,7 @@ namespace SampleWinForms
 
                         _selectedTextPrinter.HintTechnique = _glyphRenderOptions.HintTechnique;
                         _selectedTextPrinter.EnableLigature = _glyphRenderOptions.EnableLigature;
+                        _selectedTextPrinter.EnableMultiTypefaces = _basicOptions.EnableMultiTypefaces;
                         _selectedTextPrinter.SimulateSlant = _contourAnalysisOpts.SimulateSlant;
 
 
@@ -634,7 +635,7 @@ namespace SampleWinForms
                 {
                     //render by glyph index
                     RenderByGlyphIndex(glyphNameListUserControl1.SelectedGlyphIndex);
-                } 
+                }
             };
             //----------------
             //string inputstr = "ก้า";
