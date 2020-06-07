@@ -149,7 +149,15 @@ namespace Typography.TextBreak
         {
             return SelectEngine(c);
         }
-        //
+
+        /// <summary>
+        /// use unicode range breaker 
+        /// </summary>
+        public bool UseUnicodeRangeBreaker
+        {
+            get => _engBreakingEngine.EnableUnicodeRangeBreaker;
+            set => _engBreakingEngine.EnableUnicodeRangeBreaker = value;
+        }
     }
 
 

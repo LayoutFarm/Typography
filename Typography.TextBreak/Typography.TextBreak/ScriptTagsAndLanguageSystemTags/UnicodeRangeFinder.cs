@@ -10,10 +10,19 @@ namespace Typography.TextBreak
     {
         //TODO: review this again, with AUTOGEN code
 
-        public static bool GetUniCodeRangeFor(char c1, out int startCodePoint, out int endCodePoint, out UnicodeLangBits langBits)
+        static SpanBreakInfo s_thai = new SpanBreakInfo(false, (char)0x0E00, "thai");
+        static SpanBreakInfo s_loa = new SpanBreakInfo(false, (char)0x0E80, "loa");
+
+        static SpanBreakInfo s_arabic = new SpanBreakInfo(true, (char)0x0600, "arab");
+        static SpanBreakInfo s_arabic_supplement = new SpanBreakInfo(true, (char)0x0750, "arab");
+        static SpanBreakInfo s_arabic_presentation_form_a = new SpanBreakInfo(true, (char)0xFB50, "arab");
+        static SpanBreakInfo s_arabic_presentation_form_b = new SpanBreakInfo(true, (char)0xFE70, "arab");
+
+        public static bool GetUniCodeRangeFor(char c1, out int startCodePoint, out int endCodePoint, out SpanBreakInfo spanBreakInfo)
         {
             //find proper unicode range (and its lang)
             //Thai
+
             {
                 const char s_firstChar = (char)0x0E00;
                 const char s_lastChar = (char)0xE7F;
@@ -21,7 +30,7 @@ namespace Typography.TextBreak
                 {
                     startCodePoint = s_firstChar;
                     endCodePoint = s_lastChar;
-                    langBits = UnicodeLangBits.Thai;
+                    spanBreakInfo = s_thai;
                     return true;
                 }
             }
@@ -33,8 +42,7 @@ namespace Typography.TextBreak
                 {
                     startCodePoint = s_firstChar;
                     endCodePoint = s_lastChar;
-
-                    langBits = UnicodeLangBits.Lao;
+                    spanBreakInfo = s_loa;
                     return true;
                 }
             }
@@ -47,14 +55,12 @@ namespace Typography.TextBreak
                 //Ottoman Siyaq Numbers(1ED00–1ED4F, 61 characters)
                 //Arabic Mathematical Alphabetic Symbols(1EE00–1EEFF, 143 characters) 
 
-
-
                 if (c1 >= 0x0600 && c1 <= 0x06FF)
                 {
                     //Arabic (0600–06FF, 255 characters)
                     startCodePoint = 0x0600;
                     endCodePoint = 0x06FF;
-                    langBits = UnicodeLangBits.Arabic;
+                    spanBreakInfo = s_arabic;
                     return true;
                 }
                 else if (c1 >= 0x0750 && c1 <= 0x077F)
@@ -62,7 +68,7 @@ namespace Typography.TextBreak
                     //Arabic Supplement(0750–077F, 48 characters)
                     startCodePoint = 0x0750;
                     endCodePoint = 0x077F;
-                    langBits = UnicodeLangBits.Arabic_Supplement;
+                    spanBreakInfo = s_arabic_supplement;
                     return true;
                 }
                 else if (c1 >= 0x8A0 && c1 <= 0x08FF)
@@ -70,7 +76,7 @@ namespace Typography.TextBreak
                     //Arabic Extended-A(08A0–08FF, 84 characters)
                     startCodePoint = 0x8A0;
                     endCodePoint = 0x08FF;
-                    langBits = UnicodeLangBits.Arabic; //???
+                    spanBreakInfo = s_arabic; //TODO: review here
                     return true;
                 }
                 else if (c1 >= 0xFB50 && c1 <= 0xFDFF)
@@ -78,7 +84,7 @@ namespace Typography.TextBreak
                     //Arabic Presentation Forms - A(FB50–FDFF, 611 characters)
                     startCodePoint = 0xFB50;
                     endCodePoint = 0xFDFF;
-                    langBits = UnicodeLangBits.Arabic_Presentation_Forms_A; //???
+                    spanBreakInfo = s_arabic_presentation_form_a; //TODO: review here
                     return true;
                 }
                 else if (c1 >= 0xFE70 && c1 <= 0xFEFF)
@@ -86,14 +92,14 @@ namespace Typography.TextBreak
                     //Arabic Presentation Forms - B(FE70–FEFF, 141 characters)
                     startCodePoint = 0xFE70;
                     endCodePoint = 0xFEFF;
-                    langBits = UnicodeLangBits.Arabic_Presentation_Forms_B; //???
+                    spanBreakInfo = s_arabic_presentation_form_b; //TODO: review here
                     return true;
                 }
                 else
                 {
                     startCodePoint = 0;
                     endCodePoint = 0;
-                    langBits = UnicodeLangBits.Unset;
+                    spanBreakInfo = null;
                     return false;
                 }
             }

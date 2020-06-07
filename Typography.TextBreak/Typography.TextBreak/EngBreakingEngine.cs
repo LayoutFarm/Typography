@@ -5,6 +5,8 @@
 
 
 
+using System;
+
 namespace Typography.TextBreak
 {
     public class EngBreakingEngine : BreakingEngine
@@ -19,11 +21,9 @@ namespace Typography.TextBreak
 
         public bool BreakNumberAfterText { get; set; }
         public bool BreakPeroidInTextSpan { get; set; }
-
         public bool EnableCustomAbbrv { get; set; }
+        public bool EnableUnicodeRangeBreaker { get; set; }
         public CustomAbbrvDic EngCustomAbbrvDic { get; set; }
-
-
         struct BreakBounds
         {
             public int startIndex;
@@ -59,7 +59,33 @@ namespace Typography.TextBreak
         //
 
         static void OnBreak(WordVisitor vis, in BreakBounds bb) => vis.AddWordBreak_AndSetCurrentIndex(bb.startIndex + bb.length, bb.kind);
+         
 
+        static void CollectConsecutiveUnicodeRange(char[] input, ref int start, int len, out SpanBreakInfo spanBreakInfo)
+        {
+
+            char c1 = input[start];
+            if (UnicodeRangeFinder.GetUniCodeRangeFor(c1, out int startCodePoint, out int endCodePoint, out spanBreakInfo))
+            {
+                int lim = start + len;
+                for (int i = start; i < lim; ++i)
+                {
+                    c1 = input[i];
+                    if (c1 < startCodePoint || c1 > endCodePoint)
+                    {
+                        //out of range again
+                        //break here
+                        start = i;
+                        return;
+                    }
+                }
+                start = lim;
+            }
+            else
+            {
+                throw new NotSupportedException();
+            }
+        }
         void DoBreak(WordVisitor visitor, char[] input, int start, int len)
         {
             //----------------------------------------
@@ -80,8 +106,11 @@ namespace Typography.TextBreak
             BreakBounds bb = new BreakBounds();
             bb.startIndex = start;
 
-            char first = (char)0;
-            char last = (char)255;
+            bool enableUnicodeRangeBreaker = EnableUnicodeRangeBreaker;
+
+
+            const char first = (char)0;
+            const char last = (char)255;
 
             bool breakPeroidInTextSpan = BreakPeroidInTextSpan;
 
@@ -127,6 +156,7 @@ namespace Typography.TextBreak
                             }
                             else if (char.IsLetter(c))
                             {
+
                                 if (c < first || c > last)
                                 {
                                     //letter is out-of-range or not 
@@ -134,16 +164,46 @@ namespace Typography.TextBreak
                                     if (i > bb.startIndex)
                                     {
 
-                                        //some remaining data
+                                        //flush
                                         bb.length = i - bb.startIndex;
                                         //
                                         OnBreak(visitor, bb);
                                         bb.startIndex += bb.length;//***
+                                    }
+
+                                    if (enableUnicodeRangeBreaker)
+                                    {
+                                        //collect text until end for specific unicode range eng
+                                        //find a proper unicode engine and collect until end of its range 
+                                        int begin = i; //backup** (debug purpose)
+
+                                        bb.startIndex = i;
+                                        bb.kind = WordKind.Text;
+
+                                        CollectConsecutiveUnicodeRange(input, ref begin, len - i, out SpanBreakInfo spBreakInfo);
+
+                                        bb.length = begin - i;
+                                        if (bb.length > 0)
+                                        {
+                                            visitor.SpanBreakInfo = spBreakInfo;
+                                            OnBreak(visitor, bb);
+                                            bb.length = 0;
+                                        }
+                                        else
+                                        {
+                                            throw new NotSupportedException();///???
+                                        }
+
+                                        i = begin;
 
                                     }
-                                    visitor.State = VisitorState.OutOfRangeChar;
-                                    return;
+                                    else
+                                    {
+                                        visitor.State = VisitorState.OutOfRangeChar;
+                                        return;
+                                    }
                                 }
+
                                 //------------------
                                 //just collect
                                 bb.startIndex = i;
@@ -251,15 +311,40 @@ namespace Typography.TextBreak
                                 {
                                     //some remaining data
                                     bb.length = i - bb.startIndex;
-                                    //
+                                    //flush
                                     OnBreak(visitor, bb);
                                     //
                                     //
                                     //TODO: check if we should set startIndex and length
                                     //      like other 'after' onBreak()
                                 }
-                                visitor.State = VisitorState.OutOfRangeChar;
-                                return;
+
+                                if (enableUnicodeRangeBreaker)
+                                {
+                                    int begin = i;
+                                    bb.startIndex = i;
+                                    bb.kind = WordKind.Text;
+
+                                    CollectConsecutiveUnicodeRange(input, ref begin, len - i, out SpanBreakInfo spBreakInfo);
+                                    bb.length = begin - i;
+                                    if (bb.length > 0)
+                                    {
+                                        visitor.SpanBreakInfo = spBreakInfo;
+                                        OnBreak(visitor, bb);
+                                        bb.length = 0;
+                                    }
+                                    else
+                                    {
+                                        throw new NotSupportedException();///???
+                                    }
+
+                                    i = begin;
+                                }
+                                else
+                                {
+                                    visitor.State = VisitorState.OutOfRangeChar;
+                                    return;
+                                }
                             }
                             else
                             {
@@ -312,8 +397,31 @@ namespace Typography.TextBreak
                                         //TODO: check if we should set startIndex and length
                                         //      like other 'after' onBreak()
                                     }
-                                    visitor.State = VisitorState.OutOfRangeChar;
-                                    return;
+
+                                    if (enableUnicodeRangeBreaker)
+                                    {
+                                        int begin = i;
+                                        bb.startIndex = i;
+                                        bb.kind = WordKind.Text;
+                                        CollectConsecutiveUnicodeRange(input, ref begin, len - i, out SpanBreakInfo spBreakInfo);
+                                        bb.length = begin - i;
+                                        if (bb.length > 0)
+                                        {
+                                            visitor.SpanBreakInfo = spBreakInfo;
+                                            OnBreak(visitor, bb);
+                                            bb.length = 0;
+                                        }
+                                        else
+                                        {
+                                            throw new NotSupportedException();///???
+                                        }
+                                        i = begin;
+                                    }
+                                    else
+                                    {
+                                        visitor.State = VisitorState.OutOfRangeChar;
+                                        return;
+                                    }
                                 }
 
                                 if (is_number && BreakNumberAfterText)

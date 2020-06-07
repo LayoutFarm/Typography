@@ -98,6 +98,7 @@ namespace TextBreakerTest
             var dicProvider = new IcuSimpleTextFileDictionaryProvider() { DataDir = "../../../icu62/brkitr" };
             CustomBreakerBuilder.Setup(dicProvider);
             CustomBreaker breaker1 = CustomBreakerBuilder.NewCustomBreaker();
+            breaker1.UseUnicodeRangeBreaker = true;//when we want to break into a group of consecutive unicode ranges. (this does not use Dictionry breaker)
             breaker1.BreakNumberAfterText = true;
             char[] test = this.textBox1.Text.ToCharArray();
             this.listBox1.Items.Clear();

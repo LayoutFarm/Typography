@@ -14,6 +14,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)LineSegments\ILineSegments.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ScriptTagsAndLanguageSystemTags\ScriptLangInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ScriptTagsAndLanguageSystemTags\UnicodeLangBits.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ScriptTagsAndLanguageSystemTags\UnicodeRangeFinder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SheenBidi\BaseDirection.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SheenBidi\Collections\BidiChain.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SheenBidi\Collections\BidiLink.cs" />
