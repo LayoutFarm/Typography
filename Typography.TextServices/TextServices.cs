@@ -102,10 +102,12 @@ namespace Typography.TextServices
             if (_textBreaker == null)
             {
                 //setup 
-                _textBreaker = Typography.TextBreak.CustomBreakerBuilder.NewCustomBreaker();
-                _textBreaker.SetNewBreakHandler(vis => _breakSpans.Add(vis.GetBreakSpan()));
-                
+                _textBreaker = Typography.TextBreak.CustomBreakerBuilder.NewCustomBreaker();                
+                _textBreaker.SetNewBreakHandler(vis => _breakSpans.Add(vis.GetBreakSpan()));                
             }
+
+            
+            _textBreaker.UseUnicodeRangeBreaker = true;
 
             _breakSpans.Clear();
             //
