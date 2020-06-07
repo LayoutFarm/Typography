@@ -452,7 +452,7 @@ namespace PixelFarm.Drawing
                 {
                     if (!Typography.OpenFont.ScriptLangs.TryGetScriptLang((char)spBreakInfo.SampleCodePoint, out ScriptLangInfo scLang1))
                     {
-
+                        spBreakInfo.ResolvedScriptLang = new ScriptLang(spBreakInfo.ScriptTag);
                     }
                     else
                     {

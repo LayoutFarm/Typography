@@ -267,10 +267,17 @@ namespace Typography.TextLayout
             get => _scriptLang;
             set
             {
+#if DEBUG
+                if (value == null)
+                {
+                    throw new NotSupportedException();
+                }
+#endif
                 if (_scriptLang != value)
                 {
                     _needPlanUpdate = true;
-                }
+                } 
+
                 _scriptLang = value;
             }
         }
@@ -290,8 +297,6 @@ namespace Typography.TextLayout
                 }
             }
         }
-
-
 
 
         public delegate ushort GlyphNotFoundHandler(GlyphLayout glyphLayout, int codepoint, int nextcodepoint);

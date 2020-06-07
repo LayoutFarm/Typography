@@ -24,15 +24,15 @@ namespace Typography.TextBreak
 
     public class SpanBreakInfo
     {
-        public SpanBreakInfo(bool isRightToLeft, int sampleCodePoint, string scriptLang)
+        public SpanBreakInfo(bool isRightToLeft, int sampleCodePoint, string scriptTag)
         {
             RightToLeft = isRightToLeft;
             SampleCodePoint = sampleCodePoint;
-            ScriptLang = scriptLang;
+            ScriptTag = scriptTag;
         }
         public int SampleCodePoint { get; }
         public bool RightToLeft { get; }
-        public string ScriptLang { get; }
+        public string ScriptTag { get; }
         public object ResolvedScriptLang { get; set; }
     }
 
