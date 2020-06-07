@@ -1,26 +1,6 @@
-﻿//MIT, 2016-present, WinterDev
-//some code from ICU project with BSD license
-
+﻿//MIT, 2020, WinterDev
 namespace Typography.TextBreak
 {
-
-
-
-    public enum WordKind : byte
-    {
-        Unknown,
-        //
-        Whitespace,
-        NewLine,
-        Number,
-        Punc,
-        Control,
-
-        SurrogatePair,
-        TextIncomplete,
-        Text,
-    }
-
     public struct BreakAtInfo
     {
         public readonly int breakAt;
@@ -37,5 +17,4 @@ namespace Typography.TextBreak
         }
 #endif
     }
-
 }

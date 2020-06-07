@@ -25,10 +25,10 @@ namespace Typography.TextBreak
     public class WordVisitor
     {
 
-#if DEBUG
-        List<BreakAtInfo> dbugBreakAtList = new List<BreakAtInfo>();
-        bool dbugCollectBreakAtList;
-#endif
+//#if DEBUG
+//        List<BreakAtInfo> dbugBreakAtList = new List<BreakAtInfo>();
+//        bool dbugCollectBreakAtList;
+//#endif
         char[] _buffer;
 
         int _startIndex;
@@ -69,9 +69,9 @@ namespace Typography.TextBreak
             _tempCandidateBreaks.Clear();
             _latestBreakAt = 0;
 
-#if DEBUG
-            dbugBreakAtList.Clear();
-#endif
+//#if DEBUG
+//            dbugBreakAtList.Clear();
+//#endif
         }
 
 
@@ -114,13 +114,13 @@ namespace Typography.TextBreak
             _latestBreakAt = index;//**
 
             _newWordBreakHandler(this);
-#if DEBUG
-            if (dbugCollectBreakAtList)
-            {
-                dbugBreakAtList.Add(new BreakAtInfo(index, wordKind));
-            }
+//#if DEBUG
+//            if (dbugCollectBreakAtList)
+//            {
+//                dbugBreakAtList.Add(new BreakAtInfo(index, wordKind));
+//            }
 
-#endif
+//#endif
         }
         internal void AddWordBreakAtCurrentIndex(WordKind wordKind = WordKind.Text)
         {
