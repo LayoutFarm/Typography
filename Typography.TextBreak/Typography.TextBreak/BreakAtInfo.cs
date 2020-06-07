@@ -4,8 +4,8 @@
 namespace Typography.TextBreak
 {
 
-    
-   
+
+
     public enum WordKind : byte
     {
         Unknown,
@@ -14,12 +14,13 @@ namespace Typography.TextBreak
         NewLine,
         Number,
         Punc,
-        //
-        Text,
-        TextIncomplete,
         Control,
+
         SurrogatePair,
+        TextIncomplete,
+        Text,
     }
+
     public struct BreakAtInfo
     {
         public readonly int breakAt;

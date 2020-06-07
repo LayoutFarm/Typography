@@ -38,7 +38,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)SheenBidi\RunAgent.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SheenBidi\Text\UnicodeAgent.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SheenBidi\Text\UnicodeLocator.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)BreakBounds.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BreakAtInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BreakingEngine.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CustomBreaker.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CustomBreakerBuilder.cs" />
