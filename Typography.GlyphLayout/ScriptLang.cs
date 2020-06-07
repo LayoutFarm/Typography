@@ -3,7 +3,7 @@ using System;
 namespace Typography.OpenFont
 {
     /// <summary>
-    /// script tag and syslang tag request for GSUB, GPOS
+    /// script tag and lang_feature tag request for GSUB, GPOS
     /// </summary>
     public struct ScriptLang
     {
@@ -29,7 +29,7 @@ namespace Typography.OpenFont
 #if DEBUG
         public override string ToString()
         {
-            return TagToString(this.scriptTag) + ":" + TagToString(scriptTag);
+            return TagToString(this.scriptTag) + ":" + TagToString(sysLangTag);
         }
 #endif
         public bool IsEmpty() => scriptTag == 0 && sysLangTag == 0;

@@ -58,7 +58,7 @@ namespace Typography.OpenFont
 #endif
     }
 
-    
+
     public class LangSys
     {
         public string Name { get; }
@@ -741,17 +741,59 @@ namespace Typography.OpenFont
     Zazaki_ZZA = _("Zazaki", "ZZA", "zza");
     }
 
+    static class TagUtils
+    {
+        static byte GetByte(char c)
+        {
+            if (c >= 0 && c < 256)
+            {
+                return (byte)c;
+            }
+            return 0;
+        }
+        public static uint StringToTag(string str)
+        {
+            if (string.IsNullOrEmpty(str) || str.Length != 4)
+            {
+                return 0;
+            }
 
+            char[] buff = str.ToCharArray();
+            byte b0 = GetByte(buff[0]);
+            byte b1 = GetByte(buff[1]);
+            byte b2 = GetByte(buff[2]);
+            byte b3 = GetByte(buff[3]);
+
+            return (uint)((b0 << 24) | (b1 << 16) | (b2 << 8) | b3);
+        }
+
+        public static string TagToString(uint tag)
+        {
+            byte[] bytes = BitConverter.GetBytes(tag);
+            Array.Reverse(bytes);
+            return System.Text.Encoding.UTF8.GetString(bytes, 0, bytes.Length);
+        }
+    }
 
     public class ScriptTagDef
     {
-        public string Tag { get; }
+        public uint Tag { get; }
         public string Name { get; }
         public ScriptTagDef(string tag, string name)
         {
-            Tag = tag;
+#if DEBUG
+            dbugTagAsString = tag;
+#endif
+
+            Tag = TagUtils.StringToTag(tag);
             Name = name;
         }
+#if DEBUG
+        public string dbugTagAsString { get; set; }
+        public override string ToString() => dbugTagAsString;
+#endif
+
+
     }
 
     public static partial class ScriptTagDefs
@@ -954,7 +996,7 @@ Zanabazar_Square__Zanabazarin_Dörböljin_Useg__Xewtee_Dörböljin_Bicig__Horizo
     }
 
 
-   
+
 
     public partial class ScriptLangs
     {
@@ -964,7 +1006,7 @@ Zanabazar_Square__Zanabazarin_Dörböljin_Useg__Xewtee_Dörböljin_Bicig__Horizo
         readonly static Dictionary<string, int> s_registerNames = new Dictionary<string, int>();
         readonly static Dictionary<string, ScriptLangInfo> s_registeredScriptTags = new Dictionary<string, ScriptLangInfo>();
         readonly static Dictionary<string, ScriptLangInfo> s_registerScriptFromFullNames = new Dictionary<string, ScriptLangInfo>();
-        readonly static SortedList<int, UnicodeRangeMapWithScriptLang> s_unicodeLangToScriptLang = new SortedList<int, UnicodeRangeMapWithScriptLang>();
+        readonly static List<UnicodeRangeMapWithScriptLang> s_unicodeLangToScriptLang = new List<UnicodeRangeMapWithScriptLang>();
 
         readonly static Dictionary<string, UnicodeLangBits[]> s_registeredScriptTagsToUnicodeLangBits = new Dictionary<string, UnicodeLangBits[]>();
 
@@ -1015,21 +1057,14 @@ Zanabazar_Square__Zanabazarin_Dörböljin_Useg__Xewtee_Dörböljin_Bicig__Horizo
                 for (int i = langBits.Length - 1; i >= 0; --i)
                 {
                     UnicodeRangeInfo unicodeRange = langBits[i].ToUnicodeRangeInfo();
-                    if (!s_unicodeLangToScriptLang.ContainsKey(unicodeRange.StartAt))
-                    {
-                        s_unicodeLangToScriptLang.Add(unicodeRange.StartAt, new UnicodeRangeMapWithScriptLang(langBits[i], scriptLang));
-                    }
-                    else
-                    {
-
-                    }
+                    s_unicodeLangToScriptLang.Add(new UnicodeRangeMapWithScriptLang(langBits[i], scriptLang));
                 }
 
 
                 if (langBits.Length > 0)
                 {
                     s_registeredScriptTagsToUnicodeLangBits.Add(shortname, langBits);
-                } 
+                }
                 return scriptLang;
             }
         }
@@ -1039,27 +1074,23 @@ Zanabazar_Square__Zanabazarin_Dörböljin_Useg__Xewtee_Dörböljin_Bicig__Horizo
         }
         public static bool TryGetScriptLang(char c, out ScriptLangInfo scLang)
         {
-            foreach (var kp in s_unicodeLangToScriptLang)
-            {
-                if (kp.Key > c)
-                {
-                    scLang = null;
-                    return false;
-                }
-                else
-                {
-                    if (kp.Value.IsInRange(c))
-                    {
-                        //found
-                        scLang = kp.Value.scLang;
-                        return true;
-                    }
-                }
-            }
+            return UnicodeRangeFinder.GetUniCodeRangeFor(c, out var _, out var _, out scLang);
+            //foreach (var v in s_unicodeLangToScriptLang)
+            //{
 
-            scLang = null;
-            return false;
+            //    if (v.IsInRange(c))
+            //    {
+            //        //found
+            //        scLang = v.scLang;
+            //        return true;
+            //    }
+
+            //}
+
+            //scLang = null;
+            //return false;
         }
+
 
         public static ScriptLangInfo GetRegisteredScriptLang(string shortname)
         {
@@ -1080,6 +1111,273 @@ Zanabazar_Square__Zanabazarin_Dörböljin_Useg__Xewtee_Dörböljin_Bicig__Horizo
         }
 
     }
+
+    static class UnicodeRangeFinder
+    {
+        //TODO: review this again, with AUTOGEN code
+        static ScriptLangInfo s_latin = new ScriptLangInfo(ScriptTagDefs.Latin.Name, TagUtils.TagToString(ScriptTagDefs.Latin.Tag))
+        {
+            unicodeLangs = new UnicodeLangBits[] { UnicodeLangBits.Basic_Latin,
+            UnicodeLangBits.Latin_1_Supplement,
+            UnicodeLangBits.Latin_Extended_A,
+            UnicodeLangBits.Latin_Extended_Additional,
+            UnicodeLangBits.Latin_Extended_B,
+            UnicodeLangBits.Latin_Extended_C,
+            UnicodeLangBits.Latin_Extended_D,
+
+            }
+        };
+        static ScriptLangInfo s_thai = new ScriptLangInfo(ScriptTagDefs.Thai.Name, TagUtils.TagToString(ScriptTagDefs.Thai.Tag))
+        {
+            unicodeLangs = new UnicodeLangBits[] { UnicodeLangBits.Thai }
+        };
+        static ScriptLangInfo s_lao = new ScriptLangInfo(ScriptTagDefs.Lao.Name, TagUtils.TagToString(ScriptTagDefs.Lao.Tag))
+        {
+            unicodeLangs = new UnicodeLangBits[] { UnicodeLangBits.Lao }
+        };
+
+        static ScriptLangInfo s_arabic = new ScriptLangInfo(ScriptTagDefs.Arabic.Name, TagUtils.TagToString(ScriptTagDefs.Arabic.Tag))
+        {
+            unicodeLangs = new UnicodeLangBits[] { UnicodeLangBits.Arabic }
+        };
+        static ScriptLangInfo s_arabic_supplement = new ScriptLangInfo(ScriptTagDefs.Arabic.Name, TagUtils.TagToString(ScriptTagDefs.Arabic.Tag))
+        {
+            unicodeLangs = new UnicodeLangBits[] { UnicodeLangBits.Arabic_Supplement }
+        };
+        static ScriptLangInfo s_arabic_presentation_form_a = new ScriptLangInfo(ScriptTagDefs.Arabic.Name, TagUtils.TagToString(ScriptTagDefs.Arabic.Tag))
+        {
+            unicodeLangs = new UnicodeLangBits[] { UnicodeLangBits.Arabic_Presentation_Forms_A }
+
+        };
+        static ScriptLangInfo s_arabic_presentation_form_b = new ScriptLangInfo(ScriptTagDefs.Arabic.Name, TagUtils.TagToString(ScriptTagDefs.Arabic.Tag))
+        {
+            unicodeLangs = new UnicodeLangBits[] { UnicodeLangBits.Arabic_Presentation_Forms_B }
+        };
+
+
+        static ScriptLangInfo s_hana = new ScriptLangInfo(ScriptTagDefs.Katakana.Name, TagUtils.TagToString(ScriptTagDefs.Katakana.Tag))
+        {
+            unicodeLangs = new UnicodeLangBits[] { UnicodeLangBits.Katakana, UnicodeLangBits.Hiragana }
+        };
+        static ScriptLangInfo s_hangul = new ScriptLangInfo(ScriptTagDefs.Hangul.Name, TagUtils.TagToString(ScriptTagDefs.Hangul.Tag))
+        {
+            unicodeLangs = new UnicodeLangBits[] { UnicodeLangBits.Hangul_Jamo }
+        };
+        static ScriptLangInfo s_hangul_jumo = new ScriptLangInfo(ScriptTagDefs.Hangul_Jamo.Name, TagUtils.TagToString(ScriptTagDefs.Hangul_Jamo.Tag))
+        {
+            unicodeLangs = new UnicodeLangBits[] { UnicodeLangBits.Hangul_Jamo }
+        };
+        static ScriptLangInfo s_hani = new ScriptLangInfo(ScriptTagDefs.CJK_Ideographic.Name, TagUtils.TagToString(ScriptTagDefs.CJK_Ideographic.Tag))
+        {
+            unicodeLangs = new UnicodeLangBits[]
+            {
+                UnicodeLangBits.CJK_Compatibility,
+                UnicodeLangBits.CJK_Compatibility_Forms,
+                UnicodeLangBits.CJK_Compatibility_Ideographs,
+                UnicodeLangBits.CJK_Compatibility_Ideographs_Supplement,
+                UnicodeLangBits.CJK_Radicals_Supplement,
+
+                UnicodeLangBits.CJK_Strokes,
+                UnicodeLangBits.CJK_Symbols_And_Punctuation,
+                UnicodeLangBits.CJK_Unified_Ideographs,
+                UnicodeLangBits.CJK_Unified_Ideographs_Extension_A,
+                UnicodeLangBits.CJK_Unified_Ideographs_Extension_B,
+            }
+        };
+
+        //CJK_Symbols_And_Punctuation = (48L << 32) | (0x3000 << 16) | 0x303F,   
+        //Enclosed_CJK_Letters_And_Months = (54L << 32) | (0x3200 << 16) | 0x32FF,
+        //CJK_Compatibility = (55L << 32) | (0x3300 << 16) | 0x33FF, 
+        //CJK_Unified_Ideographs = (59L << 32) | (0x4E00 << 16) | 0x9FFF,
+        //CJK_Radicals_Supplement = (59L << 32) | (0x2E80 << 16) | 0x2EFF, 
+        //Ideographic_Description_Characters = (59L << 32) | (0x2FF0 << 16) | 0x2FFF,
+        //CJK_Unified_Ideographs_Extension_A = (59L << 32) | (0x3400 << 16) | 0x4DBF,
+        //CJK_Unified_Ideographs_Extension_B = (59L << 32) | (0x20000 << 16) | 0x2A6DF, 
+        //CJK_Strokes = (61L << 32) | (0x31C0 << 16) | 0x31EF,
+        //CJK_Compatibility_Ideographs = (61L << 32) | (0xF900 << 16) | 0xFAFF,
+        //CJK_Compatibility_Ideographs_Supplement = (61L << 32) | (0x2F800 << 16) | 0x2FA1F,        
+        //CJK_Compatibility_Forms = (65L << 32) | (0xFE30 << 16) | 0xFE4F,
+
+        readonly static int[] cjk_pairs = new[]
+        {   0x3000,0x303F,
+            0x3200,0x32FF,
+            0x3300,0x33FF,
+            0x4E00,0x9FFF,
+            0x2E80,0x2EFF,
+            0x2FF0,0x2FFF,
+            0x3400,0x4DBF,
+            0x20000,0x2A6DF,
+            0x31C0,0x31EF,
+            0xF900,0xFAFF,
+            0x2F800,0x2FA1F,
+            0xFE30,0xFE4F
+        };
+
+        public static bool GetUniCodeRangeFor(char c1, out int startCodePoint, out int endCodePoint, out ScriptLangInfo spanBreakInfo)
+        {
+            //find proper unicode range (and its lang)
+            //Thai
+            //TODO: review this again, with AUTOGEN code
+            {
+
+                if (c1 >= 0 && c1 < 255)
+                {
+                    startCodePoint = 0;
+                    endCodePoint = 255;
+                    spanBreakInfo = s_latin;
+                    return true;
+                }
+            }
+            {
+                const char s_firstChar = (char)0x0E00;
+                const char s_lastChar = (char)0xE7F;
+                if (c1 >= s_firstChar && c1 <= s_lastChar)
+                {
+                    startCodePoint = s_firstChar;
+                    endCodePoint = s_lastChar;
+                    spanBreakInfo = s_thai;
+                    return true;
+                }
+            }
+            //Lao
+            {
+                const char s_firstChar = (char)0x0E80;
+                const char s_lastChar = (char)0x0EFF;
+                if (c1 >= s_firstChar && c1 <= s_lastChar)
+                {
+                    startCodePoint = s_firstChar;
+                    endCodePoint = s_lastChar;
+                    spanBreakInfo = s_lao;
+                    return true;
+                }
+            }
+
+
+            {
+                //Katakana
+                const char s_firstChar = (char)0x3040;
+                const char s_lastChar = (char)0x30FF;
+                if (c1 >= s_firstChar && c1 <= s_lastChar)
+                {
+                    startCodePoint = s_firstChar;
+                    endCodePoint = s_lastChar;
+                    spanBreakInfo = s_hana;
+                    return true;
+                }
+                //CJK_Symbols_And_Punctuation = (48L << 32) | (0x3000 << 16) | 0x303F,
+                //Hiragana = (49L << 32) | (0x3040 << 16) | 0x309F,
+                //Katakana = (50L << 32) | (0x30A0 << 16) | 0x30FF,
+                //Katakana_Phonetic_Extensions = (50L << 32) | (0x31F0 << 16) | 0x31FF, 
+            }
+            {
+                //Hangul_Syllables
+                const char s_firstChar = (char)0xAC00;
+                const char s_lastChar = (char)0xD7AF;
+                if (c1 >= s_firstChar && c1 <= s_lastChar)
+                {//Hangul_Syllables = (56L << 32) | (0xAC00 << 16) | 0xD7AF,
+                    startCodePoint = s_firstChar;
+                    endCodePoint = s_lastChar;
+                    spanBreakInfo = s_hangul;
+                    return true;
+                }
+                else if (c1 >= 0x3130 && c1 <= 0x318F)
+                {
+                    //Hangul_Compatibility_Jamo = (52L << 32) | (0x3130 << 16) | 0x318F,
+                    startCodePoint = 0x3130;
+                    endCodePoint = 0x318F;
+                    spanBreakInfo = s_hangul;
+                    return true;
+                }
+            }
+
+            {
+                //Hangul_Compatibility_Jamo = (52L << 32) | (0x3130 << 16) | 0x318F,
+                const char s_firstChar = (char)0x3130;
+                const char s_lastChar = (char)0x318F;
+                if (c1 >= s_firstChar && c1 <= s_lastChar)
+                {
+                    startCodePoint = s_firstChar;
+                    endCodePoint = s_lastChar;
+                    spanBreakInfo = s_hangul_jumo;
+                    return true;
+                }
+            }
+            {
+                //cjk
+                for (int i = 0; i < cjk_pairs.Length; i += 2)
+                {
+                    int s_firstChar = cjk_pairs[i];
+                    int s_lastChar = cjk_pairs[i + 1];
+
+                    if (c1 >= s_firstChar && c1 <= s_lastChar)
+                    {
+                        startCodePoint = s_firstChar;
+                        endCodePoint = s_lastChar;
+                        spanBreakInfo = s_hani;
+                        return true;
+                    }
+                }
+            }
+
+            {
+                //https://en.wikipedia.org/wiki/Arabic_script_in_Unicode             
+
+                //Rumi Numeral Symbols(10E60–10E7F, 31 characters)
+                //Indic Siyaq Numbers(1EC70–1ECBF, 68 characters)
+                //Ottoman Siyaq Numbers(1ED00–1ED4F, 61 characters)
+                //Arabic Mathematical Alphabetic Symbols(1EE00–1EEFF, 143 characters) 
+
+                if (c1 >= 0x0600 && c1 <= 0x06FF)
+                {
+                    //Arabic (0600–06FF, 255 characters)
+                    startCodePoint = 0x0600;
+                    endCodePoint = 0x06FF;
+                    spanBreakInfo = s_arabic;
+                    return true;
+                }
+                else if (c1 >= 0x0750 && c1 <= 0x077F)
+                {
+                    //Arabic Supplement(0750–077F, 48 characters)
+                    startCodePoint = 0x0750;
+                    endCodePoint = 0x077F;
+                    spanBreakInfo = s_arabic_supplement;
+                    return true;
+                }
+                else if (c1 >= 0x8A0 && c1 <= 0x08FF)
+                {
+                    //Arabic Extended-A(08A0–08FF, 84 characters)
+                    startCodePoint = 0x8A0;
+                    endCodePoint = 0x08FF;
+                    spanBreakInfo = s_arabic; //TODO: review here
+                    return true;
+                }
+                else if (c1 >= 0xFB50 && c1 <= 0xFDFF)
+                {
+                    //Arabic Presentation Forms - A(FB50–FDFF, 611 characters)
+                    startCodePoint = 0xFB50;
+                    endCodePoint = 0xFDFF;
+                    spanBreakInfo = s_arabic_presentation_form_a; //TODO: review here
+                    return true;
+                }
+                else if (c1 >= 0xFE70 && c1 <= 0xFEFF)
+                {
+                    //Arabic Presentation Forms - B(FE70–FEFF, 141 characters)
+                    startCodePoint = 0xFE70;
+                    endCodePoint = 0xFEFF;
+                    spanBreakInfo = s_arabic_presentation_form_b; //TODO: review here
+                    return true;
+                }
+                else
+                {
+                    startCodePoint = 0;
+                    endCodePoint = 0;
+                    spanBreakInfo = null;
+                    return false;
+                }
+            }
+        }
+    }
+
     partial class ScriptLangs
     {
         //
@@ -1118,8 +1416,14 @@ Zanabazar_Square__Zanabazarin_Dörböljin_Useg__Xewtee_Dörböljin_Bicig__Horizo
             UnicodeLangBits.CJK_Compatibility_Forms,
             UnicodeLangBits.CJK_Compatibility_Ideographs,
             UnicodeLangBits.CJK_Compatibility_Ideographs_Supplement,
-            UnicodeLangBits.CJK_Radicals_Supplement
+            UnicodeLangBits.CJK_Unified_Ideographs_Extension_A,
+            UnicodeLangBits.CJK_Unified_Ideographs_Extension_B,
+            UnicodeLangBits.CJK_Radicals_Supplement,
+            UnicodeLangBits.CJK_Strokes,
+            UnicodeLangBits.CJK_Symbols_And_Punctuation
             ),
+
+
         Coptic = _("Coptic", "copt", UnicodeLangBits.Coptic),
         Cypriot_Syllabary = _("Cypriot Syllabary", "cprt", UnicodeLangBits.Cypriot_Syllabary),
         Cyrillic = _("Cyrillic", "cyrl", UnicodeLangBits.Cyrillic, UnicodeLangBits.Cyrillic_Extended_A, UnicodeLangBits.Cyrillic_Extended_B),
@@ -1144,7 +1448,7 @@ Zanabazar_Square__Zanabazarin_Dörböljin_Useg__Xewtee_Dörböljin_Bicig__Horizo
         Gurmukhi = _("Gurmukhi", "guru", UnicodeLangBits.Gurmukhi),
         Gurmukhi_v_2 = _("Gurmukhi v.2", "gur2", UnicodeLangBits.Gurmukhi),
         //// 
-        Hangul = _("Hangul", "hang", UnicodeLangBits.Hangul_Syllables),
+        Hangul = _("Hangul", "hang", UnicodeLangBits.Hangul_Jamo),
         Hangul_Jamo = _("Hangul Jamo", "jamo", UnicodeLangBits.Hangul_Jamo),
         Hanunoo = _("Hanunoo", "hano", UnicodeLangBits.Hanunoo),
         Hatran = _("Hatran", "hatr"),
@@ -1274,7 +1578,17 @@ Zanabazar_Square__Zanabazarin_Dörböljin_Useg__Xewtee_Dörböljin_Bicig__Horizo
         //
         ;
 
+        static ScriptLangs()
+        {
+            s_unicodeLangToScriptLang.Sort((a, b) =>
+            {
+                uint a_start = (uint)((uint)(a.unicodeRangeBits) >> 16);
+                uint b_start = (uint)((uint)(b.unicodeRangeBits) >> 16);
 
+                return a_start.CompareTo(b_start);
+
+            });
+        }
     }
 
 

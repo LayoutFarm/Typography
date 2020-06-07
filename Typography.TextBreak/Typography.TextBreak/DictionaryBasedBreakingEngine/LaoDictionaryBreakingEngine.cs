@@ -19,7 +19,7 @@ namespace Typography.TextBreak
         }
         protected override SpanBreakInfo GetSpanBreakInfo()
         {
-            return new SpanBreakInfo(false, FirstChar, ScriptTagDefs.Lao.Tag);
+            return new SpanBreakInfo(false, ScriptTagDefs.Lao.Tag);
         }
         //
         protected override CustomDic CurrentCustomDic => _customDic;
