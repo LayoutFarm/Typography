@@ -384,9 +384,9 @@ namespace PixelFarm.Drawing
             else
             {
                 //a single string may be broken into many glyph-plan-seq
-                using (ILineSegmentList result = _textServices.BreakToLineSegments(buffSpan))
+                using (ILineSegmentList segments = _textServices.BreakToLineSegments(buffSpan))
                 {
-                    int count = result.Count;
+                    int count = segments.Count;
 
                     _tmpGlyphPlanSeqs.Clear();
                     _tmpTypefaces.Clear();
@@ -399,7 +399,7 @@ namespace PixelFarm.Drawing
                     for (int i = 0; i < count; ++i)
                     {
                         //
-                        ILineSegment line_seg = result[i];
+                        ILineSegment line_seg = segments[i];
                         SpanBreakInfo spBreakInfo = line_seg.SpanBreakInfo;
 
                         TextBufferSpan buff = new TextBufferSpan(textBuffer, line_seg.StartAt, line_seg.Length);
@@ -413,12 +413,13 @@ namespace PixelFarm.Drawing
                         //so we need to ensure that we get a proper typeface,
                         //if not => alternative typeface
 
-                        ushort glyphIndex = curTypeface.GetGlyphIndex(spBreakInfo.SampleCodePoint);
+                        char sample_char = textBuffer[line_seg.StartAt];
+                        ushort glyphIndex = curTypeface.GetGlyphIndex(sample_char);
                         if (glyphIndex == 0)
                         {
                             //not found then => find other typeface                    
                             //we need more information about line seg layout
-                            if (_textServices.TryGetAlternativeTypefaceFromChar((char)spBreakInfo.SampleCodePoint, out Typeface alternative))
+                            if (_textServices.TryGetAlternativeTypefaceFromChar(sample_char, out Typeface alternative))
                             {
                                 curTypeface = alternative;
                                 _tmpTypefaces.Add(alternative);
@@ -426,6 +427,13 @@ namespace PixelFarm.Drawing
                             else
                             {
                                 _tmpTypefaces.Add(curTypeface);
+#if DEBUG
+                                if (sample_char >= 0 && sample_char < 255)
+                                {
+
+
+                                }
+#endif 
                             }
                         }
                         else
@@ -433,7 +441,7 @@ namespace PixelFarm.Drawing
                             _tmpTypefaces.Add(curTypeface);
                         }
 
-                        _textServices.CurrentScriptLang = (ScriptLang)spBreakInfo.ResolvedScriptLang;
+                        _textServices.CurrentScriptLang = new ScriptLang(spBreakInfo.ScriptTag, spBreakInfo.LangTag);
 
                         GlyphPlanSequence glyphPlanSeq = _textServices.CreateGlyphPlanSeq(buff, curTypeface, FontSizeInPoints);
                         glyphPlanSeq.IsRightToLeft = spBreakInfo.RightToLeft;

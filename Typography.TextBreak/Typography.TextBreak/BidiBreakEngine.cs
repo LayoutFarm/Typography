@@ -58,7 +58,7 @@ namespace Typography.TextBreak
         public override bool CanHandle(char c) => IsArabicChar(c);
 
         RunAdapter _runAdapter = new RunAdapter();
-        readonly SpanBreakInfo _breakInfo = new SpanBreakInfo(true, 0x0600, ScriptTagDefs.Arabic.Tag);
+        readonly SpanBreakInfo _breakInfo = new SpanBreakInfo(true, ScriptTagDefs.Arabic.Tag);
 
         internal override void BreakWord(WordVisitor visitor, char[] charBuff, int startAt, int len)
         {

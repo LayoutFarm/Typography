@@ -18,14 +18,12 @@ namespace Typography.TextLayout
 
         readonly GPOS _gposTable;
         internal List<GPOS.LookupTable> _lookupTables;
-
-        readonly uint _langTagCode;
-
-        public GlyphSetPosition(Typeface typeface, string scriptTag, string langTag)
+         
+        public GlyphSetPosition(Typeface typeface, uint scriptTag, uint langTag)
         {
             this.ScriptTag = scriptTag; //script tag
             this.LangTag = langTag; //lang tag
-            _langTagCode = TagUtils.StringToTag(langTag);
+             
 
             //check if this lang has 
             _gposTable = typeface.GPOSTable;
@@ -40,12 +38,12 @@ namespace Typography.TextLayout
             ScriptTable.LangSysTable selectedLang = scriptTable.defaultLang;
             if (selectedLang == null) return; //no default
 
-            if (_langTagCode != 0 && scriptTable.langSysTables != null)//use default
+            if (LangTag != 0 && scriptTable.langSysTables != null)//use default
             {
                 //find matching lang
                 for (int i = 0; i < scriptTable.langSysTables.Length; ++i)
                 {
-                    if (scriptTable.langSysTables[i].langSysTagIden == _langTagCode)
+                    if (scriptTable.langSysTables[i].langSysTagIden == LangTag)
                     {
                         //found
                         selectedLang = scriptTable.langSysTables[i];
@@ -102,8 +100,8 @@ namespace Typography.TextLayout
                 }
             }
         }
-        public string ScriptTag { get; }
-        public string LangTag { get; }
+        public uint ScriptTag { get; }
+        public uint LangTag { get; }
         public void DoGlyphPosition(IGlyphPositions glyphPositions)
         {
             //early exit if no lookup tables

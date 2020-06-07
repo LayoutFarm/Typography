@@ -167,7 +167,7 @@ namespace TypographyTest.WinForms
             foreach (var kv in dic)
             {
                 ScriptLang s = kv.Value;
-                if (s.sysLangTag != "" && LanguageSystemNames.TryGetLangSystem(s.sysLangTag, out LangSys found))
+                if (s.sysLangTag != 0 && LanguageSystemNames.TryGetLangSystem(s.GetScriptTagString(), out LangSys found))
                 {
 
                 }
@@ -217,7 +217,7 @@ namespace TypographyTest.WinForms
 
             //for debug, set default script lang here
             _options.ScriptLang = new ScriptLang(ScriptTagDefs.Latin.Tag);
-            
+
             //list only scripts that are support by current typeface 
             //show all scripts
             ////

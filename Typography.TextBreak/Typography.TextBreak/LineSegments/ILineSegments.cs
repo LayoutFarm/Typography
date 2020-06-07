@@ -24,16 +24,22 @@ namespace Typography.TextBreak
 
     public class SpanBreakInfo
     {
-        public SpanBreakInfo(bool isRightToLeft, int sampleCodePoint, string scriptTag)
+        public SpanBreakInfo(bool isRightToLeft, uint scriptTag, uint langTag = 0)
         {
             RightToLeft = isRightToLeft;
-            SampleCodePoint = sampleCodePoint;
             ScriptTag = scriptTag;
+            LangTag = 0;
         }
-        public int SampleCodePoint { get; }
         public bool RightToLeft { get; }
-        public string ScriptTag { get; }
-        public object ResolvedScriptLang { get; set; }
+        public uint ScriptTag { get; }
+        public uint LangTag { get; }
+
+#if DEBUG
+        public override string ToString()
+        {
+            return Typography.OpenFont.TagUtils.TagToString(ScriptTag) + ":" + Typography.OpenFont.TagUtils.TagToString(LangTag);
+        }
+#endif
     }
 
 

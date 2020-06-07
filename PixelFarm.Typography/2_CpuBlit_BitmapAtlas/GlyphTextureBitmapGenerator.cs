@@ -43,7 +43,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             for (int i = 0; i < j; ++i)
             {
                 GlyphTextureBuildDetail detail = details[i];
-                if (detail.ScriptLang != null)
+                if (!detail.ScriptLang.IsEmpty())
                 {
                     //skip those script lang=null
                     //2. find associated glyph index base on input script langs

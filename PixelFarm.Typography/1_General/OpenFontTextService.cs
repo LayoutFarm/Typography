@@ -78,7 +78,7 @@ namespace PixelFarm.Drawing
             //---------------
             //if not default then try guess
             //
-            if (scLang == null &&
+            if (scLang.scriptTag == 0 &&
                 !TryGetScriptLangFromCurrentThreadCultureInfo(out scLang))
             {
                 //TODO: handle error here
@@ -102,7 +102,7 @@ namespace PixelFarm.Drawing
         static bool TryGetScriptLangFromCurrentThreadCultureInfo(out Typography.OpenFont.ScriptLang scLang)
         {
             var currentCulture = System.Threading.Thread.CurrentThread.CurrentCulture;
-            scLang = null;
+
             if (Typography.TextBreak.IcuData.TryGetFullLanguageNameFromLangCode(
                  currentCulture.TwoLetterISOLanguageName,
                  currentCulture.ThreeLetterISOLanguageName,
@@ -124,6 +124,10 @@ namespace PixelFarm.Drawing
                     scLang = scLang1.GetScriptLang();
                     return true;
                 }
+            }
+            else
+            {
+                scLang = default;
             }
             return false;
         }
@@ -440,27 +444,17 @@ namespace PixelFarm.Drawing
             //a text buffer span is separated into multiple line segment list 
             char[] str = textBufferSpan.GetRawCharBuffer();
 #if DEBUG
+            if (str.Length > 10)
+            {
+
+            }
             int cur_startAt = textBufferSpan.start;
 #endif
 
             MyLineSegmentList lineSegments = MyLineSegmentList.GetFreeLineSegmentList();
             foreach (BreakSpan breakSpan in _txtServices.BreakToLineSegments(str, textBufferSpan.start, textBufferSpan.len))
             {
-                SpanBreakInfo spBreakInfo = breakSpan.SpanBreakInfo;
-
-                if (!(spBreakInfo.ResolvedScriptLang is Typography.OpenFont.ScriptLang scLang))
-                {
-                    if (!Typography.OpenFont.ScriptLangs.TryGetScriptLang((char)spBreakInfo.SampleCodePoint, out ScriptLangInfo scLang1))
-                    {
-                        spBreakInfo.ResolvedScriptLang = new ScriptLang(spBreakInfo.ScriptTag);
-                    }
-                    else
-                    {
-                        spBreakInfo.ResolvedScriptLang = scLang1.GetScriptLang();
-                    }
-                }
-
-                lineSegments.AddLineSegment(new MyLineSegment(breakSpan.startAt, breakSpan.len, spBreakInfo));
+                lineSegments.AddLineSegment(new MyLineSegment(breakSpan.startAt, breakSpan.len, breakSpan.SpanBreakInfo));
             }
             return lineSegments;
         }

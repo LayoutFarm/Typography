@@ -20,7 +20,7 @@ namespace Typography.TextBreak
         }
         protected override SpanBreakInfo GetSpanBreakInfo()
         {
-            return new SpanBreakInfo(false, FirstChar, ScriptTagDefs.Thai.Tag);
+            return new SpanBreakInfo(false, ScriptTagDefs.Thai.Tag);
         }
         //
         protected override CustomDic CurrentCustomDic => _customDic;

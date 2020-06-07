@@ -10,19 +10,19 @@ namespace Typography.TextBreak
     {
         //TODO: review this again, with AUTOGEN code
 
-        static SpanBreakInfo s_thai = new SpanBreakInfo(false, (char)0x0E00, ScriptTagDefs.Thai.Tag);
-        static SpanBreakInfo s_lao = new SpanBreakInfo(false, (char)0x0E80, ScriptTagDefs.Lao.Tag);
+        static SpanBreakInfo s_thai = new SpanBreakInfo(false, ScriptTagDefs.Thai.Tag);
+        static SpanBreakInfo s_lao = new SpanBreakInfo(false, ScriptTagDefs.Lao.Tag);
 
-        static SpanBreakInfo s_arabic = new SpanBreakInfo(true, (char)0x0600, ScriptTagDefs.Arabic.Tag);
-        static SpanBreakInfo s_arabic_supplement = new SpanBreakInfo(true, (char)0x0750, ScriptTagDefs.Arabic.Tag);
-        static SpanBreakInfo s_arabic_presentation_form_a = new SpanBreakInfo(true, (char)0xFB50, ScriptTagDefs.Arabic.Tag);
-        static SpanBreakInfo s_arabic_presentation_form_b = new SpanBreakInfo(true, (char)0xFE70, ScriptTagDefs.Arabic.Tag);
+        static SpanBreakInfo s_arabic = new SpanBreakInfo(true, ScriptTagDefs.Arabic.Tag);
+        static SpanBreakInfo s_arabic_supplement = new SpanBreakInfo(true, ScriptTagDefs.Arabic.Tag);
+        static SpanBreakInfo s_arabic_presentation_form_a = new SpanBreakInfo(true, ScriptTagDefs.Arabic.Tag);
+        static SpanBreakInfo s_arabic_presentation_form_b = new SpanBreakInfo(true, ScriptTagDefs.Arabic.Tag);
 
 
-        static SpanBreakInfo s_hana = new SpanBreakInfo(false, (char)0x3040, ScriptTagDefs.Katakana.Tag);
-        static SpanBreakInfo s_hangul = new SpanBreakInfo(false, (char)0xAC00, ScriptTagDefs.Hangul.Tag);
-        static SpanBreakInfo s_hangul_jumo = new SpanBreakInfo(false, (char)0x3130, ScriptTagDefs.Hangul_Jamo.Tag);
-        static SpanBreakInfo s_hani = new SpanBreakInfo(false, (char)0x3000, ScriptTagDefs.CJK_Ideographic.Tag);
+        static SpanBreakInfo s_hana = new SpanBreakInfo(false, ScriptTagDefs.Katakana.Tag);
+        static SpanBreakInfo s_hangul = new SpanBreakInfo(false, ScriptTagDefs.Hangul.Tag);
+        static SpanBreakInfo s_hangul_jumo = new SpanBreakInfo(false, ScriptTagDefs.Hangul_Jamo.Tag);
+        static SpanBreakInfo s_hani = new SpanBreakInfo(false, ScriptTagDefs.CJK_Ideographic.Tag);
 
         //CJK_Symbols_And_Punctuation = (48L << 32) | (0x3000 << 16) | 0x303F,   
         //Enclosed_CJK_Letters_And_Months = (54L << 32) | (0x3200 << 16) | 0x32FF,
@@ -146,7 +146,7 @@ namespace Typography.TextBreak
                         spanBreakInfo = s_hani;
                         return true;
                     }
-                } 
+                }
             }
 
             {

@@ -32,7 +32,7 @@ namespace Typography.TextBreak
             public WordKind kind;
         }
 
-        readonly SpanBreakInfo s_latin = new SpanBreakInfo(false, 'A', ScriptTagDefs.Latin.Tag);
+        readonly SpanBreakInfo s_latin = new SpanBreakInfo(false, ScriptTagDefs.Latin.Tag);
 
         public EngBreakingEngine()
         {
@@ -90,6 +90,7 @@ namespace Typography.TextBreak
         }
         void DoBreak(WordVisitor visitor, char[] input, int start, int len)
         {
+
             //----------------------------------------
             //simple break word/ num/ punc / space
             //similar to lexer function            
@@ -160,11 +161,11 @@ namespace Typography.TextBreak
 
                                 if (c < first || c > last)
                                 {
+
                                     //letter is out-of-range or not 
                                     //clear accum state
                                     if (i > bb.startIndex)
                                     {
-
                                         //flush
                                         bb.length = i - bb.startIndex;
                                         //
@@ -190,6 +191,7 @@ namespace Typography.TextBreak
 
                                             OnBreak(visitor, bb); //flush
 
+                                            bb.startIndex = begin;
                                             bb.length = 0;
                                             visitor.SpanBreakInfo = s_latin;//switch back
                                         }
@@ -197,9 +199,9 @@ namespace Typography.TextBreak
                                         {
                                             throw new NotSupportedException();///???
                                         }
-
-                                        i = begin;
-
+                                        i = begin - 1;
+                                        lexState = LexState.Init;
+                                        continue;
                                     }
                                     else
                                     {
@@ -339,13 +341,16 @@ namespace Typography.TextBreak
 
                                         visitor.SpanBreakInfo = s_latin;//switch back
                                         bb.length = 0;
+                                        bb.startIndex = begin;
                                     }
                                     else
                                     {
                                         throw new NotSupportedException();///???
                                     }
 
-                                    i = begin;
+                                    i = begin - 1;
+                                    lexState = LexState.Init;
+                                    continue;
                                 }
                                 else
                                 {
@@ -420,12 +425,16 @@ namespace Typography.TextBreak
 
                                             visitor.SpanBreakInfo = s_latin;//switch back
                                             bb.length = 0;
+                                            bb.startIndex = begin;
                                         }
                                         else
                                         {
                                             throw new NotSupportedException();///???
                                         }
-                                        i = begin;
+
+                                        i = begin - 1;
+                                        lexState = LexState.Init;
+                                        continue;
                                     }
                                     else
                                     {
