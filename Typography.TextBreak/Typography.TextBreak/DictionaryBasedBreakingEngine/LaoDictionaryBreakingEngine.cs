@@ -15,9 +15,9 @@ namespace Typography.TextBreak
         {
             _customDic = customDic;
         }
-        protected override SpanLayoutInfo GetSpanLayoutInfo()
+        protected override SpanBreakInfo GetSpanBreakInfo()
         {
-            return new SpanLayoutInfo(false, FirstChar, "lao");
+            return new SpanBreakInfo(false, FirstChar, "lao");
         }
         //
         protected override CustomDic CurrentCustomDic => _customDic;

@@ -10,7 +10,7 @@ namespace Typography.TextBreak
     {
         int Length { get; }
         int StartAt { get; }
-        SpanLayoutInfo SpanLayoutInfo { get; }
+        SpanBreakInfo SpanBreakInfo { get; }
     }
 
     public struct BreakSpan
@@ -19,12 +19,12 @@ namespace Typography.TextBreak
         public int startAt;
         public ushort len;
         public WordKind wordKind;
-        public SpanLayoutInfo spanLayoutInfo;
+        public SpanBreakInfo SpanBreakInfo;
     }
 
-    public class SpanLayoutInfo
+    public class SpanBreakInfo
     {
-        public SpanLayoutInfo(bool isRightToLeft, int sampleCodePoint, string scriptLang)
+        public SpanBreakInfo(bool isRightToLeft, int sampleCodePoint, string scriptLang)
         {
             RightToLeft = isRightToLeft;
             SampleCodePoint = sampleCodePoint;

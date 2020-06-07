@@ -401,10 +401,10 @@ namespace PixelFarm.Drawing
                     {
                         //
                         ILineSegment line_seg = result[i];
-                        SpanLayoutInfo spLayoutInfo = line_seg.SpanLayoutInfo;
+                        SpanBreakInfo breakInfo = line_seg.SpanBreakInfo;
 
                         TextBufferSpan buff = new TextBufferSpan(textBuffer, line_seg.StartAt, line_seg.Length);
-                        if (spLayoutInfo.RightToLeft)
+                        if (breakInfo.RightToLeft)
                         {
                             needRightToLeftArr = true;
                         }
@@ -414,12 +414,12 @@ namespace PixelFarm.Drawing
                         //so we need to ensure that we get a proper typeface,
                         //if not => alternative typeface
 
-                        ushort glyphIndex = curTypeface.GetGlyphIndex(spLayoutInfo.SampleCodePoint);
+                        ushort glyphIndex = curTypeface.GetGlyphIndex(breakInfo.SampleCodePoint);
                         if (glyphIndex == 0)
                         {
                             //not found then => find other typeface                    
                             //we need more information about line seg layout
-                            if (_textServices.TryGetAlternativeTypefaceFromChar((char)spLayoutInfo.SampleCodePoint, out Typeface alternative))
+                            if (_textServices.TryGetAlternativeTypefaceFromChar((char)breakInfo.SampleCodePoint, out Typeface alternative))
                             {
                                 curTypeface = alternative;
                                 _tmpTypefaces.Add(alternative);
@@ -434,10 +434,10 @@ namespace PixelFarm.Drawing
                             _tmpTypefaces.Add(curTypeface);
                         }
 
-                        _textServices.CurrentScriptLang = (ScriptLang)spLayoutInfo.ResolvedScriptLang;
+                        _textServices.CurrentScriptLang = (ScriptLang)breakInfo.ResolvedScriptLang;
 
                         GlyphPlanSequence glyphPlanSeq = _textServices.CreateGlyphPlanSeq(buff, curTypeface, FontSizeInPoints);
-                        glyphPlanSeq.IsRightToLeft = spLayoutInfo.RightToLeft;
+                        glyphPlanSeq.IsRightToLeft = breakInfo.RightToLeft;
 
                         _tmpGlyphPlanSeqs.Add(glyphPlanSeq);
 

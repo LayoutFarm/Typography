@@ -18,7 +18,7 @@ namespace Typography.TextBreak
         {
             throw new System.NotImplementedException();
         }
-        protected override SpanLayoutInfo GetSpanLayoutInfo()
+        protected override SpanBreakInfo GetSpanBreakInfo()
         {
             throw new System.NotImplementedException();
         }

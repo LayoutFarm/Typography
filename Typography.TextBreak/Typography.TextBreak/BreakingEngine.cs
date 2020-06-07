@@ -16,12 +16,12 @@ namespace Typography.TextBreak
     }
     public abstract class DictionaryBreakingEngine : BreakingEngine
     {
-        readonly SpanLayoutInfo _spanLayoutInfo;
+        readonly SpanBreakInfo _breakInfo;
         public DictionaryBreakingEngine()
         {
-            _spanLayoutInfo = GetSpanLayoutInfo();
+            _breakInfo = GetSpanBreakInfo();
         }
-        protected abstract SpanLayoutInfo GetSpanLayoutInfo();
+        protected abstract SpanBreakInfo GetSpanBreakInfo();
 
         public abstract char FirstUnicodeChar { get; }
         public abstract char LastUnicodeChar { get; }
@@ -44,7 +44,7 @@ namespace Typography.TextBreak
             char c_last = this.LastUnicodeChar;
             int endAt = startAt + len;
 
-            visitor.SpanLayoutInfo = _spanLayoutInfo;
+            visitor.SpanBreakInfo = _breakInfo;
 
             Stack<int> candidateBreakList = visitor.GetTempCandidateBreaks();
             bool breakPeroidInTextSpan = BreakPeroidInTextSpan;

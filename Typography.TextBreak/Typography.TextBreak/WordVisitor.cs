@@ -47,7 +47,7 @@ namespace Typography.TextBreak
             _newWordBreakHandler = newWordBreakHandler;
         }
 
-        internal SpanLayoutInfo SpanLayoutInfo { get; set; }
+        internal SpanBreakInfo SpanBreakInfo { get; set; }
         internal void LoadText(char[] buffer, int index)
         {
             LoadText(buffer, index, buffer.Length);
@@ -165,7 +165,7 @@ namespace Typography.TextBreak
                 startAt = vis.LatestSpanStartAt,
                 len = vis.LatestSpanLen,
                 wordKind = vis.LatestWordKind,
-                spanLayoutInfo = vis.SpanLayoutInfo,
+                SpanBreakInfo = vis.SpanBreakInfo,
             };
         }
     }

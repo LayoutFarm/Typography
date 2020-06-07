@@ -31,7 +31,7 @@ namespace Typography.TextBreak
             public WordKind kind;
         }
 
-        readonly SpanLayoutInfo _spLayoutInfo = new SpanLayoutInfo(false, 'A', "latin");
+        readonly SpanBreakInfo _breakInfo = new SpanBreakInfo(false, 'A', "latin");
         public EngBreakingEngine()
         {
 
@@ -39,7 +39,7 @@ namespace Typography.TextBreak
         internal override void BreakWord(WordVisitor visitor, char[] charBuff, int startAt, int len)
         {
             visitor.State = VisitorState.Parsing;
-            visitor.SpanLayoutInfo = _spLayoutInfo;
+            visitor.SpanBreakInfo = _breakInfo;
 
             DoBreak(visitor, charBuff, startAt, len);
 

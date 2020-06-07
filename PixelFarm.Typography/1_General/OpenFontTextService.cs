@@ -350,30 +350,30 @@ namespace PixelFarm.Drawing
         {
             readonly int _startAt;
             readonly int _len;
-            public readonly SpanLayoutInfo spanLayoutInfo;
-            public MyLineSegment(int startAt, int len, SpanLayoutInfo spanLayoutInfo)
+            public readonly SpanBreakInfo breakInfo;
+            public MyLineSegment(int startAt, int len, SpanBreakInfo breakInfo)
             {
                 _startAt = startAt;
                 _len = len;
 
 #if DEBUG
-                if (spanLayoutInfo == null)
+                if (breakInfo == null)
                 {
 
                 }
 #endif
-                this.spanLayoutInfo = spanLayoutInfo;
+                this.breakInfo = breakInfo;
 
 
             }
             public int Length => _len;
             public int StartAt => _startAt;
-            public SpanLayoutInfo SpanLayoutInfo => spanLayoutInfo;
+            public SpanBreakInfo SpanBreakInfo => breakInfo;
 
 #if DEBUG
             public override string ToString()
             {
-                return _startAt + ":" + _len + (spanLayoutInfo.RightToLeft ? "(rtl)" : "");
+                return _startAt + ":" + _len + (breakInfo.RightToLeft ? "(rtl)" : "");
             }
 #endif
         }
@@ -446,21 +446,21 @@ namespace PixelFarm.Drawing
             MyLineSegmentList lineSegments = MyLineSegmentList.GetFreeLineSegmentList();
             foreach (BreakSpan breakSpan in _txtServices.BreakToLineSegments(str, textBufferSpan.start, textBufferSpan.len))
             {
-                SpanLayoutInfo spLayoutInfo = breakSpan.spanLayoutInfo;
+                SpanBreakInfo breakInfo = breakSpan.SpanBreakInfo;
 
-                if (!(spLayoutInfo.ResolvedScriptLang is Typography.OpenFont.ScriptLang scLang))
+                if (!(breakInfo.ResolvedScriptLang is Typography.OpenFont.ScriptLang scLang))
                 {
-                    if (!Typography.OpenFont.ScriptLangs.TryGetScriptLang((char)spLayoutInfo.SampleCodePoint, out ScriptLangInfo scLang1))
+                    if (!Typography.OpenFont.ScriptLangs.TryGetScriptLang((char)breakInfo.SampleCodePoint, out ScriptLangInfo scLang1))
                     {
 
                     }
                     else
                     {
-                        spLayoutInfo.ResolvedScriptLang = scLang1.GetScriptLang();
+                        breakInfo.ResolvedScriptLang = scLang1.GetScriptLang();
                     }
                 }
 
-                lineSegments.AddLineSegment(new MyLineSegment(breakSpan.startAt, breakSpan.len, spLayoutInfo));
+                lineSegments.AddLineSegment(new MyLineSegment(breakSpan.startAt, breakSpan.len, breakInfo));
             }
             return lineSegments;
         }
