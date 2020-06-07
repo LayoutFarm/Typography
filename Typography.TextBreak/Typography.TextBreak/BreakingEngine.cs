@@ -21,8 +21,8 @@ namespace Typography.TextBreak
         {
             _spanLayoutInfo = GetSpanLayoutInfo();
         }
-        protected abstract SpanLayoutInfo GetSpanLayoutInfo(); 
-   
+        protected abstract SpanLayoutInfo GetSpanLayoutInfo();
+
         public abstract char FirstUnicodeChar { get; }
         public abstract char LastUnicodeChar { get; }
         public override bool CanHandle(char c)
@@ -93,8 +93,8 @@ namespace Typography.TextBreak
                 {
                     //continue next char
                     ++i;
-                    visitor.AddWordBreakAt(i, WordKind.Text);
-                    visitor.SetCurrentIndex(visitor.LatestBreakAt);
+                    visitor.AddWordBreak_AndSetCurrentIndex(i, WordKind.Text);
+
                 }
                 else
                 {
@@ -164,8 +164,7 @@ namespace Typography.TextBreak
                                     int p2 = FindInWordSpans(visitor, c_wordgroup);
                                     if (p2 - p1 > 0)
                                     {
-                                        visitor.AddWordBreakAt(p2, WordKind.Text);
-                                        visitor.SetCurrentIndex(p2);
+                                        visitor.AddWordBreak_AndSetCurrentIndex(p2, WordKind.Text);
                                         candidateBreakList.Clear();
                                     }
                                 }
@@ -279,8 +278,7 @@ namespace Typography.TextBreak
                                 int p2 = FindInWordSpans(visitor, c_wordgroup);
                                 if (p2 - p1 > 0)
                                 {
-                                    visitor.AddWordBreakAt(p2, WordKind.Text);
-                                    visitor.SetCurrentIndex(p2);
+                                    visitor.AddWordBreak_AndSetCurrentIndex(p2, WordKind.Text);
                                 }
                                 else
                                 {

@@ -62,7 +62,7 @@ namespace Typography.TextBreak
         internal override void BreakWord(WordVisitor visitor, char[] charBuff, int startAt, int len)
         {
             //use custom parsing
-             
+
             visitor.State = VisitorState.Parsing;
             RunAgent agent = _runAdapter.Agent;
 
@@ -108,8 +108,7 @@ namespace Typography.TextBreak
                 if (rtl)
                 {
                     //temp fix
-                    visitor.AddWordBreakAt(startAt + sp_len, WordKind.Text);
-                    visitor.SetCurrentIndex(startAt + sp_len);
+                    visitor.AddWordBreak_AndSetCurrentIndex(startAt + sp_len, WordKind.Text); 
                 }
                 else
                 {

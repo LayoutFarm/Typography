@@ -58,11 +58,7 @@ namespace Typography.TextBreak
         public override bool CanBeStartChar(char c) => true;
         //
 
-        static void OnBreak(WordVisitor vis, in BreakBounds bb)
-        {
-            vis.AddWordBreakAt(bb.startIndex + bb.length, bb.kind);
-            vis.SetCurrentIndex(vis.LatestBreakAt);
-        }
+        static void OnBreak(WordVisitor vis, in BreakBounds bb) => vis.AddWordBreak_AndSetCurrentIndex(bb.startIndex + bb.length, bb.kind);
 
         void DoBreak(WordVisitor visitor, char[] input, int start, int len)
         {
