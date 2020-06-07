@@ -16,9 +16,15 @@ namespace Typography.OpenFont
         }
         public override string ToString()
         {
+
             return this.fullname;
         }
-
+        public ScriptLangInfo(ScriptTagDef tagDef, params UnicodeLangBits[] unicodeLangs)
+        {
+            fullname = tagDef.Name;
+            shortname = TagUtils.TagToString(tagDef.Tag);
+            this.unicodeLangs = unicodeLangs;
+        }
     }
     public static class UnicodeLangBitsExtension
     {
@@ -1074,6 +1080,7 @@ Zanabazar_Square__Zanabazarin_Dörböljin_Useg__Xewtee_Dörböljin_Bicig__Horizo
         }
         public static bool TryGetScriptLang(char c, out ScriptLangInfo scLang)
         {
+            //temp fix
             return UnicodeRangeFinder.GetUniCodeRangeFor(c, out var _, out var _, out scLang);
             //foreach (var v in s_unicodeLangToScriptLang)
             //{
@@ -1115,62 +1122,35 @@ Zanabazar_Square__Zanabazarin_Dörböljin_Useg__Xewtee_Dörböljin_Bicig__Horizo
     static class UnicodeRangeFinder
     {
         //TODO: review this again, with AUTOGEN code
-        static ScriptLangInfo s_latin = new ScriptLangInfo(ScriptTagDefs.Latin.Name, TagUtils.TagToString(ScriptTagDefs.Latin.Tag))
-        {
-            unicodeLangs = new UnicodeLangBits[] { UnicodeLangBits.Basic_Latin,
+        static ScriptLangInfo s_latin = new ScriptLangInfo(ScriptTagDefs.Latin, UnicodeLangBits.Basic_Latin,
             UnicodeLangBits.Latin_1_Supplement,
             UnicodeLangBits.Latin_Extended_A,
             UnicodeLangBits.Latin_Extended_Additional,
             UnicodeLangBits.Latin_Extended_B,
             UnicodeLangBits.Latin_Extended_C,
-            UnicodeLangBits.Latin_Extended_D,
+            UnicodeLangBits.Latin_Extended_D
+            );
 
-            }
-        };
-        static ScriptLangInfo s_thai = new ScriptLangInfo(ScriptTagDefs.Thai.Name, TagUtils.TagToString(ScriptTagDefs.Thai.Tag))
-        {
-            unicodeLangs = new UnicodeLangBits[] { UnicodeLangBits.Thai }
-        };
-        static ScriptLangInfo s_lao = new ScriptLangInfo(ScriptTagDefs.Lao.Name, TagUtils.TagToString(ScriptTagDefs.Lao.Tag))
-        {
-            unicodeLangs = new UnicodeLangBits[] { UnicodeLangBits.Lao }
-        };
+        static ScriptLangInfo s_thai = new ScriptLangInfo(ScriptTagDefs.Thai, UnicodeLangBits.Thai);
 
-        static ScriptLangInfo s_arabic = new ScriptLangInfo(ScriptTagDefs.Arabic.Name, TagUtils.TagToString(ScriptTagDefs.Arabic.Tag))
-        {
-            unicodeLangs = new UnicodeLangBits[] { UnicodeLangBits.Arabic }
-        };
-        static ScriptLangInfo s_arabic_supplement = new ScriptLangInfo(ScriptTagDefs.Arabic.Name, TagUtils.TagToString(ScriptTagDefs.Arabic.Tag))
-        {
-            unicodeLangs = new UnicodeLangBits[] { UnicodeLangBits.Arabic_Supplement }
-        };
-        static ScriptLangInfo s_arabic_presentation_form_a = new ScriptLangInfo(ScriptTagDefs.Arabic.Name, TagUtils.TagToString(ScriptTagDefs.Arabic.Tag))
-        {
-            unicodeLangs = new UnicodeLangBits[] { UnicodeLangBits.Arabic_Presentation_Forms_A }
+        static ScriptLangInfo s_lao = new ScriptLangInfo(ScriptTagDefs.Lao, UnicodeLangBits.Lao);
 
-        };
-        static ScriptLangInfo s_arabic_presentation_form_b = new ScriptLangInfo(ScriptTagDefs.Arabic.Name, TagUtils.TagToString(ScriptTagDefs.Arabic.Tag))
-        {
-            unicodeLangs = new UnicodeLangBits[] { UnicodeLangBits.Arabic_Presentation_Forms_B }
-        };
+        static ScriptLangInfo s_arabic = new ScriptLangInfo(ScriptTagDefs.Arabic, UnicodeLangBits.Arabic);
 
+        static ScriptLangInfo s_arabic_supplement = new ScriptLangInfo(ScriptTagDefs.Arabic, UnicodeLangBits.Arabic_Supplement);
 
-        static ScriptLangInfo s_hana = new ScriptLangInfo(ScriptTagDefs.Katakana.Name, TagUtils.TagToString(ScriptTagDefs.Katakana.Tag))
-        {
-            unicodeLangs = new UnicodeLangBits[] { UnicodeLangBits.Katakana, UnicodeLangBits.Hiragana }
-        };
-        static ScriptLangInfo s_hangul = new ScriptLangInfo(ScriptTagDefs.Hangul.Name, TagUtils.TagToString(ScriptTagDefs.Hangul.Tag))
-        {
-            unicodeLangs = new UnicodeLangBits[] { UnicodeLangBits.Hangul_Jamo }
-        };
-        static ScriptLangInfo s_hangul_jumo = new ScriptLangInfo(ScriptTagDefs.Hangul_Jamo.Name, TagUtils.TagToString(ScriptTagDefs.Hangul_Jamo.Tag))
-        {
-            unicodeLangs = new UnicodeLangBits[] { UnicodeLangBits.Hangul_Jamo }
-        };
-        static ScriptLangInfo s_hani = new ScriptLangInfo(ScriptTagDefs.CJK_Ideographic.Name, TagUtils.TagToString(ScriptTagDefs.CJK_Ideographic.Tag))
-        {
-            unicodeLangs = new UnicodeLangBits[]
-            {
+        static ScriptLangInfo s_arabic_presentation_form_a = new ScriptLangInfo(ScriptTagDefs.Arabic, UnicodeLangBits.Arabic_Presentation_Forms_A);
+
+        static ScriptLangInfo s_arabic_presentation_form_b = new ScriptLangInfo(ScriptTagDefs.Arabic, UnicodeLangBits.Arabic_Presentation_Forms_B);
+
+        static ScriptLangInfo s_hana = new ScriptLangInfo(ScriptTagDefs.Katakana, UnicodeLangBits.Katakana);
+
+        static ScriptLangInfo s_hangul = new ScriptLangInfo(ScriptTagDefs.Hangul, UnicodeLangBits.Hangul_Jamo);
+
+        static ScriptLangInfo s_hangul_jumo = new ScriptLangInfo(ScriptTagDefs.Hangul, UnicodeLangBits.Hangul_Jamo);
+
+        static ScriptLangInfo s_hani = new ScriptLangInfo(ScriptTagDefs.CJK_Ideographic, 
+            
                 UnicodeLangBits.CJK_Compatibility,
                 UnicodeLangBits.CJK_Compatibility_Forms,
                 UnicodeLangBits.CJK_Compatibility_Ideographs,
@@ -1181,9 +1161,9 @@ Zanabazar_Square__Zanabazarin_Dörböljin_Useg__Xewtee_Dörböljin_Bicig__Horizo
                 UnicodeLangBits.CJK_Symbols_And_Punctuation,
                 UnicodeLangBits.CJK_Unified_Ideographs,
                 UnicodeLangBits.CJK_Unified_Ideographs_Extension_A,
-                UnicodeLangBits.CJK_Unified_Ideographs_Extension_B,
-            }
-        };
+                UnicodeLangBits.CJK_Unified_Ideographs_Extension_B
+             
+        );
 
         //CJK_Symbols_And_Punctuation = (48L << 32) | (0x3000 << 16) | 0x303F,   
         //Enclosed_CJK_Letters_And_Months = (54L << 32) | (0x3200 << 16) | 0x32FF,
@@ -1578,17 +1558,7 @@ Zanabazar_Square__Zanabazarin_Dörböljin_Useg__Xewtee_Dörböljin_Bicig__Horizo
         //
         ;
 
-        static ScriptLangs()
-        {
-            s_unicodeLangToScriptLang.Sort((a, b) =>
-            {
-                uint a_start = (uint)((uint)(a.unicodeRangeBits) >> 16);
-                uint b_start = (uint)((uint)(b.unicodeRangeBits) >> 16);
 
-                return a_start.CompareTo(b_start);
-
-            });
-        }
     }
 
 
