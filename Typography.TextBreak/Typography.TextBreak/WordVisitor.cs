@@ -111,7 +111,6 @@ namespace Typography.TextBreak
             LatestSpanStartAt = _latestBreakAt;
             _latestBreakAt = index;
             this.LatestWordKind = wordKind;
-
             _newWordBreakHandler(this);
 
 #if DEBUG
@@ -132,6 +131,7 @@ namespace Typography.TextBreak
         public WordKind LatestWordKind { get; private set; }
         public ushort LatestSpanLen { get; private set; }
         //
+        
         internal void SetCurrentIndex(int index)
         {
             _currentIndex = index;

@@ -4,16 +4,8 @@
 namespace Typography.TextBreak
 {
 
-    public delegate void OnBreak(BreakBounds breakBounds);
-
-    public class BreakBounds
-    {
-        public int startIndex;
-        public int length;
-        public bool stopNext;
-        public WordKind kind;
-    }
-
+    
+   
     public enum WordKind : byte
     {
         Unknown,
