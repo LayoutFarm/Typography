@@ -191,7 +191,7 @@ namespace Typography.TextBreak
                                             OnBreak(visitor, bb); //flush
 
                                             bb.length = 0;
-                                            visitor.SpanBreakInfo = s_latin;
+                                            visitor.SpanBreakInfo = s_latin;//switch back
                                         }
                                         else
                                         {
@@ -337,7 +337,7 @@ namespace Typography.TextBreak
 
                                         OnBreak(visitor, bb);//flush
 
-                                        visitor.SpanBreakInfo = s_latin;
+                                        visitor.SpanBreakInfo = s_latin;//switch back
                                         bb.length = 0;
                                     }
                                     else
@@ -418,7 +418,7 @@ namespace Typography.TextBreak
 
                                             OnBreak(visitor, bb); //flush
 
-                                            visitor.SpanBreakInfo = s_latin;
+                                            visitor.SpanBreakInfo = s_latin;//switch back
                                             bb.length = 0;
                                         }
                                         else
