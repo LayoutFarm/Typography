@@ -787,16 +787,15 @@ namespace Typography.OpenFont
         public string Name { get; }
         public ScriptTagDef(string tag, string name)
         {
-#if DEBUG
-            dbugTagAsString = tag;
-#endif
-
+ 
+            StringTag = tag; 
             Tag = TagUtils.StringToTag(tag);
             Name = name;
         }
+        public string StringTag { get; set; }
 #if DEBUG
-        public string dbugTagAsString { get; set; }
-        public override string ToString() => dbugTagAsString;
+
+        public override string ToString() => StringTag;
 #endif
 
 

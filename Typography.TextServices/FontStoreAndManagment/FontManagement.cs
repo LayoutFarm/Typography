@@ -143,6 +143,22 @@ namespace Typography.OpenFont
 namespace Typography.FontManagement
 {
 
+    public abstract class AlternativeTypefaceSelector
+    {
+#if DEBUG
+        public AlternativeTypefaceSelector() { }
+#endif
+
+        public Typeface LatestTypeface { get; set; }
+        public virtual InstalledTypeface Select(List<InstalledTypeface> choices, ScriptLangInfo scriptLangInfo, char hintChar)
+        {
+            if (choices.Count > 0)
+            {
+                return choices[0];//temp
+            }
+            return null;
+        }
+    }
 
     public class InstalledTypeface
     {
@@ -769,14 +785,13 @@ namespace Typography.FontManagement
                 }
             }
         }
-        public bool TryGetAlternativeTypefaceFromChar(char c, out List<InstalledTypeface> found)
+        public bool TryGetAlternativeTypefaceFromChar(char c, out ScriptLangInfo foundScriptLang, out List<InstalledTypeface> found)
         {
             //find a typeface that supported input char c
             //1. unicode to lang=> to script
             //2. then find typeface the support it 
 
-
-            if (ScriptLangs.TryGetScriptLang(c, out ScriptLangInfo foundScriptLang) && foundScriptLang.unicodeLangs != null)
+            if (ScriptLangs.TryGetScriptLang(c, out foundScriptLang) && foundScriptLang.unicodeLangs != null)
             {
                 foreach (UnicodeLangBits langBits in foundScriptLang.unicodeLangs)
                 {
