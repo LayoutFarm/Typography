@@ -14,29 +14,30 @@ namespace PixelFarm.Drawing
 {
     public class MyAlternativeTypefaceSelector : AlternativeTypefaceSelector
     {
-        Dictionary<string, List<PreferTypeface>> _dics = new Dictionary<string, List<PreferTypeface>>();
+        Dictionary<string, PreferTypefaceList> _dics = new Dictionary<string, PreferTypefaceList>();
 #if DEBUG
         public MyAlternativeTypefaceSelector() { }
 #endif
-        public void SetPreferTypeface(string scriptTag, List<PreferTypeface> typefaceNames)
+        public void SetPreferTypefaces(string scriptTag, PreferTypefaceList typefaceNames)
         {
             _dics[scriptTag] = typefaceNames;
         }
-        public void SetPreferTypeface(ScriptTagDef scriptTag, List<PreferTypeface> typefaceNames)
+        public void SetPreferTypefaces(ScriptTagDef scriptTag, PreferTypefaceList typefaceNames)
         {
             _dics[scriptTag.StringTag] = typefaceNames;
         }
-        public List<PreferTypeface> GetPreferTypefaces(string scriptTag) => _dics.TryGetValue(scriptTag, out List<PreferTypeface> foundList) ? foundList : null;
+        public PreferTypefaceList GetPreferTypefaces(string scriptTag) => _dics.TryGetValue(scriptTag, out PreferTypefaceList foundList) ? foundList : null;
 
         public override InstalledTypeface Select(List<InstalledTypeface> choices, ScriptLangInfo scriptLangInfo, char hintChar)
         {
-            if (_dics.TryGetValue(scriptLangInfo.shortname, out List<PreferTypeface> foundList))
+            if (_dics.TryGetValue(scriptLangInfo.shortname, out PreferTypefaceList foundList))
             {
                 //select only resolved font
-                int j = foundList.Count;
+                List<PreferTypeface> list = foundList._list;
+                int j = list.Count;
                 for (int i = 0; i < j; ++i)
                 {
-                    PreferTypeface p = foundList[i];
+                    PreferTypeface p = list[i];
                     //-------
                     if (p.InstalledTypeface == null && !p.ResolvedInstalledTypeface)
                     {
@@ -66,16 +67,25 @@ namespace PixelFarm.Drawing
             return base.Select(choices, scriptLangInfo, hintChar);
         }
 
+        public class PreferTypeface
+        {
+            public PreferTypeface(string reqTypefaceName) => RequestTypefaceName = reqTypefaceName;
+            public string RequestTypefaceName { get; }
+            public InstalledTypeface InstalledTypeface { get; internal set; }
+            internal bool ResolvedInstalledTypeface { get; set; }
+        }
 
 
+        public class PreferTypefaceList
+        {
+            internal List<PreferTypeface> _list = new List<PreferTypeface>();
+            public void AddTypefaceName(string typefaceName)
+            {
+                _list.Add(new PreferTypeface(typefaceName));
+            }
+        }
     }
-    public class PreferTypeface
-    {
-        public PreferTypeface(string reqTypefaceName) => RequestTypefaceName = reqTypefaceName;
-        public string RequestTypefaceName { get; }
-        public InstalledTypeface InstalledTypeface { get; internal set; }
-        internal bool ResolvedInstalledTypeface { get; set; }
-    }
+
 
     public class VxsTextPrinter : TextPrinterBase, ITextPrinter
     {
@@ -92,7 +102,7 @@ namespace PixelFarm.Drawing
 
         GlyphBitmapStore _glyphBitmapStore;
         BitmapCacheForSvgGlyph _glyphSvgStore;
-         
+
         public VxsTextPrinter(Painter painter, OpenFontTextService textService)
         {
 

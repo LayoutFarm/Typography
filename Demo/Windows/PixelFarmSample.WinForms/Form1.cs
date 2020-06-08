@@ -267,9 +267,10 @@ namespace SampleWinForms
                 {
                     _devVxsTextPrinter.AlternativeTypefaceSelector = _myAlternativeTypefaceSelector;
 
-                    var preferTypefaces = new List<PixelFarm.Drawing.PreferTypeface>();
-                    preferTypefaces.Add(new PixelFarm.Drawing.PreferTypeface("Noto Sans Arabic UI"));
-                    _myAlternativeTypefaceSelector.SetPreferTypeface(ScriptTagDefs.Arabic, preferTypefaces);
+                    var preferTypefaces = new PixelFarm.Drawing.MyAlternativeTypefaceSelector.PreferTypefaceList();
+                    preferTypefaces.AddTypefaceName("Noto Sans Arabic UI");
+
+                    _myAlternativeTypefaceSelector.SetPreferTypefaces(ScriptTagDefs.Arabic, preferTypefaces);
                 }
             }
 
