@@ -28,8 +28,14 @@ namespace Typography.TextBreak
         }
         public void SetNewBreakHandler(NewWordBreakHandlerDelegate newWordBreakHandler)
         {
-            _visitor = new WordVisitor(newWordBreakHandler);
+            _visitor = new DelegateBaseWordVisitor(newWordBreakHandler);
         }
+        public WordVisitor CurrentVisitor
+        {
+            get => _visitor;
+            set => _visitor = value;
+        }
+
         //
         public EngBreakingEngine EngBreakingEngine => _engBreakingEngine;
         //
@@ -100,7 +106,7 @@ namespace Typography.TextBreak
             _endAt = startAt + len;
             _visitor.LoadText(charBuff, startAt, len);
             //---------------------------------------- 
- 
+
 
             BreakingEngine currentEngine = _breakingEngine = (UseUnicodeRangeBreaker) ? _engBreakingEngine : SelectEngine(charBuff[startAt]);
             //----------------------------------------
