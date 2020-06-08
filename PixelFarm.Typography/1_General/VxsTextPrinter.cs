@@ -8,9 +8,84 @@ using Typography.OpenFont;
 using Typography.OpenFont.Extensions;
 using Typography.TextLayout;
 using Typography.TextBreak;
+using Typography.FontManagement;
 
 namespace PixelFarm.Drawing
 {
+    public class MyAlternativeTypefaceSelector : AlternativeTypefaceSelector
+    {
+        Dictionary<string, PreferTypefaceList> _dics = new Dictionary<string, PreferTypefaceList>();
+#if DEBUG
+        public MyAlternativeTypefaceSelector() { }
+#endif
+        public void SetPreferTypefaces(string scriptTag, PreferTypefaceList typefaceNames)
+        {
+            _dics[scriptTag] = typefaceNames;
+        }
+        public void SetPreferTypefaces(ScriptTagDef scriptTag, PreferTypefaceList typefaceNames)
+        {
+            _dics[scriptTag.StringTag] = typefaceNames;
+        }
+        public PreferTypefaceList GetPreferTypefaces(string scriptTag) => _dics.TryGetValue(scriptTag, out PreferTypefaceList foundList) ? foundList : null;
+
+        public override InstalledTypeface Select(List<InstalledTypeface> choices, ScriptLangInfo scriptLangInfo, char hintChar)
+        {
+            if (_dics.TryGetValue(scriptLangInfo.shortname, out PreferTypefaceList foundList))
+            {
+                //select only resolved font
+                List<PreferTypeface> list = foundList._list;
+                int j = list.Count;
+                for (int i = 0; i < j; ++i)
+                {
+                    PreferTypeface p = list[i];
+                    //-------
+                    if (p.InstalledTypeface == null && !p.ResolvedInstalledTypeface)
+                    {
+                        //find
+                        int choice_count = choices.Count;
+
+                        for (int m = 0; m < choice_count; ++m)
+                        {
+                            InstalledTypeface instTypeface = choices[m];
+                            if (p.RequestTypefaceName == instTypeface.FontName)
+                            {
+                                //TODO: review here again
+                                p.InstalledTypeface = instTypeface;
+
+                                break;
+                            }
+                        }
+                        p.ResolvedInstalledTypeface = true;
+                    }
+                    //-------
+                    if (p.InstalledTypeface != null)
+                    {
+                        return p.InstalledTypeface;
+                    }
+                }
+            }
+            return base.Select(choices, scriptLangInfo, hintChar);
+        }
+
+        public class PreferTypeface
+        {
+            public PreferTypeface(string reqTypefaceName) => RequestTypefaceName = reqTypefaceName;
+            public string RequestTypefaceName { get; }
+            public InstalledTypeface InstalledTypeface { get; internal set; }
+            internal bool ResolvedInstalledTypeface { get; set; }
+        }
+
+
+        public class PreferTypefaceList
+        {
+            internal List<PreferTypeface> _list = new List<PreferTypeface>();
+            public void AddTypefaceName(string typefaceName)
+            {
+                _list.Add(new PreferTypeface(typefaceName));
+            }
+        }
+    }
+
 
     public class VxsTextPrinter : TextPrinterBase, ITextPrinter
     {
@@ -42,7 +117,10 @@ namespace PixelFarm.Drawing
 
             _glyphBitmapStore = new GlyphBitmapStore();
             _glyphSvgStore = new BitmapCacheForSvgGlyph();
+
         }
+        public AlternativeTypefaceSelector AlternativeTypefaceSelector { get; set; }
+
         public void SetSvgBmpBuilderFunc(SvgBmpBuilderFunc svgBmpBuilderFunc)
         {
             _glyphSvgStore.SetSvgBmpBuilderFunc(svgBmpBuilderFunc);
@@ -354,9 +432,13 @@ namespace PixelFarm.Drawing
         public void DrawString(char[] text, int startAt, int len, double x, double y)
         {
             DrawString(text, startAt, len, (float)x, (float)y);
-        }         
+        }
 
-      
+
+
+
+
+
         public override void DrawString(char[] textBuffer, int startAt, int len, float x, float y)
         {
 
@@ -418,7 +500,13 @@ namespace PixelFarm.Drawing
                         {
                             //not found then => find other typeface                    
                             //we need more information about line seg layout
-                            if (_textServices.TryGetAlternativeTypefaceFromChar(sample_char, out Typeface alternative))
+
+                            if (AlternativeTypefaceSelector != null)
+                            {
+                                AlternativeTypefaceSelector.LatestTypeface = curTypeface;
+                            }
+
+                            if (_textServices.TryGetAlternativeTypefaceFromChar(sample_char, AlternativeTypefaceSelector, out Typeface alternative))
                             {
                                 curTypeface = alternative;
                                 _tmpTypefaces.Add(alternative);

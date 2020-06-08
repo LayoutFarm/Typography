@@ -21,14 +21,26 @@ namespace Typography.TextBreak
 
     public delegate void NewWordBreakHandlerDelegate(WordVisitor vistor);
     //
+    public class DelegateBaseWordVisitor : WordVisitor
+    {
+        readonly NewWordBreakHandlerDelegate _newWordBreakHandler;
+        internal DelegateBaseWordVisitor(NewWordBreakHandlerDelegate newWordBreakHandler)
+        {
+            _newWordBreakHandler = newWordBreakHandler;
+        }
+        protected override void OnBreak()
+        {
+            _newWordBreakHandler(this);
+        }
+    }
 
-    public class WordVisitor
+    public abstract class WordVisitor
     {
 
-//#if DEBUG
-//        List<BreakAtInfo> dbugBreakAtList = new List<BreakAtInfo>();
-//        bool dbugCollectBreakAtList;
-//#endif
+        //#if DEBUG
+        //        List<BreakAtInfo> dbugBreakAtList = new List<BreakAtInfo>();
+        //        bool dbugCollectBreakAtList;
+        //#endif
         char[] _buffer;
 
         int _startIndex;
@@ -36,16 +48,10 @@ namespace Typography.TextBreak
 
         int _currentIndex;
         char _currentChar;
-        int _latestBreakAt;
-
-
-        readonly NewWordBreakHandlerDelegate _newWordBreakHandler;
+        int _latestBreakAt; 
 
         Stack<int> _tempCandidateBreaks = new Stack<int>();
-        internal WordVisitor(NewWordBreakHandlerDelegate newWordBreakHandler)
-        {
-            _newWordBreakHandler = newWordBreakHandler;
-        }
+
 
         internal SpanBreakInfo SpanBreakInfo { get; set; }
         internal void LoadText(char[] buffer, int index)
@@ -69,11 +75,11 @@ namespace Typography.TextBreak
             _tempCandidateBreaks.Clear();
             _latestBreakAt = 0;
 
-//#if DEBUG
-//            dbugBreakAtList.Clear();
-//#endif
+            //#if DEBUG
+            //            dbugBreakAtList.Clear();
+            //#endif
         }
-
+        protected virtual void OnBreak() { }
 
         public VisitorState State { get; internal set; }
         //
@@ -113,14 +119,15 @@ namespace Typography.TextBreak
 
             _latestBreakAt = index;//**
 
-            _newWordBreakHandler(this);
-//#if DEBUG
-//            if (dbugCollectBreakAtList)
-//            {
-//                dbugBreakAtList.Add(new BreakAtInfo(index, wordKind));
-//            }
+            OnBreak();
+             
+            //#if DEBUG
+            //            if (dbugCollectBreakAtList)
+            //            {
+            //                dbugBreakAtList.Add(new BreakAtInfo(index, wordKind));
+            //            }
 
-//#endif
+            //#endif
         }
         internal void AddWordBreakAtCurrentIndex(WordKind wordKind = WordKind.Text)
         {

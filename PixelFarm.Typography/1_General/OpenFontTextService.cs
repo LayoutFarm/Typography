@@ -37,6 +37,8 @@ namespace PixelFarm.Drawing
               ref TextSpanMeasureResult result);
     }
 
+
+
     public class OpenFontTextService : ITextService
     {
         /// <summary>
@@ -133,14 +135,31 @@ namespace PixelFarm.Drawing
         }
 
 
-        public bool TryGetAlternativeTypefaceFromChar(char c, out Typeface found)
+
+
+        public bool TryGetAlternativeTypefaceFromChar(char c, AlternativeTypefaceSelector selector, out Typeface found)
         {
             //find a typeface that supported input char c
-            if (_txtServices.InstalledFontCollection.TryGetAlternativeTypefaceFromChar(c, out List<InstalledTypeface> installedTypefaceList))
+            if (_txtServices.InstalledFontCollection.TryGetAlternativeTypefaceFromChar(c,
+                out ScriptLangInfo scriptLangInfo,
+                out List<InstalledTypeface> installedTypefaceList))
             {
-                InstalledTypeface selected = installedTypefaceList[0];
-                found = _txtServices.GetTypeface(selected.FontName, TypefaceStyle.Regular);
-                return true;
+                //select a prefer font
+                if (selector != null)
+                {
+                    InstalledTypeface selected = selector.Select(installedTypefaceList, scriptLangInfo, c);
+                    if (selected != null)
+                    {
+                        found = _txtServices.GetTypeface(selected.FontName, TypefaceStyle.Regular);
+                        return true;
+                    }
+                }
+                else
+                {
+                    InstalledTypeface selected = installedTypefaceList[0];//default
+                    found = _txtServices.GetTypeface(selected.FontName, TypefaceStyle.Regular);
+                    return true;
+                }
             }
             found = null;
             return false;
