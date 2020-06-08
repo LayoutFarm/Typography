@@ -1,4 +1,4 @@
-﻿//MIT, 2020, WinnterDev
+﻿//MIT, 2020, WinterDev
 using System;
 using System.Collections.Generic;
 using System.Text;
