@@ -354,10 +354,9 @@ namespace PixelFarm.Drawing
         public void DrawString(char[] text, int startAt, int len, double x, double y)
         {
             DrawString(text, startAt, len, (float)x, (float)y);
-        }
+        }         
 
-        bool _enableMultiTypefaces = true;
-
+      
         public override void DrawString(char[] textBuffer, int startAt, int len, float x, float y)
         {
 
@@ -376,7 +375,7 @@ namespace PixelFarm.Drawing
             float xpos = x;
             float ypos = y;
 
-            if (!_enableMultiTypefaces)
+            if (!EnableMultiTypefaces)
             {
                 GlyphPlanSequence glyphPlanSeq = _textServices.CreateGlyphPlanSeq(buffSpan, _currentTypeface, FontSizeInPoints);
                 DrawFromGlyphPlans(glyphPlanSeq, xpos, y);
