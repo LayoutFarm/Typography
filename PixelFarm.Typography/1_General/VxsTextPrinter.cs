@@ -12,7 +12,7 @@ using Typography.FontManagement;
 
 namespace PixelFarm.Drawing
 {
-    class MyAlternativeTypefaceSelector : AlternativeTypefaceSelector
+    public class MyAlternativeTypefaceSelector : AlternativeTypefaceSelector
     {
         Dictionary<string, List<PreferTypeface>> _dics = new Dictionary<string, List<PreferTypeface>>();
 #if DEBUG
@@ -22,7 +22,10 @@ namespace PixelFarm.Drawing
         {
             _dics[scriptTag] = typefaceNames;
         }
-
+        public void SetPreferTypeface(ScriptTagDef scriptTag, List<PreferTypeface> typefaceNames)
+        {
+            _dics[scriptTag.StringTag] = typefaceNames;
+        }
         public List<PreferTypeface> GetPreferTypefaces(string scriptTag) => _dics.TryGetValue(scriptTag, out List<PreferTypeface> foundList) ? foundList : null;
 
         public override InstalledTypeface Select(List<InstalledTypeface> choices, ScriptLangInfo scriptLangInfo, char hintChar)
@@ -62,6 +65,9 @@ namespace PixelFarm.Drawing
             }
             return base.Select(choices, scriptLangInfo, hintChar);
         }
+
+
+
     }
     public class PreferTypeface
     {
@@ -70,8 +76,6 @@ namespace PixelFarm.Drawing
         public InstalledTypeface InstalledTypeface { get; internal set; }
         internal bool ResolvedInstalledTypeface { get; set; }
     }
-
-
 
     public class VxsTextPrinter : TextPrinterBase, ITextPrinter
     {
@@ -88,7 +92,7 @@ namespace PixelFarm.Drawing
 
         GlyphBitmapStore _glyphBitmapStore;
         BitmapCacheForSvgGlyph _glyphSvgStore;
-        MyAlternativeTypefaceSelector _alternativeTypefaceSelector;
+         
         public VxsTextPrinter(Painter painter, OpenFontTextService textService)
         {
 
@@ -104,17 +108,9 @@ namespace PixelFarm.Drawing
             _glyphBitmapStore = new GlyphBitmapStore();
             _glyphSvgStore = new BitmapCacheForSvgGlyph();
 
-
-            //test
-            _alternativeTypefaceSelector = new MyAlternativeTypefaceSelector();
-            {
-
-                List<PreferTypeface> preferTypefaces = new List<PreferTypeface>();
-                preferTypefaces.Add(new PreferTypeface("Noto Sans Arabic UI"));
-                _alternativeTypefaceSelector.SetPreferTypeface(ScriptTagDefs.Arabic.StringTag, preferTypefaces);
-            } 
         }
-        
+        public AlternativeTypefaceSelector AlternativeTypefaceSelector { get; set; }
+
         public void SetSvgBmpBuilderFunc(SvgBmpBuilderFunc svgBmpBuilderFunc)
         {
             _glyphSvgStore.SetSvgBmpBuilderFunc(svgBmpBuilderFunc);
@@ -495,8 +491,12 @@ namespace PixelFarm.Drawing
                             //not found then => find other typeface                    
                             //we need more information about line seg layout
 
-                            _alternativeTypefaceSelector.LatestTypeface = curTypeface;
-                            if (_textServices.TryGetAlternativeTypefaceFromChar(sample_char, _alternativeTypefaceSelector, out Typeface alternative))
+                            if (AlternativeTypefaceSelector != null)
+                            {
+                                AlternativeTypefaceSelector.LatestTypeface = curTypeface;
+                            }
+
+                            if (_textServices.TryGetAlternativeTypefaceFromChar(sample_char, AlternativeTypefaceSelector, out Typeface alternative))
                             {
                                 curTypeface = alternative;
                                 _tmpTypefaces.Add(alternative);
