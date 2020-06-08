@@ -20,13 +20,13 @@ namespace Typography.TextBreak
         static CustomDic s_thaiDic;
         [System.ThreadStatic]
         static CustomDic s_laoDic;
-
         [System.ThreadStatic]
         static CustomAbbrvDic s_enAbbrvDic;
-
-
         [System.ThreadStatic]
         static DictionaryProvider s_dicProvider;
+
+
+
 
         static void InitAllDics()
         {
@@ -91,6 +91,10 @@ namespace Typography.TextBreak
             var laoBreak = new LaoDictionaryBreakingEngine();
             laoBreak.SetDictionaryData(s_laoDic);
             breaker.AddBreakingEngine(laoBreak);
+
+            //
+            var bidiBreak = new TextBreak.BidiBreakEngine();
+            breaker.AddBreakingEngine(bidiBreak);
             return breaker;
         }
     }

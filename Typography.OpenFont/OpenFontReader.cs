@@ -3,8 +3,10 @@
 
 using System;
 using System.IO;
+
 using Typography.OpenFont.IO;
 using Typography.OpenFont.Tables;
+
 namespace Typography.OpenFont
 {
     [Flags]
@@ -50,8 +52,6 @@ namespace Typography.OpenFont
 
             }
 #endif
-
-
             Weight = weight;
             OS2TranslatedStyle = os2TranslatedStyle;
         }
@@ -65,13 +65,22 @@ namespace Typography.OpenFont
         public bool IsWebFont { get; internal set; }
         public bool IsFontCollection => _ttcfMembers != null;
 
-        public string PostScriptName { get; set; }
-        public string UniqueFontIden { get; set; }
-        public string VersionString { get; set; }
-        public uint UnicodeRange1 { get; set; }
-        public uint UnicodeRange2 { get; set; }
-        public uint UnicodeRange3 { get; set; }
-        public uint UnicodeRange4 { get; set; }
+        public string PostScriptName { get; internal set; }
+        public string UniqueFontIden { get; internal set; }
+        public string VersionString { get; internal set; }
+        public uint UnicodeRange1 { get; internal set; }
+        public uint UnicodeRange2 { get; internal set; }
+        public uint UnicodeRange3 { get; internal set; }
+        public uint UnicodeRange4 { get; internal set; }
+
+        /// <summary>
+        /// GSUB's ScriptList 
+        /// </summary>
+        public ScriptList GsubScriptList { get; internal set; }
+        /// <summary>
+        /// GPOS's ScriptList
+        /// </summary>
+        public ScriptList GposScriptList { get; internal set; }
 
         /// <summary>
         /// get font collection's member count
@@ -340,6 +349,11 @@ namespace Typography.OpenFont
             NameEntry nameEntry = ReadTableIfExists(tables, input, new NameEntry());
             OS2Table os2Table = ReadTableIfExists(tables, input, new OS2Table());
 
+            //for preview, read ONLY  script list from gsub and gpos (set OnlyScriptList).
+
+            GSUB gsub = ReadTableIfExists(tables, input, new GSUB() { OnlyScriptList = true });
+            GPOS gpos = ReadTableIfExists(tables, input, new GPOS() { OnlyScriptList = true });
+
             return new PreviewFontInfo(
               nameEntry.FontName,
               nameEntry.FontSubFamily,
@@ -355,6 +369,9 @@ namespace Typography.OpenFont
                 UnicodeRange2 = os2Table.ulUnicodeRange2,
                 UnicodeRange3 = os2Table.ulUnicodeRange3,
                 UnicodeRange4 = os2Table.ulUnicodeRange4,
+                //
+                GsubScriptList = gsub?.ScriptList,
+                GposScriptList = gpos?.ScriptList
             };
 
         }
@@ -595,5 +612,7 @@ namespace Typography.OpenFont
 
 
     }
+
+
 
 }

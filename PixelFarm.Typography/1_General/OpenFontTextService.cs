@@ -8,9 +8,36 @@ using Typography.OpenFont.Extensions;
 using Typography.TextLayout;
 using Typography.TextServices;
 using Typography.FontManagement;
+using Typography.TextBreak;
 
 namespace PixelFarm.Drawing
 {
+
+    public interface ITextService
+    {
+
+        float MeasureWhitespace(RequestFont f);
+        float MeasureBlankLineHeight(RequestFont f);
+        //
+        bool SupportsWordBreak { get; }
+        //
+        Size MeasureString(in TextBufferSpan textBufferSpan, RequestFont font);
+
+        void MeasureString(in TextBufferSpan textBufferSpan, RequestFont font, int maxWidth, out int charFit, out int charFitWidth);
+
+        void CalculateUserCharGlyphAdvancePos(in TextBufferSpan textBufferSpan,
+                RequestFont font,
+                ref TextSpanMeasureResult result);
+
+
+
+        ILineSegmentList BreakToLineSegments(in TextBufferSpan textBufferSpan);
+        void CalculateUserCharGlyphAdvancePos(in TextBufferSpan textBufferSpan, ILineSegmentList lineSegs,
+               RequestFont font,
+              ref TextSpanMeasureResult result);
+    }
+
+
 
     public class OpenFontTextService : ITextService
     {
@@ -18,19 +45,18 @@ namespace PixelFarm.Drawing
         /// instance of Typography lib's text service
         /// </summary>
         TextServices _txtServices;
-        Dictionary<int, Typeface> _resolvedTypefaceCache = new Dictionary<int, Typeface>();
+        Dictionary<int, Typeface> _resolvedTypefaceCache = new Dictionary<int, Typeface>(); //similar to TypefaceStore
         readonly int _system_id;
         //
         public static ScriptLang DefaultScriptLang { get; set; }
 
-        public OpenFontTextService(ScriptLang scLang = null)
+        public OpenFontTextService()
         {
             _system_id = PixelFarm.Drawing.Internal.RequestFontCacheAccess.GetNewCacheSystemId();
 
             //set up typography text service
             _txtServices = new TextServices();
             //default, user can set this later
-
             _txtServices.InstalledFontCollection = InstalledTypefaceCollection.GetSharedTypefaceCollection(collection =>
             {
                 collection.SetFontNameDuplicatedHandler((f0, f1) => FontNameDuplicatedDecision.Skip);
@@ -50,59 +76,94 @@ namespace PixelFarm.Drawing
 
 
             //set script-lang 
-            if (scLang == null)
-            {
-                //use default
-                scLang = DefaultScriptLang;
-            }
-            // if not default then try guess
-            if (scLang == null &&
+            ScriptLang scLang = DefaultScriptLang;
+            //---------------
+            //if not default then try guess
+            //
+            if (scLang.scriptTag == 0 &&
                 !TryGetScriptLangFromCurrentThreadCultureInfo(out scLang))
             {
                 //TODO: handle error here
+
+                throw new NotSupportedException();
             }
+
 
             _txtServices.SetDefaultScriptLang(scLang);
             _txtServices.CurrentScriptLang = scLang;
-
-            // ... or specific the scriptlang manully, eg. ...
-            //_shapingServices.SetDefaultScriptLang(scLang);
-            //_shapingServices.SetCurrentScriptLang(scLang);
-            //--------------- 
-        }
-        public void LoadSystemFonts()
-        {
-            _txtServices.InstalledFontCollection.LoadSystemFonts();
         }
 
-        public void LoadFontsFromFolder(string folder)
-        {
-            _txtServices.InstalledFontCollection.LoadFontsFromFolder(folder);
-        }
+        public void LoadSystemFonts() => _txtServices.InstalledFontCollection.LoadSystemFonts();
+
+        public void LoadFontsFromFolder(string folder) => _txtServices.InstalledFontCollection.LoadFontsFromFolder(folder);
+
+        public void UpdateUnicodeRanges() => _txtServices.InstalledFontCollection.UpdateUnicodeRanges();
+
+
+        static readonly ScriptLang s_latin = new ScriptLang(ScriptTagDefs.Latin.Tag);
         static bool TryGetScriptLangFromCurrentThreadCultureInfo(out Typography.OpenFont.ScriptLang scLang)
         {
             var currentCulture = System.Threading.Thread.CurrentThread.CurrentCulture;
-            scLang = null;
+
             if (Typography.TextBreak.IcuData.TryGetFullLanguageNameFromLangCode(
                  currentCulture.TwoLetterISOLanguageName,
                  currentCulture.ThreeLetterISOLanguageName,
                  out string langFullName))
             {
-                scLang = Typography.OpenFont.ScriptLangs.GetRegisteredScriptLangFromLanguageName(langFullName);
-                if (scLang == null)
+                Typography.OpenFont.ScriptLangInfo scLang1 = Typography.OpenFont.ScriptLangs.GetRegisteredScriptLangFromLanguageName(langFullName);
+                if (scLang1 == null)
                 {
                     //not found -> use default latin
                     //use default lang
 #if DEBUG
                     System.Diagnostics.Debug.WriteLine(langFullName + " :use latin");
 #endif
-                    scLang = ScriptLangs.Latin;
+                    scLang = s_latin;
                     return true;
                 }
+                else
+                {
+                    scLang = scLang1.GetScriptLang();
+                    return true;
+                }
+            }
+            else
+            {
+                scLang = default;
             }
             return false;
         }
 
+
+
+
+        public bool TryGetAlternativeTypefaceFromChar(char c, AlternativeTypefaceSelector selector, out Typeface found)
+        {
+            //find a typeface that supported input char c
+            if (_txtServices.InstalledFontCollection.TryGetAlternativeTypefaceFromChar(c,
+                out ScriptLangInfo scriptLangInfo,
+                out List<InstalledTypeface> installedTypefaceList))
+            {
+                //select a prefer font
+                if (selector != null)
+                {
+                    InstalledTypeface selected = selector.Select(installedTypefaceList, scriptLangInfo, c);
+                    if (selected != null)
+                    {
+                        found = _txtServices.GetTypeface(selected.FontName, TypefaceStyle.Regular);
+                        return true;
+                    }
+                }
+                else
+                {
+                    InstalledTypeface selected = installedTypefaceList[0];//default
+                    found = _txtServices.GetTypeface(selected.FontName, TypefaceStyle.Regular);
+                    return true;
+                }
+            }
+            found = null;
+            return false;
+        }
         //
         public ScriptLang CurrentScriptLang
         {
@@ -112,10 +173,13 @@ namespace PixelFarm.Drawing
         //
         public void CalculateUserCharGlyphAdvancePos(in TextBufferSpan textBufferSpan, RequestFont font, ref TextSpanMeasureResult measureResult)
         {
-            CalculateUserCharGlyphAdvancePos(textBufferSpan,
-                this.BreakToLineSegments(textBufferSpan),
+            using (ILineSegmentList lineSegList = this.BreakToLineSegments(textBufferSpan))
+            {
+                CalculateUserCharGlyphAdvancePos(textBufferSpan,
+                lineSegList,
                 font,
                 ref measureResult);
+            }
         }
         //
         ReusableTextBuffer _reusableTextBuffer = new ReusableTextBuffer();
@@ -149,8 +213,10 @@ namespace PixelFarm.Drawing
             {
                 //get each segment
                 MyLineSegment lineSeg = (MyLineSegment)mylineSegs.GetSegment(i);
+
                 //each line seg may has different script lang
-                _txtServices.CurrentScriptLang = lineSeg.scriptLang;
+
+                //_txtServices.CurrentScriptLang = lineSeg.scriptLang;
                 //
                 //CACHING ...., reduce number of GSUB/GPOS
                 //
@@ -263,15 +329,19 @@ namespace PixelFarm.Drawing
             return PixelFarm.Drawing.Internal.RequestFontCacheAccess.GetWhitespaceWidth(f, _system_id);
         }
 
-        public GlyphPlanSequence CreateGlyphPlanSeq(in TextBufferSpan textBufferSpan, RequestFont font)
-        {
 
-            Typeface typeface = ResolveTypeface(font);
-            _txtServices.SetCurrentFont(typeface, font.SizeInPoints);
+
+        public GlyphPlanSequence CreateGlyphPlanSeq(in TextBufferSpan textBufferSpan, Typeface typeface, float sizeInPts)
+        {
+            _txtServices.SetCurrentFont(typeface, sizeInPts);
 
             _reusableTextBuffer.SetRawCharBuffer(textBufferSpan.GetRawCharBuffer());
 
             return _txtServices.GetUnscaledGlyphPlanSequence(_reusableTextBuffer, textBufferSpan.start, textBufferSpan.len);
+        }
+        public GlyphPlanSequence CreateGlyphPlanSeq(in TextBufferSpan textBufferSpan, RequestFont font)
+        {
+            return CreateGlyphPlanSeq(textBufferSpan, ResolveTypeface(font), font.SizeInPoints);
         }
         public Size MeasureString(in TextBufferSpan textBufferSpan, RequestFont font)
         {
@@ -303,15 +373,32 @@ namespace PixelFarm.Drawing
         {
             readonly int _startAt;
             readonly int _len;
-            internal ScriptLang scriptLang;
-            public MyLineSegment(int startAt, int len)
+            public readonly SpanBreakInfo breakInfo;
+            public MyLineSegment(int startAt, int len, SpanBreakInfo breakInfo)
             {
                 _startAt = startAt;
                 _len = len;
-                this.scriptLang = null;
+
+#if DEBUG
+                if (breakInfo == null)
+                {
+
+                }
+#endif
+                this.breakInfo = breakInfo;
+
+
             }
             public int Length => _len;
             public int StartAt => _startAt;
+            public SpanBreakInfo SpanBreakInfo => breakInfo;
+
+#if DEBUG
+            public override string ToString()
+            {
+                return _startAt + ":" + _len + (breakInfo.RightToLeft ? "(rtl)" : "");
+            }
+#endif
         }
 
         class MyLineSegmentList : ILineSegmentList
@@ -371,22 +458,22 @@ namespace PixelFarm.Drawing
             }
         }
 
-
-
         public ILineSegmentList BreakToLineSegments(in TextBufferSpan textBufferSpan)
         {
             //a text buffer span is separated into multiple line segment list 
             char[] str = textBufferSpan.GetRawCharBuffer();
 #if DEBUG
+            if (str.Length > 10)
+            {
+
+            }
             int cur_startAt = textBufferSpan.start;
 #endif
 
             MyLineSegmentList lineSegments = MyLineSegmentList.GetFreeLineSegmentList();
             foreach (BreakSpan breakSpan in _txtServices.BreakToLineSegments(str, textBufferSpan.start, textBufferSpan.len))
             {
-                MyLineSegment lineSeg = new MyLineSegment(breakSpan.startAt, breakSpan.len);
-                lineSeg.scriptLang = breakSpan.scLang;
-                lineSegments.AddLineSegment(lineSeg);
+                lineSegments.AddLineSegment(new MyLineSegment(breakSpan.startAt, breakSpan.len, breakSpan.SpanBreakInfo));
             }
             return lineSegments;
         }
@@ -416,37 +503,7 @@ namespace PixelFarm.Drawing
         }
 
 
-
-
     }
 
 
-    //    public abstract class TextShapingService
-    //    {
-    //        protected abstract void GetGlyphPosImpl(ActualFont actualFont, char[] buffer, int startAt, int len, List<UnscaledGlyphPlan> properGlyphs);
-    //        public static void GetGlyphPos(ActualFont actualFont, char[] buffer, int startAt, int len, List<UnscaledGlyphPlan> properGlyphs)
-    //        {
-    //            defaultSharpingService.GetGlyphPosImpl(actualFont, buffer, startAt, len, properGlyphs);
-    //        }
-    //        static TextShapingService defaultSharpingService;
-    //        public void SetAsCurrentImplementation()
-    //        {
-    //            defaultSharpingService = this;
-    //        }
-    //    }
-
-    //    public abstract class TextLayoutService
-    //    {
-    //        static TextLayoutService s_defaultTextLayoutServices;
-    //        public void SetAsCurrentImplementation()
-    //        {
-    //            s_defaultTextLayoutServices = this;
-    //        }
-
-    //        public abstract Size MeasureStringImpl(char[] buff, int startAt, int len, RequestFont font);
-
-    //        public abstract Size MeasureStringImpl(char[] buff, int startAt, int len,
-    //            RequestFont font, float maxWidth,
-    //            out int charFit, out int charFitWidth);
-    //    }
 }

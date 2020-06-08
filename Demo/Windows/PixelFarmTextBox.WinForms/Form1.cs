@@ -126,6 +126,8 @@ namespace PixelFarmTextBox.WinForms
                         selectedTextPrinter.FontSizeInPoints = _basicOptions.FontSizeInPoints;
                         selectedTextPrinter.ScriptLang = _basicOptions.ScriptLang;
                         selectedTextPrinter.PositionTechnique = _basicOptions.PositionTech;
+                        selectedTextPrinter.EnableMultiTypefaces = _basicOptions.EnableMultiTypefaces;
+
 
                         selectedTextPrinter.HintTechnique = HintTechnique.None;
                         selectedTextPrinter.EnableLigature = true;
@@ -158,6 +160,8 @@ namespace PixelFarmTextBox.WinForms
             selectedTextPrinter.PositionTechnique = _basicOptions.PositionTech;
             selectedTextPrinter.HintTechnique = HintTechnique.None;
             selectedTextPrinter.EnableLigature = true;
+            selectedTextPrinter.EnableMultiTypefaces = _basicOptions.EnableMultiTypefaces;
+
             _devVxsTextPrinter.UpdateGlyphLayoutSettings();
 
             //------- 

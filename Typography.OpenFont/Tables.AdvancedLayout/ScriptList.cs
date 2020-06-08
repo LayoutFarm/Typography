@@ -5,7 +5,7 @@ using System.IO;
 
 namespace Typography.OpenFont.Tables
 {
-    public class ScriptList : Dictionary<string, ScriptTable>
+    public class ScriptList : Dictionary<uint, ScriptTable>
     {
         // https://www.microsoft.com/typography/otspec/chapter2.htm
         // The ScriptList identifies the scripts in a font,
@@ -13,10 +13,8 @@ namespace Typography.OpenFont.Tables
         // Language system tables reference features, which are defined in the FeatureList.
         // Each feature table references the lookup data defined in the LookupList that describes how, when, and where to implement the feature.
         private ScriptList() { }
-        public new ScriptTable this[string tagName]
-        {
-            get { return TryGetValue(tagName, out ScriptTable ret) ? ret : null; }
-        }
+        public new ScriptTable this[uint tagName] => TryGetValue(tagName, out ScriptTable ret) ? ret : null;
+
 
         public static ScriptList CreateFrom(BinaryReader reader, long beginAt)
         {
@@ -51,8 +49,7 @@ namespace Typography.OpenFont.Tables
             {
                 ScriptTable scriptTable = ScriptTable.CreateFrom(reader, beginAt + scriptOffsets[i]);
                 scriptTable.scriptTag = scriptTags[i];
-
-                scriptList.Add(Utils.TagToString(scriptTags[i]), scriptTable);
+                scriptList.Add(scriptTags[i], scriptTable);
             }
 
             return scriptList;

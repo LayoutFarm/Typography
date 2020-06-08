@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Typography.OpenFont;
 
+
 namespace Typography.TextLayout
 {
 
@@ -32,7 +33,7 @@ namespace Typography.TextLayout
         /// </summary>
         public short OffsetY { get; private set; }
 
-        public bool AdvanceMoveForward { get { return this.AdvanceX > 0; } }
+        public bool AdvanceMoveForward => this.AdvanceX > 0;
 
 #if DEBUG
         public override string ToString()
@@ -48,11 +49,12 @@ namespace Typography.TextLayout
         void Append(UnscaledGlyphPlan glyphPlan);
         int Count { get; }
         UnscaledGlyphPlan this[int index] { get; }
+
     }
 
     public class UnscaledGlyphPlanList : IUnscaledGlyphPlanList
     {
-        List<UnscaledGlyphPlan> _list = new List<UnscaledGlyphPlan>();
+        readonly List<UnscaledGlyphPlan> _list = new List<UnscaledGlyphPlan>();
         float _accumAdvanceX;
 
         public int Count => _list.Count;
@@ -69,6 +71,7 @@ namespace Typography.TextLayout
             _accumAdvanceX += glyphPlan.AdvanceX;
         }
         public float AccumAdvanceX => _accumAdvanceX;
+
     }
 
     /// <summary>
@@ -79,28 +82,38 @@ namespace Typography.TextLayout
         //
         public static GlyphPlanSequence Empty = new GlyphPlanSequence();
         //
-        readonly IUnscaledGlyphPlanList _glyphBuffer;
+        readonly IUnscaledGlyphPlanList _glyphPlanList;
         internal readonly int startAt;
         internal readonly ushort len;
-        public GlyphPlanSequence(IUnscaledGlyphPlanList glyphBuffer)
+
+        bool _isRTL;
+        public GlyphPlanSequence(IUnscaledGlyphPlanList glyphPlanList)
         {
-            _glyphBuffer = glyphBuffer;
+            _glyphPlanList = glyphPlanList;
             this.startAt = 0;
-            this.len = (ushort)glyphBuffer.Count;
+            this.len = (ushort)glyphPlanList.Count;
+            _isRTL = false;
         }
-        public GlyphPlanSequence(IUnscaledGlyphPlanList glyphBuffer, int startAt, int len)
+        public GlyphPlanSequence(IUnscaledGlyphPlanList glyphPlanList, int startAt, int len)
         {
-            _glyphBuffer = glyphBuffer;
+            _glyphPlanList = glyphPlanList;
             this.startAt = startAt;
             this.len = (ushort)len;
+            _isRTL = false;
         }
+        public bool IsRightToLeft
+        {
+            get => _isRTL;
+            set => _isRTL = value;
+        }
+
         public UnscaledGlyphPlan this[int index]
         {
             get
             {
                 if (index >= 0 && index < (startAt + len))
                 {
-                    return _glyphBuffer[startAt + index];
+                    return _glyphPlanList[startAt + index];
                 }
                 else
                 {
@@ -109,13 +122,13 @@ namespace Typography.TextLayout
             }
         }
         //
-        public int Count => (_glyphBuffer != null) ? len : 0;
+        public int Count => (_glyphPlanList != null) ? len : 0;
         //
         public float CalculateWidth()
         {
-            if (_glyphBuffer == null) return 0;
+            if (_glyphPlanList == null) return 0;
             //
-            IUnscaledGlyphPlanList plans = _glyphBuffer;
+            IUnscaledGlyphPlanList plans = _glyphPlanList;
             int end = startAt + len;
             float width = 0;
             for (int i = startAt; i < end; ++i)
@@ -124,7 +137,7 @@ namespace Typography.TextLayout
             }
             return width;
         }
-        public bool IsEmpty() => _glyphBuffer == null;
+        public bool IsEmpty() => _glyphPlanList == null;
 
     }
 
@@ -141,9 +154,13 @@ namespace Typography.TextLayout
         OpenFont,
     }
 
+
+
     class GlyphLayoutPlanCollection
     {
         Dictionary<GlyphLayoutPlanKey, GlyphLayoutPlanContext> _collection = new Dictionary<GlyphLayoutPlanKey, GlyphLayoutPlanContext>();
+
+        static readonly Dictionary<string, int> s_scriptLangKeys = new Dictionary<string, int>();
         /// <summary>
         /// get glyph layout plan or create if not exists
         /// </summary>
@@ -152,13 +169,20 @@ namespace Typography.TextLayout
         /// <returns></returns>
         public GlyphLayoutPlanContext GetPlanOrCreate(Typeface typeface, ScriptLang scriptLang)
         {
-            GlyphLayoutPlanKey key = new GlyphLayoutPlanKey(typeface, scriptLang.internalName);
+            string key_string = scriptLang.ToString();
+            if (!s_scriptLangKeys.TryGetValue(key_string, out int key1))
+            {
+                key1 = s_scriptLangKeys.Count + 1;
+                s_scriptLangKeys.Add(key_string, key1);
+            }
+
+            GlyphLayoutPlanKey key = new GlyphLayoutPlanKey(typeface, key1);
 
             if (!_collection.TryGetValue(key, out GlyphLayoutPlanContext context))
             {
-                var glyphSubstitution = (typeface.GSUBTable != null) ? new GlyphSubstitution(typeface, scriptLang.shortname) : null;
-                var glyphPosition = (typeface.GPOSTable != null) ? new GlyphSetPosition(typeface, scriptLang.shortname) : null;
-                _collection.Add(key, context = new GlyphLayoutPlanContext(glyphSubstitution, glyphPosition));
+                var g_sub = (typeface.GSUBTable != null) ? new GlyphSubstitution(typeface, scriptLang.scriptTag, scriptLang.sysLangTag) : null;
+                var g_pos = (typeface.GPOSTable != null) ? new GlyphSetPosition(typeface, scriptLang.scriptTag, scriptLang.sysLangTag) : null;
+                _collection.Add(key, context = new GlyphLayoutPlanContext(g_sub, g_pos));
             }
             return context;
         }
@@ -223,13 +247,14 @@ namespace Typography.TextLayout
         GlyphIndexList _inputGlyphs = new GlyphIndexList();//reusable input glyph
         GlyphPosStream _glyphPositions = new GlyphPosStream();
 
+        static ScriptLang s_latin = new ScriptLang("latn");
 
         public GlyphLayout()
         {
             PositionTechnique = PositionTechnique.OpenFont;
             EnableLigature = true;
             EnableComposition = true;
-            ScriptLang = ScriptLangs.Latin;
+            ScriptLang = s_latin;
         }
 
 
@@ -242,17 +267,19 @@ namespace Typography.TextLayout
             get => _scriptLang;
             set
             {
-                if (_scriptLang != value)
+
+                if (_scriptLang.scriptTag != value.scriptTag || _scriptLang.sysLangTag != value.sysLangTag)
                 {
                     _needPlanUpdate = true;
                 }
+
                 _scriptLang = value;
             }
         }
 
         public bool EnableLigature { get; set; }
         public bool EnableComposition { get; set; }
-         
+
         public Typeface Typeface
         {
             get => _typeface;
@@ -265,8 +292,6 @@ namespace Typography.TextLayout
                 }
             }
         }
-
-
 
 
         public delegate ushort GlyphNotFoundHandler(GlyphLayout glyphLayout, int codepoint, int nextcodepoint);
@@ -400,7 +425,7 @@ namespace Typography.TextLayout
             {
                 //TODO: review perf here
                 _gsub.EnableLigation = this.EnableLigature;
-                _gsub.EnableComposition = this.EnableComposition; 
+                _gsub.EnableComposition = this.EnableComposition;
                 _gsub.DoSubstitution(glyphs);
             }
 

@@ -5,6 +5,8 @@
 
 
 
+using Typography.OpenFont;
+
 namespace Typography.TextBreak
 {
 
@@ -15,7 +17,10 @@ namespace Typography.TextBreak
         public void SetDictionaryData(CustomDic customDic)
         {
             _customDic = customDic;
-
+        }
+        protected override SpanBreakInfo GetSpanBreakInfo()
+        {
+            return new SpanBreakInfo(false, ScriptTagDefs.Thai.Tag);
         }
         //
         protected override CustomDic CurrentCustomDic => _customDic;
@@ -26,7 +31,7 @@ namespace Typography.TextBreak
             return s_canbeStartChars[c - this.FirstUnicodeChar];
         }
         protected override WordGroup GetWordGroupForFirstChar(char c)
-        { 
+        {
             return _customDic.GetWordGroupForFirstChar(c);
         }
         //

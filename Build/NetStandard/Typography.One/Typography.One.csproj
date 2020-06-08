@@ -16,12 +16,14 @@
   <Import Project="..\..\..\Unpack_SH\Unpack_SH.projitems" Label="Shared" />
 
   <ItemGroup>
-    <Compile Include="..\..\..\Demo\Shared\DevTextPrinter\FontManagement.cs" Link="DevTextPrinter\FontManagement.cs" />
     <Compile Include="..\..\..\Demo\Shared\GlyphOutlineBuilder\GlyphOutlineBuilder.cs" Link="GlyphPathBuilder\GlyphOutlineBuilder.cs" />
-    <Compile Include="..\..\..\PixelFarm.Typography\3_Typography_Contours\GlyphMeshCollection.cs" Link="DevTextPrinter\GlyphMeshCollection.cs" />
+    <Compile Include="..\..\..\PixelFarm.Typography\3_Typography_Contours\GlyphMeshCollection.cs" Link="TextServices\GlyphMeshCollection.cs" />
     <Compile Include="..\..\..\PixelFarm.Typography\3_Typography_Contours\GlyphOutlineBuilderBase.cs" Link="GlyphPathBuilder\GlyphOutlineBuilderBase.cs" />
     <Compile Include="..\..\..\PixelFarm.Typography\3_Typography_Contours\TextPrinterBase.cs" Link="DevTextPrinter\TextPrinterBase.cs" />
     <Compile Include="..\..\..\PixelFarm\PixelFarm.Painter\Drawing\TextBaseline.cs" Link="DevTextPrinter\TextBaseline.cs" />
+    <Compile Include="..\..\..\Typography.TextBreak\Typography.TextBreak\ScriptTagsAndLanguageSystemTags\ScriptLangInfo.cs" Link="TextServices\ScriptLangInfo.cs" />
+    <Compile Include="..\..\..\Typography.TextBreak\Typography.TextBreak\ScriptTagsAndLanguageSystemTags\UnicodeLangBits.cs" Link="TextServices\UnicodeLangBits.cs" />
+    <Compile Include="..\..\..\Typography.TextServices\FontStoreAndManagment\FontManagement.cs" Link="TextServices\FontManagement.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -32,6 +34,7 @@
   <ItemGroup>
     <Folder Include="DevTextPrinter\" />
     <Folder Include="GlyphPathBuilder\" />
+    <Folder Include="TextServices\" />
   </ItemGroup>
 
 </Project>

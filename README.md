@@ -110,6 +110,10 @@ MIT, 2016, Viktor Chlumsky, https://github.com/Chlumsky/msdfgen
 
 Apache2, 2018, Apache/PDFBox Authors,  https://github.com/apache/pdfbox
 
+**Text Processing**
+
+Apache2, 2014 , Muhammad Tayyab Akram, https://sheenbidi.codeplex.com/ , https://github.com/Tehreer
+
 **Geometry**
 
 BSD, 2002-2005, Maxim Shemanarev, Anti-Grain Geometry - Version 2.4 http://www.antigrain.com

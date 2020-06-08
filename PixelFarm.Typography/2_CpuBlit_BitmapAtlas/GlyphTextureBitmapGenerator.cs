@@ -4,7 +4,6 @@ using System.Collections.Generic;
 
 using Typography.OpenFont;
 using Typography.OpenFont.Extensions;
-using Typography.TextLayout;
 using Typography.Contours;
 
 namespace PixelFarm.CpuBlit.BitmapAtlas
@@ -21,7 +20,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
     {
 
         public delegate void OnEachGlyph(BitmapAtlasItemSource glyphImage);
-         
+
         /// <summary>
         /// version of msdf generator
         /// </summary>
@@ -44,7 +43,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             for (int i = 0; i < j; ++i)
             {
                 GlyphTextureBuildDetail detail = details[i];
-                if (detail.ScriptLang != null)
+                if (!detail.ScriptLang.IsEmpty())
                 {
                     //skip those script lang=null
                     //2. find associated glyph index base on input script langs

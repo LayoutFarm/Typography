@@ -1,0 +1,8 @@
+﻿#
+Hangul:Korea
+U+AC00–U+D7AF
+U+1100–U+11FF
+U+3130–U+318F
+U+A960–U+A97F
+U+D7B0–U+D7FF
+#

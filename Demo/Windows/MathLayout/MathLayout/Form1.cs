@@ -335,7 +335,7 @@ namespace MathLayout
 
                 //---------- 
                 GlyphLayout glyphLayout = new GlyphLayout();
-                glyphLayout.ScriptLang = ScriptLangs.Math;
+                glyphLayout.ScriptLang = new ScriptLang("math");
                 glyphLayout.Typeface = _latinModernMathFont;
 
 

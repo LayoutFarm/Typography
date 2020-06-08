@@ -134,7 +134,7 @@ namespace Typography.OpenFont.Tables
             //used to render the glyphs in a script. (The LookupOrder offset is reserved for future use.)
             //
             public uint langSysTagIden { get; private set; }
-            public readonly ushort offset;
+            internal readonly ushort offset;
 
             //
             public ushort[] featureIndexList { get; private set; }
@@ -162,11 +162,9 @@ namespace Typography.OpenFont.Tables
 
             }
             public bool HasRequireFeature => RequireFeatureIndex != 0xFFFF;
+            public string LangSysTagIdenString => (langSysTagIden == 0) ? "" : Utils.TagToString(langSysTagIden);
 #if DEBUG
-            public override string ToString()
-            {
-                return Utils.TagToString(langSysTagIden);
-            }
+            public override string ToString() => LangSysTagIdenString;
 #endif
 
         }
