@@ -263,14 +263,18 @@ namespace SampleWinForms
                 _devVxsTextPrinter.PositionTechnique = Typography.TextLayout.PositionTechnique.OpenFont;
 
 
-                //test 
+
+                _devVxsTextPrinter.AlternativeTypefaceSelector = _myAlternativeTypefaceSelector;
                 {
-                    _devVxsTextPrinter.AlternativeTypefaceSelector = _myAlternativeTypefaceSelector;
-
                     var preferTypefaces = new PixelFarm.Drawing.MyAlternativeTypefaceSelector.PreferTypefaceList();
-                    preferTypefaces.AddTypefaceName("Noto Sans Arabic UI");
-
                     _myAlternativeTypefaceSelector.SetPreferTypefaces(ScriptTagDefs.Arabic, preferTypefaces);
+
+                    preferTypefaces.AddTypefaceName("Noto Sans Arabic UI");
+                }
+                {
+                    var preferTypefaces = new PixelFarm.Drawing.MyAlternativeTypefaceSelector.PreferTypefaceList();
+                    _myAlternativeTypefaceSelector.SetPreferTypefaces(ScriptTagDefs.Latin, preferTypefaces);
+                    preferTypefaces.AddTypefaceName("Sarabun");
                 }
             }
 
