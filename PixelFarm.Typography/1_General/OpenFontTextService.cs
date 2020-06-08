@@ -145,9 +145,18 @@ namespace PixelFarm.Drawing
                 out List<InstalledTypeface> installedTypefaceList))
             {
                 //select a prefer font
-                InstalledTypeface selected = selector.Select(installedTypefaceList, scriptLangInfo, c);
-                if (selected != null)
+                if (selector != null)
                 {
+                    InstalledTypeface selected = selector.Select(installedTypefaceList, scriptLangInfo, c);
+                    if (selected != null)
+                    {
+                        found = _txtServices.GetTypeface(selected.FontName, TypefaceStyle.Regular);
+                        return true;
+                    }
+                }
+                else
+                {
+                    InstalledTypeface selected = installedTypefaceList[0];//default
                     found = _txtServices.GetTypeface(selected.FontName, TypefaceStyle.Regular);
                     return true;
                 }

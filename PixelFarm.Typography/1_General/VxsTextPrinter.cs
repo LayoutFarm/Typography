@@ -112,9 +112,9 @@ namespace PixelFarm.Drawing
                 List<PreferTypeface> preferTypefaces = new List<PreferTypeface>();
                 preferTypefaces.Add(new PreferTypeface("Noto Sans Arabic UI"));
                 _alternativeTypefaceSelector.SetPreferTypeface(ScriptTagDefs.Arabic.StringTag, preferTypefaces);
-            }
-
+            } 
         }
+        
         public void SetSvgBmpBuilderFunc(SvgBmpBuilderFunc svgBmpBuilderFunc)
         {
             _glyphSvgStore.SetSvgBmpBuilderFunc(svgBmpBuilderFunc);
