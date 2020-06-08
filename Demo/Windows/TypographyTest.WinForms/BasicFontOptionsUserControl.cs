@@ -37,14 +37,23 @@ namespace TypographyTest.WinForms
             SetupFontsList2();
             SetupFontSizeList();
             SetupRenderOptions();
-            //
+
             this.lstFontSizes.SelectedIndex = 0;// lstFontSizes.Items.Count - 3;
             if (lstFontList.SelectedItem is InstalledTypeface instTypeface)
             {
                 _options.InstalledTypeface = instTypeface;
             }
             SetupPositionTechniqueList();
+            chkEnableMultiTypefaces.CheckedChanged += ChkEnableMultiTypefaces_CheckedChanged;
+
         }
+
+        private void ChkEnableMultiTypefaces_CheckedChanged(object sender, EventArgs e)
+        {
+            _options.EnableMultiTypefaces = chkEnableMultiTypefaces.Checked;
+            _options.InvokeAttachEvents();
+        }
+
         void SetupFontList()
         {
 
@@ -167,7 +176,7 @@ namespace TypographyTest.WinForms
             foreach (var kv in dic)
             {
                 ScriptLang s = kv.Value;
-                if (s.sysLangTag != "" && LanguageSystemNames.TryGetLangSystem(s.sysLangTag, out LangSys found))
+                if (s.sysLangTag != 0 && LanguageSystemNames.TryGetLangSystem(s.GetScriptTagString(), out LangSys found))
                 {
 
                 }
@@ -216,7 +225,7 @@ namespace TypographyTest.WinForms
         {
 
             //for debug, set default script lang here
-            _options.ScriptLang = ScriptLangs.Latin.GetScriptLang();
+            _options.ScriptLang = new ScriptLang(ScriptTagDefs.Latin.Tag);
 
             //list only scripts that are support by current typeface 
             //show all scripts

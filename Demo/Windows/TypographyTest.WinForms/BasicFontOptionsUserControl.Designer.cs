@@ -43,6 +43,7 @@
             this.lstScriptLangs = new System.Windows.Forms.ListBox();
             this.label1 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
+            this.chkEnableMultiTypefaces = new System.Windows.Forms.CheckBox();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
@@ -183,10 +184,21 @@
             this.label3.TabIndex = 77;
             this.label3.Text = "Suppoted UnicodeRanges";
             // 
+            // chkEnableMultiTypefaces
+            // 
+            this.chkEnableMultiTypefaces.AutoSize = true;
+            this.chkEnableMultiTypefaces.Location = new System.Drawing.Point(7, 375);
+            this.chkEnableMultiTypefaces.Name = "chkEnableMultiTypefaces";
+            this.chkEnableMultiTypefaces.Size = new System.Drawing.Size(137, 17);
+            this.chkEnableMultiTypefaces.TabIndex = 78;
+            this.chkEnableMultiTypefaces.Text = "Enable Multi-Typefaces";
+            this.chkEnableMultiTypefaces.UseVisualStyleBackColor = true;
+            // 
             // BasicFontOptionsUserControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.chkEnableMultiTypefaces);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.lstScriptLangs);
@@ -224,5 +236,6 @@
         private System.Windows.Forms.ListBox lstScriptLangs;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.CheckBox chkEnableMultiTypefaces;
     }
 }

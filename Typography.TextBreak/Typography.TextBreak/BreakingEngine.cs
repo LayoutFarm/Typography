@@ -16,13 +16,13 @@ namespace Typography.TextBreak
     }
     public abstract class DictionaryBreakingEngine : BreakingEngine
     {
-        readonly SpanLayoutInfo _spanLayoutInfo;
+        readonly SpanBreakInfo _breakInfo;
         public DictionaryBreakingEngine()
         {
-            _spanLayoutInfo = GetSpanLayoutInfo();
+            _breakInfo = GetSpanBreakInfo();
         }
-        protected abstract SpanLayoutInfo GetSpanLayoutInfo(); 
-   
+        protected abstract SpanBreakInfo GetSpanBreakInfo();
+
         public abstract char FirstUnicodeChar { get; }
         public abstract char LastUnicodeChar { get; }
         public override bool CanHandle(char c)
@@ -44,7 +44,7 @@ namespace Typography.TextBreak
             char c_last = this.LastUnicodeChar;
             int endAt = startAt + len;
 
-            visitor.SpanLayoutInfo = _spanLayoutInfo;
+            visitor.SpanBreakInfo = _breakInfo;
 
             Stack<int> candidateBreakList = visitor.GetTempCandidateBreaks();
             bool breakPeroidInTextSpan = BreakPeroidInTextSpan;
@@ -93,8 +93,8 @@ namespace Typography.TextBreak
                 {
                     //continue next char
                     ++i;
-                    visitor.AddWordBreakAt(i, WordKind.Text);
-                    visitor.SetCurrentIndex(visitor.LatestBreakAt);
+                    visitor.AddWordBreak_AndSetCurrentIndex(i, WordKind.Text);
+
                 }
                 else
                 {
@@ -164,8 +164,7 @@ namespace Typography.TextBreak
                                     int p2 = FindInWordSpans(visitor, c_wordgroup);
                                     if (p2 - p1 > 0)
                                     {
-                                        visitor.AddWordBreakAt(p2, WordKind.Text);
-                                        visitor.SetCurrentIndex(p2);
+                                        visitor.AddWordBreak_AndSetCurrentIndex(p2, WordKind.Text);
                                         candidateBreakList.Clear();
                                     }
                                 }
@@ -279,8 +278,7 @@ namespace Typography.TextBreak
                                 int p2 = FindInWordSpans(visitor, c_wordgroup);
                                 if (p2 - p1 > 0)
                                 {
-                                    visitor.AddWordBreakAt(p2, WordKind.Text);
-                                    visitor.SetCurrentIndex(p2);
+                                    visitor.AddWordBreak_AndSetCurrentIndex(p2, WordKind.Text);
                                 }
                                 else
                                 {

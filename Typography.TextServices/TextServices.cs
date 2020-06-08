@@ -4,11 +4,13 @@ using System.Collections.Generic;
 using Typography.OpenFont;
 using Typography.FontManagement;
 using System.IO;
- 
+
 namespace Typography.TextServices
 {
     using Typography.TextBreak;
     using Typography.TextLayout;
+
+
     public class TextServices
     {
         //user can do text shaping by their own
@@ -18,7 +20,8 @@ namespace Typography.TextServices
 
         GlyphPlanCacheForTypefaceAndScriptLang _currentGlyphPlanSeqCache;
         Dictionary<TextShapingContextKey, GlyphPlanCacheForTypefaceAndScriptLang> _registerShapingContexts = new Dictionary<TextShapingContextKey, GlyphPlanCacheForTypefaceAndScriptLang>();
-        GlyphLayout _glyphLayout;
+
+        readonly GlyphLayout _glyphLayout;
 
 
         float _fontSizeInPts;
@@ -94,22 +97,24 @@ namespace Typography.TextServices
         List<TextBreak.BreakSpan> _breakSpans = new List<TextBreak.BreakSpan>();
 
         public IEnumerable<Typography.TextBreak.BreakSpan> BreakToLineSegments(char[] str, int startAt, int len)
-        {
+        { 
             //user must setup the CustomBreakerBuilder before use      
             if (_textBreaker == null)
             {
+                //setup 
                 _textBreaker = Typography.TextBreak.CustomBreakerBuilder.NewCustomBreaker();
                 _textBreaker.SetNewBreakHandler(vis => _breakSpans.Add(vis.GetBreakSpan()));
-                //setup 
             }
+
+
+            _textBreaker.UseUnicodeRangeBreaker = true;
 
             _breakSpans.Clear();
             //
             if (len < 1)
             {
                 yield break;
-            }
-
+            } 
 
 #if DEBUG
             if (len > 2)
@@ -126,46 +131,6 @@ namespace Typography.TextServices
             {
                 yield return sp;
             }
-        }
-
-        /// <summary>
-        /// expandable list of glyph plan
-        /// </summary>
-        class UnscaledGlyphPlanList : IUnscaledGlyphPlanList
-        {
-            List<UnscaledGlyphPlan> _glyphPlans = new List<UnscaledGlyphPlan>();
-
-
-            public void Clear()
-            {
-                _glyphPlans.Clear();
-            }
-            public void Append(UnscaledGlyphPlan glyphPlan)
-            {
-                _glyphPlans.Add(glyphPlan);
-            }
-            public UnscaledGlyphPlan this[int index]
-            {
-                get
-                {
-                    return _glyphPlans[index];
-                }
-            }
-            public int Count
-            {
-                get
-                {
-                    return _glyphPlans.Count;
-                }
-            }
-
-
-#if DEBUG
-            public UnscaledGlyphPlanList()
-            {
-
-            }
-#endif
         }
         public void MeasureString(char[] str, int startAt, int len, out int w, out int h)
         {

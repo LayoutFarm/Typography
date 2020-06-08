@@ -8,9 +8,84 @@ using Typography.OpenFont;
 using Typography.OpenFont.Extensions;
 using Typography.TextLayout;
 using Typography.TextBreak;
+using Typography.FontManagement;
 
 namespace PixelFarm.Drawing
 {
+    public class MyAlternativeTypefaceSelector : AlternativeTypefaceSelector
+    {
+        Dictionary<string, PreferTypefaceList> _dics = new Dictionary<string, PreferTypefaceList>();
+#if DEBUG
+        public MyAlternativeTypefaceSelector() { }
+#endif
+        public void SetPreferTypefaces(string scriptTag, PreferTypefaceList typefaceNames)
+        {
+            _dics[scriptTag] = typefaceNames;
+        }
+        public void SetPreferTypefaces(ScriptTagDef scriptTag, PreferTypefaceList typefaceNames)
+        {
+            _dics[scriptTag.StringTag] = typefaceNames;
+        }
+        public PreferTypefaceList GetPreferTypefaces(string scriptTag) => _dics.TryGetValue(scriptTag, out PreferTypefaceList foundList) ? foundList : null;
+
+        public override InstalledTypeface Select(List<InstalledTypeface> choices, ScriptLangInfo scriptLangInfo, char hintChar)
+        {
+            if (_dics.TryGetValue(scriptLangInfo.shortname, out PreferTypefaceList foundList))
+            {
+                //select only resolved font
+                List<PreferTypeface> list = foundList._list;
+                int j = list.Count;
+                for (int i = 0; i < j; ++i)
+                {
+                    PreferTypeface p = list[i];
+                    //-------
+                    if (p.InstalledTypeface == null && !p.ResolvedInstalledTypeface)
+                    {
+                        //find
+                        int choice_count = choices.Count;
+
+                        for (int m = 0; m < choice_count; ++m)
+                        {
+                            InstalledTypeface instTypeface = choices[m];
+                            if (p.RequestTypefaceName == instTypeface.FontName)
+                            {
+                                //TODO: review here again
+                                p.InstalledTypeface = instTypeface;
+
+                                break;
+                            }
+                        }
+                        p.ResolvedInstalledTypeface = true;
+                    }
+                    //-------
+                    if (p.InstalledTypeface != null)
+                    {
+                        return p.InstalledTypeface;
+                    }
+                }
+            }
+            return base.Select(choices, scriptLangInfo, hintChar);
+        }
+
+        public class PreferTypeface
+        {
+            public PreferTypeface(string reqTypefaceName) => RequestTypefaceName = reqTypefaceName;
+            public string RequestTypefaceName { get; }
+            public InstalledTypeface InstalledTypeface { get; internal set; }
+            internal bool ResolvedInstalledTypeface { get; set; }
+        }
+
+
+        public class PreferTypefaceList
+        {
+            internal List<PreferTypeface> _list = new List<PreferTypeface>();
+            public void AddTypefaceName(string typefaceName)
+            {
+                _list.Add(new PreferTypeface(typefaceName));
+            }
+        }
+    }
+
 
     public class VxsTextPrinter : TextPrinterBase, ITextPrinter
     {
@@ -42,7 +117,10 @@ namespace PixelFarm.Drawing
 
             _glyphBitmapStore = new GlyphBitmapStore();
             _glyphSvgStore = new BitmapCacheForSvgGlyph();
+
         }
+        public AlternativeTypefaceSelector AlternativeTypefaceSelector { get; set; }
+
         public void SetSvgBmpBuilderFunc(SvgBmpBuilderFunc svgBmpBuilderFunc)
         {
             _glyphSvgStore.SetSvgBmpBuilderFunc(svgBmpBuilderFunc);
@@ -80,14 +158,13 @@ namespace PixelFarm.Drawing
                 this.FontDescedingPx = currentTypeface.Descender * pointToPixelScale;
                 this.FontLineGapPx = currentTypeface.LineGap * pointToPixelScale;
                 this.FontLineSpacingPx = FontAscendingPx - FontDescedingPx + FontLineGapPx;
-
             }
-
         }
         public override GlyphLayout GlyphLayoutMan
         {
             get
             {
+                //TODO: review here
                 throw new NotSupportedException();
             }
         }
@@ -357,7 +434,10 @@ namespace PixelFarm.Drawing
             DrawString(text, startAt, len, (float)x, (float)y);
         }
 
-        bool _enableMultiTypefaces = false;
+
+
+
+
 
         public override void DrawString(char[] textBuffer, int startAt, int len, float x, float y)
         {
@@ -377,7 +457,7 @@ namespace PixelFarm.Drawing
             float xpos = x;
             float ypos = y;
 
-            if (!_enableMultiTypefaces)
+            if (!EnableMultiTypefaces)
             {
                 GlyphPlanSequence glyphPlanSeq = _textServices.CreateGlyphPlanSeq(buffSpan, _currentTypeface, FontSizeInPoints);
                 DrawFromGlyphPlans(glyphPlanSeq, xpos, y);
@@ -385,93 +465,109 @@ namespace PixelFarm.Drawing
             else
             {
                 //a single string may be broken into many glyph-plan-seq
-                ILineSegmentList result = _textServices.BreakToLineSegments(buffSpan);
-                int count = result.Count;
-
-                _tmpGlyphPlanSeqs.Clear();
-                _tmpTypefaces.Clear();
-
-                bool needRightToLeftArr = false;
-
-                Typeface defaultTypeface = _currentTypeface;
-                Typeface curTypeface = defaultTypeface;
-
-                for (int i = 0; i < count; ++i)
+                using (ILineSegmentList segments = _textServices.BreakToLineSegments(buffSpan))
                 {
-                    //
-                    ILineSegment line_seg = result[i];
-                    SpanLayoutInfo spLayoutInfo = line_seg.SpanLayoutInfo;
+                    int count = segments.Count;
 
-                    TextBufferSpan buff = new TextBufferSpan(textBuffer, line_seg.StartAt, line_seg.Length);
-                    if (spLayoutInfo.RightToLeft)
+                    _tmpGlyphPlanSeqs.Clear();
+                    _tmpTypefaces.Clear();
+
+                    bool needRightToLeftArr = false;
+
+                    Typeface defaultTypeface = _currentTypeface;
+                    Typeface curTypeface = defaultTypeface;
+
+                    for (int i = 0; i < count; ++i)
                     {
-                        needRightToLeftArr = true;
-                    }
+                        //
+                        ILineSegment line_seg = segments[i];
+                        SpanBreakInfo spBreakInfo = line_seg.SpanBreakInfo;
 
-                    //each line segment may have different unicode range 
-                    //and the current typeface may not support that range
-                    //so we need to ensure that we get a proper typeface,
-                    //if not => alternative typeface
-
-                    ushort glyphIndex = curTypeface.GetGlyphIndex(spLayoutInfo.SampleCodePoint);
-                    if (glyphIndex == 0)
-                    {
-                        //not found then => find other typeface                    
-                        //we need more information about line seg layout
-                        if (_textServices.TryGetAlternativeTypefaceFromChar((char)spLayoutInfo.SampleCodePoint, out Typeface alternative))
+                        TextBufferSpan buff = new TextBufferSpan(textBuffer, line_seg.StartAt, line_seg.Length);
+                        if (spBreakInfo.RightToLeft)
                         {
-                            curTypeface = alternative;
-                            _tmpTypefaces.Add(alternative);
+                            needRightToLeftArr = true;
+                        }
+
+                        //each line segment may have different unicode range 
+                        //and the current typeface may not support that range
+                        //so we need to ensure that we get a proper typeface,
+                        //if not => alternative typeface
+
+                        char sample_char = textBuffer[line_seg.StartAt];
+                        ushort glyphIndex = curTypeface.GetGlyphIndex(sample_char);
+                        if (glyphIndex == 0)
+                        {
+                            //not found then => find other typeface                    
+                            //we need more information about line seg layout
+
+                            if (AlternativeTypefaceSelector != null)
+                            {
+                                AlternativeTypefaceSelector.LatestTypeface = curTypeface;
+                            }
+
+                            if (_textServices.TryGetAlternativeTypefaceFromChar(sample_char, AlternativeTypefaceSelector, out Typeface alternative))
+                            {
+                                curTypeface = alternative;
+                                _tmpTypefaces.Add(alternative);
+                            }
+                            else
+                            {
+                                _tmpTypefaces.Add(curTypeface);
+#if DEBUG
+                                if (sample_char >= 0 && sample_char < 255)
+                                {
+
+
+                                }
+#endif 
+                            }
                         }
                         else
                         {
                             _tmpTypefaces.Add(curTypeface);
                         }
+
+                        _textServices.CurrentScriptLang = new ScriptLang(spBreakInfo.ScriptTag, spBreakInfo.LangTag);
+
+                        GlyphPlanSequence glyphPlanSeq = _textServices.CreateGlyphPlanSeq(buff, curTypeface, FontSizeInPoints);
+                        glyphPlanSeq.IsRightToLeft = spBreakInfo.RightToLeft;
+
+                        _tmpGlyphPlanSeqs.Add(glyphPlanSeq);
+
+
+                        curTypeface = defaultTypeface;//switch back to default
+                    }
+
+                    if (needRightToLeftArr)
+                    {
+                        //special arr left-to-right
+                        for (int i = count - 1; i >= 0; --i)
+                        {
+                            GlyphPlanSequence glyphPlanSeq = _tmpGlyphPlanSeqs[i];
+
+                            Typeface = _tmpTypefaces[i];
+
+                            DrawFromGlyphPlans(glyphPlanSeq, xpos, y);
+                            xpos += (glyphPlanSeq.CalculateWidth() * _currentFontSizePxScale);
+                        }
                     }
                     else
                     {
-                        _tmpTypefaces.Add(curTypeface);
+                        for (int i = 0; i < count; ++i)
+                        {
+                            GlyphPlanSequence glyphPlanSeq = _tmpGlyphPlanSeqs[i];
+
+                            Typeface = _tmpTypefaces[i];
+
+                            DrawFromGlyphPlans(glyphPlanSeq, xpos, y);
+                            xpos += (glyphPlanSeq.CalculateWidth() * _currentFontSizePxScale);
+                        }
                     }
-
-                    _textServices.CurrentScriptLang = (ScriptLang)spLayoutInfo.ResolvedScriptLang;
-
-                    GlyphPlanSequence glyphPlanSeq = _textServices.CreateGlyphPlanSeq(buff, curTypeface, FontSizeInPoints);
-                    glyphPlanSeq.IsRightToLeft = spLayoutInfo.RightToLeft;
-
-                    _tmpGlyphPlanSeqs.Add(glyphPlanSeq);
-
-
-                    curTypeface = defaultTypeface;//switch back to default
+                    Typeface = defaultTypeface;
+                    _tmpGlyphPlanSeqs.Clear();
+                    _tmpTypefaces.Clear();
                 }
-
-                if (needRightToLeftArr)
-                {
-                    //special arr left-to-right
-                    for (int i = count - 1; i >= 0; --i)
-                    {
-                        GlyphPlanSequence glyphPlanSeq = _tmpGlyphPlanSeqs[i];
-
-                        Typeface = _tmpTypefaces[i];
-
-                        DrawFromGlyphPlans(glyphPlanSeq, xpos, y);
-                        xpos += (glyphPlanSeq.CalculateWidth() * _currentFontSizePxScale);
-                    }
-                }
-                else
-                {
-                    for (int i = 0; i < count; ++i)
-                    {
-                        GlyphPlanSequence glyphPlanSeq = _tmpGlyphPlanSeqs[i];
-
-                        Typeface = _tmpTypefaces[i];
-
-                        DrawFromGlyphPlans(glyphPlanSeq, xpos, y);
-                        xpos += (glyphPlanSeq.CalculateWidth() * _currentFontSizePxScale);
-                    }
-                }
-                Typeface = defaultTypeface;
-                _tmpGlyphPlanSeqs.Clear();
-                _tmpTypefaces.Clear();
             }
 
         }

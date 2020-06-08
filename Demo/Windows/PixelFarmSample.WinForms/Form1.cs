@@ -144,7 +144,7 @@ namespace SampleWinForms
 
             _selectedTextPrinter.HintTechnique = _glyphRenderOptions.HintTechnique;
             _selectedTextPrinter.EnableLigature = _glyphRenderOptions.EnableLigature;
-
+            _selectedTextPrinter.EnableMultiTypefaces = _basicOptions.EnableMultiTypefaces;
             //test print 3 lines
 #if DEBUG
             DynamicOutline.dbugTestNewGridFitting = _contourAnalysisOpts.EnableGridFit;
@@ -238,6 +238,8 @@ namespace SampleWinForms
         }
 
         PixelFarm.Drawing.Color _grayColor = new PixelFarm.Drawing.Color(0xFF, 0x80, 0x80, 0x80);
+        PixelFarm.Drawing.MyAlternativeTypefaceSelector _myAlternativeTypefaceSelector = new PixelFarm.Drawing.MyAlternativeTypefaceSelector();
+
         void UpdateRenderOutput()
         {
             if (!_readyToRender) return;
@@ -257,10 +259,23 @@ namespace SampleWinForms
 
                 _devVxsTextPrinter = new PixelFarm.Drawing.VxsTextPrinter(_painter, _textService);
                 _devVxsTextPrinter.SetSvgBmpBuilderFunc(ParseAndRenderSvg);
-
                 _devVxsTextPrinter.ScriptLang = _basicOptions.ScriptLang;
                 _devVxsTextPrinter.PositionTechnique = Typography.TextLayout.PositionTechnique.OpenFont;
 
+
+
+                _devVxsTextPrinter.AlternativeTypefaceSelector = _myAlternativeTypefaceSelector;
+                {
+                    var preferTypefaces = new PixelFarm.Drawing.MyAlternativeTypefaceSelector.PreferTypefaceList();
+                    _myAlternativeTypefaceSelector.SetPreferTypefaces(ScriptTagDefs.Arabic, preferTypefaces);
+
+                    preferTypefaces.AddTypefaceName("Noto Sans Arabic UI");
+                }
+                {
+                    var preferTypefaces = new PixelFarm.Drawing.MyAlternativeTypefaceSelector.PreferTypefaceList();
+                    _myAlternativeTypefaceSelector.SetPreferTypefaces(ScriptTagDefs.Latin, preferTypefaces);
+                    preferTypefaces.AddTypefaceName("Sarabun");
+                }
             }
 
             if (string.IsNullOrEmpty(this.txtInputChar.Text))
@@ -305,6 +320,7 @@ namespace SampleWinForms
 
                         _selectedTextPrinter.HintTechnique = _glyphRenderOptions.HintTechnique;
                         _selectedTextPrinter.EnableLigature = _glyphRenderOptions.EnableLigature;
+                        _selectedTextPrinter.EnableMultiTypefaces = _basicOptions.EnableMultiTypefaces;
                         _selectedTextPrinter.SimulateSlant = _contourAnalysisOpts.SimulateSlant;
 
 
@@ -634,7 +650,7 @@ namespace SampleWinForms
                 {
                     //render by glyph index
                     RenderByGlyphIndex(glyphNameListUserControl1.SelectedGlyphIndex);
-                } 
+                }
             };
             //----------------
             //string inputstr = "ก้า";

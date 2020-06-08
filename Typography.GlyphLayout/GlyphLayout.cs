@@ -267,10 +267,12 @@ namespace Typography.TextLayout
             get => _scriptLang;
             set
             {
-                if (_scriptLang != value)
+
+                if (_scriptLang.scriptTag != value.scriptTag || _scriptLang.sysLangTag != value.sysLangTag)
                 {
                     _needPlanUpdate = true;
                 }
+
                 _scriptLang = value;
             }
         }
@@ -290,8 +292,6 @@ namespace Typography.TextLayout
                 }
             }
         }
-
-
 
 
         public delegate ushort GlyphNotFoundHandler(GlyphLayout glyphLayout, int codepoint, int nextcodepoint);

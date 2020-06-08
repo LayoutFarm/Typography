@@ -10,8 +10,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)BidiBreakEngine.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)LineSegments\BreakingParameters.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)LineSegments\ILineSegments.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ScriptTagsAndLanguageSystemTags\ScriptLangInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ScriptTagsAndLanguageSystemTags\UnicodeLangBits.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ScriptTagsAndLanguageSystemTags\UnicodeRangeFinder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SheenBidi\BaseDirection.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SheenBidi\Collections\BidiChain.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SheenBidi\Collections\BidiLink.cs" />
@@ -36,8 +39,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)SheenBidi\RunAgent.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SheenBidi\Text\UnicodeAgent.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SheenBidi\Text\UnicodeLocator.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)BreakBounds.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)BreakEngine.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)WordKind.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BreakingEngine.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CustomBreaker.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CustomBreakerBuilder.cs" />

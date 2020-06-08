@@ -37,6 +37,8 @@ namespace PixelFarm.Drawing
               ref TextSpanMeasureResult result);
     }
 
+
+
     public class OpenFontTextService : ITextService
     {
         /// <summary>
@@ -78,7 +80,7 @@ namespace PixelFarm.Drawing
             //---------------
             //if not default then try guess
             //
-            if (scLang == null &&
+            if (scLang.scriptTag == 0 &&
                 !TryGetScriptLangFromCurrentThreadCultureInfo(out scLang))
             {
                 //TODO: handle error here
@@ -97,10 +99,12 @@ namespace PixelFarm.Drawing
 
         public void UpdateUnicodeRanges() => _txtServices.InstalledFontCollection.UpdateUnicodeRanges();
 
+
+        static readonly ScriptLang s_latin = new ScriptLang(ScriptTagDefs.Latin.Tag);
         static bool TryGetScriptLangFromCurrentThreadCultureInfo(out Typography.OpenFont.ScriptLang scLang)
         {
             var currentCulture = System.Threading.Thread.CurrentThread.CurrentCulture;
-            scLang = null;
+
             if (Typography.TextBreak.IcuData.TryGetFullLanguageNameFromLangCode(
                  currentCulture.TwoLetterISOLanguageName,
                  currentCulture.ThreeLetterISOLanguageName,
@@ -114,7 +118,7 @@ namespace PixelFarm.Drawing
 #if DEBUG
                     System.Diagnostics.Debug.WriteLine(langFullName + " :use latin");
 #endif
-                    scLang = ScriptLangs.Latin.GetScriptLang();
+                    scLang = s_latin;
                     return true;
                 }
                 else
@@ -123,18 +127,39 @@ namespace PixelFarm.Drawing
                     return true;
                 }
             }
+            else
+            {
+                scLang = default;
+            }
             return false;
         }
 
 
-        public bool TryGetAlternativeTypefaceFromChar(char c, out Typeface found)
+
+
+        public bool TryGetAlternativeTypefaceFromChar(char c, AlternativeTypefaceSelector selector, out Typeface found)
         {
             //find a typeface that supported input char c
-            if (_txtServices.InstalledFontCollection.TryGetAlternativeTypefaceFromChar(c, out List<InstalledTypeface> installedTypefaceList))
+            if (_txtServices.InstalledFontCollection.TryGetAlternativeTypefaceFromChar(c,
+                out ScriptLangInfo scriptLangInfo,
+                out List<InstalledTypeface> installedTypefaceList))
             {
-                InstalledTypeface selected = installedTypefaceList[0];
-                found = _txtServices.GetTypeface(selected.FontName, TypefaceStyle.Regular);
-                return true;
+                //select a prefer font
+                if (selector != null)
+                {
+                    InstalledTypeface selected = selector.Select(installedTypefaceList, scriptLangInfo, c);
+                    if (selected != null)
+                    {
+                        found = _txtServices.GetTypeface(selected.FontName, TypefaceStyle.Regular);
+                        return true;
+                    }
+                }
+                else
+                {
+                    InstalledTypeface selected = installedTypefaceList[0];//default
+                    found = _txtServices.GetTypeface(selected.FontName, TypefaceStyle.Regular);
+                    return true;
+                }
             }
             found = null;
             return false;
@@ -148,10 +173,13 @@ namespace PixelFarm.Drawing
         //
         public void CalculateUserCharGlyphAdvancePos(in TextBufferSpan textBufferSpan, RequestFont font, ref TextSpanMeasureResult measureResult)
         {
-            CalculateUserCharGlyphAdvancePos(textBufferSpan,
-                this.BreakToLineSegments(textBufferSpan),
+            using (ILineSegmentList lineSegList = this.BreakToLineSegments(textBufferSpan))
+            {
+                CalculateUserCharGlyphAdvancePos(textBufferSpan,
+                lineSegList,
                 font,
                 ref measureResult);
+            }
         }
         //
         ReusableTextBuffer _reusableTextBuffer = new ReusableTextBuffer();
@@ -345,30 +373,30 @@ namespace PixelFarm.Drawing
         {
             readonly int _startAt;
             readonly int _len;
-            public readonly SpanLayoutInfo spanLayoutInfo;
-            public MyLineSegment(int startAt, int len, SpanLayoutInfo spanLayoutInfo)
+            public readonly SpanBreakInfo breakInfo;
+            public MyLineSegment(int startAt, int len, SpanBreakInfo breakInfo)
             {
                 _startAt = startAt;
                 _len = len;
 
 #if DEBUG
-                if (spanLayoutInfo == null)
+                if (breakInfo == null)
                 {
 
                 }
 #endif
-                this.spanLayoutInfo = spanLayoutInfo;
+                this.breakInfo = breakInfo;
 
 
             }
             public int Length => _len;
             public int StartAt => _startAt;
-            public SpanLayoutInfo SpanLayoutInfo => spanLayoutInfo;
+            public SpanBreakInfo SpanBreakInfo => breakInfo;
 
 #if DEBUG
             public override string ToString()
             {
-                return _startAt + ":" + _len + (spanLayoutInfo.RightToLeft ? "(rtl)" : "");
+                return _startAt + ":" + _len + (breakInfo.RightToLeft ? "(rtl)" : "");
             }
 #endif
         }
@@ -435,27 +463,17 @@ namespace PixelFarm.Drawing
             //a text buffer span is separated into multiple line segment list 
             char[] str = textBufferSpan.GetRawCharBuffer();
 #if DEBUG
+            if (str.Length > 10)
+            {
+
+            }
             int cur_startAt = textBufferSpan.start;
 #endif
 
             MyLineSegmentList lineSegments = MyLineSegmentList.GetFreeLineSegmentList();
             foreach (BreakSpan breakSpan in _txtServices.BreakToLineSegments(str, textBufferSpan.start, textBufferSpan.len))
             {
-                SpanLayoutInfo spLayoutInfo = breakSpan.spanLayoutInfo;
-
-                if (!(spLayoutInfo.ResolvedScriptLang is Typography.OpenFont.ScriptLang scLang))
-                {
-                    if (!Typography.OpenFont.ScriptLangs.TryGetScriptLang((char)spLayoutInfo.SampleCodePoint, out ScriptLangInfo scLang1))
-                    {
-
-                    }
-                    else
-                    {
-                        spLayoutInfo.ResolvedScriptLang = scLang1.GetScriptLang();
-                    }
-                }
-
-                lineSegments.AddLineSegment(new MyLineSegment(breakSpan.startAt, breakSpan.len, spLayoutInfo));
+                lineSegments.AddLineSegment(new MyLineSegment(breakSpan.startAt, breakSpan.len, breakSpan.SpanBreakInfo));
             }
             return lineSegments;
         }

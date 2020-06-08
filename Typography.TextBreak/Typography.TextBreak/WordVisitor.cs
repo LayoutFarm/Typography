@@ -8,41 +8,6 @@ using System.Collections.Generic;
 
 namespace Typography.TextBreak
 {
-    public interface ILineSegmentList : System.IDisposable
-    {
-        int Count { get; }
-        ILineSegment this[int index] { get; }
-    }
-    public interface ILineSegment
-    {
-        int Length { get; }
-        int StartAt { get; }
-        SpanLayoutInfo SpanLayoutInfo { get; }
-    }
-    public struct BreakSpan
-    {
-        //TODO: review here again***
-        public int startAt;
-        public ushort len;
-        public WordKind wordKind;
-        public SpanLayoutInfo spanLayoutInfo;
-
-    }
-
-    public class SpanLayoutInfo
-    {
-        public SpanLayoutInfo(bool isRightToLeft, int sampleCodePoint, string scriptLang)
-        {
-            RightToLeft = isRightToLeft;
-            SampleCodePoint = sampleCodePoint;
-            ScriptLang = scriptLang;
-        }
-        public int SampleCodePoint { get; }
-        public bool RightToLeft { get; }
-        public string ScriptLang { get; }
-
-        public object ResolvedScriptLang { get; set; }
-    }
 
     public enum VisitorState
     {
@@ -53,15 +18,29 @@ namespace Typography.TextBreak
     }
 
 
+
     public delegate void NewWordBreakHandlerDelegate(WordVisitor vistor);
     //
+    public class DelegateBaseWordVisitor : WordVisitor
+    {
+        readonly NewWordBreakHandlerDelegate _newWordBreakHandler;
+        internal DelegateBaseWordVisitor(NewWordBreakHandlerDelegate newWordBreakHandler)
+        {
+            _newWordBreakHandler = newWordBreakHandler;
+        }
+        protected override void OnBreak()
+        {
+            _newWordBreakHandler(this);
+        }
+    }
 
-    public class WordVisitor
+    public abstract class WordVisitor
     {
 
-#if DEBUG
-        List<BreakAtInfo> dbugBreakAtList = new List<BreakAtInfo>();
-#endif
+        //#if DEBUG
+        //        List<BreakAtInfo> dbugBreakAtList = new List<BreakAtInfo>();
+        //        bool dbugCollectBreakAtList;
+        //#endif
         char[] _buffer;
 
         int _startIndex;
@@ -69,18 +48,12 @@ namespace Typography.TextBreak
 
         int _currentIndex;
         char _currentChar;
-        int _latestBreakAt;
-
-
-        NewWordBreakHandlerDelegate _newWordBreakHandler;
+        int _latestBreakAt; 
 
         Stack<int> _tempCandidateBreaks = new Stack<int>();
-        internal WordVisitor(NewWordBreakHandlerDelegate newWordBreakHandler)
-        {
-            _newWordBreakHandler = newWordBreakHandler;
-        }
 
-        internal SpanLayoutInfo SpanLayoutInfo { get; set; }
+
+        internal SpanBreakInfo SpanBreakInfo { get; set; }
         internal void LoadText(char[] buffer, int index)
         {
             LoadText(buffer, index, buffer.Length);
@@ -102,11 +75,11 @@ namespace Typography.TextBreak
             _tempCandidateBreaks.Clear();
             _latestBreakAt = 0;
 
-#if DEBUG
-            dbugBreakAtList.Clear();
-#endif
+            //#if DEBUG
+            //            dbugBreakAtList.Clear();
+            //#endif
         }
-
+        protected virtual void OnBreak() { }
 
         public VisitorState State { get; internal set; }
         //
@@ -142,17 +115,28 @@ namespace Typography.TextBreak
 
             LatestSpanLen = (ushort)(index - LatestBreakAt);
             LatestSpanStartAt = _latestBreakAt;
-            _latestBreakAt = index;
-            this.LatestWordKind = wordKind;
-            _newWordBreakHandler(this);
+            LatestWordKind = wordKind;
 
-#if DEBUG
-            dbugBreakAtList.Add(new BreakAtInfo(index, wordKind));
-#endif
+            _latestBreakAt = index;//**
+
+            OnBreak();
+             
+            //#if DEBUG
+            //            if (dbugCollectBreakAtList)
+            //            {
+            //                dbugBreakAtList.Add(new BreakAtInfo(index, wordKind));
+            //            }
+
+            //#endif
         }
         internal void AddWordBreakAtCurrentIndex(WordKind wordKind = WordKind.Text)
         {
             AddWordBreakAt(this.CurrentIndex, wordKind);
+        }
+        internal void AddWordBreak_AndSetCurrentIndex(int index, WordKind wordKind)
+        {
+            AddWordBreakAt(index, wordKind);
+            SetCurrentIndex(LatestBreakAt);
         }
         //
         public int LatestSpanStartAt { get; private set; }
@@ -160,6 +144,7 @@ namespace Typography.TextBreak
         public WordKind LatestWordKind { get; private set; }
         public ushort LatestSpanLen { get; private set; }
         //
+
         internal void SetCurrentIndex(int index)
         {
             _currentIndex = index;
@@ -187,7 +172,7 @@ namespace Typography.TextBreak
                 startAt = vis.LatestSpanStartAt,
                 len = vis.LatestSpanLen,
                 wordKind = vis.LatestWordKind,
-                spanLayoutInfo = vis.SpanLayoutInfo,
+                SpanBreakInfo = vis.SpanBreakInfo,
             };
         }
     }

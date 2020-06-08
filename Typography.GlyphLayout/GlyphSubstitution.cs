@@ -51,32 +51,7 @@ namespace Typography.TextLayout
     }
 
 
-    static class TagUtils
-    {
-        static byte GetByte(char c)
-        {
-            if (c >= 0 && c < 256)
-            {
-                return (byte)c;
-            }
-            return 0;
-        }
-        public static uint StringToTag(string str)
-        {
-            if (string.IsNullOrEmpty(str) || str.Length != 4)
-            {
-                return 0;
-            }
 
-            char[] buff = str.ToCharArray();
-            byte b0 = GetByte(buff[0]);
-            byte b1 = GetByte(buff[1]);
-            byte b2 = GetByte(buff[2]);
-            byte b3 = GetByte(buff[3]);
-
-            return (uint)((b0 << 24) | (b1 << 16) | (b2 << 8) | b3);
-        }
-    }
 
 
     /// <summary>
@@ -92,24 +67,17 @@ namespace Typography.TextLayout
 
         readonly Typeface _typeface;
 
-        readonly uint _langTagCode;
-        public GlyphSubstitution(Typeface typeface, string scriptTag, string langSysIden)
+        public GlyphSubstitution(Typeface typeface, uint scriptTag, uint langTag)
         {
-            LangTag = langSysIden;
             ScriptTag = scriptTag;
+            LangTag = langTag;
 
             _typeface = typeface;
             _mustRebuildTables = true;
 
-            _langTagCode = TagUtils.StringToTag(langSysIden);
         }
 
-        static string TagToString(uint tag)
-        {
-            byte[] bytes = BitConverter.GetBytes(tag);
-            Array.Reverse(bytes);
-            return System.Text.Encoding.UTF8.GetString(bytes, 0, bytes.Length);
-        }
+      
         public void DoSubstitution(IGlyphIndexList glyphIndexList)
         {
             // Rebuild tables if configuration changed
@@ -140,8 +108,8 @@ namespace Typography.TextLayout
             }
         }
 
-        public string ScriptTag { get; }
-        public string LangTag { get; }
+        public uint ScriptTag { get; }
+        public uint LangTag { get; }
 
         /// <summary>
         /// enable GSUB type 4, ligation (liga)
@@ -202,14 +170,14 @@ namespace Typography.TextLayout
 
             //-------
             ScriptTable.LangSysTable selectedLang = null;
-            if (LangTag == null)
+            if (LangTag == 0)
             {
                 //use default
                 selectedLang = scriptTable.defaultLang;
             }
             else
             {
-                if (_langTagCode == scriptTable.defaultLang.langSysTagIden)
+                if (LangTag == scriptTable.defaultLang.langSysTagIden)
                 {
                     //found
                     selectedLang = scriptTable.defaultLang;
@@ -221,7 +189,7 @@ namespace Typography.TextLayout
                     for (int i = 0; i < scriptTable.langSysTables.Length; ++i)
                     {
                         ScriptTable.LangSysTable s = scriptTable.langSysTables[i];
-                        if (s.langSysTagIden == _langTagCode)
+                        if (s.langSysTagIden == LangTag)
                         {
                             //found
                             selectedLang = s;
