@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Typography.TextBreak;
+using PixelFarm.Drawing;
 
 [TestClass]
 public class FrenchTests

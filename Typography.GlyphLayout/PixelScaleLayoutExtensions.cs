@@ -31,7 +31,7 @@ namespace Typography.TextLayout
         /// </summary>
         public float OffsetY { get; private set; }
 
-        public bool AdvanceMoveForward { get { return this.AdvanceX > 0; } }
+        public bool AdvanceMoveForward => this.AdvanceX > 0;
 
 #if DEBUG
         public override string ToString()
@@ -133,7 +133,7 @@ namespace Typography.TextLayout
             _index = glyphPlans.startAt;
             _end = glyphPlans.startAt + glyphPlans.len;
             _exactX = _exactY = 0;
-            _currentGlyphIndex = 0;             
+            _currentGlyphIndex = 0;
 
             if (_rightToLeft = glyphPlans.IsRightToLeft)
             {

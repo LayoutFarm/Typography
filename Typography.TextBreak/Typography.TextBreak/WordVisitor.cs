@@ -48,12 +48,12 @@ namespace Typography.TextBreak
 
         int _currentIndex;
         char _currentChar;
-        int _latestBreakAt; 
+        int _latestBreakAt;
 
         Stack<int> _tempCandidateBreaks = new Stack<int>();
 
 
-        internal SpanBreakInfo SpanBreakInfo { get; set; }
+        public SpanBreakInfo SpanBreakInfo { get; set; }
         internal void LoadText(char[] buffer, int index)
         {
             LoadText(buffer, index, buffer.Length);
@@ -120,7 +120,7 @@ namespace Typography.TextBreak
             _latestBreakAt = index;//**
 
             OnBreak();
-             
+
             //#if DEBUG
             //            if (dbugCollectBreakAtList)
             //            {
@@ -163,17 +163,5 @@ namespace Typography.TextBreak
     }
 
 
-    public static class WordBreakExtensions
-    {
-        public static BreakSpan GetBreakSpan(this WordVisitor vis)
-        {
-            return new BreakSpan()
-            {
-                startAt = vis.LatestSpanStartAt,
-                len = vis.LatestSpanLen,
-                wordKind = vis.LatestWordKind,
-                SpanBreakInfo = vis.SpanBreakInfo,
-            };
-        }
-    }
+
 }

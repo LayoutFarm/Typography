@@ -481,7 +481,7 @@ namespace PixelFarm.Drawing
                     {
                         //
                         ILineSegment line_seg = segments[i];
-                        SpanBreakInfo spBreakInfo = line_seg.SpanBreakInfo;
+                        SpanBreakInfo spBreakInfo = (SpanBreakInfo)line_seg.SpanBreakInfo;
 
                         TextBufferSpan buff = new TextBufferSpan(textBuffer, line_seg.StartAt, line_seg.Length);
                         if (spBreakInfo.RightToLeft)
@@ -520,7 +520,7 @@ namespace PixelFarm.Drawing
 
 
                                 }
-#endif 
+#endif
                             }
                         }
                         else

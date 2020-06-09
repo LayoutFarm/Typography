@@ -200,9 +200,7 @@ namespace PixelFarm.Drawing
         public abstract DrawTextTechnique DrawTextTechnique { get; set; }
         //TODO: review here again
         public abstract Color TextBackgroundColorHint { get; set; }//explicit set current text background color hint
-        public abstract bool SetLatestFillAsTextBackgroundColorHint();
-        public abstract bool LatestFillCouldbeUsedAsTextBackgroundHint();
-        //-------------------------------------------------------
+        
         /// <summary>
         /// create formatted string base on current font,font-size, font style
         /// </summary>

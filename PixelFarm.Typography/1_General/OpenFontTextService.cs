@@ -13,29 +13,6 @@ using Typography.TextBreak;
 namespace PixelFarm.Drawing
 {
 
-    public interface ITextService
-    {
-
-        float MeasureWhitespace(RequestFont f);
-        float MeasureBlankLineHeight(RequestFont f);
-        //
-        bool SupportsWordBreak { get; }
-        //
-        Size MeasureString(in TextBufferSpan textBufferSpan, RequestFont font);
-
-        void MeasureString(in TextBufferSpan textBufferSpan, RequestFont font, int maxWidth, out int charFit, out int charFitWidth);
-
-        void CalculateUserCharGlyphAdvancePos(in TextBufferSpan textBufferSpan,
-                RequestFont font,
-                ref TextSpanMeasureResult result);
-
-
-
-        ILineSegmentList BreakToLineSegments(in TextBufferSpan textBufferSpan);
-        void CalculateUserCharGlyphAdvancePos(in TextBufferSpan textBufferSpan, ILineSegmentList lineSegs,
-               RequestFont font,
-              ref TextSpanMeasureResult result);
-    }
 
 
 
@@ -372,12 +349,12 @@ namespace PixelFarm.Drawing
         struct MyLineSegment : ILineSegment
         {
             readonly int _startAt;
-            readonly int _len;
+            readonly ushort _len;
             public readonly SpanBreakInfo breakInfo;
             public MyLineSegment(int startAt, int len, SpanBreakInfo breakInfo)
             {
                 _startAt = startAt;
-                _len = len;
+                _len = (ushort)len; //***
 
 #if DEBUG
                 if (breakInfo == null)
@@ -389,9 +366,9 @@ namespace PixelFarm.Drawing
 
 
             }
-            public int Length => _len;
             public int StartAt => _startAt;
-            public SpanBreakInfo SpanBreakInfo => breakInfo;
+            public ushort Length => _len;
+            public object SpanBreakInfo => breakInfo;
 
 #if DEBUG
             public override string ToString()
@@ -458,8 +435,23 @@ namespace PixelFarm.Drawing
             }
         }
 
+        class MyWordVisitor : WordVisitor
+        {
+            MyLineSegmentList _lineSegs;
+            public void SetLineSegmentList(MyLineSegmentList lineSegs)
+            {
+                _lineSegs = lineSegs;
+            }
+            protected override void OnBreak()
+            {
+                _lineSegs.AddLineSegment(new MyLineSegment(this.LatestSpanStartAt, this.LatestSpanLen, this.SpanBreakInfo));
+            }
+        }
+
+        readonly MyWordVisitor _wordVisitor = new MyWordVisitor();
         public ILineSegmentList BreakToLineSegments(in TextBufferSpan textBufferSpan)
         {
+
             //a text buffer span is separated into multiple line segment list 
             char[] str = textBufferSpan.GetRawCharBuffer();
 #if DEBUG
@@ -471,10 +463,10 @@ namespace PixelFarm.Drawing
 #endif
 
             MyLineSegmentList lineSegments = MyLineSegmentList.GetFreeLineSegmentList();
-            foreach (BreakSpan breakSpan in _txtServices.BreakToLineSegments(str, textBufferSpan.start, textBufferSpan.len))
-            {
-                lineSegments.AddLineSegment(new MyLineSegment(breakSpan.startAt, breakSpan.len, breakSpan.SpanBreakInfo));
-            }
+            _wordVisitor.SetLineSegmentList(lineSegments);
+            _txtServices.BreakToLineSegments(str, textBufferSpan.start, textBufferSpan.len, _wordVisitor);
+            _wordVisitor.SetLineSegmentList(null); //clear
+            //interate result and add to lineSegs
             return lineSegments;
         }
         //-----------------------------------

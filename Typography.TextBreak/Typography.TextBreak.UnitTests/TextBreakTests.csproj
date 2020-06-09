@@ -55,6 +55,7 @@
   <ItemGroup>
     <Compile Include="BasicTests.cs" />
     <Compile Include="BreakAtInfo.cs" />
+    <Compile Include="BreakSpan01.cs" />
     <Compile Include="FrenchTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WordKindTests.cs" />
