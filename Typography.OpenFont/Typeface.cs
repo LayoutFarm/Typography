@@ -218,7 +218,9 @@ namespace Typography.OpenFont
             }
             else
             {
+#if DEBUG
                 System.Diagnostics.Debug.WriteLine("found unknown glyph:" + glyphIndex);
+#endif
                 return _glyphs[0]; //return empty glyph?;
             }
         }
@@ -442,7 +444,7 @@ namespace Typography.OpenFont
         }
     }
 
-   
+
 
     namespace Extensions
     {
@@ -451,7 +453,7 @@ namespace Typography.OpenFont
         {
 
 
-           
+
             public static bool RecommendToUseTypoMetricsForLineSpacing(this Typeface typeface)
             {
                 //https://www.microsoft.com/typography/otspec/os2.htm
@@ -759,7 +761,7 @@ namespace Typography.OpenFont
                 return typeface.OS2Table.usWinAscent + typeface.OS2Table.usWinDescent;
             }
 
-            
+
         }
         public enum LineSpacingChoice
         {
