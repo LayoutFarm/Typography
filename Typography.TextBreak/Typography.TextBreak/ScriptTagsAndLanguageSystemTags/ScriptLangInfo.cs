@@ -1080,7 +1080,7 @@ Zanabazar_Square__Zanabazarin_Dörböljin_Useg__Xewtee_Dörböljin_Bicig__Horizo
         public static bool TryGetScriptLang(char c, out ScriptLangInfo scLang)
         {
             //temp fix
-            return UnicodeRangeFinder.GetUniCodeRangeFor(c, out var _, out var _, out scLang);
+            return UnicodeRangeFinder2.GetUniCodeRangeFor(c, out var _, out var _, out scLang);
             //foreach (var v in s_unicodeLangToScriptLang)
             //{
 
@@ -1118,7 +1118,7 @@ Zanabazar_Square__Zanabazarin_Dörböljin_Useg__Xewtee_Dörböljin_Bicig__Horizo
 
     }
 
-    static class UnicodeRangeFinder
+    static class UnicodeRangeFinder2
     {
         //TODO: review this again, with AUTOGEN code
         static ScriptLangInfo s_latin = new ScriptLangInfo(ScriptTagDefs.Latin, UnicodeLangBits.Basic_Latin,
