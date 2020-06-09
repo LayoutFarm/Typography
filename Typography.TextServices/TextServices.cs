@@ -95,12 +95,12 @@ namespace Typography.TextServices
 
 
         CustomBreaker _textBreaker;
-        public void BreakToLineSegments2(char[] str, int startAt, int len, WordVisitor visitor)
+        public void BreakToLineSegments(char[] str, int startAt, int len, WordVisitor visitor)
         {
             //user must setup the CustomBreakerBuilder before use      
             if (len < 1)
             {
-                yield break;
+                return;
             }
 
 #if DEBUG
