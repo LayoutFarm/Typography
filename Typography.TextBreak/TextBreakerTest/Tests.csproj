@@ -43,7 +43,9 @@
     <Compile Include="..\Typography.TextBreak.UnitTests\BreakAtInfo.cs">
       <Link>BreakAtInfo.cs</Link>
     </Compile>
-    <Compile Include="BreakSpan01.cs" />
+    <Compile Include="..\Typography.TextBreak.UnitTests\BreakSpan01.cs">
+      <Link>BreakSpan01.cs</Link>
+    </Compile>
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>

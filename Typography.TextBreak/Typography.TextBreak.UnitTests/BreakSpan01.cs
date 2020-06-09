@@ -4,19 +4,21 @@ using Typography.TextBreak;
 
 namespace PixelFarm.Drawing
 {
-    public interface ILineSegmentList : System.IDisposable
+    //FOR TEST ONLY
+
+    interface ILineSegmentList : System.IDisposable
     {
         int Count { get; }
         ILineSegment this[int index] { get; }
     }
-    public interface ILineSegment
+    interface ILineSegment
     {
         int Length { get; }
         int StartAt { get; }
         SpanBreakInfo SpanBreakInfo { get; }
     }
 
-    public struct BreakSpan
+    struct BreakSpan
     {
         //TODO: review here again***
         public int startAt;
@@ -25,7 +27,7 @@ namespace PixelFarm.Drawing
         public SpanBreakInfo SpanBreakInfo;
     }
 
-    public static class WordBreakExtensions
+    static class WordBreakExtensions
     {
         public static BreakSpan GetBreakSpan(this WordVisitor vis)
         {
