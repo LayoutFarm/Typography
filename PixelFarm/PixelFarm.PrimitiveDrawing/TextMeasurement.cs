@@ -2,14 +2,12 @@
 
 namespace PixelFarm.Drawing
 {
-
     public struct TextBufferSpan
     {
         public readonly int start;
         public readonly int len;
 
         char[] _rawString;
-
 
         public TextBufferSpan(char[] rawCharBuffer)
         {
@@ -24,17 +22,13 @@ namespace PixelFarm.Drawing
             _rawString = rawCharBuffer;
         }
 
-        public char GetChar(int localOffset) => _rawString[start + localOffset];
-        public char[] GetRawCharBuffer() => _rawString;
-
-#if DEBUG
         public override string ToString()
         {
             return start + ":" + len;
         }
-#endif
 
 
+        public char[] GetRawCharBuffer() => _rawString;
     }
 
     public struct TextSpanMeasureResult
@@ -47,23 +41,19 @@ namespace PixelFarm.Drawing
         public short minOffsetY;
         public short maxOffsetY;
     }
-
     public interface ILineSegmentList : System.IDisposable
     {
         int Count { get; }
         ILineSegment this[int index] { get; }
     }
-    public interface ILineSegmentCollection
-    {
-        void Add(ILineSegment lineseg);
-    }
-
     public interface ILineSegment
     {
         int StartAt { get; }
         ushort Length { get; }
         object SpanBreakInfo { get; }
     }
+
+
 
     public interface ITextService
     {
@@ -86,4 +76,5 @@ namespace PixelFarm.Drawing
               RequestFont font,
               ref TextSpanMeasureResult result);
     }
+
 }
