@@ -9,10 +9,8 @@ using System.Text;
 using System.Windows.Forms;
 
 using PixelFarm.CpuBlit;
-using Typography.OpenFont;
-using Typography.OpenFont.Extensions;
 using PixelFarm.CpuBlit.BitmapAtlas;
-using Typography.FontManagement;
+using Typography.OpenFont;
 
 namespace SampleWinForms
 {
