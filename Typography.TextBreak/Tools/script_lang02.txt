@@ -1,0 +1,68 @@
+﻿#https://docs.microsoft.com/en-us/typography/script-development/use	
+Script	Script tag
+ADLaM	adlm
+Ahom	ahom
+Bhaiksuki	bhks
+Balinese	bali
+Batak	batk
+Brahmi	brah
+Buginese	bugi
+Buhid	buhd
+Chakma	cakm
+Cham	cham
+Dogra	dogr
+Duployan	dupl
+Egyptian Hieroglyphs	egyp
+Elymaic	elym
+Grantha	gran
+Gunjala Gondi	gong
+Hanifi Rohingya	rohg
+Hanunoo	hano
+Javanese	java
+Kaithi	kthi
+Kayah Li	kali
+Kharoshthi	khar
+Khojki	khoj
+Khudawadi	sind
+Lepcha	lepc
+Limbu	limb
+Mahajani	mahj
+Makasar	maka
+Mandaic	mand
+Manichaean	mani
+Marchen	marc
+Masaram Gondi	gonm
+Medefaidrin	medf
+Meitei Mayek	mtei
+Miao	miao
+Modi	modi
+Mongolian	mong
+Multani	mult
+Nandinagari	nand
+Newa	newa
+N’Ko	nkoo
+Nyiakeng Puachue Hmong	hmnp
+Old Sogdian	sogo
+Pahawh Hmong	hmng
+Phags-pa	phag
+Psalter Pahlavi	phlp
+Rejang	rjng
+Saurashtra	saur
+Sharada	shrd
+Siddham	sidd
+Sinhala	sinh
+Sogdian	sogd
+Soyombo	soyo
+Sundanese	sund
+Syloti Nagri	sylo
+Tagalog	tglg
+Tagbanwa	tagb
+Tai Le	tale
+Tai Tham	lana
+Tai Viet	tavt
+Takri	takr
+Tibetan	tibt
+Tifinagh	tfng
+Tirhuta	tirh
+Wancho	wcho
+Zanabazar Square	zanb

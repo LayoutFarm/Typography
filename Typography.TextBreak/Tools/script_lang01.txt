@@ -1,0 +1,253 @@
+﻿#https://docs.microsoft.com/en-us/typography/script-development/standard			
+Registered tags for standard scripts		Registered tags for standard language systems	
+Script tag	Script	Language system tag	Language
+"latn"	Latin	"dflt"	*default script handling
+"latn"	Latin	(languages with Basic Latin & Latin-1:)	
+"latn"	Latin	"DAN "	Danish
+"latn"	Latin	"NLD "	Dutch
+"latn"	Latin	"ENG "	English
+"latn"	Latin	"FOS "	Faroese
+"latn"	Latin	"FIN "	Finnish
+"latn"	Latin	"FLE "	Flemish
+"latn"	Latin	"DEU "	German
+"latn"	Latin	"ISL "	Icelandic
+"latn"	Latin	"IRI "	Irish
+"latn"	Latin	"ITA "	Italian
+"latn"	Latin	"NOR "	Norwegian
+"latn"	Latin	"PTG "	Portuguese
+"latn"	Latin	"ESP "	Spanish
+"latn"	Latin	"SVE "	Swedish
+"latn"	Latin	(languages with Unicode Extended Latin:)	
+"latn"	Latin	"AFK "	Afrikaans
+"latn"	Latin	"EUQ "	Basque
+"latn"	Latin	"BRE "	Breton
+"latn"	Latin	"CAT "	Catalan
+"latn"	Latin	"HRV "	Croatian
+"latn"	Latin	"CSY "	Czech
+"latn"	Latin	"NTO "	Esperanto
+"latn"	Latin	"ETI "	Estonian
+"latn"	Latin	"FRA "	French
+"latn"	Latin	"FRI "	Frisian
+"latn"	Latin	"GRN "	Greenlandic
+"latn"	Latin	"HUN "	Hungarian
+"latn"	Latin	"LAT "	Latin
+"latn"	Latin	"LVI "	Latvian
+"latn"	Latin	"LTH "	Lithuanian
+"latn"	Latin	"MTS "	Maltese
+"latn"	Latin	"PLK "	Polish
+"latn"	Latin	"PRO "	Provencal
+"latn"	Latin	"RMS "	Romansh
+"latn"	Latin	"ROM "	Romanian
+"latn"	Latin	"ROY "	Romany
+"latn"	Latin	"SKY "	Slovak
+"latn"	Latin	"SLV "	Slovenian
+"latn"	Latin	"LSB "	Sorbian (Lower)
+"latn"	Latin	"USB "	Sorbian (Upper)
+"latn"	Latin	"TRK "	Turkish
+"latn"	Latin	"WEL "	Welsh
+"latn"	Latin	"VIT "	Vietnamese
+			
+"cyrl"	Cyrillic	"dflt"	*default script handling
+"cyrl"	Cyrillic	"RUS "	Russian
+			
+"grek"	Greek	"dflt"	*default script handling
+"grek"	Greek	"COP "	Coptic
+"grek"	Greek	"ELL "	Greek
+			
+"armn"	Armenian	"dflt"	*default script handling
+"armn"	Armenian	"HYE "	Armenian
+			
+"geor"	Georgian	"dflt"	*default script handling
+"geor"	Georgian	"KAT "	Georgian
+			
+"runr"	Runic	"dflt"	*default script handling
+			
+"ogam"	Ogham	"dflt"	*default script handling
+			
+#https://docs.microsoft.com/en-us/typography/script-development/arabic			
+Registered tags for the Arabic script		Registered tags for Arabic language systems	
+Script tag	Script	Language system tag	Language
+"arab"	Arabic	"dflt"	*default script handling
+"arab"	Arabic	"ARA "	Arabic
+"arab"	Arabic	"BLI "	Baluchi
+"arab"	Arabic	"BLT "	Balti
+"arab"	Arabic	"BBR "	Berber
+"arab"	Arabic	"BRH "	Brahui
+"arab"	Arabic	"FAR "	Persian
+"arab"	Arabic	"FUL "	Fulah
+"arab"	Arabic	"HAU "	Hausa
+"arab"	Arabic	"HND "	Hindko
+"arab"	Arabic	"KNR "	Kanuri
+"arab"	Arabic	"KSH "	Kashmiri
+"arab"	Arabic	"KHW "	Khowar
+"arab"	Arabic	"KUR "	Kurdish
+"arab"	Arabic	"LDK "	Ladakhi
+"arab"	Arabic	"MLY "	Malay
+"arab"	Arabic	"MND "	Mandinka
+"arab"	Arabic	"PAS "	Pashto
+"arab"	Arabic	"PAN "	Punjabi
+"arab"	Arabic	"SRK "	Saraiki
+"arab"	Arabic	"SND "	Sindhi
+"arab"	Arabic	"SML "	Somali
+"arab"	Arabic	"SWK "	Swahili
+"arab"	Arabic	"URD "	Urdu
+"arab"	Arabic	"UYG "	Uyghur
+#https://docs.microsoft.com/en-us/typography/script-development/buginese			
+Registered tags for the Buginese script		Registered tags for Buginese language systems	
+Script tag	Script	Language system tag	Language
+"bugi"	Buginese	"dflt"	*default script handling
+"bugi"	Buginese	BUG	Bugis
+"bugi"	Buginese	MKR	Makasar
+"bugi"	Buginese	MDR	Mandar
+#https://docs.microsoft.com/en-us/typography/script-development/hangul			
+Registered tags for the Korean Hangul script		Registered tags for Korean Hangul language systems	
+Script tag	Script	Language system tag	Language
+"hang"	Korean Hangul	"dflt"	*default script handling
+"hang"	Korean Hangul	"KOR "	Korean
+#https://docs.microsoft.com/en-us/typography/script-development/hebrew			
+Registered tags for the Hebrew script		Registered tags for Hebrew language systems	
+Script tag	Script	Language system tag	Language
+"hebr"	Hebrew	"dflt"	*default script handling
+"hebr"	Hebrew	"IWR "	Hebrew
+"hebr"	Hebrew	"JUD "	Ladino
+"hebr"	Hebrew	"JII "	Yiddish
+#https://docs.microsoft.com/en-us/typography/script-development/bengali			
+Registered tags for the Bengali script		Registered tags for Bengali language systems	
+Script tag	Script	Language system tag	Language
+"bng2"	Bengali	"dflt"	*default script handling
+"bng2"	Bengali	"ASM "	Assamese
+"bng2"	Bengali	"BEN "	Bangla
+"bng2"	Bengali	"MNI "	Manipuri
+			
+#https://docs.microsoft.com/en-us/typography/script-development/devanagari			
+Registered tags for the Devanagari script		Registered tags for Devanagari language systems	
+Script tag	Script	Language system tag	Language
+"dev2"	Devanagari	"dflt"	*default script handling
+"dev2"	Devanagari	"HIN "	Hindi
+"dev2"	Devanagari	"KSH "	Kashmiri
+"dev2"	Devanagari	"KOK "	Konkani
+"dev2"	Devanagari	"MAR "	Marathi
+"dev2"	Devanagari	"NEP "	Nepali
+"dev2"	Devanagari	"SAN "	Sanskrit
+"dev2"	Devanagari	"SND "	Sindhi
+			
+#https://docs.microsoft.com/en-us/typography/script-development/gujarati			
+Registered tags for the Gujarati script		Registered tags for Gujarati language systems	
+Script tag	Script	Language system tag	Language
+"gjr2"	Gujarati	"dflt"	*default script handling
+"gjr2"	Gujarati	"GUJ "	Gujarati
+			
+#https://docs.microsoft.com/en-us/typography/script-development/gurmukhi			
+Registered tags for the Gurmukhi script		Registered tags for Bengali language systems	
+Script tag	Script	Language system tag	Language
+"gur2"	Gurmukhi	"dflt"	*default script handling
+"gur2"	Gurmukhi	"PAN "	Punjabi
+			
+			
+#https://docs.microsoft.com/en-us/typography/script-development/kannada			
+Registered tags for the Kannada script		Registered tags for Kannada language systems	
+Script tag	Script	Language system tag	Language
+"knd2"	Kannada	"dflt"	*default script handling
+"knd2"	Kannada	"KAN "	Kannada
+			
+#https://docs.microsoft.com/en-us/typography/script-development/malayalam			
+Registered tags for the Malayalam script		Registered tags for Malayalam language systems	
+Script tag	Script	Language system tag	Language
+"mlm2"	Malayalam	'dflt'	*default script handling
+"mlm2"	Malayalam	'MAL '	Malayalam
+"mlm2"	Malayalam	'MLR '	Malayalam, reformed orthography
+			
+#https://docs.microsoft.com/en-us/typography/script-development/oriya			
+Registered tags for the Oriya script		Registered tags for Oriya language systems	
+Script tag	Script	Language system tag	Language
+"ory2"	Oriya	'dflt'	*default script handling
+"ory2"	Oriya	'SAT '	Santali
+"ory2"	Oriya	'KUI '	Kui
+"ory2"	Oriya	'SAN '	Sanskrit
+			
+#https://docs.microsoft.com/en-us/typography/script-development/tamil			
+Registered tags for the Tamil script		Registered tags for Tamil language systems	
+Script tag	Script	Language system tag	Language
+"tml2"	Tamil	"dflt"	*default script handling
+"tml2"	Tamil	"TAM "	Tamil
+			
+#https://docs.microsoft.com/en-us/typography/script-development/telugu			
+Registered tags for the Telugu script		Registered tags for Telugu language systems	
+Script tag	Script	Language system tag	Language
+"telu"	Telugu	"dflt"	*default script handling
+"telu"	Telugu	"TEL "	Telugu
+			
+			
+#https://docs.microsoft.com/en-us/typography/script-development/javanese			
+Registered tags for the Javanese script		Registered tags for Javanese language systems	
+Script tag	Script	Language system tag	Language
+"java"	Javanese	"dflt"	*default script handling
+"java"	Javanese	JAV	Javanese
+"java"	Javanese	SAN	Sanskrit
+"java"	Javanese	SUN	Sundanese
+"java"	Javanese	SAS	Sasak
+			
+#https://docs.microsoft.com/en-us/typography/script-development/khmer			
+Registered tags for the Khmer script		Registered tags for Khmer language systems	
+Script tag	Script	Language system tag	Language
+"khmr"	Khmer	"dflt"	*default script handling
+"khmr"	Khmer	"KHM "	Khmer
+			
+#https://docs.microsoft.com/en-us/typography/script-development/lao			
+Registered tags for the Lao script		Registered tags for Lao language systems	
+Script tag	Script	Language system tag	Language
+"lao "	Lao	"dflt"	*default script handling
+"lao "	Lao	"LAO "	Lao
+			
+#https://docs.microsoft.com/en-us/typography/script-development/myanmar			
+Registered tags for the Myanmar script		Registered tags for Myanmar language systems	
+Script tag	Script	Language system tag	Language
+"mym2"	Myanmar	"dflt"	*default script handling
+"mym2"	Myanmar	ARK	Rakhine-Marma (Arakanese)
+"mym2"	Myanmar	BRM	Burmese
+"mym2"	Myanmar	MON	Mon
+"mym2"	Myanmar	KRN	Karen
+"mym2"	Myanmar	QIN	Chin
+"mym2"	Myanmar	SHN	Shan
+"mym2"	Myanmar	PLG	Palaung
+"mym2"	Myanmar	SAN	Sanskrit
+"mym2"	Myanmar	PAL	Pali
+			
+#https://docs.microsoft.com/en-us/typography/script-development/sinhala			
+Registered tags for the Sinhala script		Registered tags for Sinhala language systems	
+Script tag	Script	Language system tag	Language
+"sinh"	Sinhala	'dflt'	*default script handling
+"sinh"	Sinhala	'SNH '	Sinhala
+"sinh"	Sinhala	'PAL '	Pali
+"sinh"	Sinhala	"SAN"	Sanskrit
+			
+#https://docs.microsoft.com/en-us/typography/script-development/syriac			
+Registered tags for the Syriac script		Registered tags for Syriac language systems	
+Script tag	Script	Language system tag	Language
+"syrc"	Syriac	"dflt"	*default script handling
+"syrc"	Syriac	"SYR "	Syriac
+#https://docs.microsoft.com/en-us/typography/script-development/thaana			
+Registered tags for the Thaana script		Registered tags for Thaana language systems	
+Script tag	Script	Language system tag	Language
+"thaa"	Thaana	"dflt"	*default script handling
+"thaa"	Thaana	"DIV "	Dhivehi
+			
+#https://docs.microsoft.com/en-us/typography/script-development/thai			
+Registered tags for the Thai script		Registered tags for Thai language systems	
+Script tag	Script	Language system tag	Language
+"thai"	Thai	"dflt"	*default script handling
+"thai"	Thai	"KUY "	Kuy
+"thai"	Thai	"PAL "	Pali
+"thai"	Thai	"SAN "	Sanskrit
+"thai"	Thai	"THA "	Thai
+#https://docs.microsoft.com/en-us/typography/script-development/tibetan			
+Registered tags for the Tibetan script		Registered tags for Tibetan language systems	
+Script tag	Script	Language system tag	Language
+"tibt"	Tibetan	"dflt"	*default script handling
+"tibt"	Tibetan	"TIB "	Tibetan
+"tibt"	Tibetan	"SAN "	Sanskrit
+"tibt"	Tibetan	"TSJ "	Tshangla
+"tibt"	Tibetan	"XKF "	Khengkha
+"tibt"	Tibetan	"KJZ "	Bumthangkha
+"tibt"	Tibetan	"BLT "	Balti
+"tibt"	Tibetan	"DZN"	Bhutanese
