@@ -53,6 +53,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\TextBreakerTest\BreakSpan01.cs">
+      <Link>BreakSpan01.cs</Link>
+    </Compile>
     <Compile Include="BasicTests.cs" />
     <Compile Include="BreakAtInfo.cs" />
     <Compile Include="FrenchTests.cs" />

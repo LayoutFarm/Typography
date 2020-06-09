@@ -93,28 +93,15 @@ namespace Typography.TextServices
             _registerShapingContexts.Clear();
         }
 
+
         CustomBreaker _textBreaker;
-        List<TextBreak.BreakSpan> _breakSpans = new List<TextBreak.BreakSpan>();
-
-        public IEnumerable<Typography.TextBreak.BreakSpan> BreakToLineSegments(char[] str, int startAt, int len)
-        { 
+        public void BreakToLineSegments2(char[] str, int startAt, int len, WordVisitor visitor)
+        {
             //user must setup the CustomBreakerBuilder before use      
-            if (_textBreaker == null)
-            {
-                //setup 
-                _textBreaker = Typography.TextBreak.CustomBreakerBuilder.NewCustomBreaker();
-                _textBreaker.SetNewBreakHandler(vis => _breakSpans.Add(vis.GetBreakSpan()));
-            }
-
-
-            _textBreaker.UseUnicodeRangeBreaker = true;
-
-            _breakSpans.Clear();
-            //
             if (len < 1)
             {
                 yield break;
-            } 
+            }
 
 #if DEBUG
             if (len > 2)
@@ -122,16 +109,17 @@ namespace Typography.TextServices
 
             }
 #endif
-            //----------------------------
-            int cur_startAt = startAt;
-
-            _textBreaker.BreakWords(str, cur_startAt, len);//break and store into _breakSpans
-
-            foreach (TextBreak.BreakSpan sp in _breakSpans)
+            if (_textBreaker == null)
             {
-                yield return sp;
+                //setup 
+                _textBreaker = Typography.TextBreak.CustomBreakerBuilder.NewCustomBreaker();
             }
+
+            _textBreaker.UseUnicodeRangeBreaker = true;
+            _textBreaker.CurrentVisitor = visitor;
+            _textBreaker.BreakWords(str, startAt, len);
         }
+
         public void MeasureString(char[] str, int startAt, int len, out int w, out int h)
         {
             //measure string 

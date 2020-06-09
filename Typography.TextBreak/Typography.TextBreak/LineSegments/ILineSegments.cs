@@ -1,29 +1,17 @@
 ﻿//MIT, 2016-present, WinterDev 
 namespace Typography.TextBreak
 {
-    public interface ILineSegmentList : System.IDisposable
-    {
-        int Count { get; }
-        ILineSegment this[int index] { get; }
-    }
-    public interface ILineSegment
-    {
-        int Length { get; }
-        int StartAt { get; }
-        SpanBreakInfo SpanBreakInfo { get; }
-    }
 
-    public struct BreakSpan
-    {
-        //TODO: review here again***
-        public int startAt;
-        public ushort len;
-        public WordKind wordKind;
-        public SpanBreakInfo SpanBreakInfo;
-    }
 
     public class SpanBreakInfo
     {
+        public SpanBreakInfo(uint flags)
+        {
+            ushort upper = (ushort)(flags >> 8);
+            RightToLeft = (upper & 0xff) != 0;
+            LangTag = (ushort)(flags & 0xffff); //lower 2 bytes
+            ScriptTag = 0;
+        }
         public SpanBreakInfo(bool isRightToLeft, uint scriptTag, uint langTag = 0)
         {
             RightToLeft = isRightToLeft;
@@ -33,7 +21,6 @@ namespace Typography.TextBreak
         public bool RightToLeft { get; }
         public uint ScriptTag { get; }
         public uint LangTag { get; }
-
 #if DEBUG
         public override string ToString()
         {
@@ -41,6 +28,5 @@ namespace Typography.TextBreak
         }
 #endif
     }
-
 
 }
