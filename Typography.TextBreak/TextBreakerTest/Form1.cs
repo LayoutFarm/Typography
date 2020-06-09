@@ -7,9 +7,9 @@ using System.Collections.Generic;
 using System.Windows.Forms;
 using Typography.TextBreak;
 using Typography.TextBreak.ICU;
-
-
 using Typography.TextBreak.SheenBidi;
+
+using PixelFarm.Drawing; //TEMP
 
 namespace TextBreakerTest
 {

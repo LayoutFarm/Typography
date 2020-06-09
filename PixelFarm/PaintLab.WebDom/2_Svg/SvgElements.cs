@@ -151,15 +151,10 @@ namespace PaintLab.Svg
             _wellknownName = wellknownName;
             _unknownElemName = name;
         }
-        public void SetController(object controller)
-        {
-            _controller = controller;
-        }
 
-        public static object UnsafeGetController(SvgElement elem)
-        {
-            return elem._controller;
-        }
+        public void SetController(object controller) => _controller = controller;
+        public static object UnsafeGetController(SvgElement elem) => elem._controller;
+
 
         public string ElemId { get; set; }
 
