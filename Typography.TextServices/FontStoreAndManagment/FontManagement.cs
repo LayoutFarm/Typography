@@ -14,11 +14,7 @@ namespace Typography.OpenFont
             long bits = (long)unicodeLangBits;
             int bitpos = (int)(bits >> 32);
 
-            if (bitpos == 0)
-            {
-                return false; //default ?
-            }
-            else if (bitpos < 32)
+            if (bitpos < 32)
             {
                 //use range 1
                 return (langs.UnicodeRange1 & (1 << bitpos)) != 0;
