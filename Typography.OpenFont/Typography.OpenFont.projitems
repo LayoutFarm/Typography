@@ -11,6 +11,7 @@
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)AdditionalInfo\AdobeGlyphList.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AdditionalInfo\AdobeGlyphListForNewFont.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AdditionalInfo\Languages.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AdditionalInfo\MacPostFormat1.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AdditionalInfo\OS2_IBMFontClassParameters.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AdditionalInfo\Unicode5_1_Langs.cs" />
