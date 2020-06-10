@@ -1,4 +1,5 @@
-﻿Abaza	'ABA '	abq
+﻿#https://docs.microsoft.com/en-us/typography/opentype/spec/languagetags
+Abaza	'ABA '	abq
 Abkhazian	'ABK '	abk
 Acholi	'ACH '	ach
 Achi	'ACR '	acr
