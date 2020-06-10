@@ -1,6 +1,6 @@
 ﻿//MIT, 2020-present, WinterDev
 
-using System; 
+using System;
 using System.IO;
 
 namespace Typography.OpenFont.Tables
@@ -44,6 +44,9 @@ namespace Typography.OpenFont.Tables
     //“Jpan” denotes Japanese writing — ISO 15924 defines “Jpan” as an alias for Han + Hiragana + Katakana.
     //“Kore” denotes Korean writing — ISO 15924 defines “Kore” as an alias for Hangul + Han.
     //“Hang” denotes Hangul script(exclusively — Hanja are not implied by “Hang”).
+
+
+   
 
     class Meta : TableEntry
     {
@@ -123,6 +126,15 @@ namespace Typography.OpenFont.Tables
             //translate data for each tags
             //The following registered tags are defined or reserved at this time:
 
+
+
+            //------------------------------------------------------------------------------------ 
+            //IMPORTANT:
+            //Note: OpenType Layout script and language system tags are not the same as 
+            //those used in BCP 47 and should not be referenced when creating or processing ScriptLangTags.
+            //------------------------------------------------------------------------------------ 
+
+
             for (int i = 0; i < dataMaps.Length; ++i)
             {
                 DataMapRecord record = dataMaps[i];
@@ -192,7 +204,7 @@ namespace Typography.OpenFont.Tables
             }
         }
         static string[] ReadCommaSepData(byte[] data)
-        {    
+        {
             string[] tags = System.Text.Encoding.UTF8.GetString(data).Split(',');
             for (int i = 0; i < tags.Length; ++i)
             {
