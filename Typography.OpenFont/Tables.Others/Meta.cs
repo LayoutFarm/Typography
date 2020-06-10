@@ -189,11 +189,7 @@ namespace Typography.OpenFont.Tables
             }
         }
         static string[] ReadCommaSepData(byte[] data)
-        {   
-
-
-
-
+        {    
             string[] tags = System.Text.Encoding.UTF8.GetString(data).Split(',');
             for (int i = 0; i < tags.Length; ++i)
             {
