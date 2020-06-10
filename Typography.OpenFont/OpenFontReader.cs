@@ -30,9 +30,11 @@ namespace Typography.OpenFont
         public readonly ushort Weight;
         PreviewFontInfo[] _ttcfMembers;
 
-        public PreviewFontInfo(string fontName, string fontSubFam,
+
+        internal PreviewFontInfo(string fontName, string fontSubFam,
             string tFamilyName, string tSubFamilyName,
             ushort weight,
+            Languages langs,
             Extensions.TranslatedOS2FontStyle os2TranslatedStyle = Extensions.TranslatedOS2FontStyle.UNSET)
         {
             Name = fontName;
@@ -54,12 +56,14 @@ namespace Typography.OpenFont
 #endif
             Weight = weight;
             OS2TranslatedStyle = os2TranslatedStyle;
+            Languages = langs;
         }
-        public PreviewFontInfo(string fontName, PreviewFontInfo[] ttcfMembers)
+        internal PreviewFontInfo(string fontName, PreviewFontInfo[] ttcfMembers)
         {
             Name = fontName;
             SubFamilyName = "";
             _ttcfMembers = ttcfMembers;
+            Languages = new Languages();
         }
         public int ActualStreamOffset { get; internal set; }
         public bool IsWebFont { get; internal set; }
@@ -68,19 +72,21 @@ namespace Typography.OpenFont
         public string PostScriptName { get; internal set; }
         public string UniqueFontIden { get; internal set; }
         public string VersionString { get; internal set; }
-        public uint UnicodeRange1 { get; internal set; }
-        public uint UnicodeRange2 { get; internal set; }
-        public uint UnicodeRange3 { get; internal set; }
-        public uint UnicodeRange4 { get; internal set; }
+        public Languages Languages { get; }
 
-        /// <summary>
-        /// GSUB's ScriptList 
-        /// </summary>
-        public ScriptList GsubScriptList { get; internal set; }
-        /// <summary>
-        /// GPOS's ScriptList
-        /// </summary>
-        public ScriptList GposScriptList { get; internal set; }
+        //public uint UnicodeRange1 { get; internal set; }
+        //public uint UnicodeRange2 { get; internal set; }
+        //public uint UnicodeRange3 { get; internal set; }
+        //public uint UnicodeRange4 { get; internal set; }
+
+        ///// <summary>
+        ///// GSUB's ScriptList 
+        ///// </summary>
+        //public ScriptList GsubScriptList { get; internal set; }
+        ///// <summary>
+        ///// GPOS's ScriptList
+        ///// </summary>
+        //public ScriptList GposScriptList { get; internal set; }
 
         /// <summary>
         /// get font collection's member count
@@ -351,8 +357,29 @@ namespace Typography.OpenFont
 
             //for preview, read ONLY  script list from gsub and gpos (set OnlyScriptList).
 
+            Meta metaTable = ReadTableIfExists(tables, input, new Meta());
             GSUB gsub = ReadTableIfExists(tables, input, new GSUB() { OnlyScriptList = true });
             GPOS gpos = ReadTableIfExists(tables, input, new GPOS() { OnlyScriptList = true });
+
+
+            //TODO: review here again
+            //            if (metaTable == null)
+            //            {
+            //                //read only script list, not entire table
+            //                gsub = ReadTableIfExists(tables, input, new GSUB() { OnlyScriptList = true });
+            //                gpos = ReadTableIfExists(tables, input, new GPOS() { OnlyScriptList = true });
+            //            }
+            //            else
+            //            {
+            //#if DEBUG
+            //                //for debug mode only
+            //                gsub = ReadTableIfExists(tables, input, new GSUB() { OnlyScriptList = true });
+            //                gpos = ReadTableIfExists(tables, input, new GPOS() { OnlyScriptList = true });
+            //#endif
+            //            }
+
+            Languages langs = new Languages();
+            langs.Update(os2Table, metaTable, gsub, gpos);
 
             return new PreviewFontInfo(
               nameEntry.FontName,
@@ -360,18 +387,12 @@ namespace Typography.OpenFont
               nameEntry.TypographicFamilyName,
               nameEntry.TypographyicSubfamilyName,
               os2Table.usWeightClass,
+              langs,
               Extensions.TypefaceExtensions.TranslatedOS2FontStyle(os2Table))
             {
                 PostScriptName = nameEntry.PostScriptName,
                 UniqueFontIden = nameEntry.UniqueFontIden,
-                VersionString = nameEntry.VersionString,
-                UnicodeRange1 = os2Table.ulUnicodeRange1,
-                UnicodeRange2 = os2Table.ulUnicodeRange2,
-                UnicodeRange3 = os2Table.ulUnicodeRange3,
-                UnicodeRange4 = os2Table.ulUnicodeRange4,
-                //
-                GsubScriptList = gsub?.ScriptList,
-                GposScriptList = gpos?.ScriptList
+                VersionString = nameEntry.VersionString
             };
 
         }
@@ -379,12 +400,15 @@ namespace Typography.OpenFont
         {
 
             OS2Table os2Table = ReadTableIfExists(tables, input, new OS2Table());
+            Meta meta = ReadTableIfExists(tables, input, new Meta());
             NameEntry nameEntry = ReadTableIfExists(tables, input, new NameEntry());
 
             Head header = ReadTableIfExists(tables, input, new Head());
             MaxProfile maximumProfile = ReadTableIfExists(tables, input, new MaxProfile());
             HorizontalHeader horizontalHeader = ReadTableIfExists(tables, input, new HorizontalHeader());
             HorizontalMetrics horizontalMetrics = ReadTableIfExists(tables, input, new HorizontalMetrics(horizontalHeader.HorizontalMetricsCount, maximumProfile.GlyphCount));
+
+
 
             //---
             PostTable postTable = ReadTableIfExists(tables, input, new PostTable());
@@ -509,6 +533,7 @@ namespace Typography.OpenFont
             typeface.GaspTable = gaspTable;
             typeface.MaxProfile = maximumProfile;
             typeface.HheaTable = horizontalHeader;
+
             //----------------------------
 
             if (!isPostScriptOutline && !isBitmapFont)
@@ -564,6 +589,10 @@ namespace Typography.OpenFont
                 typeface.UpdateAllCffGlyphBounds();
             }
 #endif
+
+
+            typeface.UpdateLangs(meta);
+
             return typeface;
         }
 

@@ -9,80 +9,24 @@ namespace Typography.OpenFont
 {
     public static class TypefaceExtension3
     {
-        public static ScriptLang GetScriptLang(this ScriptLangInfo scLangInfo)
+        public static void CollectScriptLang(this FontManagement.InstalledTypeface typeface, Dictionary<string, ScriptLang> output)
         {
-            return new ScriptLang(scLangInfo.shortname, "");
+            typeface.Languages.CollectScriptLang(output);
         }
 
         public static bool DoesSupportUnicode(
                this PreviewFontInfo previewFontInfo,
                UnicodeLangBits unicodeLangBits)
         {
-
-            long bits = (long)unicodeLangBits;
-            int bitpos = (int)(bits >> 32);
-
-            if (bitpos == 0)
-            {
-                return true; //default
-            }
-            else if (bitpos < 32)
-            {
-                //use range 1
-                return (previewFontInfo.UnicodeRange1 & (1 << bitpos)) != 0;
-            }
-            else if (bitpos < 64)
-            {
-                return (previewFontInfo.UnicodeRange2 & (1 << (bitpos - 32))) != 0;
-            }
-            else if (bitpos < 96)
-            {
-                return (previewFontInfo.UnicodeRange3 & (1 << (bitpos - 64))) != 0;
-            }
-            else if (bitpos < 128)
-            {
-                return (previewFontInfo.UnicodeRange4 & (1 << (bitpos - 96))) != 0;
-            }
-            else
-            {
-                throw new System.NotSupportedException();
-            }
+            return previewFontInfo.Languages.DoesSupportUnicode((UnicodeLangBits5_1)unicodeLangBits);
         }
+
 
         public static bool DoesSupportUnicode(
             this Typeface typeface,
             UnicodeLangBits unicodeLangBits)
         {
-
-            //-----------------------------
-            long bits = (long)unicodeLangBits;
-            int bitpos = (int)(bits >> 32);
-
-            if (bitpos == 0)
-            {
-                return true; //default
-            }
-            else if (bitpos < 32)
-            {
-                //use range 1
-                return (typeface.UnicodeRange1 & (1 << bitpos)) != 0;
-            }
-            else if (bitpos < 64)
-            {
-                return (typeface.UnicodeRange2 & (1 << (bitpos - 32))) != 0;
-            }
-            else if (bitpos < 96)
-            {
-                return (typeface.UnicodeRange3 & (1 << (bitpos - 64))) != 0;
-            }
-            else if (bitpos < 128)
-            {
-                return (typeface.UnicodeRange4 & (1 << (bitpos - 96))) != 0;
-            }
-            else
-            {
-                throw new System.NotSupportedException();
-            }
+            return typeface.Languages.DoesSupportUnicode((UnicodeLangBits5_1)unicodeLangBits);
         }
 
         static UnicodeLangBits[] FilterOnlySelectedRange(UnicodeLangBits[] inputRanges, UnicodeLangBits[] userSpecificRanges)
@@ -173,15 +117,7 @@ namespace Typography.FontManagement
 
             PostScriptName = previewFontInfo.PostScriptName;
             UniqueFontIden = previewFontInfo.UniqueFontIden;
-
-            UnicodeRange1 = previewFontInfo.UnicodeRange1;
-            UnicodeRange2 = previewFontInfo.UnicodeRange2;
-            UnicodeRange3 = previewFontInfo.UnicodeRange3;
-            UnicodeRange4 = previewFontInfo.UnicodeRange4;
-
-            GsubScriptList = previewFontInfo.GsubScriptList;
-            GposScriptList = previewFontInfo.GposScriptList;
-
+            Languages = previewFontInfo.Languages;
             TypefaceStyle = style;
         }
 
@@ -194,48 +130,14 @@ namespace Typography.FontManagement
 
         public TypefaceStyle TypefaceStyle { get; internal set; }
         public ushort Weight { get; internal set; }
-        public uint UnicodeRange1 { get; internal set; }
-        public uint UnicodeRange2 { get; internal set; }
-        public uint UnicodeRange3 { get; internal set; }
-        public uint UnicodeRange4 { get; internal set; }
-
-        public ScriptList GsubScriptList { get; internal set; }
-        public ScriptList GposScriptList { get; internal set; }
+        public Languages Languages { get; }
 
         public string FontPath { get; internal set; }
         public int ActualStreamOffset { get; internal set; }
-        public bool DoesSupportUnicode(UnicodeLangBits unicodeLangBits)
-        {
 
-            long bits = (long)unicodeLangBits;
-            int bitpos = (int)(bits >> 32);
+        //TODO: UnicodeLangBits vs UnicodeLangBits5_1
+        public bool DoesSupportUnicode(UnicodeLangBits unicodeLangBits) => Languages.DoesSupportUnicode((UnicodeLangBits5_1)unicodeLangBits);
 
-            if (bitpos == 0)
-            {
-                return true; //default
-            }
-            else if (bitpos < 32)
-            {
-                //use range 1
-                return (UnicodeRange1 & (1 << bitpos)) != 0;
-            }
-            else if (bitpos < 64)
-            {
-                return (UnicodeRange2 & (1 << (bitpos - 32))) != 0;
-            }
-            else if (bitpos < 96)
-            {
-                return (UnicodeRange3 & (1 << (bitpos - 64))) != 0;
-            }
-            else if (bitpos < 128)
-            {
-                return (UnicodeRange4 & (1 << (bitpos - 96))) != 0;
-            }
-            else
-            {
-                throw new System.NotSupportedException();
-            }
-        }
 #if DEBUG
         public override string ToString()
         {

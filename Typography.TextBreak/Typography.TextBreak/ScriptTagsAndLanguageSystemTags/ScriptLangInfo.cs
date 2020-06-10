@@ -1098,23 +1098,16 @@ Zanabazar_Square__Zanabazarin_Dörböljin_Useg__Xewtee_Dörböljin_Bicig__Horizo
         }
 
 
-        //public static ScriptLangInfo GetRegisteredScriptLang(string shortname)
-        //{
-        //    s_registeredScriptTags.TryGetValue(shortname, out ScriptLangInfo found);
-        //    return found;
-        //}
+        public static ScriptLangInfo GetRegisteredScriptLang(string shortname)
+        {
+            s_registeredScriptTags.TryGetValue(shortname, out ScriptLangInfo found);
+            return found;
+        }
         public static ScriptLangInfo GetRegisteredScriptLangFromLanguageName(string languageName)
         {
             s_registerScriptFromFullNames.TryGetValue(languageName, out ScriptLangInfo found);
             return found;
-        }
-        public static IEnumerable<ScriptLangInfo> GetRegiteredScriptLangIter()
-        {
-            foreach (ScriptLangInfo scriptLang in s_registeredScriptTags.Values)
-            {
-                yield return scriptLang;
-            }
-        }
+        } 
 
     }
 
