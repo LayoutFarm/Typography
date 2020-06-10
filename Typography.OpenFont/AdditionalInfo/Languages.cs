@@ -99,6 +99,19 @@ namespace Typography.OpenFont
             UnicodeRange2 = os2Tabble.ulUnicodeRange2;
             UnicodeRange3 = os2Tabble.ulUnicodeRange3;
             UnicodeRange4 = os2Tabble.ulUnicodeRange4;
+
+
+            //-------
+            //IMPORTANT:***
+            //All available bits were exhausted as of Unicode 5.1.  ***
+            //The bit assignments were last updated for OS/2 version 4 in OpenType 1.5. 
+            //There are many additional ranges supported in the current version of Unicode that are not supported by these fields in the OS/2 table. 
+            //
+            //See the 'dlng' and 'slng' tags in the 'meta' table for an alternate mechanism to declare 
+            //what scripts or languages that a font can support or is designed for. 
+            //-------
+
+
             //ULONG 	ulUnicodeRange1 	Bits 0-31
             //ULONG 	ulUnicodeRange2 	Bits 32-63
             //ULONG 	ulUnicodeRange3 	Bits 64-95
@@ -130,22 +143,15 @@ namespace Typography.OpenFont
         }
 
 
-        //https://docs.microsoft.com/en-us/typography/opentype/spec/meta
-        //“Latn” denotes Latin script(and any language or writing system using Latin script).
-        //“Cyrl” denotes Cyrillic script.
-        //“sr-Cyrl” denotes Cyrillic script as used for writing the Serbian language; a font that has this property value may not be suitable for displaying text in Russian or other languages written using Cyrillic script.
-        //“en-Dsrt” denotes English written with the Deseret script.
-        //“Hant” denotes Traditional Chinese.
-        //“Hant-HK” denotes Traditional Chinese as used in China.
-        //“Jpan” denotes Japanese writing — ISO 15924 defines “Jpan” as an alias for Han + Hiragana + Katakana.
-        //“Kore” denotes Korean writing — ISO 15924 defines “Kore” as an alias for Hangul + Han.
-        //“Hang” denotes Hangul script(exclusively — Hanja are not implied by “Hang”).
+
         public bool DoesSupportUnicode(UnicodeLangBits5_1 unicodeLangBits)
         {
             if (_supportedLangs != null)
             {
                 //TODO: implement this
             }
+
+
             long bits = (long)unicodeLangBits;
             int bitpos = (int)(bits >> 32);
 

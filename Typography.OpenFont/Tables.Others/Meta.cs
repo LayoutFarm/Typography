@@ -6,6 +6,42 @@ using System.IO;
 namespace Typography.OpenFont.Tables
 {
 
+    //NOTE: readmore about language tag, https://tools.ietf.org/html/bcp47
+    //...The language of an information item or a user's language preferences
+    //often need to be identified so that appropriate processing can be
+    //applied. 
+    //...
+    //...
+    //One means of indicating the language used is by labeling the
+    //information content with an identifier or "tag".  These tags can also
+    //be used to specify the user's preferences when selecting information
+    //content or to label additional attributes of content and associated
+    //resources. 
+
+    //..
+    //..The Language Tag
+    //..
+
+    //Language tags are used to help identify languages, whether spoken,
+    //written, signed, or otherwise signaled, for the purpose of
+    //communication.This includes constructed and artificial languages
+    //but excludes languages not intended primarily for human
+    //communication, such as programming languages.
+
+
+    //------------------------------------------------------------------------------------ 
+    //“Latn” denotes Latin script(and any language or writing system using Latin script).
+    //“Cyrl” denotes Cyrillic script.
+    //“sr-Cyrl” denotes Cyrillic script as used for writing the Serbian language; 
+    //  a font that has this property value may not be suitable for displaying text in Russian or
+    //  other languages written using Cyrillic script.
+    //“en-Dsrt” denotes English written with the Deseret script.
+    //“Hant” denotes Traditional Chinese.
+    //“Hant-HK” denotes Traditional Chinese as used in China.
+    //“Jpan” denotes Japanese writing — ISO 15924 defines “Jpan” as an alias for Han + Hiragana + Katakana.
+    //“Kore” denotes Korean writing — ISO 15924 defines “Kore” as an alias for Hangul + Han.
+    //“Hang” denotes Hangul script(exclusively — Hanja are not implied by “Hang”).
+
     class Meta : TableEntry
     {
         //The metadata table contains various metadata values for the font. 
@@ -60,6 +96,20 @@ namespace Typography.OpenFont.Tables
                     reader.ReadUInt32());
             }
 
+            //Metadata tags identify the category of information provided and representation format used for a given metadata value.
+            //A registry of commonly - used tags is maintained, 
+            //but private, vendor-determined tags can also be used.
+
+            //Like other OpenType tags,            
+            //metadata tags are four unsigned bytes that can equivalently be interpreted as a string of four ASCII characters. 
+            //Metadata tags must begin with a letter (0x41 to 0x5A, 0x61 to 0x7A) and
+            //must use only letters, digits (0x30 to 0x39) or space (0x20). 
+            //Space characters must only occur as trailing characters in tags that have fewer than four letters or digits.
+
+            //Privately - defined axis tags must begin with an uppercase letter(0x41 to 0x5A), 
+            //and must use only uppercase letters or digits. 
+            //Registered axis tags must not use that pattern, but can be any other valid pattern.
+
             //The data for a given record may be either textual or binary.
             //The representation format is specified for each tag. 
             //Depending on the tag, multiple records for a given tag or multiple, 
@@ -69,6 +119,7 @@ namespace Typography.OpenFont.Tables
 
             //translate data for each tags
             //The following registered tags are defined or reserved at this time:
+
             for (int i = 0; i < dataMaps.Length; ++i)
             {
                 DataMapRecord record = dataMaps[i];
