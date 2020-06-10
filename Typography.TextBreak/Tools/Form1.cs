@@ -20,13 +20,14 @@ namespace Tools
         private void button1_Click(object sender, EventArgs e)
         {
             //https://docs.microsoft.com/en-us/typography/opentype/spec/languagetags
-            string[] allLines = File.ReadAllLines("lang_system_1.txt");
+            string[] allLines = File.ReadAllLines("languagetags.txt");
             //
             //parse each line          
             int line_no = 0;
             List<LangSystemInfo> langInfoList = new List<LangSystemInfo>();
-            foreach (string line in allLines)
+            for (int i = 1; i < allLines.Length; ++i) //first line is a note, so start at 1
             {
+                string line = allLines[i];
                 int p0 = line.IndexOf('\'');
                 if (p0 < 0) { throw new NotSupportedException(); }
                 int p1 = line.IndexOf('\'', p0 + 1);
