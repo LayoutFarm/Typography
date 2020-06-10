@@ -18,6 +18,8 @@ namespace Typography.OpenFont
         CFFTable _cffTable;
         BitmapFontGlyphSource _bitmapFontGlyphSource;
 
+
+
         internal Typeface(
             NameEntry nameEntry,
             Bounds bounds,
@@ -72,7 +74,9 @@ namespace Typography.OpenFont
             OS2Table = os2Table;
 
             _glyphs = glyphs;
+
         }
+        public Languages Languages { get; } = new Languages();
         /// <summary>
         /// control values in Font unit
         /// </summary>
@@ -218,7 +222,9 @@ namespace Typography.OpenFont
             }
             else
             {
+#if DEBUG
                 System.Diagnostics.Debug.WriteLine("found unknown glyph:" + glyphIndex);
+#endif
                 return _glyphs[0]; //return empty glyph?;
             }
         }
@@ -289,6 +295,7 @@ namespace Typography.OpenFont
             return (targetPointSize * resolution / pointsPerInch) / this.UnitsPerEm;
         }
 
+
         internal BASE BaseTable { get; set; }
         internal GDEF GDEFTable { get; set; }
 
@@ -297,12 +304,6 @@ namespace Typography.OpenFont
         public GPOS GPOSTable { get; set; }
         public GSUB GSUBTable { get; set; }
 
-        //-------------------------------------------------------
-
-        public uint UnicodeRange1 => OS2Table.ulUnicodeRange1;
-        public uint UnicodeRange2 => OS2Table.ulUnicodeRange2;
-        public uint UnicodeRange3 => OS2Table.ulUnicodeRange3;
-        public uint UnicodeRange4 => OS2Table.ulUnicodeRange4;
 
         //experiment
         internal void LoadOpenFontLayoutInfo(GDEF gdefTable, GSUB gsubTable, GPOS gposTable, BASE baseTable, COLR colrTable, CPAL cpalTable)
@@ -365,7 +366,12 @@ namespace Typography.OpenFont
         {
             _bitmapFontGlyphSource.CopyBitmapContent(glyph, output);
         }
+
+        internal void UpdateLangs(Meta metaTable) => Languages.Update(OS2Table, metaTable, this.GSUBTable, this.GPOSTable);
+
     }
+
+  
 
 
     public interface IGlyphPositions
@@ -442,7 +448,7 @@ namespace Typography.OpenFont
         }
     }
 
-   
+
 
     namespace Extensions
     {
@@ -451,7 +457,7 @@ namespace Typography.OpenFont
         {
 
 
-           
+
             public static bool RecommendToUseTypoMetricsForLineSpacing(this Typeface typeface)
             {
                 //https://www.microsoft.com/typography/otspec/os2.htm
@@ -759,7 +765,7 @@ namespace Typography.OpenFont
                 return typeface.OS2Table.usWinAscent + typeface.OS2Table.usWinDescent;
             }
 
-            
+
         }
         public enum LineSpacingChoice
         {

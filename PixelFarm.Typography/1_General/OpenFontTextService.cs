@@ -100,7 +100,7 @@ namespace PixelFarm.Drawing
                 }
                 else
                 {
-                    scLang = scLang1.GetScriptLang();
+                    scLang = new ScriptLang(scLang1.shortname);// scLang1.GetScriptLang();
                     return true;
                 }
             }

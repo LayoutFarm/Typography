@@ -2,6 +2,7 @@
 using System;
 namespace Typography.OpenFont
 {
+     
     /// <summary>
     /// script tag and lang_feature tag request for GSUB, GPOS
     /// </summary>
@@ -65,6 +66,6 @@ namespace Typography.OpenFont
 
         public string GetScriptTagString() => TagToString(this.scriptTag);
         public string GetLangTagString() => TagToString(this.sysLangTag);
-        
+
     }
 }

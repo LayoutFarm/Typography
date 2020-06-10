@@ -4,85 +4,94 @@ using System.Collections.Generic;
 using System.IO;
 using Typography.OpenFont;
 using Typography.OpenFont.Tables;
-
 namespace Typography.OpenFont
 {
     public static class TypefaceExtension3
     {
-        public static ScriptLang GetScriptLang(this ScriptLangInfo scLangInfo)
-        {
-            return new ScriptLang(scLangInfo.shortname, "");
-        }
 
-        public static bool DoesSupportUnicode(
-               this PreviewFontInfo previewFontInfo,
-               UnicodeLangBits unicodeLangBits)
+        internal static bool DoesSupportUnicode(Languages langs, UnicodeLangBits unicodeLangBits)
         {
-
             long bits = (long)unicodeLangBits;
             int bitpos = (int)(bits >> 32);
 
-            if (bitpos == 0)
-            {
-                return true; //default
-            }
-            else if (bitpos < 32)
+            if (bitpos < 32)
             {
                 //use range 1
-                return (previewFontInfo.UnicodeRange1 & (1 << bitpos)) != 0;
+                return (langs.UnicodeRange1 & (1 << bitpos)) != 0;
             }
             else if (bitpos < 64)
             {
-                return (previewFontInfo.UnicodeRange2 & (1 << (bitpos - 32))) != 0;
+                return (langs.UnicodeRange2 & (1 << (bitpos - 32))) != 0;
             }
             else if (bitpos < 96)
             {
-                return (previewFontInfo.UnicodeRange3 & (1 << (bitpos - 64))) != 0;
+                return (langs.UnicodeRange3 & (1 << (bitpos - 64))) != 0;
             }
             else if (bitpos < 128)
             {
-                return (previewFontInfo.UnicodeRange4 & (1 << (bitpos - 96))) != 0;
+                return (langs.UnicodeRange4 & (1 << (bitpos - 96))) != 0;
             }
             else
             {
                 throw new System.NotSupportedException();
             }
         }
+
+        public static void CollectScriptLang(this FontManagement.InstalledTypeface typeface, Dictionary<string, ScriptLang> output)
+        {
+            CollectScriptLang(typeface.Languages, output);
+        }
+        public static void CollectScriptLang(this Languages langs, Dictionary<string, ScriptLang> output)
+        {
+            CollectScriptTable(langs.GSUBScriptList, output);
+            CollectScriptTable(langs.GPOSScriptList, output);
+        }
+        static void CollectScriptTable(ScriptList scList, Dictionary<string, ScriptLang> output)
+        {
+            if (scList == null) { return; }
+            //
+            foreach (var kv in scList)
+            {
+
+                ScriptTable scTable = kv.Value;
+                //default and others
+                {
+                    ScriptTable.LangSysTable langSys = scTable.defaultLang;
+                    ScriptLang sclang = new ScriptLang(scTable.ScriptTagName, langSys.LangSysTagIdenString);
+                    string key = sclang.ToString();
+                    if (!output.ContainsKey(key))
+                    {
+                        output.Add(key, sclang);
+                    }
+                }
+                //
+                if (scTable.langSysTables != null && scTable.langSysTables.Length > 0)
+                {
+                    foreach (ScriptTable.LangSysTable langSys in scTable.langSysTables)
+                    {
+                        var pair = new ScriptLang(scTable.ScriptTagName, langSys.LangSysTagIdenString);
+                        string key = pair.ToString();
+                        if (!output.ContainsKey(key))
+                        {
+                            output.Add(key, pair);
+                        }
+                    }
+                }
+            }
+        }
+        public static bool DoesSupportUnicode(
+               this PreviewFontInfo previewFontInfo,
+               UnicodeLangBits unicodeLangBits)
+        {
+            return DoesSupportUnicode(previewFontInfo.Languages, unicodeLangBits);
+        }
+
 
         public static bool DoesSupportUnicode(
             this Typeface typeface,
             UnicodeLangBits unicodeLangBits)
         {
-
-            //-----------------------------
-            long bits = (long)unicodeLangBits;
-            int bitpos = (int)(bits >> 32);
-
-            if (bitpos == 0)
-            {
-                return true; //default
-            }
-            else if (bitpos < 32)
-            {
-                //use range 1
-                return (typeface.UnicodeRange1 & (1 << bitpos)) != 0;
-            }
-            else if (bitpos < 64)
-            {
-                return (typeface.UnicodeRange2 & (1 << (bitpos - 32))) != 0;
-            }
-            else if (bitpos < 96)
-            {
-                return (typeface.UnicodeRange3 & (1 << (bitpos - 64))) != 0;
-            }
-            else if (bitpos < 128)
-            {
-                return (typeface.UnicodeRange4 & (1 << (bitpos - 96))) != 0;
-            }
-            else
-            {
-                throw new System.NotSupportedException();
-            }
+            return DoesSupportUnicode(typeface.Languages, unicodeLangBits);
         }
 
         static UnicodeLangBits[] FilterOnlySelectedRange(UnicodeLangBits[] inputRanges, UnicodeLangBits[] userSpecificRanges)
@@ -173,15 +182,7 @@ namespace Typography.FontManagement
 
             PostScriptName = previewFontInfo.PostScriptName;
             UniqueFontIden = previewFontInfo.UniqueFontIden;
-
-            UnicodeRange1 = previewFontInfo.UnicodeRange1;
-            UnicodeRange2 = previewFontInfo.UnicodeRange2;
-            UnicodeRange3 = previewFontInfo.UnicodeRange3;
-            UnicodeRange4 = previewFontInfo.UnicodeRange4;
-
-            GsubScriptList = previewFontInfo.GsubScriptList;
-            GposScriptList = previewFontInfo.GposScriptList;
-
+            Languages = previewFontInfo.Languages;
             TypefaceStyle = style;
         }
 
@@ -194,48 +195,14 @@ namespace Typography.FontManagement
 
         public TypefaceStyle TypefaceStyle { get; internal set; }
         public ushort Weight { get; internal set; }
-        public uint UnicodeRange1 { get; internal set; }
-        public uint UnicodeRange2 { get; internal set; }
-        public uint UnicodeRange3 { get; internal set; }
-        public uint UnicodeRange4 { get; internal set; }
-
-        public ScriptList GsubScriptList { get; internal set; }
-        public ScriptList GposScriptList { get; internal set; }
+        public Languages Languages { get; }
 
         public string FontPath { get; internal set; }
         public int ActualStreamOffset { get; internal set; }
-        public bool DoesSupportUnicode(UnicodeLangBits unicodeLangBits)
-        {
 
-            long bits = (long)unicodeLangBits;
-            int bitpos = (int)(bits >> 32);
+        //TODO: UnicodeLangBits vs UnicodeLangBits5_1
+        public bool DoesSupportUnicode(UnicodeLangBits unicodeLangBits) => TypefaceExtension3.DoesSupportUnicode(Languages, unicodeLangBits);
 
-            if (bitpos == 0)
-            {
-                return true; //default
-            }
-            else if (bitpos < 32)
-            {
-                //use range 1
-                return (UnicodeRange1 & (1 << bitpos)) != 0;
-            }
-            else if (bitpos < 64)
-            {
-                return (UnicodeRange2 & (1 << (bitpos - 32))) != 0;
-            }
-            else if (bitpos < 96)
-            {
-                return (UnicodeRange3 & (1 << (bitpos - 64))) != 0;
-            }
-            else if (bitpos < 128)
-            {
-                return (UnicodeRange4 & (1 << (bitpos - 96))) != 0;
-            }
-            else
-            {
-                throw new System.NotSupportedException();
-            }
-        }
 #if DEBUG
         public override string ToString()
         {
@@ -898,7 +865,7 @@ namespace Typography.FontManagement
 
         public static IEnumerable<UnicodeLangBits> GetSupportedUnicodeLangBitIter(this InstalledTypeface instTypeface)
         {
-            foreach (UnicodeLangBits unicodeLangBit in s_unicodeLangs)
+            foreach (UnicodeLangBits unicodeLangBit in UnicodeLangs.GetUnicodeLangBitIter())
             {
                 if (instTypeface.DoesSupportUnicode(unicodeLangBit))
                 {
@@ -906,191 +873,6 @@ namespace Typography.FontManagement
                 }
             }
         }
-
-        static readonly UnicodeLangBits[] s_unicodeLangs = new UnicodeLangBits[]
-        {   
-                     
-                    ////alternative=> use reflection technique
-                    
-            //AUTOGEN
- UnicodeLangBits.Basic_Latin,
-UnicodeLangBits.Latin_1_Supplement,
-UnicodeLangBits.Latin_Extended_A,
-UnicodeLangBits.Latin_Extended_B,
-UnicodeLangBits.IPA_Extensions,
-UnicodeLangBits.Phonetic_Extensions,
-UnicodeLangBits.Phonetic_Extensions_Supplement,
-UnicodeLangBits.Spacing_Modifier_Letters,
-UnicodeLangBits.Modifier_Tone_Letters,
-UnicodeLangBits.Combining_Diacritical_Marks,
-UnicodeLangBits.Combining_Diacritical_Marks_Supplement,
-UnicodeLangBits.Greek_and_Coptic,
-UnicodeLangBits.Coptic,
-UnicodeLangBits.Cyrillic,
-UnicodeLangBits.Cyrillic_Supplement,
-UnicodeLangBits.Cyrillic_Extended_A,
-UnicodeLangBits.Cyrillic_Extended_B,
-UnicodeLangBits.Armenian,
-UnicodeLangBits.Hebrew,
-UnicodeLangBits.Vai,
-UnicodeLangBits.Arabic,
-UnicodeLangBits.Arabic_Supplement,
-UnicodeLangBits.NKo,
-UnicodeLangBits.Devanagari,
-UnicodeLangBits.Bengali,
-UnicodeLangBits.Gurmukhi,
-UnicodeLangBits.Gujarati,
-UnicodeLangBits.Oriya,
-UnicodeLangBits.Tamil,
-UnicodeLangBits.Telugu,
-UnicodeLangBits.Kannada,
-UnicodeLangBits.Malayalam,
-UnicodeLangBits.Thai,
-UnicodeLangBits.Lao,
-UnicodeLangBits.Georgian,
-UnicodeLangBits.Georgian_Supplement,
-UnicodeLangBits.Balinese,
-UnicodeLangBits.Hangul_Jamo,
-UnicodeLangBits.Latin_Extended_Additional,
-UnicodeLangBits.Latin_Extended_C,
-UnicodeLangBits.Latin_Extended_D,
-UnicodeLangBits.Greek_Extended,
-UnicodeLangBits.General_Punctuation,
-UnicodeLangBits.Supplemental_Punctuation,
-UnicodeLangBits.Superscripts_And_Subscripts,
-UnicodeLangBits.Currency_Symbols,
-UnicodeLangBits.Combining_Diacritical_Marks_For_Symbols,
-UnicodeLangBits.Letterlike_Symbols,
-UnicodeLangBits.Number_Forms,
-UnicodeLangBits.Arrows,
-UnicodeLangBits.Supplemental_Arrows_A,
-UnicodeLangBits.Supplemental_Arrows_B,
-UnicodeLangBits.Miscellaneous_Symbols_and_Arrows,
-UnicodeLangBits.Mathematical_Operators,
-UnicodeLangBits.Supplemental_Mathematical_Operators,
-UnicodeLangBits.Miscellaneous_Mathematical_Symbols_A,
-UnicodeLangBits.Miscellaneous_Mathematical_Symbols_B,
-UnicodeLangBits.Miscellaneous_Technical,
-UnicodeLangBits.Control_Pictures,
-UnicodeLangBits.Optical_Character_Recognition,
-UnicodeLangBits.Enclosed_Alphanumerics,
-UnicodeLangBits.Box_Drawing,
-UnicodeLangBits.Block_Elements,
-UnicodeLangBits.Geometric_Shapes,
-UnicodeLangBits.Miscellaneous_Symbols,
-UnicodeLangBits.Dingbats,
-UnicodeLangBits.CJK_Symbols_And_Punctuation,
-UnicodeLangBits.Hiragana,
-UnicodeLangBits.Katakana,
-UnicodeLangBits.Katakana_Phonetic_Extensions,
-UnicodeLangBits.Bopomofo,
-UnicodeLangBits.Bopomofo_Extended,
-UnicodeLangBits.Hangul_Compatibility_Jamo,
-UnicodeLangBits.Phags_pa,
-UnicodeLangBits.Enclosed_CJK_Letters_And_Months,
-UnicodeLangBits.CJK_Compatibility,
-UnicodeLangBits.Hangul_Syllables,
-UnicodeLangBits.Non_Plane_0,
-UnicodeLangBits.Phoenician,
-UnicodeLangBits.CJK_Unified_Ideographs,
-UnicodeLangBits.CJK_Radicals_Supplement,
-UnicodeLangBits.Kangxi_Radicals,
-UnicodeLangBits.Ideographic_Description_Characters,
-UnicodeLangBits.CJK_Unified_Ideographs_Extension_A,
-UnicodeLangBits.CJK_Unified_Ideographs_Extension_B,
-UnicodeLangBits.Kanbun,
-UnicodeLangBits.Private_Use_Area__plane_0_,
-UnicodeLangBits.CJK_Strokes,
-UnicodeLangBits.CJK_Compatibility_Ideographs,
-UnicodeLangBits.CJK_Compatibility_Ideographs_Supplement,
-UnicodeLangBits.Alphabetic_Presentation_Forms,
-UnicodeLangBits.Arabic_Presentation_Forms_A,
-UnicodeLangBits.Combining_Half_Marks,
-UnicodeLangBits.Vertical_Forms,
-UnicodeLangBits.CJK_Compatibility_Forms,
-UnicodeLangBits.Small_Form_Variants,
-UnicodeLangBits.Arabic_Presentation_Forms_B,
-UnicodeLangBits.Halfwidth_And_Fullwidth_Forms,
-UnicodeLangBits.Specials,
-UnicodeLangBits.Tibetan,
-UnicodeLangBits.Syriac,
-UnicodeLangBits.Thaana,
-UnicodeLangBits.Sinhala,
-UnicodeLangBits.Myanmar,
-UnicodeLangBits.Ethiopic,
-UnicodeLangBits.Ethiopic_Supplement,
-UnicodeLangBits.Ethiopic_Extended,
-UnicodeLangBits.Cherokee,
-UnicodeLangBits.Unified_Canadian_Aboriginal_Syllabics,
-UnicodeLangBits.Ogham,
-UnicodeLangBits.Runic,
-UnicodeLangBits.Khmer,
-UnicodeLangBits.Khmer_Symbols,
-UnicodeLangBits.Mongolian,
-UnicodeLangBits.Braille_Patterns,
-UnicodeLangBits.Yi_Syllables,
-UnicodeLangBits.Yi_Radicals,
-UnicodeLangBits.Tagalog,
-UnicodeLangBits.Hanunoo,
-UnicodeLangBits.Buhid,
-UnicodeLangBits.Tagbanwa,
-UnicodeLangBits.Old_Italic,
-UnicodeLangBits.Gothic,
-UnicodeLangBits.Deseret,
-UnicodeLangBits.Byzantine_Musical_Symbols,
-UnicodeLangBits.Musical_Symbols,
-UnicodeLangBits.Ancient_Greek_Musical_Notation,
-UnicodeLangBits.Mathematical_Alphanumeric_Symbols,
-UnicodeLangBits.Private_Use__plane_15_,
-UnicodeLangBits.Private_Use__plane_16_,
-UnicodeLangBits.Variation_Selectors,
-UnicodeLangBits.Variation_Selectors_Supplement,
-UnicodeLangBits.Tags,
-UnicodeLangBits.Limbu,
-UnicodeLangBits.Tai_Le,
-UnicodeLangBits.New_Tai_Lue,
-UnicodeLangBits.Buginese,
-UnicodeLangBits.Glagolitic,
-UnicodeLangBits.Tifinagh,
-UnicodeLangBits.Yijing_Hexagram_Symbols,
-UnicodeLangBits.Syloti_Nagri,
-UnicodeLangBits.Linear_B_Syllabary,
-UnicodeLangBits.Linear_B_Ideograms,
-UnicodeLangBits.Aegean_Numbers,
-UnicodeLangBits.Ancient_Greek_Numbers,
-UnicodeLangBits.Ugaritic,
-UnicodeLangBits.Old_Persian,
-UnicodeLangBits.Shavian,
-UnicodeLangBits.Osmanya,
-UnicodeLangBits.Cypriot_Syllabary,
-UnicodeLangBits.Kharoshthi,
-UnicodeLangBits.Tai_Xuan_Jing_Symbols,
-UnicodeLangBits.Cuneiform,
-UnicodeLangBits.Cuneiform_Numbers_and_Punctuation,
-UnicodeLangBits.Counting_Rod_Numerals,
-UnicodeLangBits.Sundanese,
-UnicodeLangBits.Lepcha,
-UnicodeLangBits.Ol_Chiki,
-UnicodeLangBits.Saurashtra,
-UnicodeLangBits.Kayah_Li,
-UnicodeLangBits.Rejang,
-UnicodeLangBits.Cham,
-UnicodeLangBits.Ancient_Symbols,
-UnicodeLangBits.Phaistos_Disc,
-UnicodeLangBits.Carian,
-UnicodeLangBits.Lycian,
-UnicodeLangBits.Lydian,
-UnicodeLangBits.Domino_Tiles,
-UnicodeLangBits.Mahjong_Tiles,
-//UnicodeLangBits.Reserved123,
-//UnicodeLangBits.Reserved124,
-//UnicodeLangBits.Reserved125,
-//UnicodeLangBits.Reserved126,
-//UnicodeLangBits.Reserved127,
-
-
-        };
-
 
         //for Windows , how to find Windows' Font Directory from Windows Registry
         //        string[] localMachineFonts = Registry.LocalMachine.OpenSubKey("Software\\Microsoft\\Windows NT\\CurrentVersion\\Fonts", false).GetValueNames();
