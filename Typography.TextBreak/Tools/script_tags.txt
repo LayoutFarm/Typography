@@ -1,4 +1,5 @@
-﻿Script 	Script Tag
+﻿#https://docs.microsoft.com/en-us/typography/opentype/spec/scripttags
+Script 	Script Tag
 Adlam 	'adlm'
 Ahom 	'ahom'
 Anatolian Hieroglyphs 	'hluw'

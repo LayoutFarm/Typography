@@ -226,7 +226,7 @@ namespace Tools
 
             string[] allLines = File.ReadAllLines("script_tags.txt");
             //skip 1st line            
-            for (int i = 1; i < allLines.Length; ++i)
+            for (int i = 2; i < allLines.Length; ++i)
             {
                 string[] fields = allLines[i].Split('\t');
 
