@@ -130,39 +130,7 @@ namespace TypographyTest.WinForms
             ShowSupportedScripts(installedTypeface);
         }
 
-        static void CollectScriptTable(Typography.OpenFont.Tables.ScriptList scList, Dictionary<string, ScriptLang> output)
-        {
-            if (scList == null) { return; }
-            //
-            foreach (var kv in scList)
-            {
-
-                ScriptTable scTable = kv.Value;
-                //default and others
-                {
-                    ScriptTable.LangSysTable langSys = scTable.defaultLang;
-                    ScriptLang sclang = new ScriptLang(scTable.ScriptTagName, langSys.LangSysTagIdenString);
-                    string key = sclang.ToString();
-                    if (!output.ContainsKey(key))
-                    {
-                        output.Add(key, sclang);
-                    }
-                }
-                //
-                if (scTable.langSysTables != null && scTable.langSysTables.Length > 0)
-                {
-                    foreach (ScriptTable.LangSysTable langSys in scTable.langSysTables)
-                    {
-                        var pair = new ScriptLang(scTable.ScriptTagName, langSys.LangSysTagIdenString);
-                        string key = pair.ToString();
-                        if (!output.ContainsKey(key))
-                        {
-                            output.Add(key, pair);
-                        }
-                    }
-                }
-            }
-        }
+      
         void ShowSupportedScripts(InstalledTypeface installedTypeface)
         {
             //show supported lang
@@ -170,9 +138,7 @@ namespace TypographyTest.WinForms
             lstScriptLangs.Items.Clear();
 
             Dictionary<string, ScriptLang> dic = new Dictionary<string, ScriptLang>();
-            CollectScriptTable(installedTypeface.GposScriptList, dic);
-            CollectScriptTable(installedTypeface.GsubScriptList, dic);
-
+            installedTypeface.CollectScriptLang(dic); 
             foreach (var kv in dic)
             {
                 ScriptLang s = kv.Value;

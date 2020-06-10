@@ -406,9 +406,9 @@ namespace Typography.OpenFont.Tables
 
         public void CollectUnicode(List<uint> unicodes)
         {
-            foreach (CharacterMap cmap in _charMaps)
+            for (int i = 0; i < _charMaps.Length; ++i)
             {
-                cmap.CollectUnicodeChars(unicodes);
+                _charMaps[i].CollectUnicodeChars(unicodes);
             }
         }
     }

@@ -77,7 +77,7 @@ namespace Typography.TextLayout
 
         }
 
-      
+
         public void DoSubstitution(IGlyphIndexList glyphIndexList)
         {
             // Rebuild tables if configuration changed
@@ -174,6 +174,15 @@ namespace Typography.TextLayout
             {
                 //use default
                 selectedLang = scriptTable.defaultLang;
+
+                if (selectedLang == null && scriptTable.langSysTables != null && scriptTable.langSysTables.Length > 0)
+                {
+                    //some font not defult lang
+                    //so we use it from langSysTable
+                    //find selected lang,
+                    //if not => choose default
+                    selectedLang = scriptTable.langSysTables[0];
+                }
             }
             else
             {

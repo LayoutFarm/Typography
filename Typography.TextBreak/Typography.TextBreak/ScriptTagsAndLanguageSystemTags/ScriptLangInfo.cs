@@ -1107,14 +1107,7 @@ Zanabazar_Square__Zanabazarin_Dörböljin_Useg__Xewtee_Dörböljin_Bicig__Horizo
         {
             s_registerScriptFromFullNames.TryGetValue(languageName, out ScriptLangInfo found);
             return found;
-        }
-        public static IEnumerable<ScriptLangInfo> GetRegiteredScriptLangIter()
-        {
-            foreach (ScriptLangInfo scriptLang in s_registeredScriptTags.Values)
-            {
-                yield return scriptLang;
-            }
-        }
+        } 
 
     }
 

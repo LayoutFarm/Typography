@@ -208,8 +208,8 @@ namespace Tools
             }
         }
 
-        List<ScriptNameAndTag> _scNameAndTags;
-        private void button4_Click(object sender, EventArgs e)
+        Dictionary<string, ScriptNameAndTag> _scNameAndTags;
+        void LoadNameAndTags()
         {
             //https://docs.microsoft.com/en-us/typography/opentype/spec/scripttags
 
@@ -222,12 +222,10 @@ namespace Tools
             //The OpenType script tags can also correlate with a particular OpenType Layout implementation,
             //with the result that more than one script tag may be registered for a given Unicode script(e.g. 'deva' and 'dev2').
 
-            _scNameAndTags = new List<ScriptNameAndTag>();
+            _scNameAndTags = new Dictionary<string, ScriptNameAndTag>();
 
             string[] allLines = File.ReadAllLines("script_tags.txt");
-            //skip 1st line           
-
-
+            //skip 1st line            
             for (int i = 1; i < allLines.Length; ++i)
             {
                 string[] fields = allLines[i].Split('\t');
@@ -239,23 +237,30 @@ namespace Tools
 
                 string scName = fields[0].Trim();
                 string scTag = fields[1].Replace("'", "").Trim();
-
-                _scNameAndTags.Add(new ScriptNameAndTag { ScriptName = scName, ScriptTag = scTag });
-
-            }
-
-            {
-                //enum iter
-                StringBuilder sb = new StringBuilder();
-                foreach (ScriptNameAndTag scNameAndTag in _scNameAndTags)
+                if (!_scNameAndTags.ContainsKey(scTag))
                 {
-                    string field_name = GetProperFieldName(scNameAndTag.ScriptName);
-                    sb.AppendLine(field_name + "=_(\"" + scNameAndTag.ScriptTag + "\",\"" + scNameAndTag.ScriptName + "\"),");
+                    _scNameAndTags.Add(scTag, new ScriptNameAndTag { ScriptName = scName, ScriptTag = scTag });
+                }
+                else
+                {
+                    Console.WriteLine("duplicated:" + scName);
                 }
 
-                File.WriteAllText("script_tags.gen.txt", sb.ToString());
+            }
+        }
+        private void button4_Click(object sender, EventArgs e)
+        {
+
+            LoadNameAndTags();
+            //enum iter
+            StringBuilder sb = new StringBuilder();
+            foreach (ScriptNameAndTag scNameAndTag in _scNameAndTags.Values)
+            {
+                string field_name = GetProperFieldName(scNameAndTag.ScriptName);
+                sb.AppendLine(field_name + "=_(\"" + scNameAndTag.ScriptTag + "\",\"" + scNameAndTag.ScriptName + "\"),");
             }
 
+            File.WriteAllText("script_tags.gen.txt", sb.ToString());
 
         }
 
@@ -373,7 +378,7 @@ namespace Tools
             //---------------------------------
             //write notFoundList
             {
-                 
+
                 using (FileStream fs = new FileStream("not_found_langs.txt", FileMode.Create))
                 using (StreamWriter w = new StreamWriter(fs))
                 {
@@ -386,5 +391,221 @@ namespace Tools
 
             }
         }
+
+        List<ScriptLangGroup> _scriptLangGroup1;
+        List<ScriptLangGroup> _scriptLangGroup2;
+        string GetFormatedTagName(string input)
+        {
+            input = input.Trim();
+            if (input.StartsWith("\'"))
+            {
+                if (!input.EndsWith("\'"))
+                {
+                    throw new NotSupportedException();
+                }
+                return input.Substring(1, input.Length - 2).Trim();
+            }
+            else if (input.StartsWith("\""))
+            {
+                if (!input.EndsWith("\""))
+                {
+                    throw new NotSupportedException();
+                }
+                return input.Substring(1, input.Length - 2).Trim();
+            }
+            else
+            {
+                return input;
+            }
+
+        }
+        void LoadScriptLang01()
+        {
+            //parse script_lang01.txt
+            string[] allLines = File.ReadAllLines("script_lang01.txt");
+            _scriptLangGroup1 = new List<ScriptLangGroup>();
+            ScriptLangGroup currentGroup = null;
+            for (int i = 0; i < allLines.Length; ++i)
+            {
+                string line = allLines[i];
+                if (line.StartsWith("#"))
+                {
+                    //new section with url link
+                    currentGroup = new ScriptLangGroup();
+                    currentGroup.Url = line.Substring(1).Trim();
+                    _scriptLangGroup1.Add(currentGroup);
+
+                    //read next 2 line
+                    string[] cells_next1 = allLines[i + 1].Split('\t');
+                    string[] cells_next2 = allLines[i + 2].Split('\t');
+                    if (cells_next1.Length == 4 && cells_next2.Length == 4)
+                    {
+                        if (cells_next2[0].ToLower().Trim() == "script tag")
+                        {
+                            //ensure
+                        }
+                        else
+                        {
+                            throw new NotSupportedException();
+                        }
+                    }
+                    else
+                    {
+                        throw new NotSupportedException();
+                    }
+                    i += 3;
+                }
+                else if (line.StartsWith("\""))
+                {
+                    string[] cells = line.Split('\t');
+
+                    var pair = new ScriptAndLangPair()
+                    {
+                        ScriptTag = GetFormatedTagName(cells[0]),
+                        ScriptName = cells[1].Trim(),
+                        LanguageSystemTag = GetFormatedTagName(cells[2]),
+                        LanguageSystemName = cells[3].Trim()
+                    };
+
+                    if (!pair.LanguageSystemTag.StartsWith("("))
+                    {
+                        currentGroup.Pairs.Add(pair);
+                    }
+                }
+                else
+                {
+                    //
+                    //blank line or title
+                    string line2 = line.ToLower().Trim();
+                    if (line2.Length != 0)
+                    {
+                        throw new NotSupportedException();
+                    }
+                    //string[] cells = line2.Split('\t');
+                    //ensure all blank line
+
+                }
+            }
+
+            //-------
+        }
+
+        void LoadScriptLang02()
+        {
+            string[] allLines = File.ReadAllLines("script_lang02.txt");
+            _scriptLangGroup2 = new List<ScriptLangGroup>();
+            ScriptLangGroup currentGroup = new ScriptLangGroup();
+            _scriptLangGroup2.Add(currentGroup);
+            currentGroup.GroupName = allLines[0].Substring(1);
+            for (int i = 2; i < allLines.Length; ++i) //start at2
+            {
+                string[] cells = allLines[i].Split('\t');
+                //USE= universal shaping engine
+                currentGroup.Pairs.Add(new ScriptAndLangPair()
+                {
+                    ScriptTag = GetFormatedTagName(cells[1]),//1 
+                    ScriptName = cells[0].Trim(),
+                    LanguageSystemTag = "USE",
+                    LanguageSystemName = "USE",
+                });
+            }
+        }
+        private void button6_Click(object sender, EventArgs e)
+        {
+            LoadScriptLang01();
+            LoadScriptLang02();
+
+
+            LoadNameAndTags();//another set data from https://docs.microsoft.com/en-us/typography/opentype/spec/scripttags
+
+            //generate code for script_lang data
+            //collect script tag
+
+            Dictionary<string, string> script_tags = new Dictionary<string, string>();
+            Dictionary<string, string> langs = new Dictionary<string, string>();
+
+            void CollectData(List<ScriptLangGroup> groups)
+            {
+                //NESTED
+                foreach (ScriptLangGroup scriptLangGroup in groups)
+                {
+                    foreach (ScriptAndLangPair pair in scriptLangGroup.Pairs)
+                    {
+                        if (!script_tags.TryGetValue(pair.ScriptTag, out string scriptName))
+                        {
+                            script_tags.Add(pair.ScriptTag, pair.ScriptName);
+                        }
+                        else
+                        {
+                            if (scriptName != pair.ScriptName)
+                            {
+                                throw new NotSupportedException();
+                            }
+                            //ensure
+                        }
+                        //---------------------------
+                        if (!langs.TryGetValue(pair.LanguageSystemTag, out string langName))
+                        {
+                            langs.Add(pair.LanguageSystemTag, pair.LanguageSystemName);
+                        }
+                        else
+                        {
+                            if (langName != pair.LanguageSystemName)
+                            {
+                                throw new NotSupportedException();
+                            }
+                        }
+                    }
+                }
+
+            }
+
+            CollectData(_scriptLangGroup1);
+            CollectData(_scriptLangGroup2);
+
+            //---------------------------
+            //compare data from 2 sources
+            List<ScriptNameAndTag> notFounds1 = new List<ScriptNameAndTag>();
+            List<ScriptNameAndTag> founds1 = new List<ScriptNameAndTag>();
+            foreach (ScriptNameAndTag scName in _scNameAndTags.Values)
+            {
+                if (!script_tags.ContainsKey(scName.ScriptTag))
+                {
+                    notFounds1.Add(scName);
+                }
+                else
+                {
+                    founds1.Add(scName);
+                }
+            }
+            //---------------------------
+            StringBuilder sb = new StringBuilder();
+
+
+        }
+        class ScriptLangGroup
+        {
+            public string Url;
+            public string GroupName;
+            public List<ScriptAndLangPair> Pairs = new List<ScriptAndLangPair>();
+            public override string ToString()
+            {
+                return Url;
+            }
+        }
+
+        class ScriptAndLangPair
+        {
+            public string ScriptTag;
+            public string ScriptName;
+            public string LanguageSystemTag;
+            public string LanguageSystemName;
+
+            public override string ToString()
+            {
+                return ScriptTag + "(" + ScriptName + "):" + LanguageSystemName;
+            }
+        }
+
     }
 }
