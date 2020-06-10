@@ -32,21 +32,8 @@ namespace Typography.OpenFont.Tables
     //communication, such as programming languages.
 
 
-    //------------------------------------------------------------------------------------ 
-    //“Latn” denotes Latin script(and any language or writing system using Latin script).
-    //“Cyrl” denotes Cyrillic script.
-    //“sr-Cyrl” denotes Cyrillic script as used for writing the Serbian language; 
-    //  a font that has this property value may not be suitable for displaying text in Russian or
-    //  other languages written using Cyrillic script.
-    //“en-Dsrt” denotes English written with the Deseret script.
-    //“Hant” denotes Traditional Chinese.
-    //“Hant-HK” denotes Traditional Chinese as used in China.
-    //“Jpan” denotes Japanese writing — ISO 15924 defines “Jpan” as an alias for Han + Hiragana + Katakana.
-    //“Kore” denotes Korean writing — ISO 15924 defines “Kore” as an alias for Hangul + Han.
-    //“Hang” denotes Hangul script(exclusively — Hanja are not implied by “Hang”).
 
 
-   
 
     class Meta : TableEntry
     {
@@ -133,6 +120,11 @@ namespace Typography.OpenFont.Tables
             //Note: OpenType Layout script and language system tags are not the same as 
             //those used in BCP 47 and should not be referenced when creating or processing ScriptLangTags.
             //------------------------------------------------------------------------------------ 
+            //... In most cases, however, generic tags should be used,
+            //and it is anticipated that most tags used in 'dlng' and 'slng' metadata declarations will consist only of a script subtag.
+            //Language or other subtags can be included, however, and may be appropriate in some cases. 
+            //Implementations must allow for ScriptLangTags that include additional subtags,
+            //but they may also choose to interpret only the script subtag and ignore other subtags.
 
 
             for (int i = 0; i < dataMaps.Length; ++i)
@@ -209,6 +201,14 @@ namespace Typography.OpenFont.Tables
             for (int i = 0; i < tags.Length; ++i)
             {
                 tags[i] = tags[i].Trim();
+
+#if DEBUG
+                if (tags[i].Contains("-"))
+                {
+
+                }
+#endif
+
             }
             return tags;
         }
