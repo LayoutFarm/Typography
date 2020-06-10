@@ -2,6 +2,30 @@
 using System;
 namespace Typography.OpenFont
 {
+
+    //NOTE: readmore about language tag, https://tools.ietf.org/html/bcp47
+    //...The language of an information item or a user's language preferences
+    //often need to be identified so that appropriate processing can be
+    //applied. 
+    //...
+    //...
+    //One means of indicating the language used is by labeling the
+    //information content with an identifier or "tag".  These tags can also
+    //be used to specify the user's preferences when selecting information
+    //content or to label additional attributes of content and associated
+    //resources. 
+
+    //..
+    //..The Language Tag
+    //..
+
+    //Language tags are used to help identify languages, whether spoken,
+    //written, signed, or otherwise signaled, for the purpose of
+    //communication.This includes constructed and artificial languages
+    //but excludes languages not intended primarily for human
+    //communication, such as programming languages.
+
+
     /// <summary>
     /// script tag and lang_feature tag request for GSUB, GPOS
     /// </summary>
@@ -65,6 +89,6 @@ namespace Typography.OpenFont
 
         public string GetScriptTagString() => TagToString(this.scriptTag);
         public string GetLangTagString() => TagToString(this.sysLangTag);
-        
+
     }
 }
