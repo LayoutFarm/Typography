@@ -98,20 +98,7 @@ namespace Typography.OpenFont
             UnicodeRange1 = os2Tabble.ulUnicodeRange1;
             UnicodeRange2 = os2Tabble.ulUnicodeRange2;
             UnicodeRange3 = os2Tabble.ulUnicodeRange3;
-            UnicodeRange4 = os2Tabble.ulUnicodeRange4;
-
-
-            //-------
-            //IMPORTANT:***
-            //All available bits were exhausted as of Unicode 5.1.  ***
-            //The bit assignments were last updated for OS/2 version 4 in OpenType 1.5. 
-            //There are many additional ranges supported in the current version of Unicode that are not supported by these fields in the OS/2 table. 
-            //
-            //See the 'dlng' and 'slng' tags in the 'meta' table for an alternate mechanism to declare 
-            //what scripts or languages that a font can support or is designed for. 
-            //-------
-
-
+            UnicodeRange4 = os2Tabble.ulUnicodeRange4; 
             //ULONG 	ulUnicodeRange1 	Bits 0-31
             //ULONG 	ulUnicodeRange2 	Bits 32-63
             //ULONG 	ulUnicodeRange3 	Bits 64-95
@@ -131,15 +118,28 @@ namespace Typography.OpenFont
                 case 4:
                     break;
             }
+             
+            //-------
+            //IMPORTANT:***
+            //All available bits were exhausted as of Unicode 5.1.  ***
+            //The bit assignments were last updated for OS/2 version 4 in OpenType 1.5. 
+            //There are many additional ranges supported in the current version of Unicode that are not supported by these fields in the OS/2 table. 
+            //
+            //See the 'dlng' and 'slng' tags in the 'meta' table for an alternate mechanism to declare 
+            //what scripts or languages that a font can support or is designed for. 
+            //-------
+             
 
-            _gsubScriptList = gsub?.ScriptList;
-            _gposScriptList = gpos?.ScriptList;
-            ///----------
             if (meta != null)
             {
                 _supportedLangs = meta.SupportedLanguageTags;
                 _dzLangs = meta.DesignLanguageTags;
             }
+
+            //----
+            //gsub and gpos contains actual script_list that are in the typeface
+            _gsubScriptList = gsub?.ScriptList;
+            _gposScriptList = gpos?.ScriptList;
         }
 
 
