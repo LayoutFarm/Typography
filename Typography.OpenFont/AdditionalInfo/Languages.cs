@@ -10,18 +10,30 @@ namespace Typography.OpenFont
     /// </summary>
     public class Languages
     {
+        /// <summary>
+        /// meta table's supported langs
+        /// </summary>
+        public string[] SupportedLangs { get; private set; }
+        /// <summary>
+        /// meta table's design langs
+        /// </summary>
+        public string[] DesignLangs { get; private set; }
 
-        internal string[] _supportedLangs;
-        internal string[] _dzLangs;
+        public ushort OS2Version { get; private set; }//for translate unicode ranges
+        public uint UnicodeRange1 { get; private set; }
+        public uint UnicodeRange2 { get; private set; }
+        public uint UnicodeRange3 { get; private set; }
+        public uint UnicodeRange4 { get; private set; }
 
-        //--old version
-        internal uint UnicodeRange1;
-        internal uint UnicodeRange2;
-        internal uint UnicodeRange3;
-        internal uint UnicodeRange4;
+        /// <summary>
+        /// actual GSUB script list
+        /// </summary>
+        public ScriptList GSUBScriptList { get; private set; }
+        /// <summary>
+        /// actual GPOS script list
+        /// </summary>
+        public ScriptList GPOSScriptList { get; private set; }
 
-        ScriptList _gsubScriptList;
-        ScriptList _gposScriptList;
 
         internal void Update(OS2Table os2Tabble, Meta meta, GSUB gsub, GPOS gpos)
         {
@@ -95,30 +107,18 @@ namespace Typography.OpenFont
             //In addition, some already-assigned bits were extended to cover additional Unicode ranges for related characters; 
             //see details in the table above.
 
+            OS2Version = os2Tabble.version;
             UnicodeRange1 = os2Tabble.ulUnicodeRange1;
             UnicodeRange2 = os2Tabble.ulUnicodeRange2;
             UnicodeRange3 = os2Tabble.ulUnicodeRange3;
-            UnicodeRange4 = os2Tabble.ulUnicodeRange4; 
+            UnicodeRange4 = os2Tabble.ulUnicodeRange4;
             //ULONG 	ulUnicodeRange1 	Bits 0-31
             //ULONG 	ulUnicodeRange2 	Bits 32-63
             //ULONG 	ulUnicodeRange3 	Bits 64-95
             //ULONG 	ulUnicodeRange4 	Bits 96-127
 
-            switch (os2Tabble.version)
-            {
-                default: throw new System.NotSupportedException();
-                case 0:
-                    break;
-                case 1:
-                    break;
-                case 2:
-                    break;
-                case 3:
-                    break;
-                case 4:
-                    break;
-            }
-             
+
+
             //-------
             //IMPORTANT:***
             //All available bits were exhausted as of Unicode 5.1.  ***
@@ -128,108 +128,21 @@ namespace Typography.OpenFont
             //See the 'dlng' and 'slng' tags in the 'meta' table for an alternate mechanism to declare 
             //what scripts or languages that a font can support or is designed for. 
             //-------
-             
+
 
             if (meta != null)
             {
-                _supportedLangs = meta.SupportedLanguageTags;
-                _dzLangs = meta.DesignLanguageTags;
+                SupportedLangs = meta.SupportedLanguageTags;
+                DesignLangs = meta.DesignLanguageTags;
             }
 
             //----
             //gsub and gpos contains actual script_list that are in the typeface
-            _gsubScriptList = gsub?.ScriptList;
-            _gposScriptList = gpos?.ScriptList;
+            GSUBScriptList = gsub?.ScriptList;
+            GPOSScriptList = gpos?.ScriptList;
         }
 
 
-
-        public bool DoesSupportUnicode(UnicodeLangBits5_1 unicodeLangBits)
-        {
-            if (_supportedLangs != null)
-            {
-                //TODO: implement this
-            }
-
-
-            long bits = (long)unicodeLangBits;
-            int bitpos = (int)(bits >> 32);
-
-            if (bitpos == 0)
-            {
-                return true; //default
-            }
-            else if (bitpos < 32)
-            {
-                //use range 1
-                return (UnicodeRange1 & (1 << bitpos)) != 0;
-            }
-            else if (bitpos < 64)
-            {
-                return (UnicodeRange2 & (1 << (bitpos - 32))) != 0;
-            }
-            else if (bitpos < 96)
-            {
-                return (UnicodeRange3 & (1 << (bitpos - 64))) != 0;
-            }
-            else if (bitpos < 128)
-            {
-                return (UnicodeRange4 & (1 << (bitpos - 96))) != 0;
-            }
-            else
-            {
-                throw new System.NotSupportedException();
-            }
-        }
-
-        public void CollectScriptLang(Dictionary<string, ScriptLang> output)
-        {
-            if (_supportedLangs != null)
-            {
-                //use this if available
-                //
-                //from meta table ...
-                //Note: Implementations that use 'slng' values in a font may choose to ignore Unicode - range bits set in the OS/ 2 table.
-
-            }
-
-            CollectScriptTable(_gsubScriptList, output);
-            CollectScriptTable(_gposScriptList, output);
-
-        }
-        static void CollectScriptTable(Typography.OpenFont.Tables.ScriptList scList, Dictionary<string, ScriptLang> output)
-        {
-            if (scList == null) { return; }
-            //
-            foreach (var kv in scList)
-            {
-
-                ScriptTable scTable = kv.Value;
-                //default and others
-                {
-                    ScriptTable.LangSysTable langSys = scTable.defaultLang;
-                    ScriptLang sclang = new ScriptLang(scTable.ScriptTagName, langSys.LangSysTagIdenString);
-                    string key = sclang.ToString();
-                    if (!output.ContainsKey(key))
-                    {
-                        output.Add(key, sclang);
-                    }
-                }
-                //
-                if (scTable.langSysTables != null && scTable.langSysTables.Length > 0)
-                {
-                    foreach (ScriptTable.LangSysTable langSys in scTable.langSysTables)
-                    {
-                        var pair = new ScriptLang(scTable.ScriptTagName, langSys.LangSysTagIdenString);
-                        string key = pair.ToString();
-                        if (!output.ContainsKey(key))
-                        {
-                            output.Add(key, pair);
-                        }
-                    }
-                }
-            }
-        }
 
     }
 

@@ -4,21 +4,90 @@ using System.Collections.Generic;
 using System.IO;
 using Typography.OpenFont;
 using Typography.OpenFont.Tables;
-
 namespace Typography.OpenFont
 {
     public static class TypefaceExtension3
     {
-        public static void CollectScriptLang(this FontManagement.InstalledTypeface typeface, Dictionary<string, ScriptLang> output)
+
+        internal static bool DoesSupportUnicode(Languages langs, UnicodeLangBits unicodeLangBits)
         {
-            typeface.Languages.CollectScriptLang(output);
+            long bits = (long)unicodeLangBits;
+            int bitpos = (int)(bits >> 32);
+
+            if (bitpos == 0)
+            {
+                return false; //default ?
+            }
+            else if (bitpos < 32)
+            {
+                //use range 1
+                return (langs.UnicodeRange1 & (1 << bitpos)) != 0;
+            }
+            else if (bitpos < 64)
+            {
+                return (langs.UnicodeRange2 & (1 << (bitpos - 32))) != 0;
+            }
+            else if (bitpos < 96)
+            {
+                return (langs.UnicodeRange3 & (1 << (bitpos - 64))) != 0;
+            }
+            else if (bitpos < 128)
+            {
+                return (langs.UnicodeRange4 & (1 << (bitpos - 96))) != 0;
+            }
+            else
+            {
+                throw new System.NotSupportedException();
+            }
         }
 
+        public static void CollectScriptLang(this FontManagement.InstalledTypeface typeface, Dictionary<string, ScriptLang> output)
+        {
+            CollectScriptLang(typeface.Languages, output);
+        }
+        public static void CollectScriptLang(this Languages langs, Dictionary<string, ScriptLang> output)
+        {
+            CollectScriptTable(langs.GSUBScriptList, output);
+            CollectScriptTable(langs.GPOSScriptList, output);
+        }
+        static void CollectScriptTable(ScriptList scList, Dictionary<string, ScriptLang> output)
+        {
+            if (scList == null) { return; }
+            //
+            foreach (var kv in scList)
+            {
+
+                ScriptTable scTable = kv.Value;
+                //default and others
+                {
+                    ScriptTable.LangSysTable langSys = scTable.defaultLang;
+                    ScriptLang sclang = new ScriptLang(scTable.ScriptTagName, langSys.LangSysTagIdenString);
+                    string key = sclang.ToString();
+                    if (!output.ContainsKey(key))
+                    {
+                        output.Add(key, sclang);
+                    }
+                }
+                //
+                if (scTable.langSysTables != null && scTable.langSysTables.Length > 0)
+                {
+                    foreach (ScriptTable.LangSysTable langSys in scTable.langSysTables)
+                    {
+                        var pair = new ScriptLang(scTable.ScriptTagName, langSys.LangSysTagIdenString);
+                        string key = pair.ToString();
+                        if (!output.ContainsKey(key))
+                        {
+                            output.Add(key, pair);
+                        }
+                    }
+                }
+            }
+        }
         public static bool DoesSupportUnicode(
                this PreviewFontInfo previewFontInfo,
                UnicodeLangBits unicodeLangBits)
         {
-            return previewFontInfo.Languages.DoesSupportUnicode((UnicodeLangBits5_1)unicodeLangBits);
+            return DoesSupportUnicode(previewFontInfo.Languages, unicodeLangBits);
         }
 
 
@@ -26,7 +95,7 @@ namespace Typography.OpenFont
             this Typeface typeface,
             UnicodeLangBits unicodeLangBits)
         {
-            return typeface.Languages.DoesSupportUnicode((UnicodeLangBits5_1)unicodeLangBits);
+            return DoesSupportUnicode(typeface.Languages, unicodeLangBits);
         }
 
         static UnicodeLangBits[] FilterOnlySelectedRange(UnicodeLangBits[] inputRanges, UnicodeLangBits[] userSpecificRanges)
@@ -136,7 +205,7 @@ namespace Typography.FontManagement
         public int ActualStreamOffset { get; internal set; }
 
         //TODO: UnicodeLangBits vs UnicodeLangBits5_1
-        public bool DoesSupportUnicode(UnicodeLangBits unicodeLangBits) => Languages.DoesSupportUnicode((UnicodeLangBits5_1)unicodeLangBits);
+        public bool DoesSupportUnicode(UnicodeLangBits unicodeLangBits) => TypefaceExtension3.DoesSupportUnicode(Languages, unicodeLangBits);
 
 #if DEBUG
         public override string ToString()

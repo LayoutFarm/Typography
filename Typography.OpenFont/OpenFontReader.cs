@@ -73,7 +73,7 @@ namespace Typography.OpenFont
         public string UniqueFontIden { get; internal set; }
         public string VersionString { get; internal set; }
         public Languages Languages { get; }
-        
+
         /// <summary>
         /// get font collection's member count
         /// </summary>
@@ -342,27 +342,10 @@ namespace Typography.OpenFont
             OS2Table os2Table = ReadTableIfExists(tables, input, new OS2Table());
 
             //for preview, read ONLY  script list from gsub and gpos (set OnlyScriptList).
-
             Meta metaTable = ReadTableIfExists(tables, input, new Meta());
             GSUB gsub = ReadTableIfExists(tables, input, new GSUB() { OnlyScriptList = true });
             GPOS gpos = ReadTableIfExists(tables, input, new GPOS() { OnlyScriptList = true });
-
-
-            //TODO: review here again
-            //            if (metaTable == null)
-            //            {
-            //                //read only script list, not entire table
-            //                gsub = ReadTableIfExists(tables, input, new GSUB() { OnlyScriptList = true });
-            //                gpos = ReadTableIfExists(tables, input, new GPOS() { OnlyScriptList = true });
-            //            }
-            //            else
-            //            {
-            //#if DEBUG
-            //                //for debug mode only
-            //                gsub = ReadTableIfExists(tables, input, new GSUB() { OnlyScriptList = true });
-            //                gpos = ReadTableIfExists(tables, input, new GPOS() { OnlyScriptList = true });
-            //#endif
-            //            }
+            //gsub and gpos contains actual script_list that are in the typeface
 
             Languages langs = new Languages();
             langs.Update(os2Table, metaTable, gsub, gpos);
