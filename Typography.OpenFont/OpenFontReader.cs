@@ -73,21 +73,7 @@ namespace Typography.OpenFont
         public string UniqueFontIden { get; internal set; }
         public string VersionString { get; internal set; }
         public Languages Languages { get; }
-
-        //public uint UnicodeRange1 { get; internal set; }
-        //public uint UnicodeRange2 { get; internal set; }
-        //public uint UnicodeRange3 { get; internal set; }
-        //public uint UnicodeRange4 { get; internal set; }
-
-        ///// <summary>
-        ///// GSUB's ScriptList 
-        ///// </summary>
-        //public ScriptList GsubScriptList { get; internal set; }
-        ///// <summary>
-        ///// GPOS's ScriptList
-        ///// </summary>
-        //public ScriptList GposScriptList { get; internal set; }
-
+        
         /// <summary>
         /// get font collection's member count
         /// </summary>
