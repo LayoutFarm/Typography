@@ -72,7 +72,13 @@
     <Content Include="icu_data\data\lang\en.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="lang_system_1.txt">
+    <Content Include="iso15924-codes.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="languagetags.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="lang_subtag_registry.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="opentype_unicode5.1_ranges.txt">
@@ -87,7 +93,6 @@
     <Content Include="script_tags.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="script_tags02.txt" />
     <Content Include="unicode13_ranges.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

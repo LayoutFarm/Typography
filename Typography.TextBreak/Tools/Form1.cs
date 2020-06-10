@@ -20,13 +20,14 @@ namespace Tools
         private void button1_Click(object sender, EventArgs e)
         {
             //https://docs.microsoft.com/en-us/typography/opentype/spec/languagetags
-            string[] allLines = File.ReadAllLines("lang_system_1.txt");
+            string[] allLines = File.ReadAllLines("languagetags.txt");
             //
             //parse each line          
             int line_no = 0;
             List<LangSystemInfo> langInfoList = new List<LangSystemInfo>();
-            foreach (string line in allLines)
+            for (int i = 1; i < allLines.Length; ++i) //first line is a note, so start at 1
             {
+                string line = allLines[i];
                 int p0 = line.IndexOf('\'');
                 if (p0 < 0) { throw new NotSupportedException(); }
                 int p1 = line.IndexOf('\'', p0 + 1);
@@ -226,7 +227,7 @@ namespace Tools
 
             string[] allLines = File.ReadAllLines("script_tags.txt");
             //skip 1st line            
-            for (int i = 1; i < allLines.Length; ++i)
+            for (int i = 2; i < allLines.Length; ++i)
             {
                 string[] fields = allLines[i].Split('\t');
 
@@ -607,5 +608,184 @@ namespace Tools
             }
         }
 
+
+        List<Iso15924Record> _iso15924Records = new List<Iso15924Record>();
+        void LoadAndParseIso15924()
+        {
+            string[] lines = File.ReadAllLines("iso15924-codes.txt");
+            _iso15924Records.Clear();
+            for (int i = 2; i < lines.Length; ++i) //start at i=2
+            {
+                //
+                string[] cells = lines[i].Split('\t');
+                if (cells.Length != 7)
+                {
+                    //ensure
+                    throw new NotSupportedException();
+                }
+                _iso15924Records.Add(new Iso15924Record()
+                {
+                    Code = cells[0],
+                    N = cells[1],
+                    EngName = cells[2],
+                    Alias = cells[4],
+                });
+
+            }
+        }
+
+        class Iso15924Record
+        {
+            public string Code;
+            public string N; //N°
+            public string EngName;
+            public string Alias;
+
+            public override string ToString()
+            {
+                return Code + ":" + EngName;
+            }
+        }
+
+
+        private void button7_Click(object sender, EventArgs e)
+        {
+            LoadAndParseIso15924();
+        }
+
+
+        List<LangSubTagReg> _langSubTagRegs = new List<LangSubTagReg>();
+        void LoadAndParseLangSubTagsReg()
+        {
+            _langSubTagRegs.Clear();
+            string[] lines = File.ReadAllLines("lang_subtag_registry.txt");
+            LangSubTagReg lang_subTag = null;
+            bool comment_mode = false;
+
+            for (int i = 2; i < lines.Length; ++i) //start at i=2
+            {
+
+                string line = lines[i].Trim();
+
+                if (line == "%%")
+                {
+                    //begin new record
+                    lang_subTag = new LangSubTagReg();
+                    _langSubTagRegs.Add(lang_subTag);
+                    comment_mode = false;
+                }
+                else
+                {
+                    string[] kv = line.Split(':');
+                    if (kv.Length == 1)
+                    {
+                        //append data
+                        continue;
+                    }
+                    //
+                    if (kv.Length != 2)
+                    {
+                        if (kv[0].Trim() != "Comments" && !comment_mode)
+                        {
+                            throw new NotSupportedException();
+                        }
+                        if (comment_mode)
+                        {
+                            continue;
+                        }
+                    }
+
+                    comment_mode = false;
+                    switch (kv[0].Trim())
+                    {
+                        default: throw new NotSupportedException();
+                        case "Type":
+                            lang_subTag.Type = kv[1].Trim();
+                            break;
+                        case "Subtag":
+                            lang_subTag.SubLang = kv[1].Trim();
+                            break;
+                        case "Description":
+                            lang_subTag.Description = kv[1].Trim();
+                            break;
+                        case "Added":
+                            break;
+                        case "Suppress-Script":
+                            break;
+                        case "Scope":
+                            break;
+                        case "Macrolanguage":
+                            break;
+                        case "Comments":
+                            {
+                                comment_mode = true;
+                                //start multi-line mode
+                            }
+                            break;
+                        case "Deprecated":
+                            break;
+                        case "Preferred-Value":
+                            break;
+                        case "Prefix":
+                            break;
+                        case "Tag":
+                            break;
+                    }
+                }
+            }
+
+
+
+
+        }
+
+        class LangSubTagReg
+        {
+            public string Type;
+            public string SubLang;
+            public string Description;
+
+            public override string ToString()
+            {
+                return SubLang ?? "??";
+            }
+        }
+        private void button8_Click(object sender, EventArgs e)
+        {
+            LoadAndParseLangSubTagsReg();
+
+            //test
+            var dic1 = new Dictionary<string, LangSubTagReg>();
+            List<LangSubTagReg> excludeList = new List<LangSubTagReg>();
+
+            int j = _langSubTagRegs.Count;
+            for (int i = 0; i < j; ++i)
+            {
+                LangSubTagReg langSub = _langSubTagRegs[i];
+
+                if (langSub.SubLang == null)
+                {
+                    //possible
+                    excludeList.Add(langSub);
+                    System.Diagnostics.Debug.WriteLine("no sub_lang:" + langSub.Description);
+                    continue;//skip this
+
+                    //throw new NotSupportedException();
+                }
+                if (!dic1.TryGetValue(langSub.SubLang, out LangSubTagReg found))
+                {
+                    dic1.Add(langSub.SubLang, langSub);
+                }
+                else
+                {
+                    //! duplicated?
+                    //replace it?
+                    excludeList.Add(found);
+                    System.Diagnostics.Debug.WriteLine("duplicated key, replace:" + found.ToString());
+                    dic1[langSub.SubLang] = langSub;
+                }
+            }
+
+        }
     }
 }
