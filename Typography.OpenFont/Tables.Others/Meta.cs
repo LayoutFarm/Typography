@@ -189,13 +189,17 @@ namespace Typography.OpenFont.Tables
             }
         }
         static string[] ReadCommaSepData(byte[] data)
-        {
-            string[] dlng_tags = System.Text.Encoding.UTF8.GetString(data).Split(',');
-            for (int i = 0; i < dlng_tags.Length; ++i)
+        {   
+
+
+
+
+            string[] tags = System.Text.Encoding.UTF8.GetString(data).Split(',');
+            for (int i = 0; i < tags.Length; ++i)
             {
-                dlng_tags[i] = dlng_tags[i].Trim();
+                tags[i] = tags[i].Trim();
             }
-            return dlng_tags;
+            return tags;
         }
         struct DataMapRecord
         {
