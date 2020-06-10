@@ -1,10 +1,13 @@
-﻿//https://docs.microsoft.com/en-us/typography/opentype/spec/meta
-//meta — Metadata Table
-using System;
-using System.Collections.Generic;
+﻿//MIT, 2020-present, WinterDev
+
+using System; 
 using System.IO;
+
 namespace Typography.OpenFont.Tables
 {
+    //https://docs.microsoft.com/en-us/typography/opentype/spec/meta
+    //meta — Metadata Table
+
 
     //NOTE: readmore about language tag, https://tools.ietf.org/html/bcp47
     //...The language of an information item or a user's language preferences
