@@ -428,21 +428,13 @@ namespace PixelFarm.Drawing
             _painter.SetOrigin(ox, oy);
         }
 
-
         public void DrawString(char[] text, int startAt, int len, double x, double y)
         {
             DrawString(text, startAt, len, (float)x, (float)y);
         }
 
-
-
-
-
-
         public override void DrawString(char[] textBuffer, int startAt, int len, float x, float y)
         {
-
-
 #if DEBUG
             if (textBuffer.Length > 3)
             {
@@ -482,7 +474,6 @@ namespace PixelFarm.Drawing
                         //
                         ILineSegment line_seg = segments[i];
                         SpanBreakInfo spBreakInfo = (SpanBreakInfo)line_seg.SpanBreakInfo;
-
                         TextBufferSpan buff = new TextBufferSpan(textBuffer, line_seg.StartAt, line_seg.Length);
                         if (spBreakInfo.RightToLeft)
                         {
@@ -494,8 +485,30 @@ namespace PixelFarm.Drawing
                         //so we need to ensure that we get a proper typeface,
                         //if not => alternative typeface
 
+                        ushort glyphIndex = 0;
                         char sample_char = textBuffer[line_seg.StartAt];
-                        ushort glyphIndex = curTypeface.GetGlyphIndex(sample_char);
+                        if (line_seg.Length > 1)
+                        {
+                            //high serogate pair or not
+                            int codepoint = sample_char;
+                            if (sample_char >= 0xd800 && sample_char <= 0xdbff)
+                            {
+                                char nextCh = textBuffer[line_seg.StartAt + 1];
+                                if (nextCh >= 0xdc00 && nextCh <= 0xdfff)
+                                {
+                                    codepoint = char.ConvertToUtf32(sample_char, nextCh);
+                                }
+                            }
+
+                            glyphIndex = curTypeface.GetGlyphIndex(codepoint);
+
+                        }
+                        else
+                        {
+                            glyphIndex = curTypeface.GetGlyphIndex(sample_char);
+                        }
+
+
                         if (glyphIndex == 0)
                         {
                             //not found then => find other typeface                    
@@ -558,7 +571,10 @@ namespace PixelFarm.Drawing
                         {
                             GlyphPlanSequence glyphPlanSeq = _tmpGlyphPlanSeqs[i];
 
+                            //change typeface                            
                             Typeface = _tmpTypefaces[i];
+                            //update pxscale size                             
+                            _currentFontSizePxScale = Typeface.CalculateScaleToPixelFromPointSize(FontSizeInPoints);
 
                             DrawFromGlyphPlans(glyphPlanSeq, xpos, y);
                             xpos += (glyphPlanSeq.CalculateWidth() * _currentFontSizePxScale);

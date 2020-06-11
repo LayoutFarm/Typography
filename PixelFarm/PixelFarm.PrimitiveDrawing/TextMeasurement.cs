@@ -49,11 +49,9 @@ namespace PixelFarm.Drawing
     public interface ILineSegment
     {
         int StartAt { get; }
-        ushort Length { get; }
+        ushort Length { get; } 
         object SpanBreakInfo { get; }
-    }
-
-
+    } 
 
     public interface ITextService
     {
