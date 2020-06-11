@@ -342,6 +342,7 @@ namespace Typography.TextBreak
                                     }
                                     else
                                     {
+                                        //see https://github.com/LayoutFarm/Typography/issues/18#issuecomment-345480185
                                         int begin = i + 2;
                                         CollectConsecutiveSurrogatePairs(input, ref begin, endBefore - begin, SurrogatePairBreakingOption == SurrogatePairBreakingOption.ConsecutiveSurrogatePairsAndJoiner);
 
