@@ -13,11 +13,11 @@ public class TestOptions
 public class BasicTests
 {
 
-    
+
     public void BasicTest(string input, string[] output, TestOptions options = null)
     {
         if (options == null)
-        { 
+        {
             options = new TestOptions();
         }
 
@@ -85,10 +85,11 @@ public class BasicTests
     [DataTestMethod]
     [DataRow("👩🏾‍👨🏾‍👧🏾‍👶🏾", 0, new[] { "👩🏾‍👨🏾‍👧🏾‍👶🏾" })]
     [DataRow("👩🏾‍👨🏾‍👧🏾‍👶🏾 👩🏾‍👨🏾‍👧🏾‍👶🏾", 0, new[] { "👩🏾‍👨🏾‍👧🏾‍👶🏾", " ", "👩🏾‍👨🏾‍👧🏾‍👶🏾" })]
+    [DataRow("a👩🏾‍👨🏾‍👧🏾‍👶🏾bc👩🏾‍👨🏾‍👧🏾‍👶🏾d", 0, new[] {"a", "👩🏾‍👨🏾‍👧🏾‍👶🏾", "bc", "👩🏾‍👨🏾‍👧🏾‍👶🏾","d" })]
     public void ConsecutiveSurrogatePairsAndJoiner(string input, int _, string[] output)
     {
-        BasicTest(input, output, new TestOptions() { SurrogatePairBreakingOption = SurrogatePairBreakingOption.ConsecutiveSurrogatePairsAndJoiner });
-    } 
+        BasicTest(input, output, new TestOptions { SurrogatePairBreakingOption = SurrogatePairBreakingOption.ConsecutiveSurrogatePairsAndJoiner });
+    }
 
 
     [DataTestMethod]
@@ -96,7 +97,7 @@ public class BasicTests
     public void BreakNumAfterText(string input, int _, string[] output)
     {
 
-        BasicTest(input, output, new TestOptions() { BreakNumberAfterText = true });
+        BasicTest(input, output, new TestOptions { BreakNumberAfterText = true });
     }
 
     [DataTestMethod]
@@ -106,6 +107,6 @@ public class BasicTests
     [DataRow("9 a.m.", 0, new[] { "9", " ", "a.m." })]
     public void DontBreakPerioidInTextSpan(string input, int _, string[] output)
     {
-        BasicTest(input, output, new TestOptions() { BreakNumberAfterText = true });
+        BasicTest(input, output, new TestOptions { BreakNumberAfterText = true });
     }
 }
