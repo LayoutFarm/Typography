@@ -10,6 +10,12 @@ using Typography.OpenFont;
 
 namespace Typography.TextBreak
 {
+    public enum SurrogatePairBreakingOption
+    {
+        OnlySurrogatePair,
+        ConsecutiveSurrogatePairs,
+        ConsecutiveSurrogatePairsAndJoiner
+    }
     public class EngBreakingEngine : BreakingEngine
     {
         enum LexState
@@ -24,6 +30,8 @@ namespace Typography.TextBreak
         public bool BreakPeroidInTextSpan { get; set; }
         public bool EnableCustomAbbrv { get; set; }
         public bool EnableUnicodeRangeBreaker { get; set; }
+        public SurrogatePairBreakingOption SurrogatePairBreakingOption { get; set; }
+
         public CustomAbbrvDic EngCustomAbbrvDic { get; set; }
         struct BreakBounds
         {
@@ -88,6 +96,37 @@ namespace Typography.TextBreak
                 throw new NotSupportedException();
             }
         }
+        static void CollectConsecutiveSurrogatePairs(char[] input, ref int start, int len, bool withZeroWidthJoiner)
+        {
+
+            int lim = start + len;
+            for (int i = start; i < lim;) //start+1
+            {
+                char c = input[i];
+
+                if ((i + 1 < lim) &&
+                    char.IsHighSurrogate(c) &&
+                    char.IsLowSurrogate(input[i + 1]))
+                {
+                    i += 2;//**
+                    start = i;
+                }
+                else if (withZeroWidthJoiner && c == 8205)
+                {
+                    //https://en.wikipedia.org/wiki/Zero-width_joiner
+                    i += 1;
+                    start = i;
+                }
+                else
+                {
+                    //stop
+                    start = i;
+                    return;
+                }
+            }
+
+        }
+
         void DoBreak(WordVisitor visitor, char[] input, int start, int len)
         {
 
@@ -289,18 +328,34 @@ namespace Typography.TextBreak
                                     }
                                     //-------------------------------
                                     //surrogate pair
-                                    bb.startIndex = i;
-                                    bb.length = 2;
-                                    bb.kind = WordKind.SurrogatePair;
 
-                                    OnBreak(visitor, bb);
-                                    //-------------------------------
+                                    if (SurrogatePairBreakingOption == SurrogatePairBreakingOption.OnlySurrogatePair)
+                                    {
+                                        bb.startIndex = i;
+                                        bb.length = 2;
+                                        bb.kind = WordKind.SurrogatePair;
+                                        OnBreak(visitor, bb);
+                                        i++;//consume next***
+                                        bb.startIndex += 2;//reset
+                                        bb.length = 0; //reset
+                                        lexState = LexState.Init;
+                                    }
+                                    else
+                                    {
+                                        int begin = i + 2;
+                                        CollectConsecutiveSurrogatePairs(input, ref begin, endBefore - begin, SurrogatePairBreakingOption == SurrogatePairBreakingOption.ConsecutiveSurrogatePairsAndJoiner);
 
-                                    i++;//consume next***
+                                        bb.startIndex = i;
+                                        bb.length = begin - i;
+                                        bb.kind = WordKind.SurrogatePair;
+                                        OnBreak(visitor, bb);
 
-                                    bb.startIndex += 2;//reset
-                                    bb.length = 0; //reset
-                                    lexState = LexState.Init;
+                                        i += bb.length - 1;//consume
+
+                                        bb.startIndex += bb.length;//reset
+                                        bb.length = 0; //reset             
+                                    }
+
                                     continue; //***
                                 }
                                 else

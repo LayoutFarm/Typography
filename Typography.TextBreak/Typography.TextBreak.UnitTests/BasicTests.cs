@@ -2,17 +2,32 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Typography.TextBreak;
 
+public class TestOptions
+{
+    public bool BreakNumberAfterText { get; set; }
+    public SurrogatePairBreakingOption SurrogatePairBreakingOption { get; set; } = SurrogatePairBreakingOption.OnlySurrogatePair;
+}
+
+
 [TestClass]
 public class BasicTests
 {
 
-    public void BasicTest(string input, string[] output, bool breakNumberAfterText = false)
+    
+    public void BasicTest(string input, string[] output, TestOptions options = null)
     {
+        if (options == null)
+        { 
+            options = new TestOptions();
+        }
+
         var outputList = new List<int> { 0 };
         var customBreaker = new CustomBreaker();
         customBreaker.SetNewBreakHandler(vis => outputList.Add(vis.LatestBreakAt));
+        //options
+        customBreaker.BreakNumberAfterText = options.BreakNumberAfterText;
+        customBreaker.EngBreakingEngine.SurrogatePairBreakingOption = options.SurrogatePairBreakingOption;
 
-        customBreaker.BreakNumberAfterText = breakNumberAfterText;
         //
         customBreaker.BreakWords(input);
 
@@ -27,6 +42,7 @@ public class BasicTests
             );
         }
     }
+
 
     [DataTestMethod]
     [DataRow("Hi!", 0, new[] { "Hi", "!" })]
@@ -63,14 +79,24 @@ public class BasicTests
     [DataRow("😂😂", 0, new[] { "😂", "😂" })]
     [DataRow("😂A😂", 0, new[] { "😂", "A", "😂" })]
     [DataRow("😂A123😂", 0, new[] { "😂", "A123", "😂" })]
+
     public void Surrogates(string input, int _, string[] output) => BasicTest(input, output);
+
+    [DataTestMethod]
+    [DataRow("👩🏾‍👨🏾‍👧🏾‍👶🏾", 0, new[] { "👩🏾‍👨🏾‍👧🏾‍👶🏾" })]
+    [DataRow("👩🏾‍👨🏾‍👧🏾‍👶🏾 👩🏾‍👨🏾‍👧🏾‍👶🏾", 0, new[] { "👩🏾‍👨🏾‍👧🏾‍👶🏾", " ", "👩🏾‍👨🏾‍👧🏾‍👶🏾" })]
+    public void ConsecutiveSurrogatePairsAndJoiner(string input, int _, string[] output)
+    {
+        BasicTest(input, output, new TestOptions() { SurrogatePairBreakingOption = SurrogatePairBreakingOption.ConsecutiveSurrogatePairsAndJoiner });
+    } 
 
 
     [DataTestMethod]
     [DataRow("A123", 0, new[] { "A", "123" })]
     public void BreakNumAfterText(string input, int _, string[] output)
     {
-        BasicTest(input, output, true);
+
+        BasicTest(input, output, new TestOptions() { BreakNumberAfterText = true });
     }
 
     [DataTestMethod]
@@ -80,6 +106,6 @@ public class BasicTests
     [DataRow("9 a.m.", 0, new[] { "9", " ", "a.m." })]
     public void DontBreakPerioidInTextSpan(string input, int _, string[] output)
     {
-        BasicTest(input, output, true);
+        BasicTest(input, output, new TestOptions() { BreakNumberAfterText = true });
     }
 }

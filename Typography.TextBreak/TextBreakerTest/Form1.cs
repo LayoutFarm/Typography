@@ -51,9 +51,13 @@ namespace TextBreakerTest
             //this.textBox1.Text = test1;
 
             string test2 = "یہ ایک (car) ہے۔";
-            this.textBox1.Text = test1 + test2;
-            //this.textBox1.Text = test2;
 
+            string test3 = "👩🏾‍👨🏾‍👧🏾‍👶🏾";
+
+            this.textBox1.Text = test3 + " " + test3;
+
+            //this.textBox1.Text = test1 + test2;
+            //this.textBox1.Text = test2;
         }
 
         static bool icuLoaded;
@@ -100,13 +104,13 @@ namespace TextBreakerTest
             CustomBreaker breaker1 = CustomBreakerBuilder.NewCustomBreaker();
 
             //when we want to break into a group of consecutive unicode ranges. (this does not use Dictionry breaker)
+            breaker1.EngBreakingEngine.SurrogatePairBreakingOption = SurrogatePairBreakingOption.ConsecutiveSurrogatePairs;
             breaker1.UseUnicodeRangeBreaker = chkUseUnicodeRangeBreaker.Checked;
-
-
             breaker1.BreakNumberAfterText = true;
+
+
             char[] test = this.textBox1.Text.ToCharArray();
             this.listBox1.Items.Clear();
-
             breaker1.SetNewBreakHandler(vis =>
             {
                 BreakSpan span = vis.GetBreakSpan();
