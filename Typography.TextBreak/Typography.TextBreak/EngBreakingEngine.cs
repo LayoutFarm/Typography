@@ -336,9 +336,7 @@ namespace Typography.TextBreak
                                         bb.kind = WordKind.SurrogatePair;
                                         OnBreak(visitor, bb);
                                         i++;//consume next***
-                                        bb.startIndex += 2;//reset
-                                        bb.length = 0; //reset
-                                        lexState = LexState.Init;
+                                        bb.startIndex += 2;//reset 
                                     }
                                     else
                                     {
@@ -349,14 +347,12 @@ namespace Typography.TextBreak
                                         bb.startIndex = i;
                                         bb.length = begin - i;
                                         bb.kind = WordKind.SurrogatePair;
-                                        OnBreak(visitor, bb);
-
-                                        i += bb.length - 1;//consume
-
-                                        bb.startIndex += bb.length;//reset
-                                        bb.length = 0; //reset             
+                                        OnBreak(visitor, bb); 
+                                        i += bb.length - 1;//consume 
+                                        bb.startIndex += bb.length;//reset 
                                     }
-
+                                    bb.length = 0; //reset
+                                    lexState = LexState.Init;
                                     continue; //***
                                 }
                                 else
