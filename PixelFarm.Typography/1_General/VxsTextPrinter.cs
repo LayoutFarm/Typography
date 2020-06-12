@@ -283,11 +283,6 @@ namespace PixelFarm.Drawing
             float ox = _painter.OriginX;
             float oy = _painter.OriginY;
 
-
-            Typography.OpenFont.Tables.COLR colrTable = _currentTypeface.COLRTable;
-            Typography.OpenFont.Tables.CPAL cpalTable = _currentTypeface.CPALTable;
-            bool hasColorGlyphs = (colrTable != null) && (cpalTable != null);
-
             //--------------------------------------------------- 
             _glyphMeshStore.SetHintTechnique(this.HintTechnique);
             _glyphMeshStore.SetFont(_currentTypeface, fontSizePoint);
@@ -346,7 +341,10 @@ namespace PixelFarm.Drawing
             }
             else
             {
-                if (!hasColorGlyphs)
+                Typography.OpenFont.Tables.COLR colrTable = _currentTypeface.COLRTable;
+                Typography.OpenFont.Tables.CPAL cpalTable = _currentTypeface.CPALTable;
+
+                if (colrTable == null || cpalTable == null)
                 {
                     bool savedUseLcdMode = _painter.UseLcdEffectSubPixelRendering; //save,restore later
                     RenderQuality savedRederQuality = _painter.RenderQuality;
