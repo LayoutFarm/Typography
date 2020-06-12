@@ -2,8 +2,6 @@
 using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.Collections.Generic;
-//
 using Typography.OpenFont;
 using Typography.OpenFont.Tables;
 using Typography.TextLayout;
@@ -116,6 +114,23 @@ namespace SampleWinForms
             _outlinePen.Color = this.OutlineColor;
         }
 
+        GraphicsPath GetExistingOrCreateGraphicsPath(ushort glyphIndex)
+        {
+            if (!_glyphMeshCollections.TryGetCacheGlyph(glyphIndex, out GraphicsPath path))
+            {
+                _txToGdiPath.Reset(); //clear
+
+                //if not found then create a new one
+                _currentGlyphPathBuilder.BuildFromGlyphIndex(glyphIndex, this.FontSizeInPoints, _txToGdiPath);
+                path = _txToGdiPath.ResultGraphicsPath;
+
+                //register
+                _glyphMeshCollections.RegisterCachedGlyph(glyphIndex, path);
+            }
+
+            return path;
+        }
+
         public override void DrawFromGlyphPlans(GlyphPlanSequence seq, int startAt, int len, float x, float y)
         {
             UpdateVisualOutputSettings();
@@ -153,18 +168,15 @@ namespace SampleWinForms
 
                     for (int c = colorLayerStart; c < colorLayerStart + colorLayerCount; ++c)
                     {
-                        ushort gIndex = colrTable.GlyphLayers[c];
 
-                        if (!_glyphMeshCollections.TryGetCacheGlyph(gIndex, out GraphicsPath path))
+                        GraphicsPath path = GetExistingOrCreateGraphicsPath(colrTable.GlyphLayers[c]);
+                        if (path == null)
                         {
-                            _txToGdiPath.Reset(); //clear
-
-                            //if not found then create a new one
-                            _currentGlyphPathBuilder.BuildFromGlyphIndex(gIndex, sizeInPoints, _txToGdiPath);
-                            path = _txToGdiPath.ResultGraphicsPath;
-
-                            //register
-                            _glyphMeshCollections.RegisterCachedGlyph(gIndex, path);
+                            //???
+#if DEBUG
+                            System.Diagnostics.Debug.WriteLine("gdi_printer: no path?");
+#endif
+                            continue;
                         }
 
                         //------
@@ -194,48 +206,36 @@ namespace SampleWinForms
                 }
                 else
                 {
-                    if (!_glyphMeshCollections.TryGetCacheGlyph(snapToPxScale.CurrentGlyphIndex, out GraphicsPath path))
+                    GraphicsPath path = GetExistingOrCreateGraphicsPath(glyphIndex);
+
+                    if (path == null)
                     {
-                        _txToGdiPath.Reset(); //clear
-
-                        //if not found then create a new one
-                        _currentGlyphPathBuilder.BuildFromGlyphIndex(snapToPxScale.CurrentGlyphIndex, sizeInPoints, _txToGdiPath);
-                        path = _txToGdiPath.ResultGraphicsPath;
-
-                        //register
-                        _glyphMeshCollections.RegisterCachedGlyph(snapToPxScale.CurrentGlyphIndex, path);
+                        //???
+#if DEBUG
+                        System.Diagnostics.Debug.WriteLine("gdi_printer: no path?");
+#endif
+                        continue;
                     }
 
+                    //------
+                    //then move pen point to the position we want to draw a glyph
+                    float cx = (float)Math.Round(snapToPxScale.ExactX + x);
+                    float cy = (float)Math.Floor(snapToPxScale.ExactY + baseline);
 
+                    g.TranslateTransform(cx, cy);
 
-                    if (path != null)
+                    if (FillBackground)
                     {
-                        //------
-                        //then move pen point to the position we want to draw a glyph
-                        float cx = (float)Math.Round(snapToPxScale.ExactX + x);
-                        float cy = (float)Math.Floor(snapToPxScale.ExactY + baseline);
-
-                        g.TranslateTransform(cx, cy);
-
-                        if (FillBackground)
-                        {
-                            g.FillPath(_fillBrush, path);
-                        }
-                        if (DrawOutline)
-                        {
-                            g.DrawPath(_outlinePen, path);
-                        }
-                        //and then we reset back ***
-                        g.TranslateTransform(-cx, -cy);
+                        g.FillPath(_fillBrush, path);
                     }
-                    else
+                    if (DrawOutline)
                     {
-
+                        g.DrawPath(_outlinePen, path);
                     }
+                    //and then we reset back ***
+                    g.TranslateTransform(-cx, -cy);
                 }
-
             }
-
         }
 
     }
