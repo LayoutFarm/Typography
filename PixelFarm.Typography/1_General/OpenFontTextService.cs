@@ -368,8 +368,8 @@ namespace PixelFarm.Drawing
             }
             public int StartAt => _startAt;
             public ushort Length => _len;
+            
             public object SpanBreakInfo => breakInfo;
-
 #if DEBUG
             public override string ToString()
             {

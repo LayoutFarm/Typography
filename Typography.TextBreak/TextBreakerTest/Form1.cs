@@ -51,9 +51,21 @@ namespace TextBreakerTest
             //this.textBox1.Text = test1;
 
             string test2 = "یہ ایک (car) ہے۔";
-            this.textBox1.Text = test1 + test2;
-            //this.textBox1.Text = test2;
 
+            string test3 = "👩🏾‍👨🏾‍👧🏾‍👶🏾";
+
+            this.textBox1.Text = test3 + " " + test3;
+
+            //this.textBox1.Text = test1 + test2;
+            //this.textBox1.Text = test2;
+            cmbSurrogatePairBreakOptions.Items.AddRange(
+                new object[]
+                {
+                    SurrogatePairBreakingOption.OnlySurrogatePair,
+                    SurrogatePairBreakingOption.ConsecutiveSurrogatePairs,
+                    SurrogatePairBreakingOption.ConsecutiveSurrogatePairsAndJoiner
+                });
+            cmbSurrogatePairBreakOptions.SelectedIndex = 2;
         }
 
         static bool icuLoaded;
@@ -100,13 +112,13 @@ namespace TextBreakerTest
             CustomBreaker breaker1 = CustomBreakerBuilder.NewCustomBreaker();
 
             //when we want to break into a group of consecutive unicode ranges. (this does not use Dictionry breaker)
+            breaker1.EngBreakingEngine.SurrogatePairBreakingOption = (SurrogatePairBreakingOption)cmbSurrogatePairBreakOptions.SelectedItem;
             breaker1.UseUnicodeRangeBreaker = chkUseUnicodeRangeBreaker.Checked;
-
-
             breaker1.BreakNumberAfterText = true;
+
+
             char[] test = this.textBox1.Text.ToCharArray();
             this.listBox1.Items.Clear();
-
             breaker1.SetNewBreakHandler(vis =>
             {
                 BreakSpan span = vis.GetBreakSpan();
@@ -190,6 +202,7 @@ namespace TextBreakerTest
             CustomBreakerBuilder.Setup(dicProvider);
             CustomBreaker breaker1 = CustomBreakerBuilder.NewCustomBreaker();
             breaker1.UseUnicodeRangeBreaker = chkUseUnicodeRangeBreaker.Checked;
+            breaker1.EngBreakingEngine.SurrogatePairBreakingOption = (SurrogatePairBreakingOption)cmbSurrogatePairBreakOptions.SelectedItem;
             breaker1.SetNewBreakHandler(vis => { }); //just break, do nothing about result
             char[] test = this.textBox1.Text.ToCharArray();
             //-------------
