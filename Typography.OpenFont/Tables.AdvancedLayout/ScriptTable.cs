@@ -65,9 +65,10 @@ namespace Typography.OpenFont.Tables
     //---------------------
     public class ScriptTable
     {
-        public LangSysTable defaultLang;
-        public LangSysTable[] langSysTables;
-        public uint scriptTag;
+        public uint scriptTag { get; internal set; }
+        public LangSysTable defaultLang { get; private set; }// be NULL
+        public LangSysTable[] langSysTables { get; private set; }
+
         public string ScriptTagName => Utils.TagToString(this.scriptTag);
 
         public static ScriptTable CreateFrom(BinaryReader reader, long beginAt)
@@ -119,8 +120,6 @@ namespace Typography.OpenFont.Tables
             return scriptTable;
         }
 
-
-
 #if DEBUG
         public override string ToString()
         {
@@ -134,7 +133,7 @@ namespace Typography.OpenFont.Tables
             //used to render the glyphs in a script. (The LookupOrder offset is reserved for future use.)
             //
             public uint langSysTagIden { get; private set; }
-            public readonly ushort offset;
+            internal readonly ushort offset;
 
             //
             public ushort[] featureIndexList { get; private set; }
@@ -162,11 +161,9 @@ namespace Typography.OpenFont.Tables
 
             }
             public bool HasRequireFeature => RequireFeatureIndex != 0xFFFF;
+            public string LangSysTagIdenString => (langSysTagIden == 0) ? "" : Utils.TagToString(langSysTagIden);
 #if DEBUG
-            public override string ToString()
-            {
-                return Utils.TagToString(langSysTagIden);
-            }
+            public override string ToString() => LangSysTagIdenString;
 #endif
 
         }

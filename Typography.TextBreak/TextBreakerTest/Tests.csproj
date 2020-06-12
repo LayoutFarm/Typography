@@ -40,6 +40,12 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\Typography.TextBreak.UnitTests\BreakAtInfo.cs">
+      <Link>BreakAtInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\Typography.TextBreak.UnitTests\BreakSpan01.cs">
+      <Link>BreakSpan01.cs</Link>
+    </Compile>
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>

@@ -3,7 +3,7 @@
 
 /*x2*/using System;
 /*x3*/using System.IO;
-/*x4*/using System.Xml;
+
 /*x5*/namespace MathLayout{
 /*x6*///PART1: node-definitions
 /*x7*///identifier

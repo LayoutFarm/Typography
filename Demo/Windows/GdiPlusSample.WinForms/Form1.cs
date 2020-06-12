@@ -6,9 +6,10 @@ using System.Windows.Forms;
 // 
 using Typography.TextLayout;
 using Typography.Contours;
-using Typography.TextServices;
+using Typography.FontManagement;
 using Typography.OpenFont;
 using Typography.OpenFont.Extensions;
+
 namespace SampleWinForms
 {
     public partial class Form1 : Form
@@ -17,7 +18,7 @@ namespace SampleWinForms
         //for this sample code,
         //create text printer env for developer.
         DevGdiTextPrinter _currentTextPrinter = new DevGdiTextPrinter();
-        InstalledFontCollection installedFontCollection;
+        InstalledTypefaceCollection _installedFontCollection;
         TypefaceStore _typefaceStore;
         public Form1()
         {
@@ -25,7 +26,7 @@ namespace SampleWinForms
 
             //choose Thai script for 'complex script' testing.
             //you can change this to test other script.
-            _currentTextPrinter.ScriptLang = Typography.OpenFont.ScriptLangs.Thai;
+            _currentTextPrinter.ScriptLang = new ScriptLang(ScriptTagDefs.Thai.Tag);
             //----------
             button1.Click += (s, e) => UpdateRenderOutput();
             //simple load test fonts from local test dir
@@ -51,21 +52,21 @@ namespace SampleWinForms
             //
 
             //1. create font collection             
-            installedFontCollection = new InstalledFontCollection();
+            _installedFontCollection = new InstalledTypefaceCollection();
             //2. set some essential handler
-            installedFontCollection.SetFontNameDuplicatedHandler((f1, f2) => FontNameDuplicatedDecision.Skip);
+            _installedFontCollection.SetFontNameDuplicatedHandler((f1, f2) => FontNameDuplicatedDecision.Skip);
 
-            installedFontCollection.LoadFontsFromFolder("../../../TestFonts_Err");
-            installedFontCollection.LoadFontsFromFolder("../../../TestFonts");
+            _installedFontCollection.LoadFontsFromFolder("../../../TestFonts_Err");
+            _installedFontCollection.LoadFontsFromFolder("../../../TestFonts");
             //installedFontCollection.LoadSystemFonts();
 
             //---------- 
             //show result
-            InstalledFont selectedFF = null;
+            InstalledTypeface selectedFF = null;
             int selected_index = 0;
             int ffcount = 0;
             bool found = false;
-            foreach (InstalledFont ff in installedFontCollection.GetInstalledFontIter())
+            foreach (InstalledTypeface ff in _installedFontCollection.GetInstalledFontIter())
             {
                 if (!found && ff.FontName == "Source Sans Pro")
                 {
@@ -79,8 +80,8 @@ namespace SampleWinForms
             //set default font for current text printer
             //
             _typefaceStore = new TypefaceStore();
-            _typefaceStore.FontCollection = installedFontCollection;
-            installedFontCollection.UpdateUnicodeRanges();
+            _typefaceStore.FontCollection = _installedFontCollection;
+            _installedFontCollection.UpdateUnicodeRanges();
 
             //set default font for current text printer
             _currentTextPrinter.Typeface = _typefaceStore.GetTypeface(selectedFF);
@@ -88,7 +89,7 @@ namespace SampleWinForms
 #if DEBUG
             //test get font from typeface store
 
-            InstalledFont instFont = installedFontCollection.GetFontByPostScriptName("SourceSansPro-Regular");
+            InstalledTypeface instFont = _installedFontCollection.GetFontByPostScriptName("SourceSansPro-Regular");
 
 
 #endif
@@ -97,8 +98,7 @@ namespace SampleWinForms
             lstFontList.SelectedIndex = selected_index;
             lstFontList.SelectedIndexChanged += (s, e) =>
             {
-                InstalledFont ff = lstFontList.SelectedItem as InstalledFont;
-                if (ff != null)
+                if (lstFontList.SelectedItem is InstalledTypeface ff)
                 {
                     _currentTextPrinter.Typeface = _typefaceStore.GetTypeface(ff);
                     //sample text box 
@@ -250,13 +250,17 @@ namespace SampleWinForms
                   x_pos,
                   y_pos
              );
-
+            //--------------------------------------------------
             //Example 3: MeasureString    
-            UnscaledGlyphPlanList glyphPlans = new UnscaledGlyphPlanList();
-            _currentTextPrinter.GlyphLayoutMan.GenerateUnscaledGlyphPlans(glyphPlans);
+
             MeasuredStringBox strBox = _currentTextPrinter.GlyphLayoutMan.LayoutAndMeasureString(
               textBuffer, 0, textBuffer.Length,
               _currentTextPrinter.FontSizeInPoints);
+
+            UnscaledGlyphPlanList glyphPlans = new UnscaledGlyphPlanList();
+            _currentTextPrinter.GlyphLayoutMan.GenerateUnscaledGlyphPlans(glyphPlans);
+
+
 
             int j = glyphPlans.Count;
             float backup_xpos = x_pos;

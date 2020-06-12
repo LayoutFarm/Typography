@@ -37,6 +37,10 @@ namespace Typography.OpenFont.Tables
         public ScriptList ScriptList { get; private set; }
         public FeatureList FeatureList { get; private set; }
 
+        /// <summary>
+        /// read script_list, feature_list, and skip look up table
+        /// </summary>
+        internal bool OnlyScriptList { get; set; } //
 
         protected override void ReadContentFrom(BinaryReader reader)
         {
@@ -78,10 +82,14 @@ namespace Typography.OpenFont.Tables
             //-----------------------
             //1. scriptlist
             ScriptList = ScriptList.CreateFrom(reader, tableStartAt + scriptListOffset);
+
+            if (OnlyScriptList) return; //for preview script-list and feature list only
+
             //-----------------------
             //2. feature list
+
             FeatureList = FeatureList.CreateFrom(reader, tableStartAt + featureListOffset);
-            //-----------------------
+
             //3. lookup list
             ReadLookupListTable(reader, tableStartAt + lookupListOffset);
 
@@ -162,7 +170,8 @@ namespace Typography.OpenFont.Tables
             //0x0002  ignoreBaseGlyphs        If set, skips over base glyphs
             //0x0004  ignoreLigatures         If set, skips over ligatures
             //0x0008  ignoreMarks             If set, skips over all combining marks
-            //0x0010  useMarkFilteringSet     If set, indicates that the lookup table structure is followed by a MarkFilteringSet field.The layout engine skips over all mark glyphs not in the mark filtering set indicated.
+            //0x0010  useMarkFilteringSet     If set, indicates that the lookup table structure is followed by a MarkFilteringSet field.
+            //                                The layout engine skips over all mark glyphs not in the mark filtering set indicated.
             //0x00E0  reserved                For future use(Set to zero)
             //0xFF00  markAttachmentType      If not zero, skips over all marks of attachment type different from specified.
             // --------------------------------

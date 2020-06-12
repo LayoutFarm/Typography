@@ -9,7 +9,6 @@
     <Import_RootNamespace>DrawingGL.Common</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)DevTextPrinter\FontManagement.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DrawingGL.Text\TextBaseline.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DrawingGL\Color.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DrawingGL\Shaders.cs" />

@@ -3,46 +3,212 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Typography.OpenFont;
+using Typography.OpenFont.Tables;
+namespace Typography.OpenFont
+{
+    public static class TypefaceExtension3
+    {
+
+        internal static bool DoesSupportUnicode(Languages langs, UnicodeLangBits unicodeLangBits)
+        {
+            long bits = (long)unicodeLangBits;
+            int bitpos = (int)(bits >> 32);
+
+            if (bitpos < 32)
+            {
+                //use range 1
+                return (langs.UnicodeRange1 & (1 << bitpos)) != 0;
+            }
+            else if (bitpos < 64)
+            {
+                return (langs.UnicodeRange2 & (1 << (bitpos - 32))) != 0;
+            }
+            else if (bitpos < 96)
+            {
+                return (langs.UnicodeRange3 & (1 << (bitpos - 64))) != 0;
+            }
+            else if (bitpos < 128)
+            {
+                return (langs.UnicodeRange4 & (1 << (bitpos - 96))) != 0;
+            }
+            else
+            {
+                throw new System.NotSupportedException();
+            }
+        }
+
+        public static void CollectScriptLang(this FontManagement.InstalledTypeface typeface, Dictionary<string, ScriptLang> output)
+        {
+            CollectScriptLang(typeface.Languages, output);
+        }
+        public static void CollectScriptLang(this Languages langs, Dictionary<string, ScriptLang> output)
+        {
+            CollectScriptTable(langs.GSUBScriptList, output);
+            CollectScriptTable(langs.GPOSScriptList, output);
+        }
+        static void CollectScriptTable(ScriptList scList, Dictionary<string, ScriptLang> output)
+        {
+            if (scList == null) { return; }
+            //
+            foreach (var kv in scList)
+            {
+
+                ScriptTable scTable = kv.Value;
+                //default and others
+                {
+                    ScriptTable.LangSysTable langSys = scTable.defaultLang;
+                    ScriptLang sclang = new ScriptLang(scTable.ScriptTagName, langSys.LangSysTagIdenString);
+                    string key = sclang.ToString();
+                    if (!output.ContainsKey(key))
+                    {
+                        output.Add(key, sclang);
+                    }
+                }
+                //
+                if (scTable.langSysTables != null && scTable.langSysTables.Length > 0)
+                {
+                    foreach (ScriptTable.LangSysTable langSys in scTable.langSysTables)
+                    {
+                        var pair = new ScriptLang(scTable.ScriptTagName, langSys.LangSysTagIdenString);
+                        string key = pair.ToString();
+                        if (!output.ContainsKey(key))
+                        {
+                            output.Add(key, pair);
+                        }
+                    }
+                }
+            }
+        }
+        public static bool DoesSupportUnicode(
+               this PreviewFontInfo previewFontInfo,
+               UnicodeLangBits unicodeLangBits)
+        {
+            return DoesSupportUnicode(previewFontInfo.Languages, unicodeLangBits);
+        }
+
+
+        public static bool DoesSupportUnicode(
+            this Typeface typeface,
+            UnicodeLangBits unicodeLangBits)
+        {
+            return DoesSupportUnicode(typeface.Languages, unicodeLangBits);
+        }
+
+        static UnicodeLangBits[] FilterOnlySelectedRange(UnicodeLangBits[] inputRanges, UnicodeLangBits[] userSpecificRanges)
+        {
+            List<UnicodeLangBits> selectedRanges = new List<UnicodeLangBits>();
+            foreach (UnicodeLangBits range in inputRanges)
+            {
+                int foundAt = System.Array.IndexOf(userSpecificRanges, range);
+                if (foundAt > 0)
+                {
+                    selectedRanges.Add(range);
+                }
+            }
+            return selectedRanges.ToArray();
+        }
+
+        public static void CollectAllAssociateGlyphIndex(this Typeface typeface, List<ushort> outputGlyphIndexList, ScriptLang scLang, UnicodeLangBits[] selectedRangs = null)
+        {
+            //-----------
+            //general glyph index in the unicode range
+
+            //if user dose not specific the unicode lanf bit ranges
+            //the we try to select it ourself. 
+
+            if (ScriptLangs.TryGetUnicodeLangBitsArray(scLang.GetScriptTagString(), out UnicodeLangBits[] unicodeLangBitsRanges))
+            {
+                //one lang may contains may ranges
+                if (selectedRangs != null)
+                {
+                    //select only in range 
+                    unicodeLangBitsRanges = FilterOnlySelectedRange(unicodeLangBitsRanges, selectedRangs);
+                }
+
+                foreach (UnicodeLangBits unicodeLangBits in unicodeLangBitsRanges)
+                {
+                    UnicodeRangeInfo rngInfo = unicodeLangBits.ToUnicodeRangeInfo();
+                    int endAt = rngInfo.EndAt;
+                    for (int codePoint = rngInfo.StartAt; codePoint <= endAt; ++codePoint)
+                    {
+
+                        ushort glyphIndex = typeface.GetGlyphIndex(codePoint);
+                        if (glyphIndex > 0)
+                        {
+                            //add this glyph index
+                            outputGlyphIndexList.Add(glyphIndex);
+                        }
+                    }
+                }
+            }
+
+            typeface.CollectAdditionalGlyphIndices(outputGlyphIndexList, scLang);
+        }
+    }
+
+}
 
 
 namespace Typography.FontManagement
 {
 
+    public abstract class AlternativeTypefaceSelector
+    {
+#if DEBUG
+        public AlternativeTypefaceSelector() { }
+#endif
+
+        public Typeface LatestTypeface { get; set; }
+        public virtual InstalledTypeface Select(List<InstalledTypeface> choices, ScriptLangInfo scriptLangInfo, char hintChar)
+        {
+            if (choices.Count > 0)
+            {
+                return choices[0];//temp
+            }
+            return null;
+        }
+    }
+
     public class InstalledTypeface
     {
-        internal InstalledTypeface(string fontName,
-            string fontSubFamily,
-            string tFamilyName,
-            string tSubFamilyName,
-            string fontPath,
-            TypefaceStyle typefaceStyle,
-            ushort weight)
+        internal InstalledTypeface(PreviewFontInfo previewFontInfo, TypefaceStyle style, string fontPath)
         {
-            FontName = fontName;
-            FontSubFamily = fontSubFamily;
-
-            TypographicFamilyName = tFamilyName;
-            TypographicFontSubFamily = tSubFamilyName;
-
+            FontName = previewFontInfo.Name;
+            FontSubFamily = previewFontInfo.SubFamilyName;
+            TypographicFamilyName = previewFontInfo.TypographicFamilyName;
+            TypographicFontSubFamily = previewFontInfo.TypographicSubFamilyName;
+            Weight = previewFontInfo.Weight;
             FontPath = fontPath;
-            TypefaceStyle = typefaceStyle;
-            Weight = weight;
+
+            PostScriptName = previewFontInfo.PostScriptName;
+            UniqueFontIden = previewFontInfo.UniqueFontIden;
+            Languages = previewFontInfo.Languages;
+            TypefaceStyle = style;
         }
 
         public string FontName { get; internal set; }
         public string FontSubFamily { get; internal set; }
         public string TypographicFamilyName { get; internal set; }
         public string TypographicFontSubFamily { get; internal set; }
+        public string PostScriptName { get; internal set; }
+        public string UniqueFontIden { get; internal set; }
+
         public TypefaceStyle TypefaceStyle { get; internal set; }
         public ushort Weight { get; internal set; }
+        public Languages Languages { get; }
 
         public string FontPath { get; internal set; }
         public int ActualStreamOffset { get; internal set; }
 
+        //TODO: UnicodeLangBits vs UnicodeLangBits5_1
+        public bool DoesSupportUnicode(UnicodeLangBits unicodeLangBits) => TypefaceExtension3.DoesSupportUnicode(Languages, unicodeLangBits);
+
+#if DEBUG
         public override string ToString()
         {
             return FontName + " " + FontSubFamily;
         }
+#endif
     }
     [Flags]
     public enum TypefaceStyle
@@ -136,7 +302,7 @@ namespace Typography.FontManagement
         FontNotFoundHandler _fontNotFoundHandler;
 
         Dictionary<string, InstalledTypeface> _otherFontNames = new Dictionary<string, InstalledTypeface>();
-
+        Dictionary<string, InstalledTypeface> _postScriptNames = new Dictionary<string, InstalledTypeface>();
 
         public InstalledTypefaceCollection()
         {
@@ -242,13 +408,9 @@ namespace Typography.FontManagement
                 }
             }
             return Register(new InstalledTypeface(
-                previewFont.Name,
-                previewFont.SubFamilyName,
-                previewFont.TypographicFamilyName,
-                previewFont.TypographicSubFamilyName,
-                srcPath,
+                previewFont,
                 typefaceStyle,
-                previewFont.Weight)
+                srcPath)
             { ActualStreamOffset = previewFont.ActualStreamOffset });
         }
         public bool AddFontStreamSource(IFontStreamSource src)
@@ -418,23 +580,42 @@ namespace Typography.FontManagement
                 }
             }
 
+            //register font
+            if (newTypeface.PostScriptName != null)
+            {
+                string postScriptName = newTypeface.PostScriptName.ToUpper();
+                if (!_postScriptNames.ContainsKey(postScriptName))
+                {
+                    _postScriptNames.Add(postScriptName, newTypeface);
+                }
+                else
+                {
+#if DEBUG
+                    System.Diagnostics.Debug.WriteLine("duplicated postscriptname:" + postScriptName);
+#endif
+                }
+            }
+
             return register_result;
 
         }
-
+        public InstalledTypeface GetFontByPostScriptName(string postScriptName)
+        {
+            _postScriptNames.TryGetValue(postScriptName.ToUpper(), out InstalledTypeface found);
+            return found;
+        }
         public InstalledTypeface GetInstalledTypeface(string fontName, string subFamName)
         {
             string upperCaseFontName = fontName.ToUpper();
             string upperCaseSubFamName = subFamName.ToUpper();
 
             InstalledTypeface foundInstalledFont;
+
             //find font group  
-            if (_subFamToFontGroup.TryGetValue(upperCaseSubFamName, out InstalledTypefaceGroup foundFontGroup))
+            if (_subFamToFontGroup.TryGetValue(upperCaseSubFamName, out InstalledTypefaceGroup foundFontGroup) &&
+                foundFontGroup.TryGetValue(upperCaseFontName, out foundInstalledFont))
             {
-                if (foundFontGroup.TryGetValue(upperCaseFontName, out foundInstalledFont))
-                {
-                    return foundInstalledFont;
-                }
+                return foundInstalledFont;
             }
 
             //
@@ -559,6 +740,53 @@ namespace Typography.FontManagement
             }
         }
 
+        public void UpdateUnicodeRanges()
+        {
+            _registeredWithUniCodeLangBits.Clear();
+            foreach (InstalledTypeface instFont in GetInstalledFontIter())
+            {
+                foreach (UnicodeLangBits unicodeLangBit in instFont.GetSupportedUnicodeLangBitIter())
+                {
+
+                    RegisterUnicodeSupport(unicodeLangBit, instFont);
+                }
+            }
+        }
+        public bool TryGetAlternativeTypefaceFromChar(char c, out ScriptLangInfo foundScriptLang, out List<InstalledTypeface> found)
+        {
+            //find a typeface that supported input char c
+            //1. unicode to lang=> to script
+            //2. then find typeface the support it 
+
+            if (ScriptLangs.TryGetScriptLang(c, out foundScriptLang) && foundScriptLang.unicodeLangs != null)
+            {
+                foreach (UnicodeLangBits langBits in foundScriptLang.unicodeLangs)
+                {
+                    if (_registeredWithUniCodeLangBits.TryGetValue(langBits, out List<InstalledTypeface> typefaceList) && typefaceList.Count > 0)
+                    {
+                        //select a proper typeface                        
+                        found = typefaceList;
+                        return true;
+                    }
+                }
+            }
+            found = null;
+            return false;
+        }
+
+
+        readonly Dictionary<UnicodeLangBits, List<InstalledTypeface>> _registeredWithUniCodeLangBits = new Dictionary<UnicodeLangBits, List<InstalledTypeface>>();
+        void RegisterUnicodeSupport(UnicodeLangBits langBit, InstalledTypeface instFont)
+        {
+
+            if (!_registeredWithUniCodeLangBits.TryGetValue(langBit, out List<InstalledTypeface> found))
+            {
+                found = new List<InstalledTypeface>();
+                _registeredWithUniCodeLangBits.Add(langBit, found);
+            }
+            found.Add(instFont);
+        }
+
     }
 
 
@@ -571,8 +799,6 @@ namespace Typography.FontManagement
         public static Action<InstalledTypefaceCollection> CustomSystemFontListLoader;
 
         public static MyFunc<string, Stream> CustomFontStreamLoader;
-
-
         public static void LoadFontsFromFolder(this InstalledTypefaceCollection fontCollection, string folder, bool recursive = false)
         {
             if (!Directory.Exists(folder))
@@ -635,6 +861,17 @@ namespace Typography.FontManagement
             LoadFontsFromFolder(fontCollection, "/System/Library/Fonts");
             LoadFontsFromFolder(fontCollection, "/Library/Fonts");
 
+        }
+
+        public static IEnumerable<UnicodeLangBits> GetSupportedUnicodeLangBitIter(this InstalledTypeface instTypeface)
+        {
+            foreach (UnicodeLangBits unicodeLangBit in UnicodeLangs.GetUnicodeLangBitIter())
+            {
+                if (instTypeface.DoesSupportUnicode(unicodeLangBit))
+                {
+                    yield return unicodeLangBit;
+                }
+            }
         }
 
         //for Windows , how to find Windows' Font Directory from Windows Registry

@@ -111,10 +111,10 @@ namespace Typography.OpenFont.Tables
                     {
                         //...When building a Unicode font for Windows, 
                         // the platform ID should be 3 and the encoding ID should be 1
-                        ushort gid = cmap.GetGlyphIndex(codepoint);
-                        if (gid != 0)
+                        ushort glyphIndex = cmap.GetGlyphIndex(codepoint); //glyphIndex=> gid
+                        if (glyphIndex != 0)
                         {
-                            found = gid;
+                            found = glyphIndex;
                         }
                     }
                 }
@@ -128,11 +128,11 @@ namespace Typography.OpenFont.Tables
             {
                 foreach (CharMapFormat14 cmap14 in _charMap14List)
                 {
-                    ushort gid = cmap14.CharacterPairToGlyphIndex(codepoint, found, nextCodepoint);
-                    if (gid > 0)
+                    ushort glyphIndex = cmap14.CharacterPairToGlyphIndex(codepoint, found, nextCodepoint);
+                    if (glyphIndex > 0)
                     {
                         skipNextCodepoint = true;
-                        return gid;
+                        return glyphIndex;
                     }
                 }
             }
@@ -406,9 +406,9 @@ namespace Typography.OpenFont.Tables
 
         public void CollectUnicode(List<uint> unicodes)
         {
-            foreach (CharacterMap cmap in _charMaps)
+            for (int i = 0; i < _charMaps.Length; ++i)
             {
-                cmap.CollectUnicodeChars(unicodes);
+                _charMaps[i].CollectUnicodeChars(unicodes);
             }
         }
     }

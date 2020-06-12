@@ -22,15 +22,12 @@ namespace LayoutFarm.WebDom
         }
         public CssPropertyDeclaration(WellknownCssPropertyName wellNamePropertyName)
         {
+
             //convert from name to wellknown property name; 
             this.WellknownPropertyName = wellNamePropertyName;
         }
         public CssPropertyDeclaration(WellknownCssPropertyName wellNamePropertyName, CssCodeValueExpression value)
         {
-            //if (this.dbugId == 221)
-            //{
-            //}
-
             //from another 
             this.WellknownPropertyName = wellNamePropertyName;
             _firstValue = value;

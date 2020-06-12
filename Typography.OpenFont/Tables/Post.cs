@@ -51,9 +51,7 @@ namespace Typography.OpenFont.Tables
         public const string _N = "post";
         public override string Name => _N;
         //
-        uint _italicAngle;
-        short _underlinePosition;
-        short _underlineThickness;
+       
 
         //---------------
 
@@ -61,15 +59,17 @@ namespace Typography.OpenFont.Tables
         Dictionary<string, ushort> _glyphIndiceByName;
 
         public int Version { get; private set; }
-
+        public uint ItalicAngle { get; private set; }
+        public short UnderlinePosition { get; private set; }
+        public short UnderlineThickness { get; private set; }
 
         protected override void ReadContentFrom(BinaryReader reader)
         {
             //header
             uint version = reader.ReadUInt32(); //16.16
-            _italicAngle = reader.ReadUInt32();
-            _underlinePosition = reader.ReadInt16();
-            _underlineThickness = reader.ReadInt16();
+            ItalicAngle = reader.ReadUInt32();
+            UnderlinePosition = reader.ReadInt16();
+            UnderlineThickness = reader.ReadInt16();
             uint isFixedPitch = reader.ReadUInt32();
             uint minMemType42 = reader.ReadUInt32();
             uint maxMemType42 = reader.ReadUInt32();

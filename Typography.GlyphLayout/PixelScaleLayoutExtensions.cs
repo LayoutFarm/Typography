@@ -31,7 +31,7 @@ namespace Typography.TextLayout
         /// </summary>
         public float OffsetY { get; private set; }
 
-        public bool AdvanceMoveForward { get { return this.AdvanceX > 0; } }
+        public bool AdvanceMoveForward => this.AdvanceX > 0;
 
 #if DEBUG
         public override string ToString()
@@ -123,7 +123,7 @@ namespace Typography.TextLayout
 
         int _exactX;
         int _exactY;
-
+        bool _rightToLeft;
         ushort _currentGlyphIndex;
         public GlyphPlanSequenceSnapPixelScaleLayout(GlyphPlanSequence glyphPlans, float pxscale)
         {
@@ -134,6 +134,11 @@ namespace Typography.TextLayout
             _end = glyphPlans.startAt + glyphPlans.len;
             _exactX = _exactY = 0;
             _currentGlyphIndex = 0;
+
+            if (_rightToLeft = glyphPlans.IsRightToLeft)
+            {
+                _index = _end - 1;
+            }
         }
         public GlyphPlanSequenceSnapPixelScaleLayout(GlyphPlanSequence glyphPlans, int start, int len, float pxscale)
         {
@@ -144,33 +149,62 @@ namespace Typography.TextLayout
             _end = start + len;
             _exactX = _exactY = 0;
             _currentGlyphIndex = 0;
+
+            if (_rightToLeft = glyphPlans.IsRightToLeft)
+            {
+                _index = _end - 1;
+            }
         }
-        //
         public ushort CurrentGlyphIndex => _currentGlyphIndex;
         public int CurrentIndex => _index;
         //
         public bool Read()
         {
-            if (_index >= _end)
+            if (_rightToLeft)
+            {
+                if (_index < 0)
+                {
+                    return false;
+                }
+
+                //read current 
+                UnscaledGlyphPlan unscale = _seq[_index];
+
+                short scaled_advW = (short)Math.Round(unscale.AdvanceX * _pxscale);
+                short scaled_offsetX = (short)Math.Round(unscale.OffsetX * _pxscale);
+                short scaled_offsetY = (short)Math.Round(unscale.OffsetY * _pxscale);
+
+                _exactX = _accW + scaled_offsetX;
+                _exactY = scaled_offsetY;
+                _accW += scaled_advW;
+
+                _currentGlyphIndex = unscale.glyphIndex;
+                _index--;
+                return true;
+            }
+            else
             {
 
-                return false;
+                if (_index >= _end)
+                {
+                    return false;
+                }
+
+                //read current 
+                UnscaledGlyphPlan unscale = _seq[_index];
+
+                short scaled_advW = (short)Math.Round(unscale.AdvanceX * _pxscale);
+                short scaled_offsetX = (short)Math.Round(unscale.OffsetX * _pxscale);
+                short scaled_offsetY = (short)Math.Round(unscale.OffsetY * _pxscale);
+
+                _exactX = _accW + scaled_offsetX;
+                _exactY = scaled_offsetY;
+                _accW += scaled_advW;
+
+                _currentGlyphIndex = unscale.glyphIndex;
+                _index++;
+                return true;
             }
-
-            //read current 
-            UnscaledGlyphPlan unscale = _seq[_index];
-
-            short scaled_advW = (short)Math.Round(unscale.AdvanceX * _pxscale);
-            short scaled_offsetX = (short)Math.Round(unscale.OffsetX * _pxscale);
-            short scaled_offsetY = (short)Math.Round(unscale.OffsetY * _pxscale);
-
-            _exactX = _accW + scaled_offsetX;
-            _exactY = scaled_offsetY;
-            _accW += scaled_advW;
-
-            _currentGlyphIndex = unscale.glyphIndex;
-            _index++;
-            return true;
         }
         public int AccumWidth => _accW;
         public int ExactX => _exactX;
@@ -257,7 +291,7 @@ namespace Typography.TextLayout
                 for (int i = 0; i < finalGlyphCount; ++i)
                 {
 
-                     //all from pen-pos
+                    //all from pen-pos
                     ushort glyphIndex = glyphPositions.GetGlyph(i,
                         out ushort input_offset,
                         out short offsetX,
