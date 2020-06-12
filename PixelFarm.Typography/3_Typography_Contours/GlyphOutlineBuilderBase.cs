@@ -166,7 +166,22 @@ namespace Typography.Contours
                     break;
             }
         }
+
+        /// <summary>
+        /// build and translate
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <param name="glyphIndex"></param>
+        /// <param name="sizeInPoints"></param>
+        /// <param name="tx"></param>
+        public static void BuildFromGlyphIndex(this GlyphOutlineBuilderBase builder, ushort glyphIndex, float sizeInPoints, IGlyphTranslator tx)
+        {
+            builder.BuildFromGlyphIndex(glyphIndex, sizeInPoints);
+            builder.ReadShapes(tx);
+        }
     }
+
+
     public enum HintTechnique : byte
     {
         /// <summary>

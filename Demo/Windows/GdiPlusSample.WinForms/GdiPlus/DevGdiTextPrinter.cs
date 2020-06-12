@@ -143,10 +143,10 @@ namespace SampleWinForms
             {
                 if (!_glyphMeshCollections.TryGetCacheGlyph(snapToPxScale.CurrentGlyphIndex, out GraphicsPath path))
                 {
+                    _txToGdiPath.Reset(); //clear
+
                     //if not found then create a new one
-                    _currentGlyphPathBuilder.BuildFromGlyphIndex(snapToPxScale.CurrentGlyphIndex, sizeInPoints);
-                    _txToGdiPath.Reset();
-                    _currentGlyphPathBuilder.ReadShapes(_txToGdiPath);
+                    _currentGlyphPathBuilder.BuildFromGlyphIndex(snapToPxScale.CurrentGlyphIndex, sizeInPoints,_txToGdiPath); 
                     path = _txToGdiPath.ResultGraphicsPath;
 
                     //register
