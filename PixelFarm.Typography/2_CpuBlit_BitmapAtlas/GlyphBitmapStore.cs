@@ -36,6 +36,9 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             }
             _dic.Clear();
         }
+
+        public bool IsDelayList { get; set; }
+
     }
 
     class GlyphBitmapStore
@@ -44,7 +47,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
         GlyphBitmapList _bitmapList;
         Dictionary<Typeface, GlyphBitmapList> _cachedBmpList = new Dictionary<Typeface, GlyphBitmapList>();
 
-        public void SetCurrentTypeface(Typeface typeface)
+        public void SetCurrentTypeface(Typeface typeface, bool delayCreateBmp = false)
         {
             _currentTypeface = typeface;
             if (_cachedBmpList.TryGetValue(typeface, out _bitmapList))
@@ -60,25 +63,29 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             _bitmapList = new GlyphBitmapList();
             _cachedBmpList.Add(typeface, _bitmapList);
 
-            int glyphCount = typeface.GlyphCount;
-            using (System.IO.MemoryStream ms = new System.IO.MemoryStream())
+            if (!delayCreateBmp)
             {
-                for (ushort i = 0; i < glyphCount; ++i)
+                _bitmapList.IsDelayList = false;
+                int glyphCount = typeface.GlyphCount;
+                using (System.IO.MemoryStream ms = new System.IO.MemoryStream())
                 {
-                    ms.SetLength(0);
+                    for (ushort i = 0; i < glyphCount; ++i)
+                    {
+                        ms.SetLength(0);
 
-                    Glyph glyph = typeface.GetGlyph(i);
-                    typeface.ReadBitmapContent(glyph, ms);                    
+                        Glyph glyph = typeface.GetGlyph(i);
+                        typeface.ReadBitmapContent(glyph, ms);
 
-                    GlyphBitmap glyphBitmap = new GlyphBitmap();
-                    glyphBitmap.Width = glyph.MaxX - glyph.MinX;
-                    glyphBitmap.Height = glyph.MaxY - glyph.MinY;
+                        GlyphBitmap glyphBitmap = new GlyphBitmap();
+                        glyphBitmap.Width = glyph.MaxX - glyph.MinX;
+                        glyphBitmap.Height = glyph.MaxY - glyph.MinY;
 
-                    //glyphBitmap.Bitmap = ...                     
-                    glyphBitmap.Bitmap = MemBitmap.LoadBitmap(ms);
-                    //MemBitmapExtensions.SaveImage(glyphBitmap.Bitmap, "testGlyphBmp_" + i + ".png");
+                        //glyphBitmap.Bitmap = ...                     
+                        glyphBitmap.Bitmap = MemBitmap.LoadBitmap(ms);
+                        //MemBitmapExtensions.SaveImage(glyphBitmap.Bitmap, "testGlyphBmp_" + i + ".png");
 
-                    _bitmapList.RegisterBitmap(glyph.GlyphIndex, glyphBitmap);
+                        _bitmapList.RegisterBitmap(glyph.GlyphIndex, glyphBitmap);
+                    }
                 }
             }
         }
@@ -86,6 +93,10 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
         {
             _bitmapList.TryGetBitmap(glyphIndex, out GlyphBitmap found);
             return found;
+        }
+        public void SetGlyphBitmap(ushort glyphIndex, GlyphBitmap glyphBmp)
+        {
+            _bitmapList.RegisterBitmap(glyphIndex, glyphBmp);
         }
     }
 
