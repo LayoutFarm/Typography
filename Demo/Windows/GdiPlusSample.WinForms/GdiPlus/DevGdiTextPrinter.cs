@@ -12,7 +12,6 @@ using Typography.Contours;
 namespace SampleWinForms
 {
 
-
     /// <summary>
     /// developer's version, Gdi+ text printer
     /// </summary>
@@ -28,13 +27,13 @@ namespace SampleWinForms
         //for optimization
         GlyphMeshCollection<GraphicsPath> _glyphMeshCollections = new GlyphMeshCollection<GraphicsPath>();
 
-
         public DevGdiTextPrinter()
         {
             FillBackground = true;
             FillColor = Color.Black;
             OutlineColor = Color.Green;
         }
+
         public override GlyphLayout GlyphLayoutMan => _glyphLayout;
         public override Typeface Typeface
         {
@@ -121,7 +120,7 @@ namespace SampleWinForms
             UpdateVisualOutputSettings();
 
             //draw data in glyph plan 
-            //3. render each glyph  
+            //3. render each glyph
 
             float sizeInPoints = this.FontSizeInPoints;
             float pxscale = _currentTypeface.CalculateScaleToPixelFromPointSize(sizeInPoints);
@@ -132,8 +131,6 @@ namespace SampleWinForms
             //this draw a single line text span*** 
             Graphics g = this.TargetGraphics;
 
-            float cx = 0;
-            float cy = 0;
 
             float baseline = y;
 
@@ -146,18 +143,17 @@ namespace SampleWinForms
                     _txToGdiPath.Reset(); //clear
 
                     //if not found then create a new one
-                    _currentGlyphPathBuilder.BuildFromGlyphIndex(snapToPxScale.CurrentGlyphIndex, sizeInPoints,_txToGdiPath); 
+                    _currentGlyphPathBuilder.BuildFromGlyphIndex(snapToPxScale.CurrentGlyphIndex, sizeInPoints, _txToGdiPath);
                     path = _txToGdiPath.ResultGraphicsPath;
 
                     //register
                     _glyphMeshCollections.RegisterCachedGlyph(snapToPxScale.CurrentGlyphIndex, path);
                 }
+
                 //------
                 //then move pen point to the position we want to draw a glyph
-
-
-                cx = (float)Math.Round(snapToPxScale.ExactX + x);
-                cy = (float)Math.Floor(snapToPxScale.ExactY + baseline);
+                float cx = (float)Math.Round(snapToPxScale.ExactX + x);
+                float cy = (float)Math.Floor(snapToPxScale.ExactY + baseline);
 
                 g.TranslateTransform(cx, cy);
 
