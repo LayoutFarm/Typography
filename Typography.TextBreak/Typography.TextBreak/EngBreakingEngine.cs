@@ -107,9 +107,10 @@ namespace Typography.TextBreak
                 for (int i = start; i < lim; ++i)
                 {
                     c1 = input[i];
-                    if (c1 >= 0 && c1 < 256)
+                    if ((c1 >= 0 && c1 < 256) || //eng range
+                        char.IsHighSurrogate(c1) || //surrogate pair
+                        UnicodeRangeFinder.GetUniCodeRangeFor(c1, out startCodePoint, out endCodePoint, out spanBreakInfo)) //or found some wellknown range
                     {
-
                         //break here
                         start = i;
                         return;
