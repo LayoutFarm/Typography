@@ -82,7 +82,7 @@ namespace SampleWinForms
         public bool EnableColorGlyph { get; set; } = true;
         public Color FillColor { get; set; }
         public Color OutlineColor { get; set; }
-        public Graphics TargetGraphics { get; set; }        
+        public Graphics TargetGraphics { get; set; }
 
         UnscaledGlyphPlanList _reusableUnscaledGlyphPlanList = new UnscaledGlyphPlanList();
         public override void DrawString(char[] textBuffer, int startAt, int len, float x, float y)
@@ -190,7 +190,7 @@ namespace SampleWinForms
                         }
                         //and then we reset back ***
                         g.TranslateTransform(-cx, -cy);
-                    } 
+                    }
                 }
                 else
                 {
@@ -206,23 +206,32 @@ namespace SampleWinForms
                         _glyphMeshCollections.RegisterCachedGlyph(snapToPxScale.CurrentGlyphIndex, path);
                     }
 
-                    //------
-                    //then move pen point to the position we want to draw a glyph
-                    float cx = (float)Math.Round(snapToPxScale.ExactX + x);
-                    float cy = (float)Math.Floor(snapToPxScale.ExactY + baseline);
 
-                    g.TranslateTransform(cx, cy);
 
-                    if (FillBackground)
+                    if (path != null)
                     {
-                        g.FillPath(_fillBrush, path);
+                        //------
+                        //then move pen point to the position we want to draw a glyph
+                        float cx = (float)Math.Round(snapToPxScale.ExactX + x);
+                        float cy = (float)Math.Floor(snapToPxScale.ExactY + baseline);
+
+                        g.TranslateTransform(cx, cy);
+
+                        if (FillBackground)
+                        {
+                            g.FillPath(_fillBrush, path);
+                        }
+                        if (DrawOutline)
+                        {
+                            g.DrawPath(_outlinePen, path);
+                        }
+                        //and then we reset back ***
+                        g.TranslateTransform(-cx, -cy);
                     }
-                    if (DrawOutline)
+                    else
                     {
-                        g.DrawPath(_outlinePen, path);
+
                     }
-                    //and then we reset back ***
-                    g.TranslateTransform(-cx, -cy);
                 }
 
             }
