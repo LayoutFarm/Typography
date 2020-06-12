@@ -76,15 +76,6 @@ namespace Typography.OpenFont
         void CloseContour();
     }
 
-
-    public interface IMultiLayerGlyphTranslator : IGlyphTranslator
-    {
-        void HasColorInfo(int nsubLayer);//if 0 => no color info
-        void BeginSubGlyph(ushort glyphIndex);
-        void EndSubGlyph(ushort glyphIndex);
-        void SetFillColor(byte r, byte g, byte b, byte a);
-    }
-
     public static class IGlyphReaderExtensions
     {
         //for TrueType Font
