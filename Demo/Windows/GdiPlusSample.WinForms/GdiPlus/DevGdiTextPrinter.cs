@@ -2,16 +2,14 @@
 using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.Collections.Generic;
-//
 using Typography.OpenFont;
+using Typography.OpenFont.Tables;
 using Typography.TextLayout;
 using Typography.Contours;
 
 
 namespace SampleWinForms
 {
-
 
     /// <summary>
     /// developer's version, Gdi+ text printer
@@ -28,13 +26,13 @@ namespace SampleWinForms
         //for optimization
         GlyphMeshCollection<GraphicsPath> _glyphMeshCollections = new GlyphMeshCollection<GraphicsPath>();
 
-
         public DevGdiTextPrinter()
         {
             FillBackground = true;
             FillColor = Color.Black;
             OutlineColor = Color.Green;
         }
+
         public override GlyphLayout GlyphLayoutMan => _glyphLayout;
         public override Typeface Typeface
         {
@@ -79,10 +77,10 @@ namespace SampleWinForms
             }
         }
 
+        public bool EnableColorGlyph { get; set; } = true;
         public Color FillColor { get; set; }
         public Color OutlineColor { get; set; }
         public Graphics TargetGraphics { get; set; }
-
 
         UnscaledGlyphPlanList _reusableUnscaledGlyphPlanList = new UnscaledGlyphPlanList();
         public override void DrawString(char[] textBuffer, int startAt, int len, float x, float y)
@@ -116,63 +114,128 @@ namespace SampleWinForms
             _outlinePen.Color = this.OutlineColor;
         }
 
+        GraphicsPath GetExistingOrCreateGraphicsPath(ushort glyphIndex)
+        {
+            if (!_glyphMeshCollections.TryGetCacheGlyph(glyphIndex, out GraphicsPath path))
+            {
+                _txToGdiPath.Reset(); //clear
+
+                //if not found then create a new one
+                _currentGlyphPathBuilder.BuildFromGlyphIndex(glyphIndex, this.FontSizeInPoints, _txToGdiPath);
+                path = _txToGdiPath.ResultGraphicsPath;
+
+                //register
+                _glyphMeshCollections.RegisterCachedGlyph(glyphIndex, path);
+            }
+
+            return path;
+        }
+
         public override void DrawFromGlyphPlans(GlyphPlanSequence seq, int startAt, int len, float x, float y)
         {
             UpdateVisualOutputSettings();
 
             //draw data in glyph plan 
-            //3. render each glyph  
+            //3. render each glyph
 
             float sizeInPoints = this.FontSizeInPoints;
             float pxscale = _currentTypeface.CalculateScaleToPixelFromPointSize(sizeInPoints);
-            //
-            _glyphMeshCollections.SetCacheInfo(this.Typeface, sizeInPoints, this.HintTechnique);
+
+
+            Typeface typeface = this.Typeface;
+            _glyphMeshCollections.SetCacheInfo(typeface, sizeInPoints, this.HintTechnique);
 
 
             //this draw a single line text span*** 
             Graphics g = this.TargetGraphics;
-
-            float cx = 0;
-            float cy = 0;
-
             float baseline = y;
-
             var snapToPxScale = new GlyphPlanSequenceSnapPixelScaleLayout(seq, startAt, len, pxscale);
+
+
+            COLR colrTable = typeface.COLRTable;
+            CPAL cpalTable = typeface.CPALTable;
+
+            bool canUseColorGlyph = EnableColorGlyph && colrTable != null && cpalTable != null;
 
             while (snapToPxScale.Read())
             {
-                if (!_glyphMeshCollections.TryGetCacheGlyph(snapToPxScale.CurrentGlyphIndex, out GraphicsPath path))
+                ushort glyphIndex = snapToPxScale.CurrentGlyphIndex;
+
+                if (canUseColorGlyph && colrTable.LayerIndices.TryGetValue(glyphIndex, out ushort colorLayerStart))
                 {
-                    //if not found then create a new one
-                    _currentGlyphPathBuilder.BuildFromGlyphIndex(snapToPxScale.CurrentGlyphIndex, sizeInPoints);
-                    _txToGdiPath.Reset();
-                    _currentGlyphPathBuilder.ReadShapes(_txToGdiPath);
-                    path = _txToGdiPath.ResultGraphicsPath;
 
-                    //register
-                    _glyphMeshCollections.RegisterCachedGlyph(snapToPxScale.CurrentGlyphIndex, path);
+                    ushort colorLayerCount = colrTable.LayerCounts[glyphIndex];
+
+                    for (int c = colorLayerStart; c < colorLayerStart + colorLayerCount; ++c)
+                    {
+
+                        GraphicsPath path = GetExistingOrCreateGraphicsPath(colrTable.GlyphLayers[c]);
+                        if (path == null)
+                        {
+                            //???
+#if DEBUG
+                            System.Diagnostics.Debug.WriteLine("gdi_printer: no path?");
+#endif
+                            continue;
+                        }
+
+                        //------
+                        //then move pen point to the position we want to draw a glyph
+                        float cx = (float)Math.Round(snapToPxScale.ExactX + x);
+                        float cy = (float)Math.Floor(snapToPxScale.ExactY + baseline);
+
+                        int palette = 0; // FIXME: assume palette 0 for now 
+                        cpalTable.GetColor(
+                            cpalTable.Palettes[palette] + colrTable.GlyphPalettes[c], //index
+                            out byte red, out byte green, out byte blue, out byte alpha);
+
+                        g.TranslateTransform(cx, cy);
+
+                        _fillBrush.Color = Color.FromArgb(red, green, blue);//***
+                        if (FillBackground)
+                        {
+                            g.FillPath(_fillBrush, path);
+                        }
+                        if (DrawOutline)
+                        {
+                            g.DrawPath(_outlinePen, path);
+                        }
+                        //and then we reset back ***
+                        g.TranslateTransform(-cx, -cy);
+                    }
                 }
-                //------
-                //then move pen point to the position we want to draw a glyph
-
-
-                cx = (float)Math.Round(snapToPxScale.ExactX + x);
-                cy = (float)Math.Floor(snapToPxScale.ExactY + baseline);
-
-                g.TranslateTransform(cx, cy);
-
-                if (FillBackground)
+                else
                 {
-                    g.FillPath(_fillBrush, path);
+                    GraphicsPath path = GetExistingOrCreateGraphicsPath(glyphIndex);
+
+                    if (path == null)
+                    {
+                        //???
+#if DEBUG
+                        System.Diagnostics.Debug.WriteLine("gdi_printer: no path?");
+#endif
+                        continue;
+                    }
+
+                    //------
+                    //then move pen point to the position we want to draw a glyph
+                    float cx = (float)Math.Round(snapToPxScale.ExactX + x);
+                    float cy = (float)Math.Floor(snapToPxScale.ExactY + baseline);
+
+                    g.TranslateTransform(cx, cy);
+
+                    if (FillBackground)
+                    {
+                        g.FillPath(_fillBrush, path);
+                    }
+                    if (DrawOutline)
+                    {
+                        g.DrawPath(_outlinePen, path);
+                    }
+                    //and then we reset back ***
+                    g.TranslateTransform(-cx, -cy);
                 }
-                if (DrawOutline)
-                {
-                    g.DrawPath(_outlinePen, path);
-                }
-                //and then we reset back ***
-                g.TranslateTransform(-cx, -cy);
             }
-
         }
 
     }

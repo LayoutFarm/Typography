@@ -37,6 +37,8 @@
             this.cmdBidiTest = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
             this.chkUseUnicodeRangeBreaker = new System.Windows.Forms.CheckBox();
+            this.cmbSurrogatePairBreakOptions = new System.Windows.Forms.ComboBox();
+            this.label1 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // listBox1
@@ -125,11 +127,30 @@
             this.chkUseUnicodeRangeBreaker.Text = "Use UnicodeRangeBreaker";
             this.chkUseUnicodeRangeBreaker.UseVisualStyleBackColor = true;
             // 
+            // cmbSurrogatePairBreakOptions
+            // 
+            this.cmbSurrogatePairBreakOptions.FormattingEnabled = true;
+            this.cmbSurrogatePairBreakOptions.Location = new System.Drawing.Point(178, 44);
+            this.cmbSurrogatePairBreakOptions.Name = "cmbSurrogatePairBreakOptions";
+            this.cmbSurrogatePairBreakOptions.Size = new System.Drawing.Size(248, 21);
+            this.cmbSurrogatePairBreakOptions.TabIndex = 10;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(178, 25);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(135, 13);
+            this.label1.TabIndex = 11;
+            this.label1.Text = "SurrogatePairBreakOptions";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1100, 507);
+            this.Controls.Add(this.label1);
+            this.Controls.Add(this.cmbSurrogatePairBreakOptions);
             this.Controls.Add(this.chkUseUnicodeRangeBreaker);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.cmdBidiTest);
@@ -158,6 +179,8 @@
         private System.Windows.Forms.Button cmdBidiTest;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.CheckBox chkUseUnicodeRangeBreaker;
+        private System.Windows.Forms.ComboBox cmbSurrogatePairBreakOptions;
+        private System.Windows.Forms.Label label1;
     }
 }
 

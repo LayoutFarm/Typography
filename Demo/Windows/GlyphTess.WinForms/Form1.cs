@@ -12,6 +12,7 @@ using DrawingGL;
 using DrawingGL.Text;
 //
 using Tesselate;
+using Typography.Contours;
 
 namespace Test_WinForm_TessGlyph
 {
@@ -81,13 +82,13 @@ namespace Test_WinForm_TessGlyph
                 OpenFontReader reader = new OpenFontReader();
                 Typeface typeface = reader.Read(fs);
 
-                var builder = new Typography.Contours.GlyphOutlineBuilder(typeface);
-                builder.BuildFromGlyphIndex(typeface.GetGlyphIndex(selectedChar), 300);
 
-                var txToPath = new GlyphTranslatorToPath();
                 var writablePath = new WritablePath();
+                var txToPath = new GlyphTranslatorToPath(); //translator
                 txToPath.SetOutput(writablePath);
-                builder.ReadShapes(txToPath);
+
+                var builder = new Typography.Contours.GlyphOutlineBuilder(typeface);
+                builder.BuildFromGlyphIndex(typeface.GetGlyphIndex(selectedChar), 300, txToPath);
 
                 //------
                 //

@@ -151,10 +151,9 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                         //create picture with unscaled version set scale=-1
                         //(we will create glyph contours and analyze them)
 
-                        outlineBuilder.BuildFromGlyphIndex(gindex, -1);
-
                         var glyphToVxs = new GlyphTranslatorToVxs();
-                        outlineBuilder.ReadShapes(glyphToVxs);
+                        outlineBuilder.BuildFromGlyphIndex(gindex, -1, glyphToVxs);
+
                         using (Tools.BorrowVxs(out var vxs))
                         {
                             glyphToVxs.WriteUnFlattenOutput(vxs, pxscale);
@@ -177,10 +176,9 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                         ushort gindex = glyphIndices[i];
                         //create picture with unscaled version set scale=-1
                         //(we will create glyph contours and analyze them)
-                        outlineBuilder.BuildFromGlyphIndex(gindex, -1);
 
                         var glyphToVxs = new GlyphTranslatorToVxs();
-                        outlineBuilder.ReadShapes(glyphToVxs);
+                        outlineBuilder.BuildFromGlyphIndex(gindex, -1, glyphToVxs);
 
                         using (Tools.BorrowVxs(out var vxs))
                         {

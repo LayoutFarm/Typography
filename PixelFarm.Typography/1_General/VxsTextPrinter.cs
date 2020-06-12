@@ -9,6 +9,8 @@ using Typography.OpenFont.Extensions;
 using Typography.TextLayout;
 using Typography.TextBreak;
 using Typography.FontManagement;
+using PixelFarm.CpuBlit;
+using PixelFarm.CpuBlit.VertexProcessing;
 
 namespace PixelFarm.Drawing
 {
@@ -203,7 +205,6 @@ namespace PixelFarm.Drawing
             _textServices.CurrentScriptLang = this.ScriptLang;
         }
 
-
         public void MeasureString(char[] buffer, int startAt, int len, out int w, out int h)
         {
             UpdateGlyphLayoutSettings();
@@ -258,8 +259,16 @@ namespace PixelFarm.Drawing
             _painter.SetOrigin(ox, oy);
         }
 
+        public int LatestAccumulateWidth { get; private set; }
+
+#if DEBUG
+        int dbugExportCount = 0;
+#endif
+
         public override void DrawFromGlyphPlans(GlyphPlanSequence seq, int startAt, int len, float left, float top)
         {
+            LatestAccumulateWidth = 0;//reset
+
             if (_currentTypeface == null) return;
 
             float baseLine = top;
@@ -282,11 +291,6 @@ namespace PixelFarm.Drawing
             //4. render each glyph 
             float ox = _painter.OriginX;
             float oy = _painter.OriginY;
-
-
-            Typography.OpenFont.Tables.COLR colrTable = _currentTypeface.COLRTable;
-            Typography.OpenFont.Tables.CPAL cpalTable = _currentTypeface.CPALTable;
-            bool hasColorGlyphs = (colrTable != null) && (cpalTable != null);
 
             //--------------------------------------------------- 
             _glyphMeshStore.SetHintTechnique(this.HintTechnique);
@@ -317,6 +321,7 @@ namespace PixelFarm.Drawing
                         _painter.DrawImage(glyphBmp.Bitmap);
                     }
                 }
+                LatestAccumulateWidth = snapToPx.AccumWidth;
             }
             else if (_currentTypeface.IsBitmapFont)
             {
@@ -343,11 +348,17 @@ namespace PixelFarm.Drawing
                         _painter.DrawImage(glyphBmp.Bitmap);
                     }
                 }
+                LatestAccumulateWidth = snapToPx.AccumWidth;
             }
             else
             {
-                if (!hasColorGlyphs)
+                Typography.OpenFont.Tables.COLR colrTable = _currentTypeface.COLRTable;
+                Typography.OpenFont.Tables.CPAL cpalTable = _currentTypeface.CPALTable;
+
+                if (colrTable == null || cpalTable == null)
                 {
+                    //NO color information, 
+
                     bool savedUseLcdMode = _painter.UseLcdEffectSubPixelRendering; //save,restore later
                     RenderQuality savedRederQuality = _painter.RenderQuality;
                     _painter.RenderQuality = RenderQuality.HighQuality;
@@ -367,6 +378,7 @@ namespace PixelFarm.Drawing
                         _painter.Fill(_glyphMeshStore.GetGlyphMesh(snapToPx.CurrentGlyphIndex));
                     }
 
+                    LatestAccumulateWidth = snapToPx.AccumWidth;
                     //restore
                     _painter.RenderQuality = savedRederQuality;
                     _painter.UseLcdEffectSubPixelRendering = savedUseLcdMode;
@@ -386,28 +398,113 @@ namespace PixelFarm.Drawing
                     }
 
                     var snapToPx = new GlyphPlanSequenceSnapPixelScaleLayout(seq, startAt, len, scale);
+
+                    float maxAccumWidth = 0;
                     while (snapToPx.Read())
                     {
+                        float start_pos_x = (float)Math.Round(left + snapToPx.ExactX);
 
-                        _painter.SetOrigin((float)Math.Round(left + snapToPx.ExactX), (float)Math.Floor(baseLine + snapToPx.ExactY));
+                        _painter.SetOrigin(start_pos_x, (float)Math.Floor(baseLine + snapToPx.ExactY));
 
                         if (colrTable.LayerIndices.TryGetValue(snapToPx.CurrentGlyphIndex, out ushort colorLayerStart))
                         {
-                            //TODO: optimize this                        
-                            //we found color info for this glyph 
-                            ushort colorLayerCount = colrTable.LayerCounts[snapToPx.CurrentGlyphIndex];
-                            byte r, g, b, a;
-                            for (int c = colorLayerStart; c < colorLayerStart + colorLayerCount; ++c)
+                            //check if we have a bitmap cache for this glyph or not
+                            //
+                            if (EnableColorGlyphBitmapCache)
                             {
-                                ushort gIndex = colrTable.GlyphLayers[c];
+                                _glyphBitmapStore.SetCurrentTypeface(_currentTypeface, true);
+                                GlyphBitmap glyphBmp = _glyphBitmapStore.GetGlyphBitmap(snapToPx.CurrentGlyphIndex);
+                                if (glyphBmp == null)
+                                {
+                                    //not found=> create a newone
+                                    Q1RectD totalBounds = Q1RectD.ZeroIntersection();
+                                    {
+                                        //calculate bounds of this glyph
+                                        ushort colorLayerCount = colrTable.LayerCounts[snapToPx.CurrentGlyphIndex];
+                                        for (int c = colorLayerStart; c < colorLayerStart + colorLayerCount; ++c)
+                                        {
+                                            BoundingRect.GetBoundingRect(_glyphMeshStore.GetGlyphMesh(colrTable.GlyphLayers[c]), ref totalBounds);
+                                        }
+                                    }
+
+                                    //dbugExportCount++;                                     
+
+                                    var memBmp = new MemBitmap((int)Math.Round(totalBounds.Width), (int)Math.Round(totalBounds.Height));//???
+                                    int offset_x = 0;
+                                    int offset_y = 0;
+                                    using (Tools.BorrowAggPainter(memBmp, out AggPainter painter))
+                                    {
+                                        painter.Clear(Color.Transparent);
+                                        painter.SetOrigin(0, 0);
+
+                                        offset_x = -(int)(totalBounds.Left);
+                                        offset_y = -(int)(totalBounds.Bottom);
+
+                                        ushort colorLayerCount = colrTable.LayerCounts[snapToPx.CurrentGlyphIndex];
+                                        int palette = 0; // FIXME: assume palette 0 for now 
+                                        for (int c = colorLayerStart; c < colorLayerStart + colorLayerCount; ++c)
+                                        {
+                                            cpalTable.GetColor(
+                                                cpalTable.Palettes[palette] + colrTable.GlyphPalettes[c], //index
+                                                 out byte r, out byte g, out byte b, out byte a);
+
+                                            ushort gIndex = colrTable.GlyphLayers[c];
+                                            VertexStore vxs = _glyphMeshStore.GetGlyphMesh(gIndex);
+                                            using (Tools.BorrowVxs(out var v1))
+                                            {
+                                                vxs.TranslateToNewVxs(offset_x, offset_y, v1);
+                                                painter.FillColor = new Color(r, g, b);//? a component
+                                                painter.Fill(v1);
+                                            }
+                                        }
+                                        //find ex
+#if DEBUG
+                                        //memBmp.SaveImage("a0x" + (dbugExportCount) + ".png");
+#endif
+                                    }
+
+                                    _glyphBitmapStore.SetGlyphBitmap(snapToPx.CurrentGlyphIndex,
+                                        glyphBmp = new GlyphBitmap
+                                        {
+                                            Bitmap = memBmp,
+                                            Width = memBmp.Width,
+                                            Height = memBmp.Height,
+                                            ImageStartX = -offset_x,//offset back
+                                            ImageStartY = -offset_y //offset back
+                                        });
+
+                                }
+
+                                _painter.DrawImage(glyphBmp.Bitmap, glyphBmp.ImageStartX, glyphBmp.ImageStartY);
+
+
+                                if (start_pos_x + glyphBmp.ImageStartX + glyphBmp.Width > maxAccumWidth)
+                                {
+                                    maxAccumWidth = start_pos_x + glyphBmp.ImageStartX + glyphBmp.Width;
+                                }
+
+                                LatestAccumulateWidth = (int)maxAccumWidth;
+                            }
+                            else
+                            {
+
+                                //TODO: optimize this                        
+                                //we found color info for this glyph 
+                                ushort colorLayerCount = colrTable.LayerCounts[snapToPx.CurrentGlyphIndex];
 
                                 int palette = 0; // FIXME: assume palette 0 for now 
-                                cpalTable.GetColor(
-                                    cpalTable.Palettes[palette] + colrTable.GlyphPalettes[c], //index
-                                    out r, out g, out b, out a);
-                                //-----------  
-                                _painter.FillColor = new Color(r, g, b);//? a component
-                                _painter.Fill(_glyphMeshStore.GetGlyphMesh(gIndex));
+                                for (int c = colorLayerStart; c < colorLayerStart + colorLayerCount; ++c)
+                                {
+                                    cpalTable.GetColor(
+                                        cpalTable.Palettes[palette] + colrTable.GlyphPalettes[c], //index
+                                        out byte r, out byte g, out byte b, out byte a);
+
+                                    _painter.FillColor = new Color(r, g, b);//? a component
+                                    ushort gIndex = colrTable.GlyphLayers[c];
+                                    _painter.Fill(_glyphMeshStore.GetGlyphMesh(gIndex));
+                                }
+
+                                LatestAccumulateWidth = snapToPx.AccumWidth;
                             }
                         }
                         else
@@ -418,6 +515,7 @@ namespace PixelFarm.Drawing
                             //if we have create a vxs we can cache it for later use?
                             //----------------------------------- 
                             _painter.Fill(_glyphMeshStore.GetGlyphMesh(snapToPx.CurrentGlyphIndex));
+                            LatestAccumulateWidth = snapToPx.AccumWidth;
                         }
                     }
 
@@ -428,16 +526,14 @@ namespace PixelFarm.Drawing
             _painter.SetOrigin(ox, oy);
         }
 
+        bool EnableColorGlyphBitmapCache { get; set; } = true;
 
-        public void DrawString(char[] text, int startAt, int len, double x, double y)
+
+
+        public void DrawString(char[] textBuffer, int startAt, int len, double x, double y)
         {
-            DrawString(text, startAt, len, (float)x, (float)y);
+            DrawString(textBuffer, startAt, len, (float)x, (float)y);
         }
-
-
-
-
-
 
         public override void DrawString(char[] textBuffer, int startAt, int len, float x, float y)
         {
@@ -451,6 +547,7 @@ namespace PixelFarm.Drawing
 #endif 
 
             UpdateGlyphLayoutSettings();
+
             //unscale layout, with design unit scale
             var buffSpan = new TextBufferSpan(textBuffer, startAt, len);
 
@@ -469,8 +566,7 @@ namespace PixelFarm.Drawing
                 {
                     int count = segments.Count;
 
-                    _tmpGlyphPlanSeqs.Clear();
-                    _tmpTypefaces.Clear();
+                    ClearTempFormattedGlyphPlanSeq();
 
                     bool needRightToLeftArr = false;
 
@@ -482,7 +578,6 @@ namespace PixelFarm.Drawing
                         //
                         ILineSegment line_seg = segments[i];
                         SpanBreakInfo spBreakInfo = (SpanBreakInfo)line_seg.SpanBreakInfo;
-
                         TextBufferSpan buff = new TextBufferSpan(textBuffer, line_seg.StartAt, line_seg.Length);
                         if (spBreakInfo.RightToLeft)
                         {
@@ -494,8 +589,31 @@ namespace PixelFarm.Drawing
                         //so we need to ensure that we get a proper typeface,
                         //if not => alternative typeface
 
+                        ushort glyphIndex = 0;
                         char sample_char = textBuffer[line_seg.StartAt];
-                        ushort glyphIndex = curTypeface.GetGlyphIndex(sample_char);
+                        bool contains_surrogate_pair = false;
+                        if (line_seg.Length > 1)
+                        {
+                            //high serogate pair or not
+                            int codepoint = sample_char;
+                            if (sample_char >= 0xd800 && sample_char <= 0xdbff) //high surrogate 
+                            {
+                                char nextCh = textBuffer[line_seg.StartAt + 1];
+                                if (nextCh >= 0xdc00 && nextCh <= 0xdfff) //low surrogate
+                                {
+                                    codepoint = char.ConvertToUtf32(sample_char, nextCh);
+                                    contains_surrogate_pair = true;
+                                }
+                            }
+
+                            glyphIndex = curTypeface.GetGlyphIndex(codepoint);
+                        }
+                        else
+                        {
+                            glyphIndex = curTypeface.GetGlyphIndex(sample_char);
+                        }
+
+
                         if (glyphIndex == 0)
                         {
                             //not found then => find other typeface                    
@@ -509,11 +627,10 @@ namespace PixelFarm.Drawing
                             if (_textServices.TryGetAlternativeTypefaceFromChar(sample_char, AlternativeTypefaceSelector, out Typeface alternative))
                             {
                                 curTypeface = alternative;
-                                _tmpTypefaces.Add(alternative);
+
                             }
                             else
                             {
-                                _tmpTypefaces.Add(curTypeface);
 #if DEBUG
                                 if (sample_char >= 0 && sample_char < 255)
                                 {
@@ -523,20 +640,22 @@ namespace PixelFarm.Drawing
 #endif
                             }
                         }
-                        else
-                        {
-                            _tmpTypefaces.Add(curTypeface);
-                        }
+
 
                         _textServices.CurrentScriptLang = new ScriptLang(spBreakInfo.ScriptTag, spBreakInfo.LangTag);
+                        GlyphPlanSequence seq = _textServices.CreateGlyphPlanSeq(buff, curTypeface, FontSizeInPoints);
+                        seq.IsRightToLeft = spBreakInfo.RightToLeft;
 
-                        GlyphPlanSequence glyphPlanSeq = _textServices.CreateGlyphPlanSeq(buff, curTypeface, FontSizeInPoints);
-                        glyphPlanSeq.IsRightToLeft = spBreakInfo.RightToLeft;
+                        FormattedGlyphPlanSeq formattedGlyphPlanSeq = GetFreeFmtGlyphPlanSeqs();
+                        formattedGlyphPlanSeq.seq = seq;
+                        formattedGlyphPlanSeq.Typeface = curTypeface;
+                        formattedGlyphPlanSeq.ContainsSurrogatePair = contains_surrogate_pair;
 
-                        _tmpGlyphPlanSeqs.Add(glyphPlanSeq);
-
+                        _tmpGlyphPlanSeqs.Add(formattedGlyphPlanSeq);
 
                         curTypeface = defaultTypeface;//switch back to default
+
+                        //restore latest script lang?
                     }
 
                     if (needRightToLeftArr)
@@ -544,35 +663,74 @@ namespace PixelFarm.Drawing
                         //special arr left-to-right
                         for (int i = count - 1; i >= 0; --i)
                         {
-                            GlyphPlanSequence glyphPlanSeq = _tmpGlyphPlanSeqs[i];
+                            FormattedGlyphPlanSeq formattedGlyphPlanSeq = _tmpGlyphPlanSeqs[i];
 
-                            Typeface = _tmpTypefaces[i];
+                            Typeface = formattedGlyphPlanSeq.Typeface;
 
-                            DrawFromGlyphPlans(glyphPlanSeq, xpos, y);
-                            xpos += (glyphPlanSeq.CalculateWidth() * _currentFontSizePxScale);
+                            DrawFromGlyphPlans(formattedGlyphPlanSeq.seq, xpos, y);
+
+
+                            //xpos += (glyphPlanSeq.CalculateWidth() * _currentFontSizePxScale);
+                            xpos += LatestAccumulateWidth;
                         }
                     }
                     else
                     {
                         for (int i = 0; i < count; ++i)
                         {
-                            GlyphPlanSequence glyphPlanSeq = _tmpGlyphPlanSeqs[i];
+                            FormattedGlyphPlanSeq formattedGlyphPlanSeq = _tmpGlyphPlanSeqs[i];
 
-                            Typeface = _tmpTypefaces[i];
+                            //change typeface                            
+                            Typeface = formattedGlyphPlanSeq.Typeface;
+                            //update pxscale size                             
+                            _currentFontSizePxScale = Typeface.CalculateScaleToPixelFromPointSize(FontSizeInPoints);
 
-                            DrawFromGlyphPlans(glyphPlanSeq, xpos, y);
-                            xpos += (glyphPlanSeq.CalculateWidth() * _currentFontSizePxScale);
+                            DrawFromGlyphPlans(formattedGlyphPlanSeq.seq, xpos, y);
+                            xpos += LatestAccumulateWidth;
+                             
                         }
                     }
+
                     Typeface = defaultTypeface;
-                    _tmpGlyphPlanSeqs.Clear();
-                    _tmpTypefaces.Clear();
+                    ClearTempFormattedGlyphPlanSeq();
                 }
             }
-
         }
 
-        List<GlyphPlanSequence> _tmpGlyphPlanSeqs = new List<GlyphPlanSequence>();
-        List<Typeface> _tmpTypefaces = new List<Typeface>();
+
+        class FormattedGlyphPlanSeq
+        {
+            static readonly GlyphPlanSequence s_EmptyGlypgPlanSeq = new GlyphPlanSequence();
+
+            public GlyphPlanSequence seq;
+
+            public Typeface Typeface;
+            public bool ContainsSurrogatePair;
+            public bool IsEmpty() => Typeface == null;
+            public void Reset()
+            {
+
+                seq = s_EmptyGlypgPlanSeq;
+                Typeface = null;
+            }
+        }
+
+        void ClearTempFormattedGlyphPlanSeq()
+        {
+            for (int i = _tmpGlyphPlanSeqs.Count - 1; i >= 0; --i)
+            {
+                ReleaseFmtGlyphPlanSeqs(_tmpGlyphPlanSeqs[i]);
+            }
+            _tmpGlyphPlanSeqs.Clear();
+        }
+
+        Queue<FormattedGlyphPlanSeq> _pool = new Queue<FormattedGlyphPlanSeq>();
+        List<FormattedGlyphPlanSeq> _tmpGlyphPlanSeqs = new List<FormattedGlyphPlanSeq>();
+        FormattedGlyphPlanSeq GetFreeFmtGlyphPlanSeqs() => (_pool.Count > 0) ? _pool.Dequeue() : new FormattedGlyphPlanSeq();
+        void ReleaseFmtGlyphPlanSeqs(FormattedGlyphPlanSeq seq)
+        {
+            seq.Reset();
+            _pool.Enqueue(seq);
+        }
     }
 }

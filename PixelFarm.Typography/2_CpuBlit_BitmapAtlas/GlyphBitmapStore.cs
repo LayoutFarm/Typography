@@ -26,25 +26,32 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
         }
         public void Dispose()
         {
-            foreach (GlyphBitmap glyphBmp in _dic.Values)
+            if (_dic != null)
             {
-                if (glyphBmp.Bitmap != null)
+                foreach (GlyphBitmap glyphBmp in _dic.Values)
                 {
-                    glyphBmp.Bitmap.Dispose();
-                    glyphBmp.Bitmap = null;
+                    if (glyphBmp.Bitmap != null)
+                    {
+                        glyphBmp.Bitmap.Dispose();
+                        glyphBmp.Bitmap = null;
+                    }
                 }
+                _dic.Clear();
+                _dic = null;
             }
-            _dic.Clear();
         }
+
+        public bool IsDelayList { get; set; }
+
     }
 
-    class GlyphBitmapStore
+    class GlyphBitmapStore : IDisposable
     {
         Typeface _currentTypeface;
         GlyphBitmapList _bitmapList;
         Dictionary<Typeface, GlyphBitmapList> _cachedBmpList = new Dictionary<Typeface, GlyphBitmapList>();
 
-        public void SetCurrentTypeface(Typeface typeface)
+        public void SetCurrentTypeface(Typeface typeface, bool delayCreateBmp = false)
         {
             _currentTypeface = typeface;
             if (_cachedBmpList.TryGetValue(typeface, out _bitmapList))
@@ -60,25 +67,29 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             _bitmapList = new GlyphBitmapList();
             _cachedBmpList.Add(typeface, _bitmapList);
 
-            int glyphCount = typeface.GlyphCount;
-            using (System.IO.MemoryStream ms = new System.IO.MemoryStream())
+            if (!delayCreateBmp)
             {
-                for (ushort i = 0; i < glyphCount; ++i)
+                _bitmapList.IsDelayList = false;
+                int glyphCount = typeface.GlyphCount;
+                using (System.IO.MemoryStream ms = new System.IO.MemoryStream())
                 {
-                    ms.SetLength(0);
+                    for (ushort i = 0; i < glyphCount; ++i)
+                    {
+                        ms.SetLength(0);
 
-                    Glyph glyph = typeface.GetGlyph(i);
-                    typeface.ReadBitmapContent(glyph, ms);                    
+                        Glyph glyph = typeface.GetGlyph(i);
+                        typeface.ReadBitmapContent(glyph, ms);
 
-                    GlyphBitmap glyphBitmap = new GlyphBitmap();
-                    glyphBitmap.Width = glyph.MaxX - glyph.MinX;
-                    glyphBitmap.Height = glyph.MaxY - glyph.MinY;
+                        GlyphBitmap glyphBitmap = new GlyphBitmap();
+                        glyphBitmap.Width = glyph.MaxX - glyph.MinX;
+                        glyphBitmap.Height = glyph.MaxY - glyph.MinY;
 
-                    //glyphBitmap.Bitmap = ...                     
-                    glyphBitmap.Bitmap = MemBitmap.LoadBitmap(ms);
-                    //MemBitmapExtensions.SaveImage(glyphBitmap.Bitmap, "testGlyphBmp_" + i + ".png");
+                        //glyphBitmap.Bitmap = ...                     
+                        glyphBitmap.Bitmap = MemBitmap.LoadBitmap(ms);
+                        //MemBitmapExtensions.SaveImage(glyphBitmap.Bitmap, "testGlyphBmp_" + i + ".png");
 
-                    _bitmapList.RegisterBitmap(glyph.GlyphIndex, glyphBitmap);
+                        _bitmapList.RegisterBitmap(glyph.GlyphIndex, glyphBitmap);
+                    }
                 }
             }
         }
@@ -86,6 +97,35 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
         {
             _bitmapList.TryGetBitmap(glyphIndex, out GlyphBitmap found);
             return found;
+        }
+        public void SetGlyphBitmap(ushort glyphIndex, GlyphBitmap glyphBmp)
+        {
+            _bitmapList.RegisterBitmap(glyphIndex, glyphBmp);
+        }
+
+
+        public void Clear()
+        {
+            if (_currentTypeface == null)
+            {
+                return;
+            }
+
+            _currentTypeface = null;
+            foreach (GlyphBitmapList bmplist in _cachedBmpList.Values)
+            {
+                bmplist.Dispose();
+            }
+            _cachedBmpList.Clear();
+            _cachedBmpList = null;
+            //
+            _bitmapList?.Dispose();
+            _bitmapList = null;
+            //
+        }
+        public void Dispose()
+        {
+            Clear();
         }
     }
 

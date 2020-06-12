@@ -13,7 +13,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         public double Left, Bottom, Right, Top;
         public static Q1RectD ZeroIntersection() => new Q1RectD(double.MaxValue, double.MaxValue, double.MinValue, double.MinValue);
 
-         
+
         public Q1RectD(double left, double bottom, double right, double top)
         {
             this.Left = left;
@@ -21,7 +21,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             this.Right = right;
             this.Top = top;
         }
- 
+
         public static Q1RectD CreateFromLTWH(double left, double top, double width, double height)
         {
             return new Q1RectD(left, top + height, left + width, top);
@@ -31,7 +31,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         public double Width => Right - Left;
         // This function assumes the rect is normalized
         public double Height => Top - Bottom;
-       
+
         ////
         public bool Contains(double x, double y) => (x >= Left && x <= Right && y >= Bottom && y <= Top);
         ////
@@ -39,14 +39,14 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         ////
         public bool Contains(Vector2 position) => Contains(position.x, position.y);
         ////
-     
+
         public void Offset(double x, double y)
         {
-            Left = Left + x;
-            Bottom = Bottom + y;
-            Right = Right + x;
-            Top = Top + y;
-        } 
+            Left += x;
+            Bottom += y;
+            Right += x;
+            Top += y;
+        }
         public override string ToString()
         {
             return string.Format("L:{0}, B:{1}, R:{2}, T:{3}", Left, Bottom, Right, Top);

@@ -55,23 +55,16 @@ namespace Typography.TextLayout
     public class UnscaledGlyphPlanList : IUnscaledGlyphPlanList
     {
         readonly List<UnscaledGlyphPlan> _list = new List<UnscaledGlyphPlan>();
-        float _accumAdvanceX;
-
         public int Count => _list.Count;
         public UnscaledGlyphPlan this[int index] => _list[index];
-
         public void Clear()
         {
             _list.Clear();
-            _accumAdvanceX = 0;
         }
         public void Append(UnscaledGlyphPlan glyphPlan)
         {
             _list.Add(glyphPlan);
-            _accumAdvanceX += glyphPlan.AdvanceX;
         }
-        public float AccumAdvanceX => _accumAdvanceX;
-
     }
 
     /// <summary>
