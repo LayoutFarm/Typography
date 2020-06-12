@@ -26,22 +26,26 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
         }
         public void Dispose()
         {
-            foreach (GlyphBitmap glyphBmp in _dic.Values)
+            if (_dic != null)
             {
-                if (glyphBmp.Bitmap != null)
+                foreach (GlyphBitmap glyphBmp in _dic.Values)
                 {
-                    glyphBmp.Bitmap.Dispose();
-                    glyphBmp.Bitmap = null;
+                    if (glyphBmp.Bitmap != null)
+                    {
+                        glyphBmp.Bitmap.Dispose();
+                        glyphBmp.Bitmap = null;
+                    }
                 }
+                _dic.Clear();
+                _dic = null;
             }
-            _dic.Clear();
         }
 
         public bool IsDelayList { get; set; }
 
     }
 
-    class GlyphBitmapStore
+    class GlyphBitmapStore : IDisposable
     {
         Typeface _currentTypeface;
         GlyphBitmapList _bitmapList;
@@ -97,6 +101,31 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
         public void SetGlyphBitmap(ushort glyphIndex, GlyphBitmap glyphBmp)
         {
             _bitmapList.RegisterBitmap(glyphIndex, glyphBmp);
+        }
+
+
+        public void Clear()
+        {
+            if (_currentTypeface == null)
+            {
+                return;
+            }
+
+            _currentTypeface = null;
+            foreach (GlyphBitmapList bmplist in _cachedBmpList.Values)
+            {
+                bmplist.Dispose();
+            }
+            _cachedBmpList.Clear();
+            _cachedBmpList = null;
+            //
+            _bitmapList?.Dispose();
+            _bitmapList = null;
+            //
+        }
+        public void Dispose()
+        {
+            Clear();
         }
     }
 
