@@ -328,7 +328,9 @@ namespace PixelFarm.Drawing
                 //check if we have exported all the glyph bitmap 
                 //to some 'ready' form?
                 //if not then create it
-                _glyphBitmapStore.SetCurrentTypeface(_currentTypeface);
+
+                //TODO: review this again
+                _glyphBitmapStore.SetCurrentTypeface(_currentTypeface, true);
 
                 int seqLen = seq.Count;
 
@@ -526,9 +528,7 @@ namespace PixelFarm.Drawing
             _painter.SetOrigin(ox, oy);
         }
 
-        bool EnableColorGlyphBitmapCache { get; set; } = true;
-
-
+        bool EnableColorGlyphBitmapCache { get; set; } = false; 
 
         public void DrawString(char[] textBuffer, int startAt, int len, double x, double y)
         {
@@ -687,7 +687,7 @@ namespace PixelFarm.Drawing
 
                             DrawFromGlyphPlans(formattedGlyphPlanSeq.seq, xpos, y);
                             xpos += LatestAccumulateWidth;
-                             
+
                         }
                     }
 
