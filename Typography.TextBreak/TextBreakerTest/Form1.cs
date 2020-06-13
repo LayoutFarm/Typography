@@ -326,6 +326,89 @@ namespace TextBreakerTest
             //    );
             //}
         }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            //TODO: testing devnagri character-reodering from ms-spec
+            //I'm a beginer to this :)
+
+            //Indic font
+            //https://docs.microsoft.com/en-us/typography/script-development/devanagari
+            //..he OpenType lookups in an Indic font must be written to match glyph sequences after re-ordering has occurred
+
+            string s = "रवि";
+            char[] buff = s.ToCharArray();
+
+
+            //1. Find base consonant: The shaping engine finds the base consonant of the syllable, 
+            //using the following algorithm: starting from the end of the syllable,
+            //move backwards until a consonant is found that does not have 
+            //a below-base or post-base form (post-base forms have to follow below-base forms),
+            //or that is not a pre-base reordering Ra, or arrive at the first consonant. 
+            //The consonant stopped at will be the base.
+
+            for (int i = buff.Length - 1; i >= 0; --i)
+            {
+                char c = buff[i];
+                if (c >= 0x0915 && c <= 0x0939)
+                {
+                    //first 
+                    break;
+                }
+            }
+            //If the syllable starts with Ra + Halant (in a script that has Reph) and has more than one consonant,
+            //Ra is excluded from candidates for base consonants.
+
+
+
+            DevanagariReOrdrerClass[] reorderClasses = new DevanagariReOrdrerClass[buff.Length];
+            for (int i = 0; i < buff.Length; ++i)
+            {
+                reorderClasses[i] = GetReorderClass(buff[i]);
+            }
+        }
+
+        static DevanagariReOrdrerClass GetReorderClass(char c)
+        {
+            //test indic char reordering
+            //Character reordering Classes for Devanagari:
+            //Table 2
+            //_Characters_              _Reorder Class_
+            //0930(reph)                BeforePostscript
+            //093F                      BeforeHalf
+            //0945 - 0948               AfterSubscript
+            //0941 - 0944, 0962, 0963   AfterSubscript
+            //093E, 0940, 0949 - 094C   AfterSubscript
+
+            //TODO: use array
+            if (c == 0x0930)
+            {
+                //(reph)
+                return DevanagariReOrdrerClass.BeforePostscript;
+            }
+            else if (c == 093F)
+            {
+                return DevanagariReOrdrerClass.BeforeHalf;
+            }
+            else if ((c > 0x0945 && c <= 0948) ||
+                c == 0x0962 || c == 0x0963 ||
+                c == 0x093E || c == 0x0940 ||
+               (c >= 0949 && c <= 0x094C))
+            {
+                return DevanagariReOrdrerClass.AfterSubscript;
+            }
+            else
+            {
+                return DevanagariReOrdrerClass.Unknown;
+            }
+        }
+        enum DevanagariReOrdrerClass
+        {
+            Unknown,
+            BeforePostscript,
+            BeforeHalf,
+            AfterSubscript
+        }
     }
 }
 
