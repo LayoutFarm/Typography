@@ -337,6 +337,8 @@ namespace TextBreakerTest
             //..he OpenType lookups in an Indic font must be written to match glyph sequences after re-ordering has occurred
 
             string s = "रवि";
+            //string s = "रु";//रू   //(https://omniglot.com/language/articles/devanagari.htm)
+
             char[] buff = s.ToCharArray();
 
 
