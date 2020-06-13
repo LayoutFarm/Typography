@@ -18,12 +18,12 @@ namespace Typography.TextLayout
 
         readonly GPOS _gposTable;
         internal List<GPOS.LookupTable> _lookupTables;
-         
+
         public GlyphSetPosition(Typeface typeface, uint scriptTag, uint langTag)
         {
             this.ScriptTag = scriptTag; //script tag
             this.LangTag = langTag; //lang tag
-             
+
 
             //check if this lang has 
             _gposTable = typeface.GPOSTable;
@@ -86,6 +86,12 @@ namespace Typography.TextLayout
                         break;
                     //case "palt":
                     //    break;
+                     
+                    case "abvm":
+                    case "blwm":
+                    case "dist":
+                        includeThisFeature = true;
+                        break;
                     default:
                         System.Diagnostics.Debug.WriteLine("gpos_skip_tag:" + feature.TagName);
                         break;
