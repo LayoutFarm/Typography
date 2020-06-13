@@ -2,7 +2,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Runtime.Remoting.Metadata.W3cXsd2001;
 using Typography.OpenFont;
 using Typography.OpenFont.Tables;
 
@@ -292,7 +291,7 @@ namespace Typography.TextLayout
                         {
                             //other, TODO review here
 
-                            includeThisFeature = true;                            
+                            includeThisFeature = true;
                             if (!KnownLayoutTags.IsKnownGSUB_Tags(feature.TagName))
                             {
 #if DEBUG
