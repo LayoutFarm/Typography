@@ -242,6 +242,7 @@ namespace Typography.TextLayout
                     default:
                         {
 #if DEBUG
+
                             System.Diagnostics.Debug.WriteLine("gsub_skip_feature_tag:" + feature.TagName);
 #endif
                         }
@@ -315,6 +316,20 @@ namespace Typography.TextLayout
                         includeThisFeature = EnableMathFeature;
                         break;
                     case "flac": //Flattened Accents over Capitals  
+                        break;
+                    case "abvs":
+                    case "akhn":
+                    case "blwf":
+                    case "blws":
+                    case "cjct":
+                    case "half":
+                    case "haln":
+                    case "nukt":
+                    case "pres":
+                    case "psts":
+                    case "rkrf":
+                    case "rphf":
+                        includeThisFeature = true;
                         break;
                 }
 

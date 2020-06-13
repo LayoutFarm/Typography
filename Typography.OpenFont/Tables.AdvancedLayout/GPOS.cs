@@ -6,7 +6,8 @@ using System.IO;
 
 namespace Typography.OpenFont.Tables
 {
-    // https://www.microsoft.com/typography/otspec/GPOS.htm
+    //https://docs.microsoft.com/en-us/typography/opentype/spec/gpos
+
     public partial class GPOS : GlyphShapingTableEntry
     {
         public const string _N = "GPOS";
@@ -723,7 +724,7 @@ namespace Typography.OpenFont.Tables
                 public LigatureArrayTable LigatureArrayTable { get; set; }
                 public override void DoGlyphPosition(IGlyphPositions inputGlyphs, int startAt, int len)
                 {
-                    Utils.WarnUnimplemented("GPOS Lookup Sub Table Type 5"); 
+                    Utils.WarnUnimplemented("GPOS Lookup Sub Table Type 5");
                 }
             }
 
@@ -1027,8 +1028,19 @@ namespace Typography.OpenFont.Tables
                 public ushort InputClassDefOffset { get; set; }
                 public ushort LookaheadClassDefOffset { get; set; }
 
+                public ClassDefTable BackTrackClassDef { get; set; }
+                public ClassDefTable InputClassDef { get; set; }
+                public ClassDefTable LookaheadClassDef { get; set; }
+
                 public override void DoGlyphPosition(IGlyphPositions inputGlyphs, int startAt, int len)
                 {
+                    int lim = Math.Min(startAt + len, inputGlyphs.Count);
+                    ushort glyphIndex = inputGlyphs.GetGlyph(startAt, out ushort advW);
+
+                    int coverage_pos = CoverageTable.FindPosition(glyphIndex);
+                    if (coverage_pos < 0) { return; }
+
+
                     Utils.WarnUnimplemented("GPOS Lookup Sub Table Type 8 Format 2");
                 }
             }
@@ -1040,7 +1052,7 @@ namespace Typography.OpenFont.Tables
                 public PosLookupRecord[] PosLookupRecords { get; set; }
 
                 public override void DoGlyphPosition(IGlyphPositions inputGlyphs, int startAt, int len)
-                {  
+                {
                     Utils.WarnUnimplemented("GPOS Lookup Sub Table Type 8 Format 3");
                 }
             }
@@ -1088,24 +1100,36 @@ namespace Typography.OpenFont.Tables
 
                             ushort coverageOffset = reader.ReadUInt16();
                             ushort backTrackClassDefOffset = reader.ReadUInt16();
-                            ushort inpuClassDefOffset = reader.ReadUInt16();
+                            ushort inputClassDefOffset = reader.ReadUInt16();
                             ushort lookadheadClassDefOffset = reader.ReadUInt16();
                             ushort chainPosClassSetCnt = reader.ReadUInt16();
                             ushort[] chainPosClassSetOffsetArray = Utils.ReadUInt16Array(reader, chainPosClassSetCnt);
 
                             LkSubTableType8Fmt2 subTable = new LkSubTableType8Fmt2();
                             subTable.BacktrackClassDefOffset = backTrackClassDefOffset;
-                            subTable.InputClassDefOffset = inpuClassDefOffset;
+                            subTable.BackTrackClassDef = ClassDefTable.CreateFrom(reader, subTableStartAt + backTrackClassDefOffset);
+
+                            subTable.InputClassDefOffset = inputClassDefOffset;
+                            subTable.InputClassDef = ClassDefTable.CreateFrom(reader, subTableStartAt + inputClassDefOffset);
+
                             subTable.LookaheadClassDefOffset = lookadheadClassDefOffset;
+                            subTable.LookaheadClassDef = ClassDefTable.CreateFrom(reader, subTableStartAt + lookadheadClassDefOffset);
+
                             //----------
                             PosClassSetTable[] posClassSetTables = new PosClassSetTable[chainPosClassSetCnt];
                             for (int n = 0; n < chainPosClassSetCnt; ++n)
                             {
-                                posClassSetTables[n] = PosClassSetTable.CreateFrom(reader, subTableStartAt + chainPosClassSetOffsetArray[n]);
+                                ushort offset = chainPosClassSetOffsetArray[n];
+                                if (offset > 0)
+                                {
+                                    posClassSetTables[n] = PosClassSetTable.CreateFrom(reader, subTableStartAt + offset);
+                                }
+
                             }
                             subTable.PosClassSetTables = posClassSetTables;
-
                             subTable.CoverageTable = CoverageTable.CreateFrom(reader, subTableStartAt + coverageOffset);
+
+
                             return subTable;
                         }
                     case 3:
