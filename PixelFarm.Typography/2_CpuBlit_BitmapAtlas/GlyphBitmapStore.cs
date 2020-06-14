@@ -42,21 +42,96 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
         }
 
 
+    }
 
+    /// <summary>
+    /// typeface-specific, glyph bitmap store
+    /// </summary>
+    class TypefaceGlyphBitmapCache : IDisposable
+    {
+
+        GlyphBitmapList _bitmapList;
+        Dictionary<float, GlyphBitmapList> _specificFontSizeGlyphBitmaps;//sometime we may want to cache multiple size of glyph
+        float _size;
+
+        public TypefaceGlyphBitmapCache(Typeface typeface)
+        {
+            Typeface = typeface;
+        }
+
+        /// <summary>
+        /// actual rounding cache font size
+        /// </summary>
+        public float ActualCacheSize => _size;
+        /// <summary>
+        /// set font size in point unit, this value may be rounded
+        /// </summary>
+        /// <param name="value"></param>
+        public void SetFontSize(float value)
+        {
+            //check if we have size-specific bmp cache or not 
+            float actualCacheSize = (float)Math.Round(value, 1);
+            if (_size == actualCacheSize) { return; }
+
+            //
+            _size = actualCacheSize;
+
+            if (_specificFontSizeGlyphBitmaps == null) { _specificFontSizeGlyphBitmaps = new Dictionary<float, GlyphBitmapList>(); }
+
+            if (!_specificFontSizeGlyphBitmaps.TryGetValue(actualCacheSize, out _bitmapList))
+            {
+                //not found=> create a new one
+                _bitmapList = new GlyphBitmapList();
+
+
+                _specificFontSizeGlyphBitmaps.Add(actualCacheSize, _bitmapList);
+            }
+        }
+
+        public Typeface Typeface { get; }
+
+        public bool TryGetBitmap(ushort glyphIndex, out GlyphBitmap glyphBmp) => _bitmapList.TryGetBitmap(glyphIndex, out glyphBmp);
+        public void RegisterBitmap(ushort glyphIndex, GlyphBitmap bmp) => _bitmapList.RegisterBitmap(glyphIndex, bmp);
+
+        public void Dispose()
+        {
+            Clear();
+            _specificFontSizeGlyphBitmaps = null;
+        }
+        public void Clear()
+        {
+            if (_specificFontSizeGlyphBitmaps != null)
+            {
+                foreach (GlyphBitmapList bmplist in _specificFontSizeGlyphBitmaps.Values)
+                {
+                    bmplist.Dispose();
+                }
+                _specificFontSizeGlyphBitmaps.Clear();
+            }
+        }
     }
 
     class GlyphBitmapStore : IDisposable
     {
         Typeface _currentTypeface;
-        GlyphBitmapList _bitmapList;
-        Dictionary<Typeface, GlyphBitmapList> _cachedBmpList = new Dictionary<Typeface, GlyphBitmapList>();
+        float _currentSizeInPts;//current size in point unit
 
+        TypefaceGlyphBitmapCache _bmpCache;//current
+        Dictionary<Typeface, TypefaceGlyphBitmapCache> _totalBmpCache = new Dictionary<Typeface, TypefaceGlyphBitmapCache>();
 
-        public void SetCurrentTypeface(Typeface typeface, bool delayCreateBmp)
+        public void SetCurrentTypeface(Typeface typeface, float sizeInPts)
         {
-            _currentTypeface = typeface;
-            if (_cachedBmpList.TryGetValue(typeface, out _bitmapList))
+            if (_currentTypeface == typeface && _currentSizeInPts == sizeInPts)
             {
+                return;
+            }
+
+            _currentSizeInPts = sizeInPts;
+            _currentTypeface = typeface;
+
+            if (_totalBmpCache.TryGetValue(typeface, out _bmpCache))
+            {
+                _bmpCache.SetFontSize(_currentSizeInPts);
                 return;
             }
 
@@ -64,70 +139,38 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             //or create a single texture atlas. 
 
             //if not create a new one
-            _bitmapList = new GlyphBitmapList();
-            _cachedBmpList.Add(typeface, _bitmapList);
+            _bmpCache = new TypefaceGlyphBitmapCache(typeface);
+            _bmpCache.SetFontSize(_currentSizeInPts);
+            return;
 
-            if (!delayCreateBmp)
-            {
-                int glyphCount = typeface.GlyphCount;
-                using (System.IO.MemoryStream ms = new System.IO.MemoryStream())
-                {
-                    for (ushort i = 0; i < glyphCount; ++i)
-                    {
-                        ms.SetLength(0);
+            //if (!delayCreateBmp)
+            //{
+            //    int glyphCount = typeface.GlyphCount;
+            //    using (System.IO.MemoryStream ms = new System.IO.MemoryStream())
+            //    {
+            //        for (ushort i = 0; i < glyphCount; ++i)
+            //        {
+            //            ms.SetLength(0);
 
-                        Glyph glyph = typeface.GetGlyph(i);
-                        typeface.ReadBitmapContent(glyph, ms);
+            //            Glyph glyph = typeface.GetGlyph(i);
+            //            typeface.ReadBitmapContent(glyph, ms);
 
-                        GlyphBitmap glyphBitmap = new GlyphBitmap();
-                        glyphBitmap.Width = glyph.MaxX - glyph.MinX;
-                        glyphBitmap.Height = glyph.MaxY - glyph.MinY;
+            //            GlyphBitmap glyphBitmap = new GlyphBitmap();
+            //            glyphBitmap.Width = glyph.MaxX - glyph.MinX;
+            //            glyphBitmap.Height = glyph.MaxY - glyph.MinY;
 
-                        //glyphBitmap.Bitmap = ...                     
-                        glyphBitmap.Bitmap = MemBitmap.LoadBitmap(ms);
-                        //MemBitmapExtensions.SaveImage(glyphBitmap.Bitmap, "testGlyphBmp_" + i + ".png");
+            //            //glyphBitmap.Bitmap = ...                     
+            //            glyphBitmap.Bitmap = MemBitmap.LoadBitmap(ms);
+            //            //MemBitmapExtensions.SaveImage(glyphBitmap.Bitmap, "testGlyphBmp_" + i + ".png");
 
-                        //_bitmapList.RegisterBitmap(glyph.GlyphIndex, glyphBitmap);
-                        _bitmapList.RegisterBitmap(i, glyphBitmap);
-                    }
-                }
-            }
+            //            //_bitmapList.RegisterBitmap(glyph.GlyphIndex, glyphBitmap);
+            //            _bitmapList.RegisterBitmap(i, glyphBitmap);
+            //        }
+            //    }
+            //}
         }
-        public GlyphBitmap GetGlyphBitmap(ushort glyphIndex)
-        {
-            if (_bitmapList.TryGetBitmap(glyphIndex, out GlyphBitmap found))
-            {
-                return found;
-            }
-            else if (_currentTypeface.IsBitmapFont)
-            {
-                //try load
-                using (System.IO.MemoryStream ms = new System.IO.MemoryStream())
-                {
+        public TypefaceGlyphBitmapCache CurrrentBitmapCache => _bmpCache;
 
-                    ms.SetLength(0);
-
-                    Glyph glyph = _currentTypeface.GetGlyph(glyphIndex);
-                    _currentTypeface.ReadBitmapContent(glyph, ms);
-
-                    GlyphBitmap glyphBitmap = new GlyphBitmap();
-                    glyphBitmap.Width = glyph.MaxX - glyph.MinX;
-                    glyphBitmap.Height = glyph.MaxY - glyph.MinY;
-
-                    //glyphBitmap.Bitmap = ...                     
-                    glyphBitmap.Bitmap = MemBitmap.LoadBitmap(ms);
-                    //MemBitmapExtensions.SaveImage(glyphBitmap.Bitmap, "testGlyphBmp_" + i + ".png");
-                    _bitmapList.RegisterBitmap(glyphIndex, glyphBitmap);
-
-                    return glyphBitmap;
-                }
-            }
-            return null;
-        }
-        public void SetGlyphBitmap(ushort glyphIndex, GlyphBitmap glyphBmp)
-        {
-            _bitmapList.RegisterBitmap(glyphIndex, glyphBmp);
-        }
 
 
         public void Clear()
@@ -138,14 +181,15 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             }
 
             _currentTypeface = null;
-            foreach (GlyphBitmapList bmplist in _cachedBmpList.Values)
+
+            foreach (TypefaceGlyphBitmapCache bmplist in _totalBmpCache.Values)
             {
                 bmplist.Dispose();
             }
-            _cachedBmpList.Clear();
+            _totalBmpCache.Clear();
             //
-            _bitmapList?.Dispose();
-            _bitmapList = null;
+            _bmpCache?.Dispose();
+            _bmpCache = null;
         }
         public void Dispose()
         {
