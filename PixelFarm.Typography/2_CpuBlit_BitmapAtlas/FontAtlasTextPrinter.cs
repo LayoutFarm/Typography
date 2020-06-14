@@ -28,10 +28,9 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
 
         AggPainter _painter;
         RequestFont _font;
-        //-----------------------------------------------------------  
+
         Typeface _currentTypeface;
         Color _fontColor;
-
 
         OpenFontTextService _textServices;
         BitmapFontManager<MemBitmap> _bmpFontMx;
@@ -72,8 +71,9 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             _textServices.ResolveTypeface(font); //resolve for 'actual' font
             _fontAtlas = _bmpFontMx.GetFontAtlas(_font, out _fontBmp);
             FontSizeInPoints = font.SizeInPoints;
-
         }
+
+        public void SetSvgBmpBuilderFunc(SvgBmpBuilderFunc svgBmpBuilderFunc) => _bmpFontMx.SetSvgBmpBuilderFunc(svgBmpBuilderFunc);
 
         public RequestFont CurrentFont => _font;
 
@@ -107,15 +107,12 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             get => _currentTypeface;
             set
             {
-
                 if (_currentTypeface == value) return;
                 //
                 _currentTypeface = value;
                 OnFontSizeChanged();
             }
         }
-
-        //public TextBaseline TextBaseline { get; set; }
 
         void SetupMaskPixelBlender(int width, int height)
         {
