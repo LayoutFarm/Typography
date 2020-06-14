@@ -51,6 +51,34 @@ namespace Typography.TextLayout
     }
 
 
+    static class KnownLayoutTags
+    {
+
+        static readonly Dictionary<string, bool> s_knownGSubTags = new Dictionary<string, bool>();
+
+        static KnownLayoutTags()
+        {
+
+            CollectTags(s_knownGSubTags, "ccmp");
+            //arabic-related
+            CollectTags(s_knownGSubTags, "liga,dlig,falt,rclt,rlig,locl,init,medi,fina,isol");
+            //math-glyph related
+            CollectTags(s_knownGSubTags, "math,ssty,dlts,flac");
+            //indic script related
+            CollectTags(s_knownGSubTags, "abvs,akhn,blwf,blws,cjct,half,haln,nukt,pres,psts,rkrf,rphf");
+        }
+
+        public static bool IsKnownGSUB_Tags(string tagName) => s_knownGSubTags.ContainsKey(tagName);
+
+        static void CollectTags(Dictionary<string, bool> dic, string tags_str)
+        {
+            string[] tags = tags_str.Split(',');
+            for (int i = 0; i < tags.Length; ++i)
+            {
+                dic[tags[i].Trim()] = true;//replace
+            }
+        }
+    }
 
 
 
@@ -74,7 +102,6 @@ namespace Typography.TextLayout
 
             _typeface = typeface;
             _mustRebuildTables = true;
-
         }
 
 
@@ -237,55 +264,14 @@ namespace Typography.TextLayout
                 FeatureList.FeatureTable feature = gsubTable.FeatureList.featureTables[featureIndex];
                 bool includeThisFeature = false;
                 GSubLkContextName contextName = GSubLkContextName.None;
+
                 switch (feature.TagName)
                 {
-                    default:
-                        {
-#if DEBUG
-                            System.Diagnostics.Debug.WriteLine("gsub_skip_feature_tag:" + feature.TagName);
-#endif
-                        }
-                        break;
                     case "ccmp": // glyph composition/decomposition 
                         includeThisFeature = EnableComposition;
                         break;
                     case "liga": // Standard Ligatures --enable by default
                         includeThisFeature = EnableLigation;
-                        break;
-
-                    //--------
-                    case "calt": //Contextual Alternates
-                        //In specified situations, replaces default glyphs with alternate forms which provide better joining behavior.
-                        //Used in script typefaces which are designed to have some or all of their glyphs join.
-                        includeThisFeature = true;
-                        break;
-                    case "dlig":
-                        // Replaces a sequence of glyphs with a single glyph which is preferred for typographic purposes.
-                        //This feature covers those ligatures which may be used for special effect, at the user’s preference.
-                        includeThisFeature = true;
-                        break;
-                    case "falt":
-                        //Replaces line final glyphs with alternate forms specifically designed for this purpose(they would have less or more advance width as need may be), 
-                        //to help justification of text.
-                        includeThisFeature = true;
-                        break;
-                    case "rclt":
-                        includeThisFeature = true;
-                        //In specified situations, replaces default glyphs with alternate forms which provide for better joining behavior or other glyph relationships.
-                        //Especially important in script typefaces which are designed to have some or all of their glyphs join,
-                        //but applicable also to e.g.variants to improve spacing.
-                        //This feature is similar to 'calt', 
-                        //but with the difference that it should not be possible to turn off 'rclt' substitutions: they are considered essential to correct layout of the font
-                        break;
-                    case "rlig":
-                        includeThisFeature = true;
-                        //Required Ligatures
-                        //Replaces a sequence of glyphs with a single glyph which is preferred for typographic purposes. 
-                        //This feature covers those ligatures, which the script determines as required to be used in normal conditions. 
-                        //This feature is important for some scripts to insure correct glyph formation
-                        break;
-                    case "locl":
-                        includeThisFeature = true;
                         break;
                     case "init":
                         includeThisFeature = true;
@@ -301,22 +287,29 @@ namespace Typography.TextLayout
                         includeThisFeature = true;
                         contextName = GSubLkContextName.Fina;
                         break;
-                    case "isol":
-                        includeThisFeature = true;
-                        break;
-                    //--------
-                    //OpenType Layout tags for math processing:
-                    //https://docs.microsoft.com/en-us/typography/opentype/spec/math
-                    //'math', 'ssty','flac','dtls' 	
-                    case "ssty":
-                        includeThisFeature = EnableMathFeature;
-                        break;
-                    case "dlts"://'dtls' 	Dotless Forms 
-                        includeThisFeature = EnableMathFeature;
-                        break;
-                    case "flac": //Flattened Accents over Capitals  
+                    default:
+                        {
+                            //other, TODO review here
+
+                            includeThisFeature = true;
+                            if (!KnownLayoutTags.IsKnownGSUB_Tags(feature.TagName))
+                            {
+                                includeThisFeature = false;
+
+#if DEBUG
+
+                                System.Diagnostics.Debug.WriteLine("gsub_skip_feature_tag:" + feature.TagName);
+#endif
+                            }
+                            else
+                            {
+
+                            }
+                        }
                         break;
                 }
+
+
 
                 if (includeThisFeature)
                 {

@@ -1,7 +1,8 @@
 ﻿//MIT, 2016-present, WinterDev
 
+using System;
 using Typography.OpenFont;
-
+using Typography.OpenFont.Tables;
 namespace Typography.Contours
 {
     //-----------------------------------
@@ -24,8 +25,8 @@ namespace Typography.Contours
         /// scale for converting latest glyph points to latest request font size
         /// </summary>
         float _recentPixelScale;
-
         Typography.OpenFont.CFF.CffEvaluationEngine _cffEvalEngine;
+
 
         public GlyphOutlineBuilderBase(Typeface typeface)
         {
@@ -37,7 +38,12 @@ namespace Typography.Contours
             {
                 _cffEvalEngine = new OpenFont.CFF.CffEvaluationEngine();
             }
+
+            HasColorInfo = typeface.COLRTable != null && typeface.CPALTable != null;
         }
+
+        public bool HasColorInfo { get; }
+
         public Typeface Typeface => _typeface;
         /// <summary>
         /// use Maxim's Agg Vertical Hinting
@@ -68,7 +74,6 @@ namespace Typography.Contours
             _outputGlyphPoints = glyph.GlyphPoints;
             _outputContours = glyph.EndPoints;
 
-
             //------------
             //temp fix for Cff Font
             if (glyph.IsCffGlyph)
@@ -78,9 +83,6 @@ namespace Typography.Contours
             }
 
             //---------------
-
-
-
             if ((RecentFontSizeInPixels = Typeface.ConvPointsToPixels(sizeInPoints)) < 0)
             {
                 //convert to pixel size
@@ -94,7 +96,11 @@ namespace Typography.Contours
                 HasSizeChanged = true;
             }
             //-------------------------------------
-            FitCurrentGlyph(glyph);
+            if (!HasColorInfo)
+            {
+                //when no color info
+                FitCurrentGlyph(glyph);
+            }
         }
         protected bool HasSizeChanged { get; set; }
         protected float RecentFontSizeInPixels { get; private set; }
@@ -166,7 +172,23 @@ namespace Typography.Contours
                     break;
             }
         }
+
+        /// <summary>
+        /// build and translate
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <param name="glyphIndex"></param>
+        /// <param name="sizeInPoints"></param>
+        /// <param name="tx"></param>
+        public static void BuildFromGlyphIndex(this GlyphOutlineBuilderBase builder, ushort glyphIndex, float sizeInPoints, IGlyphTranslator tx)
+        {
+            builder.BuildFromGlyphIndex(glyphIndex, sizeInPoints);
+            builder.ReadShapes(tx);
+        }
+
     }
+
+
     public enum HintTechnique : byte
     {
         /// <summary>

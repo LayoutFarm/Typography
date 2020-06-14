@@ -25,6 +25,8 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
         public Color GlyphColor { get; set; }
         public TextureKind TextureKind { get; set; }
         public AggPainter Painter { get; set; }
+
+
         public BitmapAtlasItemSource CreateAtlasItem(GlyphOutlineBuilder builder, float pxscale)
         {
 
@@ -124,7 +126,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                     {
                         painter.Clear(Color.Empty);
                         painter.FillColor = Color.Black;
-                    }
+                    } 
                     else
                     {
                         painter.Clear(BackGroundColor);
