@@ -227,18 +227,12 @@ namespace Typography.OpenFont
 #endif
                 return _glyphs[0]; //return empty glyph?;
             }
-        }
-
-
-        public ushort GetAdvanceWidth(int codepoint)
+        } 
+        public ushort GetAdvanceWidthFromGlyphIndex(ushort glyphIndex)
         {
-            return _horizontalMetrics.GetAdvanceWidth(GetGlyphIndex(codepoint));
-        }
-        public ushort GetHAdvanceWidthFromGlyphIndex(ushort glyphIndex)
-        {
-
             return _horizontalMetrics.GetAdvanceWidth(glyphIndex);
         }
+
         public short GetHFrontSideBearingFromGlyphIndex(ushort glyphIndex)
         {
             return _horizontalMetrics.GetLeftSideBearing(glyphIndex);
@@ -371,7 +365,7 @@ namespace Typography.OpenFont
 
     }
 
-  
+
 
 
     public interface IGlyphPositions

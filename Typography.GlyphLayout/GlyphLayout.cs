@@ -569,7 +569,7 @@ namespace Typography.TextLayout
             {
                 //TODO: review here, 
                 //WHY? some glyph dose not have original advanced width
-                glyph.OriginalAdvanceWidth = _typeface.GetHAdvanceWidthFromGlyphIndex(glyphIndex);
+                glyph.OriginalAdvanceWidth = _typeface.GetAdvanceWidthFromGlyphIndex(glyphIndex);
             }
 
             _glyphPosList.Add(new GlyphPos(o_offset, glyphIndex, glyph.GlyphClass, glyph.OriginalAdvanceWidth));

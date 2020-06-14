@@ -558,7 +558,7 @@ namespace MathLayout
                     }
                 }
             }
-            ushort advW = _typeface.GetHAdvanceWidthFromGlyphIndex(glyphIndex);//unscale glyph width
+            ushort advW = _typeface.GetAdvanceWidthFromGlyphIndex(glyphIndex);//unscale glyph width
             int advW_s = (int)System.Math.Round(px_scale * advW);
 
             glyphBox.GlyphIndex = glyphIndex;
