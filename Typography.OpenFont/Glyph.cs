@@ -60,6 +60,9 @@ namespace Typography.OpenFont
                 _hasOrgAdvWidth = true;
             }
         }
+
+        internal ushort BitmapGlyphAdvanceWidth { get; set; }
+
         public bool HasOriginalAdvancedWidth => _hasOrgAdvWidth;
         //      
 

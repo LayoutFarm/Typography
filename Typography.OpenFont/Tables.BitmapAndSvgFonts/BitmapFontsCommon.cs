@@ -527,8 +527,9 @@ namespace Typography.OpenFont.Tables.BitmapFonts
         public byte advance;
 
         public const int SIZE = 5; //size of SmallGlyphMetrics
-        public static void ReadSmallGlyphMetric(BinaryReader reader, ref SmallGlyphMetrics output)
+        public static void ReadSmallGlyphMetric(BinaryReader reader, out SmallGlyphMetrics output)
         {
+            output = new SmallGlyphMetrics();
             output.height = reader.ReadByte();
             output.width = reader.ReadByte();
 
@@ -780,11 +781,11 @@ namespace Typography.OpenFont.Tables.BitmapFonts
 
         public override void FillGlyphInfo(BinaryReader reader, Glyph bitmapGlyph)
         {
-            SmallGlyphMetrics smallGlyphMetric = new SmallGlyphMetrics();
-            SmallGlyphMetrics.ReadSmallGlyphMetric(reader, ref smallGlyphMetric);
-            uint dataLen = reader.ReadUInt32();
-            bitmapGlyph.OriginalAdvanceWidth = smallGlyphMetric.advance;
+            SmallGlyphMetrics.ReadSmallGlyphMetric(reader, out SmallGlyphMetrics smallGlyphMetric);
+
+            bitmapGlyph.BitmapGlyphAdvanceWidth = smallGlyphMetric.advance;
             bitmapGlyph.Bounds = new Bounds(0, 0, smallGlyphMetric.width, smallGlyphMetric.height);
+
             //then 
             //byte[] buff = reader.ReadBytes((int)dataLen);
             //System.IO.File.WriteAllBytes("testBitmapGlyph_" + glyph.GlyphIndex + ".png", buff);
