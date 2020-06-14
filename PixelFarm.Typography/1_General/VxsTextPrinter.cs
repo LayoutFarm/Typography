@@ -6,7 +6,6 @@ using PixelFarm.CpuBlit.BitmapAtlas;
 using Typography.Contours;
 using Typography.OpenFont;
 using Typography.OpenFont.Tables;
-using Typography.OpenFont.Extensions;
 using Typography.TextLayout;
 using Typography.TextBreak;
 using Typography.FontManagement;
@@ -91,13 +90,15 @@ namespace PixelFarm.Drawing
 
     public class SvgBmpBuilderReq
     {
+        //input
         public System.Text.StringBuilder SvgContent;
         public float ExpectedWidth;
-
+        public Color DefaultBgColor = Color.White;
         //output 
         public MemBitmap Output;
         public int BitmapXOffset;
         public int BitmapYOffset;
+
     }
 
     public delegate void SvgBmpBuilderFunc(SvgBmpBuilderReq req);
@@ -291,11 +292,11 @@ namespace PixelFarm.Drawing
                 return glyphBmp;
             }
 
-            //TODO: use string builder from pool?
-
 
             Glyph glyph = _currentTypeface.GetGlyph(glyphIndex);
 
+
+            //TODO: use string builder from pool?
             var stbuilder = new System.Text.StringBuilder();
             _currentTypeface.ReadSvgContent(glyph, stbuilder);
 
