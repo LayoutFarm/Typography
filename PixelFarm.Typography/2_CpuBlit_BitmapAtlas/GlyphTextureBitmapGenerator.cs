@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using Typography.OpenFont;
 using Typography.OpenFont.Extensions;
 using Typography.Contours;
+using System.IO;
+using PixelFarm.Drawing;
 
 namespace PixelFarm.CpuBlit.BitmapAtlas
 {
@@ -18,13 +20,20 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
 
     public struct GlyphTextureBitmapGenerator
     {
-
         public delegate void OnEachGlyph(BitmapAtlasItemSource glyphImage);
 
         /// <summary>
         /// version of msdf generator
         /// </summary>
         public ushort MsdfGenVersion { get; set; }
+
+        PixelFarm.Drawing.SvgBmpBuilderFunc _svgBmpBuilderFunc;
+
+        public void SetSvgBmpBuilderFunc(PixelFarm.Drawing.SvgBmpBuilderFunc svgBmpBuilderFunc)
+        {
+            _svgBmpBuilderFunc = svgBmpBuilderFunc;
+        }
+
 
         OnEachGlyph _onEachGlyphDel;
         public SimpleBitmapAtlasBuilder CreateTextureFontFromBuildDetail(
@@ -121,6 +130,49 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
 
             CreateTextureFontFromGlyphIndices(typeface, sizeInPoint, hintTechnique, atlasBuilder, glyphIndices);
         }
+
+        GlyphBitmap GetGlyphBitmapFromSvg(Typeface typeface, float sizeInPoint, ushort glyphIndex)
+        {
+
+            //TODO: use string builder from pool? 
+            Glyph glyph = typeface.GetGlyph(glyphIndex);
+
+            var stbuilder = new System.Text.StringBuilder();
+            typeface.ReadSvgContent(glyph, stbuilder);
+
+            float bmpScale = typeface.CalculateScaleToPixelFromPointSize(sizeInPoint);
+            float target_advW = typeface.GetAdvanceWidthFromGlyphIndex(glyphIndex) * bmpScale;
+
+            var req = new PixelFarm.Drawing.SvgBmpBuilderReq
+            {
+                SvgContent = stbuilder,
+                DefaultBgColor = Color.Transparent,
+                ExpectedWidth = target_advW
+            };
+
+            _svgBmpBuilderFunc.Invoke(req);
+
+            MemBitmap memBmp = req.Output;
+
+            if (memBmp == null)
+            {
+                //TODO: use blank img?
+                return null;
+            }
+
+            //TODO... review this again 
+            short offset_x = (short)req.BitmapXOffset;
+            short offset_y = (short)req.BitmapYOffset;
+
+            return new GlyphBitmap
+            {
+                Bitmap = memBmp,
+                Width = memBmp.Width,
+                Height = memBmp.Height,
+                ImageStartX = -offset_x,//offset back
+                ImageStartY = -offset_y //offset back
+            };
+        }
         void CreateTextureFontFromGlyphIndices(
               Typeface typeface,
               float sizeInPoint,
@@ -191,8 +243,80 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                         }
                     }
                 }
+                return;
             }
-            else
+            else if (atlasBuilder.TextureKind == TextureKind.Bitmap)
+            {
+                //generate color bitmap atlas
+                int j = glyphIndices.Length;
+                if (typeface.HasColorTable())
+                {
+                    //outline glyph 
+
+                    return;
+                }
+                else if (typeface.IsBitmapFont)
+                {
+                    //test this with Noto Color Emoji
+
+                    return;
+                }
+                else if (typeface.HasSvgTable())
+                {
+                    //test this with TwitterEmoji
+                    //generate membitmap from svg
+                    for (int i = 0; i < j; ++i)
+                    {
+                        ushort gindex = glyphIndices[i];
+                        GlyphBitmap glyphBmp = GetGlyphBitmapFromSvg(typeface, sizeInPoint, gindex);
+                        if (glyphBmp == null)
+                        {
+                            //use empty glyph?
+                            //temp fix
+                            BitmapAtlasItemSource glyphImage = new BitmapAtlasItemSource(16, 16);
+                            using (MemBitmap empty = new MemBitmap(16, 16))
+                            {
+                                empty.Clear(PixelFarm.Drawing.Color.Transparent);
+                                glyphImage.SetImageBuffer(MemBitmapExtensions.CopyImgBuffer(empty, empty.Width, empty.Height), false);
+
+                            }
+
+                            glyphImage.UniqueInt16Name = gindex;
+                            _onEachGlyphDel?.Invoke(glyphImage);
+                            atlasBuilder.AddItemSource(glyphImage);
+                        }
+                        else
+                        {
+                            int w = glyphBmp.Width;
+                            int h = glyphBmp.Height;
+
+                            BitmapAtlasItemSource glyphImage = new BitmapAtlasItemSource(glyphBmp.Width, glyphBmp.Height);
+
+                            glyphImage.TextureXOffset = (short)glyphBmp.ImageStartX;
+                            glyphImage.TextureYOffset = (short)glyphBmp.ImageStartY;
+
+                            //
+                            glyphImage.SetImageBuffer(MemBitmapExtensions.CopyImgBuffer(glyphBmp.Bitmap, w, h, true), false);
+
+                            glyphImage.UniqueInt16Name = gindex;
+                            _onEachGlyphDel?.Invoke(glyphImage);
+                            atlasBuilder.AddItemSource(glyphImage);
+
+                            //clear
+                            glyphBmp.Bitmap.Dispose();
+                            glyphBmp.Bitmap = null;
+                        }
+
+                    }
+
+                    return;
+                }
+            }
+
+
+
+            //---------------------------
+            //OTHERS....
             {
                 AggGlyphTextureGen aggTextureGen = new AggGlyphTextureGen();
                 aggTextureGen.TextureKind = atlasBuilder.TextureKind;

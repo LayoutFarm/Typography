@@ -53,6 +53,9 @@ namespace SampleWinForms
             //msdf3 is our extension to the original Msdf technique
             this.cmbTextureKind.Items.Add(new TextureKindAndDescription(TextureKind.Msdf, "Msdf3") { TechniqueDetail = 3 });
 
+            this.cmbTextureKind.Items.Add(new TextureKindAndDescription(TextureKind.Bitmap, "ColorBitmap"));//color bitmap
+
+
             this.cmbTextureKind.SelectedIndex = 0;//default
         }
 
@@ -139,6 +142,7 @@ namespace SampleWinForms
 
             //1. create glyph-texture-bitmap generator
             var glyphTextureGen = new GlyphTextureBitmapGenerator();
+            glyphTextureGen.SetSvgBmpBuilderFunc(SvgBuilderHelper.ParseAndRenderSvg);
 
             //2. generate the glyphs
             TextureKindAndDescription textureKindAndDesc = (TextureKindAndDescription)this.cmbTextureKind.SelectedItem;
@@ -252,6 +256,8 @@ namespace SampleWinForms
 
             //1. create glyph-texture-bitmap generator
             var glyphTextureGen = new GlyphTextureBitmapGenerator();
+            glyphTextureGen.SetSvgBmpBuilderFunc(SvgBuilderHelper.ParseAndRenderSvg);
+
             //2. generate the glyphs
             TextureKindAndDescription textureKindAndDesc = (TextureKindAndDescription)this.cmbTextureKind.SelectedItem;
             if (textureKindAndDesc.Kind == TextureKind.Msdf)
