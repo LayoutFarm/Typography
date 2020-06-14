@@ -74,11 +74,11 @@ namespace SampleWinForms
             _collectedScriptLangs.Clear();
             typeface.Languages.CollectScriptLang(_collectedScriptLangs);
             foreach (ScriptLang scriptLang in _collectedScriptLangs.Values)
-            {   
-                UIFontScriptOpt customUIFontScript = new UIFontScriptOpt(); 
-                customUIFontScript.SetInfo(scriptLang);
+            {
+                UIFontScriptOpt customUIFontScript = new UIFontScriptOpt();
+                customUIFontScript.ScriptLang = scriptLang;
                 _availableScripts.Add(customUIFontScript);
-                this.flowLayoutPanel1.Controls.Add(customUIFontScript); 
+                this.flowLayoutPanel1.Controls.Add(customUIFontScript);
 
                 //UnicodeLangBits[] unicodeLangs = scriptLangInfo.unicodeLangs;
                 //if (unicodeLangs != null)
