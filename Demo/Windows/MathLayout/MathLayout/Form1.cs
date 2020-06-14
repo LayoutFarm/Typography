@@ -146,7 +146,7 @@ namespace MathLayout
                 for (int i = 0; i < length; ++i)
                 {
                     ushort glyphIndex = _latinModernMathFont.GetGlyphIndex((int)ch[i]);
-                    ushort advW = _latinModernMathFont.GetAdvanceWidth((int)ch[i]);//unscale glyph width
+                    ushort advW = _latinModernMathFont.GetAdvanceWidthFromGlyphIndex(glyphIndex);//unscale glyph width
                     var t = _latinModernMathFont.GetGlyph(glyphIndex);
                     //now scale it to specific font size
 
@@ -474,7 +474,7 @@ namespace MathLayout
             float px_scale = _latinModernMathFont.CalculateScaleToPixelFromPointSize(font_size_in_Point);
 
             ushort glyphIndex = _latinModernMathFont.GetGlyphIndex((int)ch);
-            ushort advW = _latinModernMathFont.GetAdvanceWidth((int)ch);//unscale glyph width
+            ushort advW = _latinModernMathFont.GetAdvanceWidthFromGlyphIndex(glyphIndex);//unscale glyph width
             //now scale it to specific font size
 
             int advW_s = (int)System.Math.Round(px_scale * advW);

@@ -294,10 +294,16 @@ namespace Typography.TextLayout
                             includeThisFeature = true;
                             if (!KnownLayoutTags.IsKnownGSUB_Tags(feature.TagName))
                             {
+                                includeThisFeature = false;
+
 #if DEBUG
 
                                 System.Diagnostics.Debug.WriteLine("gsub_skip_feature_tag:" + feature.TagName);
 #endif
+                            }
+                            else
+                            {
+
                             }
                         }
                         break;

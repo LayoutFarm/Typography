@@ -21,18 +21,18 @@ namespace SampleWinForms
         {
 
         }
-        UnicodeLangBits _langBits;
-        Typography.OpenFont.ScriptLang _scriptLang;
-        public Typography.OpenFont.ScriptLang ScriptLang => _scriptLang;
         public bool Selected => chkSelected.Checked;
-
         public Typography.Contours.HintTechnique HintTechnique => (Typography.Contours.HintTechnique)cmbHintTech.SelectedItem;
 
-        public void SetInfo(Typography.OpenFont.ScriptLangInfo scriptLang, UnicodeLangBits langBits)
+        ScriptLang _scLang;
+        public ScriptLang ScriptLang
         {
-            _scriptLang = new ScriptLang(scriptLang.shortname, "");
-            _langBits = langBits;
-            this.label1.Text = _scriptLang.scriptTag + "," + langBits.ToString();
+            get => _scLang;
+            set
+            {
+                _scLang = value;
+                this.label1.Text = ScriptLang.GetScriptTagString() + ":" + ScriptLang.GetLangTagString();
+            }
         }
 
     }

@@ -228,17 +228,11 @@ namespace Typography.OpenFont
                 return _glyphs[0]; //return empty glyph?;
             }
         }
-
-
-        public ushort GetAdvanceWidth(int codepoint)
+        public ushort GetAdvanceWidthFromGlyphIndex(ushort glyphIndex)
         {
-            return _horizontalMetrics.GetAdvanceWidth(GetGlyphIndex(codepoint));
-        }
-        public ushort GetHAdvanceWidthFromGlyphIndex(ushort glyphIndex)
-        {
-
             return _horizontalMetrics.GetAdvanceWidth(glyphIndex);
         }
+
         public short GetHFrontSideBearingFromGlyphIndex(ushort glyphIndex)
         {
             return _horizontalMetrics.GetLeftSideBearing(glyphIndex);
@@ -371,7 +365,7 @@ namespace Typography.OpenFont
 
     }
 
-  
+
 
 
     public interface IGlyphPositions
@@ -839,14 +833,12 @@ namespace Typography.OpenFont
             }
         }
 
-        public static bool HasMathTable(this Typeface typeface)
-        {
-            return typeface.MathConsts != null;
-        }
-        public static bool HasSvgTable(this Typeface typeface)
-        {
-            return typeface._svgTable != null;
-        }
+        public static bool HasMathTable(this Typeface typeface) => typeface.MathConsts != null;
+
+        public static bool HasSvgTable(this Typeface typeface) => typeface._svgTable != null;
+
+        public static bool HasColorTable(this Typeface typeface) => typeface.COLRTable != null && typeface.CPALTable != null;
+
 
         class CffBoundFinder : IGlyphTranslator
         {

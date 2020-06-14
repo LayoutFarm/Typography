@@ -966,7 +966,35 @@ namespace Typography.OpenFont.Tables
 
                 public override void CollectAssociatedSubtitutionGlyphs(List<ushort> outputAssocGlyphs)
                 {
-                    throw new NotImplementedException();
+                    //collect only assoc  
+                    Dictionary<int, bool> collected = new Dictionary<int, bool>();
+                    foreach (ushort glyphIndex in coverageTable.GetExpandedValueIter())
+                    {
+                        int class_value = classDef.GetClassValue(glyphIndex);
+                        if (collected.ContainsKey(class_value))
+                        {
+                            continue;
+                        }
+                        //
+                        collected.Add(class_value, true);
+
+                        LkSubT5Fmt2_SubClassSet subClassSet = subClassSets[class_value];
+                        LkSubT5Fmt2_SubClassRule[] subClassRules = subClassSet.subClassRules;
+
+                        for (int i = 0; i < subClassRules.Length; ++i)
+                        {
+                            LkSubT5Fmt2_SubClassRule rule = subClassRules[i];
+                            if (rule != null && rule.substRecords != null)
+                            {
+                                for (int n = 0; n < rule.substRecords.Length; ++n)
+                                {
+                                    SubstLookupRecord rect = rule.substRecords[n];
+                                    LookupTable anotherLookup = OwnerGSub.LookupList[rect.lookupListIndex];
+                                    anotherLookup.CollectAssociatedSubstitutionGlyph(outputAssocGlyphs);
+                                }
+                            }
+                        }
+                    }
                 }
 
                 public override bool DoSubstitutionAt(IGlyphIndexList glyphIndices, int pos, int len)
@@ -1049,7 +1077,7 @@ namespace Typography.OpenFont.Tables
                 //SubstLookupRecord 	        substLookupRecords[substitutionCount] 	Array of Substitution lookups, in design order.
 
                 public ushort[] inputSequence;
-                SubstLookupRecord[] substRecords;
+                public SubstLookupRecord[] substRecords;
                 public void ReadFrom(BinaryReader reader, long pos)
                 {
                     reader.BaseStream.Seek(pos, SeekOrigin.Begin);

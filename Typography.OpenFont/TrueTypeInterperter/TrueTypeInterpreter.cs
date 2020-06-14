@@ -43,7 +43,7 @@ namespace Typography.OpenFont
             Glyph glyph = _currentTypeFace.GetGlyph(glyphIndex);
             //-------------------------------------------
             //1. start with original points/contours from glyph 
-            int horizontalAdv = _currentTypeFace.GetHAdvanceWidthFromGlyphIndex(glyphIndex);
+            int horizontalAdv = _currentTypeFace.GetAdvanceWidthFromGlyphIndex(glyphIndex);
             int hFrontSideBearing = _currentTypeFace.GetHFrontSideBearingFromGlyphIndex(glyphIndex);
 
             return HintGlyph(horizontalAdv,

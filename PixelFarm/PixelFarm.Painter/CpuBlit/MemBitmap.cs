@@ -456,7 +456,7 @@ namespace PixelFarm.CpuBlit
     {
 
 
-        public static int[] CopyImgBuffer(this MemBitmap memBmp, int width, int height)
+        public static int[] CopyImgBuffer(this MemBitmap memBmp, int width, int height, bool flipY = false)
         {
             //calculate stride for the width
 
@@ -471,17 +471,38 @@ namespace PixelFarm.CpuBlit
                     byte* srcBuffer = (byte*)srcBufferPtr.Ptr;
                     int srcIndex = 0;
                     int srcStride = memBmp.Stride;
-                    fixed (int* destHead = &buff2[0])
+
+                    if (flipY)
                     {
-                        byte* destHead2 = (byte*)destHead;
-                        for (int line = 0; line < height; ++line)
+                        fixed (int* destHead = &buff2[0])
                         {
-                            //System.Runtime.InteropServices.Marshal.Copy(srcBuffer, srcIndex, (IntPtr)destHead2, destStride);
-                            MemMx.memcpy((byte*)destHead2, srcBuffer + srcIndex, destStride);
-                            srcIndex += srcStride;
-                            destHead2 += destStride;
+                            byte* destHead2 = (byte*)destHead;
+
+                            srcBuffer += (height - 1) * srcStride;
+                            for (int line = 0; line < height; ++line)
+                            {
+                                //System.Runtime.InteropServices.Marshal.Copy(srcBuffer, srcIndex, (IntPtr)destHead2, destStride);
+                                MemMx.memcpy((byte*)destHead2, srcBuffer + srcIndex, destStride);
+                                srcIndex -= srcStride;
+                                destHead2 += destStride;
+                            }
                         }
                     }
+                    else
+                    {
+                        fixed (int* destHead = &buff2[0])
+                        {
+                            byte* destHead2 = (byte*)destHead;
+                            for (int line = 0; line < height; ++line)
+                            {
+                                //System.Runtime.InteropServices.Marshal.Copy(srcBuffer, srcIndex, (IntPtr)destHead2, destStride);
+                                MemMx.memcpy((byte*)destHead2, srcBuffer + srcIndex, destStride);
+                                srcIndex += srcStride;
+                                destHead2 += destStride;
+                            }
+                        }
+                    }
+
                 }
             }
             return buff2;

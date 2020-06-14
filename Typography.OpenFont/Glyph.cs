@@ -51,16 +51,15 @@ namespace Typography.OpenFont
         public ushort[] EndPoints => _contourEndPoints;
         public GlyphPointF[] GlyphPoints => glyphPoints;
         //
-        public ushort OriginalAdvanceWidth
+
+        public ushort OriginalAdvanceWidth => _orgAdvWidth;
+        public static bool HasOriginalAdvancedWidth(Glyph glyph) => glyph._hasOrgAdvWidth;
+        public static void SetOriginalAdvancedWidth(Glyph glyph, ushort advW)
         {
-            get => _orgAdvWidth;
-            set
-            {
-                _orgAdvWidth = value;
-                _hasOrgAdvWidth = true;
-            }
+            glyph._orgAdvWidth = advW;
+            glyph._hasOrgAdvWidth = true;
         }
-        public bool HasOriginalAdvancedWidth => _hasOrgAdvWidth;
+        internal ushort BitmapGlyphAdvanceWidth { get; set; }
         //      
 
         internal static void OffsetXY(Glyph glyph, short dx, short dy)
