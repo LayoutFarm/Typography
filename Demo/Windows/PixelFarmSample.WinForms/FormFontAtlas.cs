@@ -74,34 +74,29 @@ namespace SampleWinForms
             _collectedScriptLangs.Clear();
             typeface.Languages.CollectScriptLang(_collectedScriptLangs);
             foreach (ScriptLang scriptLang in _collectedScriptLangs.Values)
-            {
-                ScriptLangInfo scriptLangInfo = ScriptLangs.GetRegisteredScriptLang(scriptLang.GetScriptTagString());
-                if (scriptLangInfo != null)
-                {
-                    UIFontScriptOpt customUIFontScript = new UIFontScriptOpt();
-                    customUIFontScript.SetInfo(scriptLangInfo);
-                    _availableScripts.Add(customUIFontScript);
-                    this.flowLayoutPanel1.Controls.Add(customUIFontScript);
+            {   
+                UIFontScriptOpt customUIFontScript = new UIFontScriptOpt(); 
+                customUIFontScript.SetInfo(scriptLang);
+                _availableScripts.Add(customUIFontScript);
+                this.flowLayoutPanel1.Controls.Add(customUIFontScript); 
 
+                //UnicodeLangBits[] unicodeLangs = scriptLangInfo.unicodeLangs;
+                //if (unicodeLangs != null)
+                //{
+                //    foreach (UnicodeLangBits unicodeLang in unicodeLangs)
+                //    {
+                //        if (typeface.DoesSupportUnicode(unicodeLang))
+                //        {
+                //            //
+                //            UIFontScriptOpt customUIFontScript = new UIFontScriptOpt();
+                //            customUIFontScript.SetInfo(scriptLangInfo);
+                //            _availableScripts.Add(customUIFontScript);
 
+                //            this.flowLayoutPanel1.Controls.Add(customUIFontScript);
+                //        }
+                //    }
+                //}
 
-                    //UnicodeLangBits[] unicodeLangs = scriptLangInfo.unicodeLangs;
-                    //if (unicodeLangs != null)
-                    //{
-                    //    foreach (UnicodeLangBits unicodeLang in unicodeLangs)
-                    //    {
-                    //        if (typeface.DoesSupportUnicode(unicodeLang))
-                    //        {
-                    //            //
-                    //            UIFontScriptOpt customUIFontScript = new UIFontScriptOpt();
-                    //            customUIFontScript.SetInfo(scriptLangInfo);
-                    //            _availableScripts.Add(customUIFontScript);
-
-                    //            this.flowLayoutPanel1.Controls.Add(customUIFontScript);
-                    //        }
-                    //    }
-                    //}
-                }
             }
 
         }
