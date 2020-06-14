@@ -117,8 +117,15 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
         {
             _textServices = textServices;
         }
+
         public TextureKind TextureKindForNewFont { get; set; }
 
+
+        SvgBmpBuilderFunc _svgBmpBuilderFunc;
+        public void SetSvgBmpBuilderFunc(SvgBmpBuilderFunc svgBmpBuilderFunc)
+        {
+            _svgBmpBuilderFunc = svgBmpBuilderFunc;
+        }
 
 #if DEBUG
         System.Diagnostics.Stopwatch _dbugStopWatch = new System.Diagnostics.Stopwatch();
@@ -145,6 +152,8 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                 }
             }
         }
+        
+
         static object s_loadDataLock = new object();
 
         /// <summary>
@@ -225,6 +234,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
 
                 //1. create glyph-texture-bitmap generator
                 var glyphTextureGen = new GlyphTextureBitmapGenerator();
+                glyphTextureGen.SetSvgBmpBuilderFunc(_svgBmpBuilderFunc);
 
                 //2. generate the glyphs
                 SimpleBitmapAtlasBuilder atlasBuilder = glyphTextureGen.CreateTextureFontFromBuildDetail(
