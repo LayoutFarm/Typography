@@ -199,6 +199,8 @@ namespace PixelFarm.Drawing
                 if (_currentTypeface == value) return;
                 // 
                 _currentTypeface = value;
+                if (value == null) { return; }
+                //
                 _colrTable = _currentTypeface.COLRTable;
                 _cpalTable = _currentTypeface.CPALTable;
                 _hasColorInfo = _colrTable != null && _cpalTable != null;

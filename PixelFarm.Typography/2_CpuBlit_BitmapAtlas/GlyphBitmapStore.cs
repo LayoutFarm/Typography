@@ -43,7 +43,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
 
 
     }
-
+    
     /// <summary>
     /// typeface-specific, glyph bitmap store
     /// </summary>
