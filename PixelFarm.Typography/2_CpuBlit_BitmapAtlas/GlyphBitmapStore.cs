@@ -172,7 +172,24 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
         public TypefaceGlyphBitmapCache CurrrentBitmapCache => _bmpCache;
 
 
+        public void Clear(Typeface typeface)
+        {
+            if (_totalBmpCache.TryGetValue(typeface, out TypefaceGlyphBitmapCache found))
+            {
+                found.Clear();
+                _totalBmpCache.Remove(typeface);
+            }
 
+            if (_currentTypeface == typeface)
+            {
+                _currentTypeface = null;
+                _bmpCache = null;
+            }
+
+        }
+        /// <summary>
+        /// clear all cache bitmap
+        /// </summary>
         public void Clear()
         {
             if (_currentTypeface == null)
