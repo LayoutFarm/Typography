@@ -372,8 +372,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                     {
 
 #if DEBUG
-                        System.Diagnostics.Debugger.Break();
-                        System.Diagnostics.Debug.WriteLine("create fallback glyph:");
+                        System.Diagnostics.Debug.WriteLine("bitmap texture,create fallback glyph:" + glyphIndex);
 #endif
 
                         //NESTED
