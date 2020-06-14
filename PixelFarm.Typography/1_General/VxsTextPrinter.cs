@@ -89,6 +89,18 @@ namespace PixelFarm.Drawing
         }
     }
 
+    public class SvgBmpBuilderReq
+    {
+        public System.Text.StringBuilder SvgContent;
+        public float ExpectedWidth;
+
+        //output 
+        public MemBitmap Output;
+        public int BitmapXOffset;
+        public int BitmapYOffset;
+    }
+
+    public delegate void SvgBmpBuilderFunc(SvgBmpBuilderReq req);
 
     public class VxsTextPrinter : TextPrinterBase, ITextPrinter
     {
@@ -104,7 +116,6 @@ namespace PixelFarm.Drawing
         float _currentFontSizePxScale;
 
         GlyphBitmapStore _glyphBitmapStore;
-        BitmapCacheForSvgGlyph _glyphSvgStore;
 
         public VxsTextPrinter(Painter painter, OpenFontTextService textService)
         {
@@ -119,14 +130,15 @@ namespace PixelFarm.Drawing
             ChangeFont(new RequestFont("Source Sans Pro", 10));
 
             _glyphBitmapStore = new GlyphBitmapStore();
-            _glyphSvgStore = new BitmapCacheForSvgGlyph();
 
         }
         public AlternativeTypefaceSelector AlternativeTypefaceSelector { get; set; }
 
+
+        SvgBmpBuilderFunc _svgBmpBuilderFunc;
         public void SetSvgBmpBuilderFunc(SvgBmpBuilderFunc svgBmpBuilderFunc)
         {
-            _glyphSvgStore.SetSvgBmpBuilderFunc(svgBmpBuilderFunc);
+            _svgBmpBuilderFunc = svgBmpBuilderFunc;
         }
 
         public AntialiasTechnique AntialiasTechnique { get; set; }
@@ -272,6 +284,59 @@ namespace PixelFarm.Drawing
         int dbugExportCount = 0;
 #endif
 
+        GlyphBitmap GetGlyphBitmapFromSvg(ushort glyphIndex)
+        {
+            if (_glyphBitmapStore.CurrrentBitmapCache.TryGetBitmap(glyphIndex, out GlyphBitmap glyphBmp))
+            {
+                return glyphBmp;
+            }
+
+            //TODO: use string builder from pool?
+
+
+            Glyph glyph = _currentTypeface.GetGlyph(glyphIndex);
+
+            var stbuilder = new System.Text.StringBuilder();
+            _currentTypeface.ReadSvgContent(glyph, stbuilder);
+
+            float bmpScale = _currentTypeface.CalculateScaleToPixelFromPointSize(FontSizeInPoints);
+            float target_advW = _currentTypeface.GetAdvanceWidthFromGlyphIndex(glyphIndex) * bmpScale;
+
+            var req = new SvgBmpBuilderReq
+            {
+                SvgContent = stbuilder,
+                ExpectedWidth = target_advW
+            };
+
+            _svgBmpBuilderFunc.Invoke(req);
+
+            MemBitmap memBmp = req.Output;
+
+            if (memBmp == null)
+            {
+                //TODO: use blank img?
+                return null;
+            }
+
+            TypefaceGlyphBitmapCache currentCache = _glyphBitmapStore.CurrrentBitmapCache;
+            //find bitmap scale             
+
+            //TODO...
+            short offset_x = 0;
+            short offset_y = 0;
+
+            currentCache.RegisterBitmap(glyphIndex,
+                glyphBmp = new GlyphBitmap
+                {
+                    Bitmap = memBmp,
+                    Width = memBmp.Width,
+                    Height = memBmp.Height,
+                    ImageStartX = -offset_x,//offset back
+                    ImageStartY = -offset_y //offset back
+                });
+
+            return glyphBmp;
+        }
         GlyphBitmap GetGlyphBitmapFromColorOutlineGlyph(ushort glyphIndex, ushort colorLayerStart)
         {
             if (_glyphBitmapStore.CurrrentBitmapCache.TryGetBitmap(glyphIndex, out GlyphBitmap glyphBmp))
@@ -326,13 +391,10 @@ namespace PixelFarm.Drawing
 #endif
             }
 
-            TypefaceGlyphBitmapCache typefaceBmpCache = _glyphBitmapStore.CurrrentBitmapCache;
-            //find bitmap scale
+            TypefaceGlyphBitmapCache currentCache = _glyphBitmapStore.CurrrentBitmapCache;
+            //find bitmap scale             
 
-            float actualFontSize = FontSizeInPoints / typefaceBmpCache.ActualCacheSize;
-
-
-            typefaceBmpCache.RegisterBitmap(glyphIndex,
+            currentCache.RegisterBitmap(glyphIndex,
                 glyphBmp = new GlyphBitmap
                 {
                     Bitmap = memBmp,
@@ -347,11 +409,25 @@ namespace PixelFarm.Drawing
         GlyphBitmap GetGlyphBitmapFromBitmapFont(ushort glyphIndex)
         {
 
-            if (_glyphBitmapStore.CurrrentBitmapCache.TryGetBitmap(glyphIndex, out GlyphBitmap glyphBmp))
+            TypefaceGlyphBitmapCache currentCache = _glyphBitmapStore.CurrrentBitmapCache;
+            float actualCacheSize = currentCache.ActualCacheSize;
+
+            //actual size of glyph that we store may not equal the current req size
+            //since we do not store all font size in the cache
+
+#if DEBUG
+            if (actualCacheSize != FontSizeInPoints)
+            {
+                System.Diagnostics.Debugger.Break();
+            }
+#endif
+
+            if (currentCache.TryGetBitmap(glyphIndex, out GlyphBitmap glyphBmp))
             {
                 return glyphBmp;
             }
 
+            //not found=> create a new one
             if (_currentTypeface.IsBitmapFont)
             {
                 //try load
@@ -422,7 +498,10 @@ namespace PixelFarm.Drawing
 
             if (_currentTypeface.HasSvgTable())
             {
-                _glyphSvgStore.SetCurrentTypeface(_currentTypeface);
+                //Test svg font with Twitter Color Emoji Regular
+
+                _glyphBitmapStore.SetCurrentTypeface(_currentTypeface, fontSizePoint);
+
                 int seqLen = seq.Count;
                 if (len > seqLen)
                 {
@@ -435,7 +514,7 @@ namespace PixelFarm.Drawing
                     _painter.SetOrigin((float)Math.Round(left + snapToPx.ExactX) + 0.33f, (float)Math.Floor(baseLine + snapToPx.ExactY));
 
                     //***
-                    GlyphBitmap glyphBmp = _glyphSvgStore.GetGlyphBitmap(snapToPx.CurrentGlyphIndex);
+                    GlyphBitmap glyphBmp = GetGlyphBitmapFromSvg(snapToPx.CurrentGlyphIndex);
                     //how to draw the image
                     //1. 
                     if (glyphBmp != null)
@@ -447,6 +526,8 @@ namespace PixelFarm.Drawing
             }
             else if (_currentTypeface.IsBitmapFont)
             {
+                //Test IsBitmapFont font with Noto Color Emoji
+
                 //check if we have exported all the glyph bitmap 
                 //to some 'ready' form?
                 //if not then create it
@@ -477,8 +558,6 @@ namespace PixelFarm.Drawing
             }
             else
             {
-
-
                 if (!_hasColorInfo)
                 {
                     //NO color information, 
@@ -510,6 +589,7 @@ namespace PixelFarm.Drawing
                 }
                 else
                 {
+                    //Test Color Outline Font with Firefox Emoji
                     //-------------    
                     //this glyph has color information
                     //-------------
