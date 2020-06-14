@@ -7,6 +7,7 @@ using Typography.OpenFont.Extensions;
 using Typography.Contours;
 using System.IO;
 using PixelFarm.Drawing;
+using PixelFarm.CpuBlit.VertexProcessing;
 
 namespace PixelFarm.CpuBlit.BitmapAtlas
 {
@@ -130,6 +131,103 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
 
             CreateTextureFontFromGlyphIndices(typeface, sizeInPoint, hintTechnique, atlasBuilder, glyphIndices);
         }
+        GlyphBitmap GetGlyphBitmapFromColorOutlineGlyph(Typeface typeface, ushort glyphIndex, GlyphMeshStore glyphMeshStore, ushort colorLayerStart)
+        {
+
+            //not found=> create a newone 
+            Typography.OpenFont.Tables.COLR _colrTable = typeface.COLRTable;
+            Typography.OpenFont.Tables.CPAL _cpalTable = typeface.CPALTable;
+
+
+            Q1RectD totalBounds = Q1RectD.ZeroIntersection();
+            {
+                //calculate bounds of this glyph
+                ushort colorLayerCount = _colrTable.LayerCounts[glyphIndex];
+                for (int c = colorLayerStart; c < colorLayerStart + colorLayerCount; ++c)
+                {
+                    BoundingRect.GetBoundingRect(glyphMeshStore.GetGlyphMesh(_colrTable.GlyphLayers[c]), ref totalBounds);
+                }
+            }
+            //dbugExportCount++;     
+            var memBmp = new MemBitmap((int)Math.Round(totalBounds.Width), (int)Math.Round(totalBounds.Height));//???
+            int offset_x = 0;
+            int offset_y = 0;
+            using (Tools.BorrowAggPainter(memBmp, out AggPainter painter))
+            {
+                painter.Clear(Color.Transparent);
+                painter.SetOrigin(0, 0);
+
+                offset_x = -(int)(totalBounds.Left);
+                offset_y = -(int)(totalBounds.Bottom);
+
+                ushort colorLayerCount = _colrTable.LayerCounts[glyphIndex];
+                int palette = 0; // FIXME: assume palette 0 for now 
+                for (int c = colorLayerStart; c < colorLayerStart + colorLayerCount; ++c)
+                {
+
+                    _cpalTable.GetColor(
+                        _cpalTable.Palettes[palette] + _colrTable.GlyphPalettes[c], //index
+                         out byte r, out byte g, out byte b, out byte a);
+
+                    ushort gIndex = _colrTable.GlyphLayers[c];
+                    VertexStore vxs = glyphMeshStore.GetGlyphMesh(gIndex);
+                    using (Tools.BorrowVxs(out var v1))
+                    {
+                        vxs.TranslateToNewVxs(offset_x, offset_y, v1);
+                        painter.FillColor = new Color(r, g, b);//? a component
+                        painter.Fill(v1);
+                    }
+                }
+                //find ex
+#if DEBUG
+                //memBmp.SaveImage("a0x" + (dbugExportCount) + ".png");
+#endif
+            }
+
+            return new GlyphBitmap
+            {
+                Bitmap = memBmp,
+                Width = memBmp.Width,
+                Height = memBmp.Height,
+                ImageStartX = -offset_x,//offset back
+                ImageStartY = -offset_y //offset back
+            };
+        }
+        GlyphBitmap GetGlyphBitmapFromBitmapFont(Typeface typeface, float sizeInPoint, ushort glyphIndex)
+        {
+            //not found=> create a new one
+            if (typeface.IsBitmapFont)
+            {
+                //try load
+                using (System.IO.MemoryStream ms = new System.IO.MemoryStream())
+                {
+                    //load actual bitmap font
+                    Glyph glyph = typeface.GetGlyph(glyphIndex);
+                    typeface.ReadBitmapContent(glyph, ms);
+
+                    using (MemBitmap memBitmap = MemBitmap.LoadBitmap(ms))
+                    {
+                        //bitmap that are load may be larger than we need
+                        //so we need to scale it to specfic size
+
+                        float bmpScale = typeface.CalculateScaleToPixelFromPointSize(sizeInPoint);
+                        float target_advW = typeface.GetAdvanceWidthFromGlyphIndex(glyphIndex) * bmpScale;
+                        float scaleForBmp = target_advW / memBitmap.Width;
+
+                        MemBitmap scaledMemBmp = memBitmap.ScaleImage(scaleForBmp, scaleForBmp);
+
+                        var glyphBitmap = new GlyphBitmap
+                        {
+                            Width = scaledMemBmp.Width,
+                            Height = scaledMemBmp.Height,
+                            Bitmap = scaledMemBmp //**
+                        };
+                        return glyphBitmap;
+                    }
+                }
+            }
+            return null;
+        }
 
         GlyphBitmap GetGlyphBitmapFromSvg(Typeface typeface, float sizeInPoint, ushort glyphIndex)
         {
@@ -251,13 +349,112 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                 int j = glyphIndices.Length;
                 if (typeface.HasColorTable())
                 {
-                    //outline glyph 
+                    //outline glyph  
+                    GlyphMeshStore glyphMeshStore = new GlyphMeshStore();
+                    glyphMeshStore.SetFont(typeface, sizeInPoint);
+
+
+                    for (int i = 0; i < j; ++i)
+                    {
+                        ushort gindex = glyphIndices[i];
+
+                        if (!typeface.COLRTable.LayerIndices.TryGetValue(gindex, out ushort colorLayerStart))
+                        {
+                            //not found, then render as normal
+
+                        }
+                        else
+                        {
+                            //TODO: review this again
+                            GlyphBitmap glyphBmp = GetGlyphBitmapFromColorOutlineGlyph(typeface, gindex, glyphMeshStore, colorLayerStart);
+                            if (glyphBmp == null)
+                            {
+                                //use empty glyph?
+                                //temp fix
+                                BitmapAtlasItemSource glyphImage = new BitmapAtlasItemSource(16, 16);
+                                using (MemBitmap empty = new MemBitmap(16, 16))
+                                {
+                                    empty.Clear(PixelFarm.Drawing.Color.Transparent);
+                                    glyphImage.SetImageBuffer(MemBitmapExtensions.CopyImgBuffer(empty, empty.Width, empty.Height), false);
+
+                                }
+
+                                glyphImage.UniqueInt16Name = gindex;
+                                _onEachGlyphDel?.Invoke(glyphImage);
+                                atlasBuilder.AddItemSource(glyphImage);
+                            }
+                            else
+                            {
+                                int w = glyphBmp.Width;
+                                int h = glyphBmp.Height;
+
+                                BitmapAtlasItemSource glyphImage = new BitmapAtlasItemSource(glyphBmp.Width, glyphBmp.Height);
+
+                                glyphImage.TextureXOffset = (short)glyphBmp.ImageStartX;
+                                glyphImage.TextureYOffset = (short)glyphBmp.ImageStartY;
+
+                                //
+                                glyphImage.SetImageBuffer(MemBitmapExtensions.CopyImgBuffer(glyphBmp.Bitmap, w, h, true), false);
+
+                                glyphImage.UniqueInt16Name = gindex;
+                                _onEachGlyphDel?.Invoke(glyphImage);
+                                atlasBuilder.AddItemSource(glyphImage);
+
+                                //clear
+                                glyphBmp.Bitmap.Dispose();
+                                glyphBmp.Bitmap = null;
+                            }
+                        }
+                    }
 
                     return;
                 }
                 else if (typeface.IsBitmapFont)
                 {
                     //test this with Noto Color Emoji
+                    for (int i = 0; i < j; ++i)
+                    {
+                        ushort gindex = glyphIndices[i];
+
+                        GlyphBitmap glyphBmp = GetGlyphBitmapFromBitmapFont(typeface, sizeInPoint, gindex);
+                        if (glyphBmp == null)
+                        {
+                            //use empty glyph?
+                            //temp fix
+                            BitmapAtlasItemSource glyphImage = new BitmapAtlasItemSource(16, 16);
+                            using (MemBitmap empty = new MemBitmap(16, 16))
+                            {
+                                empty.Clear(PixelFarm.Drawing.Color.Transparent);
+                                glyphImage.SetImageBuffer(MemBitmapExtensions.CopyImgBuffer(empty, empty.Width, empty.Height), false);
+
+                            }
+
+                            glyphImage.UniqueInt16Name = gindex;
+                            _onEachGlyphDel?.Invoke(glyphImage);
+                            atlasBuilder.AddItemSource(glyphImage);
+                        }
+                        else
+                        {
+                            int w = glyphBmp.Width;
+                            int h = glyphBmp.Height;
+
+                            BitmapAtlasItemSource glyphImage = new BitmapAtlasItemSource(glyphBmp.Width, glyphBmp.Height);
+
+                            glyphImage.TextureXOffset = (short)glyphBmp.ImageStartX;
+                            glyphImage.TextureYOffset = (short)glyphBmp.ImageStartY;
+
+                            //
+                            glyphImage.SetImageBuffer(MemBitmapExtensions.CopyImgBuffer(glyphBmp.Bitmap, w, h, true), false);
+
+                            glyphImage.UniqueInt16Name = gindex;
+                            _onEachGlyphDel?.Invoke(glyphImage);
+                            atlasBuilder.AddItemSource(glyphImage);
+
+                            //clear
+                            glyphBmp.Bitmap.Dispose();
+                            glyphBmp.Bitmap = null;
+                        }
+                    }
 
                     return;
                 }
@@ -306,7 +503,6 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                             glyphBmp.Bitmap.Dispose();
                             glyphBmp.Bitmap = null;
                         }
-
                     }
 
                     return;
