@@ -995,9 +995,6 @@ namespace Typography.OpenFont.Tables
                             }
                         }
                     }
-
-                     
-
                 }
 
                 public override bool DoSubstitutionAt(IGlyphIndexList glyphIndices, int pos, int len)
