@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using Typography.OpenFont;
 using Typography.OpenFont.Extensions;
 using Typography.Contours;
-using System.IO;
+
 using PixelFarm.Drawing;
 using PixelFarm.CpuBlit.VertexProcessing;
 
