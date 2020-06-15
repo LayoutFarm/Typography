@@ -531,7 +531,7 @@ namespace MathLayout
             AssignGlyphVxsByGlyphIndex(glyphBox, glyphIndex);
         }
 
-
+        Dictionary<ushort, Bounds> _glyphBounding = new Dictionary<ushort, Bounds>();
         void AssignGlyphVxsByGlyphIndex(GlyphBox glyphBox, ushort glyphIndex)
         {
            
@@ -542,9 +542,9 @@ namespace MathLayout
                 return;
             }
 
+            Glyph glyph = _typeface.GetGlyph(glyphIndex);
             if (_typeface.HasMathTable())
             {
-                Glyph glyph = _typeface.GetGlyph(glyphIndex);
                 if (glyph.MathGlyphInfo != null)
                 {
                     glyphBox.MathGlyphInfo = glyph.MathGlyphInfo;
@@ -558,6 +558,21 @@ namespace MathLayout
                     }
                 }
             }
+            if (glyphBox.MathNode != null)
+            {
+                string mathVariant = glyphBox.MathNode.GetAttributeValue("mathvariant");
+                switch (mathVariant)
+                {
+                    case "italic":
+                        glyphBox.IsItalic = true;
+                        break;
+                }
+            }
+            if (!_glyphBounding.ContainsKey(glyphIndex))
+            {
+                _glyphBounding.Add(glyphIndex, glyph.Bounds);
+            }
+
             ushort advW = _typeface.GetHAdvanceWidthFromGlyphIndex(glyphIndex);//unscale glyph width
             int advW_s = (int)System.Math.Round(px_scale * advW);
 
@@ -808,6 +823,7 @@ namespace MathLayout
             }
             return null;
         }
+        List<int> _reuseUserCodePoints = new List<int>();
         Box CreateTextBox(MathNode node)
         {
             if (node.Text == null)
@@ -824,15 +840,104 @@ namespace MathLayout
             {
                 HorizontalStackBox textSpan = new HorizontalStackBox();
                 textSpan.MathNode = node;
+                _reuseUserCodePoints.Clear();
+                bool allIsLetter = true;
                 for (int i = 0; i < text_buff.Length; ++i)
                 {
                     char ch = text_buff[i];
+                    if (!char.IsLetter(ch))
+                    {
+                        allIsLetter = false;
+                    }
+                    int codepoint = ch;
                     if (!MathMLOperatorTable.IsInvicibleCharacter(ch))
                     {
+                        if (char.IsHighSurrogate(ch) && i + 1 < text_buff.Length)
+                        {
+                            char nextCh = text_buff[i + 1];
+                            if (char.IsLowSurrogate(nextCh))
+                            {
+                                //please note: 
+                                //num of codepoint may be less than  original user input char 
+                                ++i;//skip lowSurrogate
+                                codepoint = char.ConvertToUtf32(ch, nextCh);
+                            }
+                        }
                         GlyphBox glyphBox = NewGlyphBox();
-                        glyphBox.Character = ch;
+                        glyphBox.Character = ch;//character or highSurrogate
+                        glyphBox.MathNode = node;
                         glyphBox.IsInvisible = _isPhantom;
                         textSpan.AddChild(glyphBox);
+                        _reuseUserCodePoints.Add(codepoint);
+                    }
+                }
+
+                int codeEnd = _reuseUserCodePoints.Count;
+                int cur_codepoint, next_codepoint;
+                for (int i = 0; i < codeEnd; i++)
+                {
+                    //find glyph index by specific codepoint  
+                    if (i + 1 < codeEnd)
+                    {
+                        cur_codepoint = _reuseUserCodePoints[i];
+                        next_codepoint = _reuseUserCodePoints[i + 1];
+                    }
+                    else
+                    {
+                        cur_codepoint = _reuseUserCodePoints[i];
+                        next_codepoint = 0;
+                    }
+                    ushort glyphIndex = _typeface.GetGlyphIndex(cur_codepoint, next_codepoint, out bool skipNextCodepoint);
+                    if (cur_codepoint == 32)//space
+                    {
+                        glyphIndex = _typeface.GetGlyphIndex(cur_codepoint);
+                        skipNextCodepoint = false;
+                    }
+
+                    if (glyphIndex != 0)
+                    {
+                        GlyphBox glyphBox = textSpan.GetChild(i) as GlyphBox;
+                        glyphBox.GlyphIndex = glyphIndex;
+                        AssignGlyphVxsByGlyphIndex(glyphBox, glyphIndex);
+                        if (i + 1 >= codeEnd)
+                        {
+                            if ((cur_codepoint >= 0x1d434 && cur_codepoint <= 0x1d49b)//MATHEMATICAL ITALIC & MATHEMATICAL BOLD ITALIC 
+                             || (cur_codepoint >= 0x1d608 && cur_codepoint <= 0x1d66f)//MATHEMATICAL SANS-SERIF ITALIC & MATHEMATICAL SANS-SERIF BOLD ITALIC
+                             || (cur_codepoint >= 0x1d6e2 && cur_codepoint <= 0x1d755)//MATHEMATICAL ITALIC PI SYMBOL & MATHEMATICAL BOLD ITALIC PI SYMBOL
+                             || (cur_codepoint >= 0x1d790 && cur_codepoint <= 0x1d7c9))//MATHEMATICAL SANS-SERIF ITALIC PI SYMBOL & MATHEMATICAL SANS-SERIF BOLD ITALIC PI SYMBOL
+                            {
+                                Bounds bounds = _glyphBounding[glyphIndex];
+                                glyphBox.AdvanceWidthScale = (int)((bounds.XMax - bounds.XMin) * GetPixelScale());
+                            }
+                            else if (glyphBox.IsItalic)
+                            {
+                                glyphBox.AdvanceWidthScale = (int)glyphBox.GetBoundingRect().Width;
+                            }
+                        }
+                        else if ((cur_codepoint >= 0x1d434 && cur_codepoint <= 0x1d49b)//MATHEMATICAL ITALIC & MATHEMATICAL BOLD ITALIC 
+                                 || (cur_codepoint >= 0x1d608 && cur_codepoint <= 0x1d66f)//MATHEMATICAL SANS-SERIF ITALIC & MATHEMATICAL SANS-SERIF BOLD ITALIC
+                                 || (cur_codepoint >= 0x1d6e2 && cur_codepoint <= 0x1d755)//MATHEMATICAL ITALIC PI SYMBOL & MATHEMATICAL BOLD ITALIC PI SYMBOL
+                                 || (cur_codepoint >= 0x1d790 && cur_codepoint <= 0x1d7c9))//MATHEMATICAL SANS-SERIF ITALIC PI SYMBOL & MATHEMATICAL SANS-SERIF BOLD ITALIC PI SYMBOL
+                        {
+                            Bounds bounds = _glyphBounding[glyphIndex];
+                            glyphBox.AdvanceWidthScale += (int)((bounds.XMin) * GetPixelScale());
+                        }
+                        //else
+                        //{
+                        //    if (!allIsLetter && cur_codepoint != 32)
+                        //    {
+                        //        Bounds bounds = _glyphBounding[glyphIndex];
+                        //        glyphBox.AdvanceWidthScale = (int)((bounds.XMax) * GetPixelScale());
+                        //    }
+                        //}
+                    }
+                    if (skipNextCodepoint)
+                    {
+                        // Maybe this is a UVS sequence; in that case,
+                        //***SKIP*** the second codepoint 
+                        GlyphBox glyphBox = textSpan.GetChild(i + 1) as GlyphBox;//next glyph
+                        glyphBox.Character = '\0';
+                        ++i;
                     }
                 }
                 return textSpan;
@@ -846,6 +951,18 @@ namespace MathLayout
                     glyphBox.MathNode = node;
                     glyphBox.Character = text_buff[0];
                     glyphBox.IsInvisible = _isPhantom;
+                    //if (!char.IsLetter(glyphBox.Character))
+                    if (glyphBox.Character == '(' || glyphBox.Character == ')')
+                    {
+                        //AssignGlyphVxs(glyphBox);
+                        //Bounds bounds = _glyphBounding[glyphBox.GlyphIndex];
+                        //glyphBox.AdvanceWidthScale = (int)((bounds.XMax) * GetPixelScale());
+                        //glyphBox.AdvanceWidthScale = (int)glyphBox.GetBoundingRect().Width;
+                    }
+                    else if (glyphBox.Character == '-' && node.Name == "mo")
+                    {
+                        glyphBox.Character = (char)0x2212;
+                    }
                     return glyphBox;
                 }
                 return null;
