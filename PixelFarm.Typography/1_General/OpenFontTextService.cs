@@ -112,7 +112,7 @@ namespace PixelFarm.Drawing
         }
 
 
-
+        public PixelFarm.Drawing.SvgBmpBuilderFunc SvgBmpBuilder { get; set; }
 
         public bool TryGetAlternativeTypefaceFromChar(char c, AlternativeTypefaceSelector selector, out Typeface found)
         {
@@ -368,7 +368,7 @@ namespace PixelFarm.Drawing
             }
             public int StartAt => _startAt;
             public ushort Length => _len;
-            
+
             public object SpanBreakInfo => breakInfo;
 #if DEBUG
             public override string ToString()

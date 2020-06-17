@@ -609,11 +609,10 @@ namespace Typography.FontManagement
             string upperCaseFontName = fontName.ToUpper();
             string upperCaseSubFamName = subFamName.ToUpper();
 
-            InstalledTypeface foundInstalledFont;
 
             //find font group  
             if (_subFamToFontGroup.TryGetValue(upperCaseSubFamName, out InstalledTypefaceGroup foundFontGroup) &&
-                foundFontGroup.TryGetValue(upperCaseFontName, out foundInstalledFont))
+                foundFontGroup.TryGetValue(upperCaseFontName, out InstalledTypeface foundInstalledFont))
             {
                 return foundInstalledFont;
             }
