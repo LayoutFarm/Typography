@@ -40,12 +40,13 @@
             this.cmbTextureKind = new System.Windows.Forms.ComboBox();
             this.chkShowAtlasViewer = new System.Windows.Forms.CheckBox();
             this.uiFontAtlasFileViewer1 = new SampleWinForms.UIFontAtlasFileViewer();
+            this.cmdBuildAtlasFromAllGlyphs = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.picOutput)).BeginInit();
             this.SuspendLayout();
             // 
             // txtSampleChars
             // 
-            this.txtSampleChars.Location = new System.Drawing.Point(511, 12);
+            this.txtSampleChars.Location = new System.Drawing.Point(740, 12);
             this.txtSampleChars.Name = "txtSampleChars";
             this.txtSampleChars.Size = new System.Drawing.Size(119, 20);
             this.txtSampleChars.TabIndex = 75;
@@ -53,7 +54,7 @@
             // 
             // cmdBuildAtlasFromText
             // 
-            this.cmdBuildAtlasFromText.Location = new System.Drawing.Point(636, 10);
+            this.cmdBuildAtlasFromText.Location = new System.Drawing.Point(865, 10);
             this.cmdBuildAtlasFromText.Name = "cmdBuildAtlasFromText";
             this.cmdBuildAtlasFromText.Size = new System.Drawing.Size(111, 23);
             this.cmdBuildAtlasFromText.TabIndex = 76;
@@ -145,17 +146,29 @@
             // 
             // uiFontAtlasFileViewer1
             // 
+            this.uiFontAtlasFileViewer1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
             this.uiFontAtlasFileViewer1.Location = new System.Drawing.Point(11, 10);
             this.uiFontAtlasFileViewer1.Name = "uiFontAtlasFileViewer1";
             this.uiFontAtlasFileViewer1.Size = new System.Drawing.Size(1152, 667);
             this.uiFontAtlasFileViewer1.TabIndex = 86;
             this.uiFontAtlasFileViewer1.Visible = false;
             // 
+            // cmdBuildAtlasFromAllGlyphs
+            // 
+            this.cmdBuildAtlasFromAllGlyphs.Location = new System.Drawing.Point(503, 10);
+            this.cmdBuildAtlasFromAllGlyphs.Name = "cmdBuildAtlasFromAllGlyphs";
+            this.cmdBuildAtlasFromAllGlyphs.Size = new System.Drawing.Size(157, 36);
+            this.cmdBuildAtlasFromAllGlyphs.TabIndex = 87;
+            this.cmdBuildAtlasFromAllGlyphs.Text = "BuildAtlas from ALL glyphs";
+            this.cmdBuildAtlasFromAllGlyphs.UseVisualStyleBackColor = true;
+            this.cmdBuildAtlasFromAllGlyphs.Click += new System.EventHandler(this.cmdBuildAtlasFromAllGlyphs_Click);
+            // 
             // FormFontAtlas
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1163, 727);
+            this.Controls.Add(this.cmdBuildAtlasFromAllGlyphs);
             this.Controls.Add(this.chkShowAtlasViewer);
             this.Controls.Add(this.cmbTextureKind);
             this.Controls.Add(this.label2);
@@ -191,5 +204,6 @@
         private System.Windows.Forms.ComboBox cmbTextureKind;
         private System.Windows.Forms.CheckBox chkShowAtlasViewer;
         private UIFontAtlasFileViewer uiFontAtlasFileViewer1;
+        private System.Windows.Forms.Button cmdBuildAtlasFromAllGlyphs;
     }
 }
