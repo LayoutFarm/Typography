@@ -1,17 +1,14 @@
 ﻿//MIT, 2020-present, WinterDev
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 
 using System.Drawing;
-using System.IO;
-using System.Text;
 using System.Windows.Forms;
 
 using PixelFarm.CpuBlit;
 using PixelFarm.CpuBlit.BitmapAtlas;
 using Typography.OpenFont;
-using Typography.OpenFont.Extensions;
+using PaintLab;
 
 namespace SampleWinForms
 {

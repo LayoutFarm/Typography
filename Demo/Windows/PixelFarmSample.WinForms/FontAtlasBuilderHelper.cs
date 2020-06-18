@@ -14,7 +14,7 @@ using LayoutFarm.WebLexer;
 using Typography.OpenFont;
 
 
-namespace SampleWinForms
+namespace PaintLab
 {
     struct FontAtlasBuilderHelper
     {

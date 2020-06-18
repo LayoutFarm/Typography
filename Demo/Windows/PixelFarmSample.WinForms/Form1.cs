@@ -210,7 +210,7 @@ namespace SampleWinForms
                 _textService.UpdateUnicodeRanges();
 
                 _devVxsTextPrinter = new PixelFarm.Drawing.VxsTextPrinter(_painter, _textService);
-                _devVxsTextPrinter.SetSvgBmpBuilderFunc(SvgBuilderHelper.ParseAndRenderSvg);
+                _devVxsTextPrinter.SetSvgBmpBuilderFunc(PaintLab.SvgBuilderHelper.ParseAndRenderSvg);
                 _devVxsTextPrinter.ScriptLang = _basicOptions.ScriptLang;
                 _devVxsTextPrinter.PositionTechnique = Typography.TextLayout.PositionTechnique.OpenFont;
 
