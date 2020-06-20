@@ -20,7 +20,7 @@ namespace Typography.TextBreak.SheenBidi
 {
     public class Line
     {
-        #region Line Run
+
 
         internal class Run
         {
@@ -34,28 +34,20 @@ namespace Typography.TextBreak.SheenBidi
             }
         }
 
-        #endregion
 
-        #region Variables
 
         private string _text;
         private int _offset;
         private int _length;
         private List<Run> _runs = new List<Run>();
 
-        #endregion Variables
 
-        #region Properties
 
         public string Text => _text;
         public int Offset => _offset;
         public int Length => _length;
         internal List<Run> Runs => _runs;
 
-
-        #endregion Properties
-
-        #region Constructors
 
         public Line(Paragraph paragraph)
             : this(paragraph, 0, paragraph.Text.Length)
@@ -99,9 +91,6 @@ namespace Typography.TextBreak.SheenBidi
             ReorderRuns(maxLevel);
         }
 
-        #endregion Constructors
-
-        #region Reset Levels
 
         private void ResetLevels(CharType[] types, byte[] levels, byte baseLevel)
         {
@@ -159,9 +148,7 @@ namespace Typography.TextBreak.SheenBidi
             }
         }
 
-        #endregion Reset Levels
 
-        #region Determine Runs
 
         private byte DetermineRuns(byte[] levels)
         {
@@ -196,9 +183,7 @@ namespace Typography.TextBreak.SheenBidi
             return maxLevel;
         }
 
-        #endregion Determine Runs
 
-        #region Reorder Runs
 
         private void ReorderRuns(byte maxLevel)
         {
@@ -236,7 +221,5 @@ namespace Typography.TextBreak.SheenBidi
                 _runs[tieIndex] = tempRun;
             }
         }
-
-        #endregion Reorder Runs
     }
 }
