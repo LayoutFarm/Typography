@@ -681,15 +681,17 @@ namespace PixelFarm.Drawing
         }
 
         bool EnableColorGlyphBitmapCache { get; set; } = true;
-
-        public void DrawString(char[] textBuffer, int startAt, int len, double x, double y)
+       
+        void ITextPrinter.DrawString(char[] textBuffer, int startAt, int len, double x, double y)
         {
-            DrawString(textBuffer, startAt, len, (float)x, (float)y);
+            InnerDrawString(textBuffer, startAt, len, (float)x, (float)y);
         }
-
         public override void DrawString(char[] textBuffer, int startAt, int len, float x, float y)
         {
-
+            InnerDrawString(textBuffer, startAt, len, x, y);
+        }
+        void InnerDrawString(char[] textBuffer, int startAt, int len, float x, float y)
+        {
 
 #if DEBUG
             if (textBuffer.Length > 3)
@@ -848,6 +850,7 @@ namespace PixelFarm.Drawing
                 }
             }
         }
+
 
 
         class FormattedGlyphPlanSeq
