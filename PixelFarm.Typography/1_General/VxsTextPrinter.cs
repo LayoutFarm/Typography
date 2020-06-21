@@ -681,7 +681,7 @@ namespace PixelFarm.Drawing
         }
 
         bool EnableColorGlyphBitmapCache { get; set; } = true;
-       
+
         void ITextPrinter.DrawString(char[] textBuffer, int startAt, int len, double x, double y)
         {
             InnerDrawString(textBuffer, startAt, len, (float)x, (float)y);
@@ -800,7 +800,7 @@ namespace PixelFarm.Drawing
                         GlyphPlanSequence seq = _textServices.CreateGlyphPlanSeq(buff, curTypeface, FontSizeInPoints);
                         seq.IsRightToLeft = spBreakInfo.RightToLeft;
 
-                        FormattedGlyphPlanSeq formattedGlyphPlanSeq = GetFreeFmtGlyphPlanSeqs();
+                        FormattedGlyphPlanSeq formattedGlyphPlanSeq = _pool.GetFreeFmtGlyphPlanSeqs();
                         formattedGlyphPlanSeq.seq = seq;
                         formattedGlyphPlanSeq.Typeface = curTypeface;
                         formattedGlyphPlanSeq.ContainsSurrogatePair = contains_surrogate_pair;
@@ -851,44 +851,46 @@ namespace PixelFarm.Drawing
             }
         }
 
-
-
-        class FormattedGlyphPlanSeq
-        {
-            static readonly GlyphPlanSequence s_EmptyGlypgPlanSeq = new GlyphPlanSequence();
-
-            public GlyphPlanSequence seq;
-
-            public Typeface Typeface;
-            public bool ContainsSurrogatePair;
-            public bool IsEmpty() => Typeface == null;
-            public void Reset()
-            {
-
-                seq = s_EmptyGlypgPlanSeq;
-                Typeface = null;
-            }
-        }
-
         void ClearTempFormattedGlyphPlanSeq()
         {
             for (int i = _tmpGlyphPlanSeqs.Count - 1; i >= 0; --i)
             {
-                ReleaseFmtGlyphPlanSeqs(_tmpGlyphPlanSeqs[i]);
+                _pool.ReleaseFmtGlyphPlanSeqs(_tmpGlyphPlanSeqs[i]);
             }
             _tmpGlyphPlanSeqs.Clear();
         }
 
-        Queue<FormattedGlyphPlanSeq> _pool = new Queue<FormattedGlyphPlanSeq>();
+        FormattedGlyphPlanSeqPool _pool = new FormattedGlyphPlanSeqPool();
         List<FormattedGlyphPlanSeq> _tmpGlyphPlanSeqs = new List<FormattedGlyphPlanSeq>();
-        FormattedGlyphPlanSeq GetFreeFmtGlyphPlanSeqs() => (_pool.Count > 0) ? _pool.Dequeue() : new FormattedGlyphPlanSeq();
-        void ReleaseFmtGlyphPlanSeqs(FormattedGlyphPlanSeq seq)
+    }
+
+    public class FormattedGlyphPlanSeqPool
+    {
+        Queue<FormattedGlyphPlanSeq> _pool = new Queue<FormattedGlyphPlanSeq>();
+
+        public FormattedGlyphPlanSeq GetFreeFmtGlyphPlanSeqs() => (_pool.Count > 0) ? _pool.Dequeue() : new FormattedGlyphPlanSeq();
+        public void ReleaseFmtGlyphPlanSeqs(FormattedGlyphPlanSeq seq)
         {
             seq.Reset();
             _pool.Enqueue(seq);
         }
     }
+    public class FormattedGlyphPlanSeq
+    {
+        static readonly GlyphPlanSequence s_EmptyGlypgPlanSeq = new GlyphPlanSequence();
 
+        public GlyphPlanSequence seq;
+
+        public Typeface Typeface;
+        public bool ContainsSurrogatePair;
+        public bool IsEmpty() => Typeface == null;
+        public void Reset()
+        {
+
+            seq = s_EmptyGlypgPlanSeq;
+            Typeface = null;
+        }
+    }
 
     public interface IMultiLayerGlyphTranslator : IGlyphTranslator
     {
