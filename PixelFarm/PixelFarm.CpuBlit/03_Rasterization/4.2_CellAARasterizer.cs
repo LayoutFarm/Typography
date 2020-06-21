@@ -36,7 +36,7 @@
 using poly_subpix = PixelFarm.CpuBlit.Rasterization.PolySubPix;
 namespace PixelFarm.CpuBlit.Rasterization
 {
-    
+
     partial class ScanlineRasterizer
     {
 
@@ -139,6 +139,7 @@ namespace PixelFarm.CpuBlit.Rasterization
             const int BLOCK_MASK = BLOCK_SIZE - 1;
             const int BLOCK_POOL = 256;
             const int BLOCK_LIMIT = BLOCK_SIZE * 1024;
+
             struct SortedY
             {
                 internal int start;
@@ -355,43 +356,66 @@ namespace PixelFarm.CpuBlit.Rasterization
                 SortedY[] sortedYData = _sorted_y.UnsafeInternalArray;
                 CellAA[] sortedCellsData = _sorted_cells.UnsafeInternalArray;
                 // Create the Y-histogram (count the numbers of cells for each Y)
-                for (int i = 0; i < _num_used_cells; ++i)
-                {
-                    int index = cells[i].y - _min_y;
-                    sortedYData[index].start++;
-                }
 
-                // Convert the Y-histogram into the array of starting indexes
-                int start = 0;
-                int sortedYSize = _sorted_y.Count;
-                for (int i = 0; i < sortedYSize; i++)
+                unsafe
                 {
-                    int v = sortedYData[i].start;
-                    sortedYData[i].start = start;
-                    start += v;
-                }
-
-                // Fill the cell pointer array sorted by Y
-                for (int i = 0; i < _num_used_cells; ++i)
-                {
-                    int sortedIndex = cells[i].y - _min_y;
-                    int curr_y_start = sortedYData[sortedIndex].start;
-                    int curr_y_num = sortedYData[sortedIndex].num;
-                    sortedCellsData[curr_y_start + curr_y_num] = cells[i];
-                    sortedYData[sortedIndex].num++;
-                }
-
-                // Finally arrange the X-arrays
-                for (int i = 0; i < sortedYSize; i++)
-                {
-                    var yData = sortedYData[i];
-                    if (yData.num != 0)
+                    fixed (SortedY* sortedY_arr = &sortedYData[0])
                     {
-                        QuickSort.Sort(sortedCellsData,
-                            yData.start,
-                            yData.start + yData.num - 1);
+                        for (int i = 0; i < _num_used_cells; ++i)
+                        {
+                            //int index = cells[i].y - _min_y;//dbug
+                            //sortedYData[index].start++;
+
+                            //sortedYData[cells[i].y - _min_y].start++;
+
+                            //SortedY* sortedY_elem = sortedY_arr + (cells[i].y - _min_y);
+                            //sortedY_elem->start++;
+
+                            (sortedY_arr + (cells[i].y - _min_y))->start++;
+                        }
+
+                        // Convert the Y-histogram into the array of starting indexes
+                        int start = 0;
+                        int sortedYSize = _sorted_y.Count;
+                        for (int i = 0; i < sortedYSize; i++)
+                        {
+                            SortedY* sortedY_elem = sortedY_arr + i;
+                            int v = sortedY_elem->start;
+                            sortedY_elem->start = start;
+                            start += v;
+                        }
+
+                        // Fill the cell pointer array sorted by Y
+                        for (int i = 0; i < _num_used_cells; ++i)
+                        {
+                            //int sortedIndex = cells[i].y - _min_y;
+                            //int curr_y_start = sortedYData[sortedIndex].start;
+                            //int curr_y_num = sortedYData[sortedIndex].num;
+                            //sortedCellsData[curr_y_start + curr_y_num] = cells[i];
+                            //sortedYData[sortedIndex].num++;
+
+                            SortedY* sortedY_elem = sortedY_arr + (cells[i].y - _min_y);
+
+                            sortedCellsData[sortedY_elem->start + sortedY_elem->num] = cells[i];
+
+                            sortedY_elem->num++;
+                        }
+
+                        // Finally arrange the X-arrays
+                        for (int i = 0; i < sortedYSize; i++)
+                        {
+                            SortedY* sortedY_elem = sortedY_arr + i;
+                            if (sortedY_elem->num != 0)
+                            {
+                                QuickSort.Sort(sortedCellsData,
+                                    sortedY_elem->start,
+                                    sortedY_elem->start + sortedY_elem->num - 1);
+                            }
+                        }
                     }
+
                 }
+
                 _sorted = true;
             }
 
@@ -581,7 +605,8 @@ namespace PixelFarm.CpuBlit.Rasterization
                     int pivot = begPoint;
                     int m = begPoint + 1;
                     int n = endPoint;
-                    var x_at_PivotPoint = dataToSort[pivot].x;
+                    int x_at_PivotPoint = dataToSort[pivot].x;
+
                     while ((m < endPoint)
                         && x_at_PivotPoint >= dataToSort[m].x)
                     {

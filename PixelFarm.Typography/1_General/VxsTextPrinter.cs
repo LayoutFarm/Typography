@@ -16,7 +16,7 @@ namespace PixelFarm.Drawing
 {
     public class MyAlternativeTypefaceSelector : AlternativeTypefaceSelector
     {
-        Dictionary<string, PreferTypefaceList> _dics = new Dictionary<string, PreferTypefaceList>();
+        readonly Dictionary<string, PreferTypefaceList> _dics = new Dictionary<string, PreferTypefaceList>();
 #if DEBUG
         public MyAlternativeTypefaceSelector() { }
 #endif

@@ -318,12 +318,9 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                     int* cur = first + _height - 1;
                     for (int i = _height - 1; i >= 0;)
                     {
-                        //--------------------
-                        //*cur = i * strideInBytes;
                         *cur = i * _width;
                         --i;
                         cur--;
-                        //--------------------
                     }
                 }
                 fixed (int* first = &_xTableArray[0])
@@ -333,12 +330,9 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                     //even
                     for (int i = _width - 1; i >= 0;)
                     {
-                        //--------------------
-                        //*cur = i * m_DistanceInBytesBetweenPixelsInclusive;
                         *cur = i * 1;
                         --i;
                         cur--;
-                        //--------------------
                     }
                 }
             }
@@ -735,11 +729,7 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                 }
             }
         }
-        //public RectInt GetBoundingRect()
-        //{
-        //    return new RectInt(0, 0, Width, Height);
-        //}
-        //---------
+
         public void SetFilterImage(MemBitmap filterBmp)
         {
             _filterBmp = filterBmp;

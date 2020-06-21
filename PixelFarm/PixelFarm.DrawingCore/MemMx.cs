@@ -100,23 +100,7 @@ namespace PixelFarm.Drawing.Internal
             s_memCopyImpl = memcopyImpl;
             s_memSetImpl = memsetImpl;
         }
-
-        static void MemSet(byte[] dest, int startAt, byte value, int count)
-        {
-            unsafe
-            {
-                fixed (byte* head = &dest[startAt])
-                {
-                    s_memSetImpl(head, value, count);
-                }
-            }
-        }
-
-        static unsafe void MemCopy(byte* head_dest, byte* head_src, int len)
-        {
-            memcpy(head_dest, head_src, len);
-        }
-
+         
         static MemMx()
         {
             unsafe
