@@ -32,6 +32,11 @@ namespace Typography.TextBreak
         public bool BreakPeroidInTextSpan { get; set; }
         public bool EnableCustomAbbrv { get; set; }
         public bool EnableUnicodeRangeBreaker { get; set; }
+
+
+        public bool IncludeLatinExtended { get; set; } = true;
+
+
         public SurrogatePairBreakingOption SurrogatePairBreakingOption { get; set; } = SurrogatePairBreakingOption.ConsecutiveSurrogatePairsAndJoiner;
 
         public CustomAbbrvDic EngCustomAbbrvDic { get; set; }
@@ -65,8 +70,11 @@ namespace Typography.TextBreak
                    char.IsPunctuation(c) ||
                    char.IsWhiteSpace(c) ||
                    char.IsControl(c) ||
-                   char.IsSymbol(c);
+                   char.IsSymbol(c) ||
+                   (IncludeLatinExtended && (IsLatinExtendedA(c) || IsLatinExtendedB(c)));
         }
+        static bool IsLatinExtendedA(char c) => c >= 0x100 & c <= 0x017F;
+        static bool IsLatinExtendedB(char c) => c >= 0x0180 & c <= 0x024F;
         //
         public override bool CanBeStartChar(char c) => true;
         //
@@ -152,6 +160,11 @@ namespace Typography.TextBreak
 
         }
 
+        const char FIRST_CHAR = (char)0;
+        const char LAST_CHAR = (char)255;
+        bool IsInOurLetterRange(char c) => (c >= FIRST_CHAR && c <= LAST_CHAR) || (IncludeLatinExtended && (IsLatinExtendedA(c) || IsLatinExtendedB(c)));
+
+
         void DoBreak(WordVisitor visitor, char[] input, int start, int len)
         {
 
@@ -174,12 +187,10 @@ namespace Typography.TextBreak
             bb.startIndex = start;
 
             bool enableUnicodeRangeBreaker = EnableUnicodeRangeBreaker;
-            bool breakPeroidInTextSpan = BreakPeroidInTextSpan;
+            bool breakPeroidInTextSpan = BreakPeroidInTextSpan; 
 
             visitor.SpanBreakInfo = s_latin;
-            const char first = (char)0;
-            const char last = (char)255;
-
+             
             for (int i = start; i < endBefore; ++i)
             {
                 char c = input[i];
@@ -222,12 +233,11 @@ namespace Typography.TextBreak
                             }
                             else if (char.IsLetter(c))
                             {
-
-                                if (c < first || c > last)
+                                if (!IsInOurLetterRange(c))
                                 {
 
-                                    //letter is out-of-range or not 
-                                    //clear accum state
+                                    //letter is OUT_OF_RANGE
+
                                     if (i > bb.startIndex)
                                     {
                                         //flush
@@ -268,7 +278,6 @@ namespace Typography.TextBreak
                                 bb.startIndex = i;
                                 bb.kind = WordKind.Number;
                                 lexState = LexState.Number;
-
                             }
                             else if (char.IsWhiteSpace(c))
                             {
@@ -325,7 +334,7 @@ namespace Typography.TextBreak
                                 lexState = LexState.CollectSurrogatePair;
                                 goto case LexState.CollectSurrogatePair;
                             }
-                            else if (c < first || c > last)
+                            else if (!IsInOurLetterRange(c))
                             {
                                 //letter is out-of-range or not 
                                 //clear accum state
@@ -395,7 +404,7 @@ namespace Typography.TextBreak
                                 //letter is out-of-range or not 
                                 //clear accum state   
 
-                                if (c < first || c > last)
+                                if (!IsInOurLetterRange(c))
                                 {
                                     if (i > bb.startIndex)
                                     {
