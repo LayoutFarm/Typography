@@ -16,6 +16,7 @@
 
 using System;
 using PixelFarm.Drawing;
+
 namespace PixelFarm.CpuBlit.Rasterization
 {
     public enum ScanlineRenderMode : byte
@@ -107,11 +108,14 @@ namespace PixelFarm.CpuBlit.Rasterization
                     int dest_stride = _destImgStride = dest.Stride;
                     //*** set color before call Blend()
                     _color = color;
-                    byte color_alpha = color.A;
+
                     //---------------------------
                     //3. loop, render single scanline with subpixel rendering 
 
                     byte[] lineBuff = _grayScaleLine.GetInternalBuffer();
+
+                    _grayScaleLine.SetBlendAlpha(color.A);
+                    _grayScaleLine.SetCurrentCovers(scline.GetCovers());
 
                     while (sclineRas.SweepScanline(scline))
                     {
@@ -122,22 +126,22 @@ namespace PixelFarm.CpuBlit.Rasterization
                         //3.3 convert to subpixel value and write to dest buffer 
                         //render solid single scanline 
                         int num_spans = scline.SpanCount;
-                        byte[] covers = scline.GetCovers();
-                        //render each span in the scanline
+
+
+                        //render each span in the scanline 
+
                         for (int i = 1; i <= num_spans; ++i)
                         {
                             ScanlineSpan span = scline.GetSpan(i);
                             if (span.len > 0)
                             {
                                 //positive len  
-                                _grayScaleLine.BlendSolidHSpan(span.x, span.len, color_alpha, covers, span.cover_index);
+                                _grayScaleLine.BlendSolidHSpan(span.x, span.len, span.cover_index);
                             }
                             else
                             {
-                                //fill the line, same coverage area
-                                int x = span.x;
-                                int x2 = (x - span.len - 1);
-                                _grayScaleLine.BlendHL(x, x2, color_alpha, covers[span.cover_index]);
+                                //fill the line, same coverage area                                 
+                                _grayScaleLine.BlendHL(span.x, -span.len, span.cover_index);
                             }
                         }
 
@@ -1206,8 +1210,24 @@ namespace PixelFarm.CpuBlit.Rasterization
 
             public byte[] GetInternalBuffer() => _line_buffer;
 
-            public void BlendSolidHSpan(int x, int len, byte src_alpha, byte[] covers, int coversIndex)
+
+            byte _src_alpha;
+            public void SetBlendAlpha(byte src_alpha)
             {
+                //similar to SetBlendColor(Color c)
+                _src_alpha = src_alpha;
+            }
+            byte[] _covers;
+            public void SetCurrentCovers(byte[] covers)
+            {
+                _covers = covers;
+            }
+            public void BlendSolidHSpan(int x, int len, int coversIndex)
+            {
+                byte src_alpha = _src_alpha;
+                byte[] covers = _covers;
+
+                //use _src_alpha and _cover
                 //-------------------------------------
                 //reference code:
                 //int colorAlpha = sourceColor.alpha;
@@ -1257,8 +1277,15 @@ namespace PixelFarm.CpuBlit.Rasterization
                 }
             }
 
-            public void BlendHL(int x1, int x2, byte src_alpha, byte cover)
+
+            public void BlendHL(int x1, int len, int coversIndex)
             {
+                //use _src_alpha and _cover
+                byte src_alpha;
+                if ((src_alpha = _src_alpha) == 0) { return; }
+
+                byte cover = _covers[coversIndex];
+
                 //------------------------------------------------- 
                 //reference code:
                 //if (sourceColor.A == 0) { return; }
@@ -1286,10 +1313,6 @@ namespace PixelFarm.CpuBlit.Rasterization
                 ////-------------------------------------------------  
 
 
-
-                if (src_alpha == 0) { return; }
-                //------------------------------------------------- 
-                int len = x2 - x1 + 1;
                 int bufferOffset = x1;
                 byte alpha = (byte)(((int)(src_alpha) * (cover + 1)) >> 8);
                 byte[] buffer = _line_buffer;
@@ -1445,32 +1468,42 @@ namespace PixelFarm.CpuBlit.Rasterization
             {
                 default:
 
+                    dest.SetBlendColor(color);//set once
+                    dest.SetCovers(scline.GetCovers()); //cover may be changed after call scline.ResetSpans()
+
                     while (sclineRas.SweepScanline(scline))
                     {
 
                         //render solid single scanline
                         int y = scline.Y;
                         int num_spans = scline.SpanCount;
-                        byte[] covers = scline.GetCovers();
-                        //render each span in the scanline
+                        //render each span in the scanline 
+
+                        //TODO: inside the inner loop, y is not changed
+                        //so we can set y once for every SweepScanline()
+
                         for (int i = 1; i <= num_spans; ++i)
                         {
                             ScanlineSpan span = scline.GetSpan(i);
                             if (span.len > 0)
                             {
                                 //positive len 
-                                dest.BlendSolidHSpan(span.x, y, span.len, color, covers, span.cover_index);
+                                dest.BlendSolidHSpan(span.x, y, span.len, span.cover_index);
                             }
                             else
                             {
                                 //fill the line, same coverage area
-                                int x = span.x;
-                                int x2 = (x - span.len - 1);
-                                dest.BlendHL(x, y, x2, color, covers[span.cover_index]);
+                                //int x = span.x;
+                                //int x2 = (x - span.len - 1);
+                                //dest.BlendHL(x, y, x2, color, covers[span.cover_index]);
+                                //TODO: review here again
+                                dest.BlendHL(span.x, y, span.x - span.len - 1, span.cover_index);
                             }
                         }
-
                     }
+
+
+
                     break;
                 case ScanlineRenderMode.SubPixelLcdEffect:
                     _scSubPixRas.RenderScanlines(dest, sclineRas, scline, color);

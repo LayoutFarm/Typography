@@ -33,6 +33,7 @@
 //----------------------------------------------------------------------------
 
 
+using System;
 using poly_subpix = PixelFarm.CpuBlit.Rasterization.PolySubPix;
 namespace PixelFarm.CpuBlit.Rasterization
 {
@@ -108,15 +109,64 @@ namespace PixelFarm.CpuBlit.Rasterization
         }
 
 
+
+        struct CellAABlob
+        {
+            readonly CellAARasterizer _cellAARas;
+            public CellAABlob(CellAARasterizer aaRas)
+            {
+                _cellAARas = aaRas;
+                _dbugLockSortCell = false;
+            }
+            public int MinX => _cellAARas.MinX;
+            public int MinY => _cellAARas.MinY;
+            //
+            public int MaxX => _cellAARas.MaxX;
+            public int MaxY => _cellAARas.MaxY;
+
+            public void Reset() => _cellAARas.Reset();
+            public bool Sorted => _cellAARas.Sorted;
+
+            /// <summary>
+            /// sort cell, and return total cell count
+            /// </summary>
+            /// <returns></returns>
+            public int SortCells()
+            {
+#if DEBUG
+                if (_dbugLockSortCell)
+                {
+                    throw new NotSupportedException();
+                }
+#endif
+                _cellAARas.SortCells();
+                return _cellAARas.TotalCells;
+            }
+#if DEBUG
+            bool _dbugLockSortCell;
+            public void dbugLockSortCell(bool value)
+            {
+                _dbugLockSortCell = value;
+            }
+#endif
+            public CellAA[] UnsafeGetAllSortedCells() => _cellAARas.UnsafeGetAllSortedCells();
+
+            public void GetCellRange(int y, out int offset, out int num)
+            {
+                _cellAARas.GetCellRange(y, out offset, out num);
+            }
+        }
+
         //-----------------------------------------------------rasterizer_cells_aa
         // An internal class that implements the main rasterization algorithm.
         // Used in the rasterizer. Should not be used directly.
+
         sealed class CellAARasterizer
         {
             int _num_used_cells;
             ArrayList<CellAA> _cells;
-            ArrayList<CellAA> _sorted_cells;
-            ArrayList<SortedY> _sorted_y;
+            readonly ArrayList<CellAA> _sorted_cells;
+            readonly ArrayList<SortedY> _sorted_y;
             //------------------
             int _cCell_x;
             int _cCell_y;
@@ -134,6 +184,7 @@ namespace PixelFarm.CpuBlit.Rasterization
             int _max_x;
             int _max_y;
             bool _sorted;
+
             const int BLOCK_SHIFT = 12;
             const int BLOCK_SIZE = 1 << BLOCK_SHIFT;
             const int BLOCK_MASK = BLOCK_SIZE - 1;
@@ -181,11 +232,11 @@ namespace PixelFarm.CpuBlit.Rasterization
                 _max_y = -0x7FFFFFFF;
             }
 
-
             const int DX_LIMIT = (16384 << PolySubPix.SHIFT);
             const int POLY_SUBPIXEL_SHIFT = PolySubPix.SHIFT;
             const int POLY_SUBPIXEL_MASK = PolySubPix.MASK;
             const int POLY_SUBPIXEL_SCALE = PolySubPix.SCALE;
+
             public void DrawLine(int x1, int y1, int x2, int y2)
             {
                 int dx = x2 - x1;
@@ -326,8 +377,6 @@ namespace PixelFarm.CpuBlit.Rasterization
                 RenderHLine(ey1, x_from, POLY_SUBPIXEL_SCALE - first, x2, fy2);
             }
 
-
-
             public int MinX => _min_x;
             public int MinY => _min_y;
             //
@@ -422,9 +471,10 @@ namespace PixelFarm.CpuBlit.Rasterization
             public int TotalCells => _num_used_cells;
 
 
-            public void GetCells(int y, out CellAA[] cellData, out int offset, out int num)
+            public CellAA[] UnsafeGetAllSortedCells() => _sorted_cells.UnsafeInternalArray;
+
+            public void GetCellRange(int y, out int offset, out int num)
             {
-                cellData = _sorted_cells.UnsafeInternalArray;
                 SortedY d = _sorted_y[y - _min_y];
                 offset = d.start;
                 num = d.num;
