@@ -13,7 +13,7 @@ namespace PixelFarm.Drawing
 
     public abstract class RenderVxFormattedString : RenderVx
     {
-
+        
         public short DescendingInPx { get; set; }
         public float Width { get; set; }
         public float SpanHeight { get; set; }

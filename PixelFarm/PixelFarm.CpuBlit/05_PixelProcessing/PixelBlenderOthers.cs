@@ -72,7 +72,7 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                     {
                         fixed (int* head = &dstBuffer[arrayElemOffset])
                         {
-                            int* header2 = (int*)(IntPtr)head;
+                            int* header2 = head;
 
                             if (count % 2 != 0)
                             {
@@ -109,7 +109,7 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                     {
                         fixed (int* head = &dstBuffer[arrayElemOffset])
                         {
-                            int* header2 = (int*)(IntPtr)head;
+                            int* header2 = head;
 
                             if (count % 2 != 0)
                             {
