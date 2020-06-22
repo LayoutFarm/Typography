@@ -118,33 +118,21 @@ namespace PixelFarm.Drawing
     //---------
     public struct TextPrinterLineSegment : ILineSegment
     {
-        readonly int _startAt;
-        readonly ushort _len;
-        public readonly SpanBreakInfo breakInfo;
-
-        public TextPrinterLineSegment(int startAt, int len, SpanBreakInfo breakInfo)
+        public TextPrinterLineSegment(int startAt, int len, WordKind wordKind, SpanBreakInfo breakInfo)
         {
-            _startAt = startAt;
-            _len = (ushort)len; //***
-
-#if DEBUG
-            if (breakInfo == null)
-            {
-
-            }
-#endif
-            this.breakInfo = breakInfo;
-
-
+            StartAt = startAt;
+            Length = (ushort)len; //***
+            WordKind = wordKind;
+            BreakInfo = breakInfo;
         }
-        public int StartAt => _startAt;
-        public ushort Length => _len;
-
-
+        public int StartAt { get; }
+        public ushort Length { get; }
+        public WordKind WordKind { get; }
+        public SpanBreakInfo BreakInfo { get; }
 #if DEBUG
         public override string ToString()
         {
-            return _startAt + ":" + _len + (breakInfo.RightToLeft ? "(rtl)" : "");
+            return StartAt + ":" + Length + (BreakInfo.RightToLeft ? "(rtl)" : "");
         }
 #endif
     }
@@ -192,7 +180,11 @@ namespace PixelFarm.Drawing
         }
         protected override void OnBreak()
         {
-            _lineSegs.AddLineSegment(new TextPrinterLineSegment(this.LatestSpanStartAt, this.LatestSpanLen, this.SpanBreakInfo));
+            _lineSegs.AddLineSegment(new TextPrinterLineSegment(
+                this.LatestSpanStartAt,
+                this.LatestSpanLen,
+                this.LatestWordKind,
+                this.SpanBreakInfo));
         }
     }
 
@@ -838,13 +830,14 @@ namespace PixelFarm.Drawing
                 {
                     //
                     TextPrinterLineSegment line_seg = _textPrinterLineSegmentList.GetLineSegment(i);
-                    SpanBreakInfo spBreakInfo = line_seg.breakInfo;
 
-                    TextBufferSpan buff = new TextBufferSpan(textBuffer, line_seg.StartAt, line_seg.Length);
+                    SpanBreakInfo spBreakInfo = line_seg.BreakInfo;
                     if (spBreakInfo.RightToLeft)
                     {
                         needRightToLeftArr = true;
                     }
+
+                    TextBufferSpan buff = new TextBufferSpan(textBuffer, line_seg.StartAt, line_seg.Length);
 
                     //each line segment may have different unicode range 
                     //and the current typeface may not support that range
@@ -855,21 +848,12 @@ namespace PixelFarm.Drawing
                     char sample_char = textBuffer[line_seg.StartAt];
                     bool contains_surrogate_pair = false;
 
-                    if (line_seg.Length > 1)
+                    if (line_seg.Length > 1 && line_seg.WordKind == WordKind.SurrogatePair)
                     {
-                        //high serogate pair or not
-                        int codepoint = sample_char;
-                        if (sample_char >= 0xd800 && sample_char <= 0xdbff) //high surrogate 
-                        {
-                            char nextCh = textBuffer[line_seg.StartAt + 1];
-                            if (nextCh >= 0xdc00 && nextCh <= 0xdfff) //low surrogate
-                            {
-                                codepoint = char.ConvertToUtf32(sample_char, nextCh);
-                                contains_surrogate_pair = true;
-                            }
-                        }
-
-                        glyphIndex = curTypeface.GetGlyphIndex(codepoint);
+                        contains_surrogate_pair = true;//***
+                        //bind 2 char to utf32=> codepoint
+                        //and get glyphIndex from current typeface
+                        glyphIndex = curTypeface.GetGlyphIndex(char.ConvertToUtf32(sample_char, textBuffer[line_seg.StartAt + 1]));
                     }
                     else
                     {
