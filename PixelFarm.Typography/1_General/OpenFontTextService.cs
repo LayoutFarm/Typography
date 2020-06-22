@@ -148,9 +148,9 @@ namespace PixelFarm.Drawing
             set => _txtServices.CurrentScriptLang = value;
         }
 
+        readonly TextPrinterWordVisitor _wordVisitor = new TextPrinterWordVisitor();
+        readonly TextPrinterLineSegmentList<TextPrinterLineSegment> _lineSegmentList = new TextPrinterLineSegmentList<TextPrinterLineSegment>();
 
-        readonly MyWordVisitor _wordVisitor = new MyWordVisitor(); //for internal use only
-        readonly MyLineSegmentList _lineSegmentList = new MyLineSegmentList();
         public void CalculateUserCharGlyphAdvancePos(in TextBufferSpan textBufferSpan, RequestFont font, ref TextSpanMeasureResult measureResult)
         {
 
@@ -182,7 +182,7 @@ namespace PixelFarm.Drawing
             //  
             Typeface typeface = ResolveTypeface(font);
             _txtServices.SetCurrentFont(typeface, font.SizeInPoints);
-           
+
             float scale = typeface.CalculateScaleToPixelFromPointSize(font.SizeInPoints);
 
             int j = lineSegs.Count;
@@ -354,83 +354,7 @@ namespace PixelFarm.Drawing
         }
         //
         public bool SupportsWordBreak => true;
-        //
-        struct MyLineSegment : ILineSegment
-        {
-            readonly int _startAt;
-            readonly ushort _len;
-            public readonly SpanBreakInfo breakInfo;
-            public MyLineSegment(int startAt, int len, SpanBreakInfo breakInfo)
-            {
-                _startAt = startAt;
-                _len = (ushort)len; //***
-
-#if DEBUG
-                if (breakInfo == null)
-                {
-
-                }
-#endif
-                this.breakInfo = breakInfo;
-
-
-            }
-            public int StartAt => _startAt;
-            public ushort Length => _len;
-
-            public object SpanBreakInfo => breakInfo;
-#if DEBUG
-            public override string ToString()
-            {
-                return _startAt + ":" + _len + (breakInfo.RightToLeft ? "(rtl)" : "");
-            }
-#endif
-        }
-
-        class MyLineSegmentList : ILineSegmentList
-        {
-            List<ILineSegment> _segments = new List<ILineSegment>();
-            public MyLineSegmentList()
-            {
-            }
-            public void AddLineSegment(ILineSegment lineSegment)
-            {
-                _segments.Add(lineSegment);
-            }
-            public void Clear()
-            {
-                _segments.Clear();
-            }
-            //
-            public ILineSegment this[int index] => _segments[index];
-            //
-            public int Count => _segments.Count;
-            //
-            public ILineSegment GetSegment(int index) => _segments[index];
-            //
-#if DEBUG
-            public int dbugStartAt;
-            public int dbugLen;
-#endif
-
-
-        }
-
-        class MyWordVisitor : WordVisitor
-        {
-            //internal use only
-            MyLineSegmentList _lineSegs;
-            public void SetLineSegmentList(MyLineSegmentList lineSegs)
-            {
-                _lineSegs = lineSegs;
-            }
-            protected override void OnBreak()
-            {
-                _lineSegs.AddLineSegment(new MyLineSegment(this.LatestSpanStartAt, this.LatestSpanLen, this.SpanBreakInfo));
-            }
-        }
-
-
+   
         public void BreakToLineSegments(in TextBufferSpan textBufferSpan, WordVisitor wordVisitor)
         {
 

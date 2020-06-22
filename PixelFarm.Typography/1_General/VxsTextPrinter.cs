@@ -854,6 +854,7 @@ namespace PixelFarm.Drawing
                     ushort glyphIndex = 0;
                     char sample_char = textBuffer[line_seg.StartAt];
                     bool contains_surrogate_pair = false;
+
                     if (line_seg.Length > 1)
                     {
                         //high serogate pair or not
