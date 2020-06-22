@@ -25,10 +25,11 @@ namespace Typography.TextServices
 
 
         float _fontSizeInPts;
+
         ScriptLang _defaultScriptLang;
-        ActiveTypefaceCache _typefaceStore;
-        InstalledTypefaceCollection _installedTypefaceCollection;
         ScriptLang _scLang;
+
+        ActiveTypefaceCache _typefaceStore;
 
         public TextServices()
         {
@@ -40,11 +41,7 @@ namespace Typography.TextServices
         {
             _scLang = _defaultScriptLang = scLang;
         }
-        public InstalledTypefaceCollection InstalledFontCollection
-        {
-            get => _installedTypefaceCollection;
-            set => _installedTypefaceCollection = value;
-        }
+        public InstalledTypefaceCollection InstalledFontCollection { get; set; }
 
         public ScriptLang CurrentScriptLang
         {
@@ -68,19 +65,11 @@ namespace Typography.TextServices
 
             _glyphLayout.Typeface = typeface;
             _fontSizeInPts = fontSizeInPts;
-
-            //_glyphLayout.FontSizeInPoints = _fontSizeInPts = fontSizeInPts;
         }
         public Typeface GetTypeface(string name, TypefaceStyle installedFontStyle)
         {
-            InstalledTypeface inst = _installedTypefaceCollection.GetInstalledTypeface(name, InstalledTypefaceCollection.GetSubFam(installedFontStyle));
-            if (inst != null)
-            {
-
-                return _typefaceStore.GetTypeface(inst);
-            }
-            return null;
-
+            InstalledTypeface inst = InstalledFontCollection.GetInstalledTypeface(name, InstalledTypefaceCollection.GetSubFam(installedFontStyle));
+            return (inst != null) ? _typefaceStore.GetTypeface(inst) : null;
         }
 
         public GlyphPlanSequence GetUnscaledGlyphPlanSequence(TextBuffer buffer, int start, int len)
@@ -92,7 +81,6 @@ namespace Typography.TextServices
         {
             _registerShapingContexts.Clear();
         }
-
 
         CustomBreaker _textBreaker;
         public void BreakToLineSegments(char[] str, int startAt, int len, WordVisitor visitor)

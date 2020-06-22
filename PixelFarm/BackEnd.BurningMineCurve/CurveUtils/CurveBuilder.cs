@@ -195,14 +195,14 @@ namespace burningmime.curves
 
         // We provide these for both convience and performance, since a call to List<T>.GetEnumerator() doesn't actually allocate if
         // the type is never boxed
-        public List<CubicBezier>.Enumerator GetEnumerator() { return _result.GetEnumerator(); }
-        IEnumerator<CubicBezier> IEnumerable<CubicBezier>.GetEnumerator() { return GetEnumerator(); }
-        IEnumerator IEnumerable.GetEnumerator() { return GetEnumerator(); }
+        public List<CubicBezier>.Enumerator GetEnumerator() => _result.GetEnumerator();
+        IEnumerator<CubicBezier> IEnumerable<CubicBezier>.GetEnumerator() => GetEnumerator(); 
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator(); 
 
         /// <summary>
         /// The current curves in the builder.
         /// </summary>
-        public ReadOnlyCollection<CubicBezier> Curves { get { return _resultView; } }
+        public ReadOnlyCollection<CubicBezier> Curves => _resultView; 
 
         /// <summary>
         /// Changes made to the CurveBuilder.curves list after a call to <see cref="CurveBuilder.AddPoint"/>.
@@ -218,19 +218,19 @@ namespace burningmime.curves
             /// <summary>
             /// Were any curves changed or added?
             /// </summary>
-            public bool WasChanged { get { return _data != 0; } }
+            public bool WasChanged => _data != 0;
 
             /// <summary>
             /// Index into curves array of first curve that was changed, or -1 if no curves were changed.
             /// All curves after this are assumed to have changed/been added as well. If a curve was added
             /// this is a considered a "change" so <see cref="WasAdded"/> will always be true.
             /// </summary>
-            public int FirstChangedIndex { get { return Math.Abs(_data) - 1; } }
+            public int FirstChangedIndex => Math.Abs(_data) - 1;
 
             /// <summary>
             /// Were any curves added?
             /// </summary>
-            public bool WasAdded { get { return _data < 0; } }
+            public bool WasAdded => _data < 0;
 
             public AddPointResult(int firstChangedIndex, bool curveAdded)
             {

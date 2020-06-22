@@ -318,12 +318,9 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                     int* cur = first + _height - 1;
                     for (int i = _height - 1; i >= 0;)
                     {
-                        //--------------------
-                        //*cur = i * strideInBytes;
                         *cur = i * _width;
                         --i;
                         cur--;
-                        //--------------------
                     }
                 }
                 fixed (int* first = &_xTableArray[0])
@@ -333,12 +330,9 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                     //even
                     for (int i = _width - 1; i >= 0;)
                     {
-                        //--------------------
-                        //*cur = i * m_DistanceInBytesBetweenPixelsInclusive;
                         *cur = i * 1;
                         --i;
                         cur--;
-                        //--------------------
                     }
                 }
             }
@@ -434,60 +428,8 @@ namespace PixelFarm.CpuBlit.PixelProcessing
             while (--len != 0);
 #endif
         }
-        public void BlendHL(int x1, int y, int x2, Color sourceColor, byte cover)
-        {
-            if (sourceColor.A == 0) { return; }
-            //-------------------------------------------------
 
-            int len = x2 - x1 + 1;
-
-            int bufferOffset = GetBufferOffsetXY32(x1, y);
-
-            int alpha = (((int)(sourceColor.A) * (cover + 1)) >> 8);
-            if (alpha == BASE_MASK)
-            {
-                //full
-                //int[] buffer = this.GetBuffer32();
-                _outputPxBlender.CopyPixels(this.GetBufferPtr(), bufferOffset, sourceColor, len);
-
-            }
-            else
-            {
-                Color c2 = Color.FromArgb(alpha, sourceColor);
-
-                TempMemPtr buffer = this.GetBufferPtr();
-                do
-                {
-                    //copy pixel-by-pixel
-                    _outputPxBlender.BlendPixels(buffer, bufferOffset, c2);
-                    bufferOffset++;
-                }
-                while (--len != 0);
-            }
-
-
-            //byte[] buffer = GetBuffer();
-            //int bufferOffset = GetBufferOffsetXY(x1, y);
-            //int alpha = (((int)(sourceColor.A) * (cover + 1)) >> 8);
-            //if (alpha == BASE_MASK)
-            //{
-            //    //full
-            //    _recvBlender32.CopyPixels(buffer, bufferOffset, sourceColor, len);
-            //}
-            //else
-            //{
-            //    Color c2 = Color.FromArgb(alpha, sourceColor);
-            //    do
-            //    {
-            //        //copy pixel-by-pixel
-            //        _recvBlender32.BlendPixel(buffer, bufferOffset, c2);
-            //        bufferOffset += m_DistanceInBytesBetweenPixelsInclusive;
-            //    }
-            //    while (--len != 0);
-            //}
-
-
-        }
+        
 
         public void BlendVL(int x, int y1, int y2, Color sourceColor, byte cover)
         {
@@ -539,8 +481,11 @@ namespace PixelFarm.CpuBlit.PixelProcessing
 #endif
         }
 
-        public void BlendSolidHSpan(int x, int y, int len, Color sourceColor, byte[] covers, int coversIndex)
+        public void BlendSolidHSpan(int x, int y, int len, int coversIndex)
         {
+            Color sourceColor = _blendColor;
+            byte[] covers = _covers;
+
             int colorAlpha = sourceColor.A;
             if (colorAlpha != 0)
             {
@@ -564,6 +509,7 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                 while (--len != 0);
             }
         }
+        
 
         public void BlendSolidVSpan(int x, int y, int len, Color sourceColor, byte[] covers, int coversIndex)
         {
@@ -735,11 +681,7 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                 }
             }
         }
-        //public RectInt GetBoundingRect()
-        //{
-        //    return new RectInt(0, 0, Width, Height);
-        //}
-        //---------
+
         public void SetFilterImage(MemBitmap filterBmp)
         {
             _filterBmp = filterBmp;
@@ -752,6 +694,135 @@ namespace PixelFarm.CpuBlit.PixelProcessing
             return dbugTotalId++;
         }
 #endif
+
+        byte[] _covers;
+        Color _blendColor;
+        public void SetBlendColor(Color srcColor)
+        {
+            //set blend color for BlendHL(int x, int y, int x2, byte cover)
+            _blendColor = srcColor;
+        }
+        public void SetCovers(byte[] covers)
+        {
+            _covers = covers;
+        }
+
+        public void BlendHL(int x1, int y, int x2, int coverIndex)
+        {
+            Color srcColor = _blendColor;
+            byte cover = _covers[coverIndex];
+
+            if (srcColor.A == 0) { return; } //TODO: review here again, blend other channel???
+
+            int len = x2 - x1 + 1;
+            int bufferOffset = GetBufferOffsetXY32(x1, y);
+
+            int alpha = (((int)(srcColor.A) * (cover + 1)) >> 8);
+
+            if (alpha == BASE_MASK)
+            {
+                //full
+                //int[] buffer = this.GetBuffer32();
+                _outputPxBlender.CopyPixels(this.GetBufferPtr(), bufferOffset, srcColor, len);
+
+            }
+            else
+            {
+                Color c2 = Color.FromArgb(alpha, srcColor);
+                TempMemPtr buffer = this.GetBufferPtr();
+                do
+                {
+                    //copy pixel-by-pixel
+                    _outputPxBlender.BlendPixels(buffer, bufferOffset, c2);
+                    bufferOffset++;
+                }
+                while (--len != 0);
+            }
+
+
+            //byte[] buffer = GetBuffer();
+            //int bufferOffset = GetBufferOffsetXY(x1, y);
+            //int alpha = (((int)(sourceColor.A) * (cover + 1)) >> 8);
+            //if (alpha == BASE_MASK)
+            //{
+            //    //full
+            //    _recvBlender32.CopyPixels(buffer, bufferOffset, sourceColor, len);
+            //}
+            //else
+            //{
+            //    Color c2 = Color.FromArgb(alpha, sourceColor);
+            //    do
+            //    {
+            //        //copy pixel-by-pixel
+            //        _recvBlender32.BlendPixel(buffer, bufferOffset, c2);
+            //        bufferOffset += m_DistanceInBytesBetweenPixelsInclusive;
+            //    }
+            //    while (--len != 0);
+            //} 
+        } 
+        public void BlendHL(int x1, int y, int x2, Color srcColor, byte cover)
+        {
+              
+
+            if (srcColor.A == 0) { return; } //TODO: review here again, blend other channel???
+
+            int len = x2 - x1 + 1;
+            int bufferOffset = GetBufferOffsetXY32(x1, y);
+
+            int alpha = (((int)(srcColor.A) * (cover + 1)) >> 8);
+
+            if (alpha == BASE_MASK)
+            {
+                //full
+                //int[] buffer = this.GetBuffer32();
+                _outputPxBlender.CopyPixels(this.GetBufferPtr(), bufferOffset, srcColor, len);
+
+            }
+            else
+            {
+                Color c2 = Color.FromArgb(alpha, srcColor);
+                TempMemPtr buffer = this.GetBufferPtr();
+                do
+                {
+                    //copy pixel-by-pixel
+                    _outputPxBlender.BlendPixels(buffer, bufferOffset, c2);
+                    bufferOffset++;
+                }
+                while (--len != 0);
+            }
+        }
+
+        public void BlendSolidHSpan(int x, int y, int len, Color sourceColor, byte[] covers, int coversIndex)
+        {
+              
+            int colorAlpha = sourceColor.A;
+            if (colorAlpha != 0)
+            {
+                TempMemPtr buffer = this.GetBufferPtr();
+                int bufferOffset32 = GetBufferOffsetXY32(x, y);
+                do
+                {
+                    int alpha = ((colorAlpha) * ((covers[coversIndex]) + 1)) >> 8;
+                    if (alpha == BASE_MASK)
+                    {
+                        _outputPxBlender.CopyPixel(buffer, bufferOffset32, sourceColor);
+                    }
+                    else
+                    {
+                        _outputPxBlender.BlendPixels(buffer, bufferOffset32, Color.FromArgb(alpha, sourceColor));
+                    }
+
+                    bufferOffset32++;
+                    coversIndex++;
+                }
+                while (--len != 0);
+            }
+        }
+
+
+
+
+
 
 
         //public int[] GetOrgInt32Buffer()

@@ -1,17 +1,14 @@
 ﻿//MIT, 2020-present, WinterDev
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 
 using System.Drawing;
-using System.IO;
-using System.Text;
 using System.Windows.Forms;
 
 using PixelFarm.CpuBlit;
 using PixelFarm.CpuBlit.BitmapAtlas;
 using Typography.OpenFont;
-using Typography.OpenFont.Extensions;
+using PaintLab;
 
 namespace SampleWinForms
 {
@@ -208,7 +205,7 @@ namespace SampleWinForms
 
 
         //-----------------------------------------------------------------------------------------------
-        void BuiltAtlas_FromUserOptions()
+        void BuiltAtlas_FromUserOptions(List<GlyphTextureBuildDetail> buildDetails)
         {
 
             //we can create font atlas by specific script-langs  
@@ -234,19 +231,7 @@ namespace SampleWinForms
             //and each script user may want different glyph-gen technique.
             //so we use GlyphTextureBuildDetail to describe that information.
 
-            List<GlyphTextureBuildDetail> buildDetails = new List<GlyphTextureBuildDetail>();
 
-            foreach (UIFontScriptOpt scriptLangUI in _availableScripts)
-            {
-                if (scriptLangUI.Selected)
-                {
-                    buildDetails.Add(new GlyphTextureBuildDetail()
-                    {
-                        ScriptLang = scriptLangUI.ScriptLang,
-                        HintTechnique = scriptLangUI.HintTechnique,
-                    });
-                }
-            }
 
             if (buildDetails.Count == 0)
             {
@@ -299,9 +284,27 @@ namespace SampleWinForms
 
         private void cmdBuildFromSelectedScriptLangs_Click(object sender, EventArgs e)
         {
-            BuiltAtlas_FromUserOptions();
+            var buildDetails = new List<GlyphTextureBuildDetail>();
+            foreach (UIFontScriptOpt scriptLangUI in _availableScripts)
+            {
+                if (scriptLangUI.Selected)
+                {
+                    buildDetails.Add(new GlyphTextureBuildDetail()
+                    {
+                        ScriptLang = scriptLangUI.ScriptLang,
+                        HintTechnique = scriptLangUI.HintTechnique,
+                    });
+                }
+            }
+            BuiltAtlas_FromUserOptions(buildDetails);
         }
-
+        private void cmdBuildAtlasFromAllGlyphs_Click(object sender, EventArgs e)
+        {
+            if (MessageBox.Show("Build ALL Glyphs?") == DialogResult.OK)
+            {
+                BuiltAtlas_FromUserOptions(new List<GlyphTextureBuildDetail> { new GlyphTextureBuildDetail { AllGlyphs = true } });
+            }
+        }
         private void cmdShowAtlasViewer_Click(object sender, EventArgs e)
         {
 
@@ -311,5 +314,7 @@ namespace SampleWinForms
         {
             uiFontAtlasFileViewer1.Visible = chkShowAtlasViewer.Checked;
         }
+
+
     }
 }

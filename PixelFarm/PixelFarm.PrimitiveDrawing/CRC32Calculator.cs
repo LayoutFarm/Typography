@@ -31,53 +31,10 @@
 // ------------------------------------------------------------------
 namespace PixelFarm.Drawing
 {
-    class CRC32Calculator
+
+    public struct TinyCRC32Calculator
     {
-        public CRC32Calculator()
-        {
 
-        }
-        /// <summary>
-        /// indicates the total number of bytes read on the CRC stream.
-        /// This is used when writing the ZipDirEntry when compressing files.
-        /// </summary>
-        public Int64 TotalBytesRead => _TotalBytesRead;
-
-        /// <summary>
-        /// Indicates the current CRC for all blocks slurped in.
-        /// </summary>
-        public Int32 Crc32Result => unchecked((Int32)(~_RunningCrc32Result));
-        // return one's complement of the running result
-
-        /// <summary>
-        ///reset before reuse
-        /// </summary>
-        public void Reset()
-        {
-            _RunningCrc32Result = 0xFFFFFFFF;
-            _TotalBytesRead = 0;
-        }
-
-        /// <summary>
-        /// Get the CRC32 for the given (word,byte) combo.  This is a computation
-        /// defined by PKzip.
-        /// </summary>
-        /// <param name="W">The word to start with.</param>
-        /// <param name="B">The byte to combine it with.</param>
-        /// <returns>The CRC-ized result.</returns>
-        static Int32 ComputeCrc32(Int32 W, byte B)
-        {
-            return _InternalComputeCrc32((UInt32)W, B);
-        }
-
-        internal static Int32 _InternalComputeCrc32(UInt32 W, byte B)
-        {
-            return (Int32)(crc32Table[(W ^ B) & 0xFF] ^ (W >> 8));
-        }
-        public void SlurpBlock(byte[] block)
-        {
-            SlurpBlock(block, 0, block.Length);
-        }
         /// <summary>
         /// Update the value for the running CRC32 using the given block of bytes.
         /// This is useful when using the CRC32() class in a Stream.
@@ -85,7 +42,7 @@ namespace PixelFarm.Drawing
         /// <param name="block">block of bytes to slurp</param>
         /// <param name="offset">starting point in the block</param>
         /// <param name="count">how many bytes within the block to slurp</param>
-        public void SlurpBlock(byte[] block, int offset, int count)
+        static int SlurpBlock(byte[] block, int offset, int count)
         {
             if (block == null)
             {
@@ -93,20 +50,23 @@ namespace PixelFarm.Drawing
             }
 
             // UInt32 tmpRunningCRC32Result = _RunningCrc32Result;
+
+            uint _runningCrc32Result = 0xFFFFFFFF;
             for (int i = 0; i < count; i++)
             {
+#if DEBUG
                 int x = offset + i;
-                _RunningCrc32Result = ((_RunningCrc32Result) >> 8) ^ crc32Table[(block[x]) ^ ((_RunningCrc32Result) & 0x000000FF)];
+#endif
+                //_runningCrc32Result = ((_runningCrc32Result) >> 8) ^ s_crc32Table[(block[x]) ^ ((_runningCrc32Result) & 0x000000FF)];
+                _runningCrc32Result = ((_runningCrc32Result) >> 8) ^ s_crc32Table[(block[offset + i]) ^ ((_runningCrc32Result) & 0x000000FF)];
                 //tmpRunningCRC32Result = ((tmpRunningCRC32Result) >> 8) ^ crc32Table[(block[offset + i]) ^ ((tmpRunningCRC32Result) & 0x000000FF)];
             }
-
-            _TotalBytesRead += count;
-            //_RunningCrc32Result = tmpRunningCRC32Result;
+            return unchecked((Int32)(~_runningCrc32Result));
         }
 
 
         // pre-initialize the crc table for speed of lookup.
-        static CRC32Calculator()
+        static TinyCRC32Calculator()
         {
             unchecked
             {
@@ -118,7 +78,7 @@ namespace PixelFarm.Drawing
                 UInt32 dwPolynomial = 0xEDB88320;
 
 
-                crc32Table = new UInt32[256];
+                s_crc32Table = new UInt32[256];
                 UInt32 dwCrc;
                 for (uint i = 0; i < 256; i++)
                 {
@@ -134,122 +94,46 @@ namespace PixelFarm.Drawing
                             dwCrc >>= 1;
                         }
                     }
-                    crc32Table[i] = dwCrc;
+                    s_crc32Table[i] = dwCrc;
                 }
             }
         }
-        static uint gf2_matrix_times(uint[] matrix, uint vec)
-        {
-            uint sum = 0;
-            int i = 0;
-            while (vec != 0)
-            {
-                if ((vec & 0x01) == 0x01)
-                {
-                    sum ^= matrix[i];
-                }
-                vec >>= 1;
-                i++;
-            }
-            return sum;
-        }
-
-        static void gf2_matrix_square(uint[] square, uint[] mat)
-        {
-            for (int i = 0; i < 32; i++)
-            {
-                square[i] = gf2_matrix_times(mat, mat[i]);
-            }
-        }
 
 
+#if DEBUG
+        Int64 dbugTotalBytesRead;
+#endif
 
-        /// <summary>
-        /// Combines the given CRC32 value with the current running total.
-        /// </summary>
-        /// <remarks>
-        /// This is useful when using a divide-and-conquer approach to calculating a CRC.
-        /// Multiple threads can each calculate a CRC32 on a segment of the data, and then
-        /// combine the individual CRC32 values at the end.
-        /// </remarks>
-        /// <param name="crc">the crc value to be combined with this one</param>
-        /// <param name="length">the length of data the CRC value was calculated on</param>
-        public void Combine(int crc, int length)
-        {
-            uint[] even = new uint[32];     // even-power-of-two zeros operator
-            uint[] odd = new uint[32];      // odd-power-of-two zeros operator
+        static readonly UInt32[] s_crc32Table;
+        const int BUFFER_SIZE = 2048;
 
-            if (length == 0)
-                return;
+        [System.ThreadStatic]
+        static byte[] s_buffer;
 
-            uint crc1 = ~_RunningCrc32Result;
-            uint crc2 = (uint)crc;
-
-            // put operator for one zero bit in odd
-            odd[0] = 0xEDB88320;  // the CRC-32 polynomial
-            uint row = 1;
-            for (int i = 1; i < 32; i++)
-            {
-                odd[i] = row;
-                row <<= 1;
-            }
-
-            // put operator for two zero bits in even
-            gf2_matrix_square(even, odd);
-
-            // put operator for four zero bits in odd
-            gf2_matrix_square(odd, even);
-
-            uint len2 = (uint)length;
-
-            // apply len2 zeros to crc1 (first square will put the operator for one
-            // zero byte, eight zero bits, in even)
-            do
-            {
-                // apply zeros operator for this bit of len2
-                gf2_matrix_square(even, odd);
-
-                if ((len2 & 1) == 1)
-                    crc1 = gf2_matrix_times(even, crc1);
-                len2 >>= 1;
-
-                if (len2 == 0)
-                    break;
-
-                // another iteration of the loop with odd and even swapped
-                gf2_matrix_square(odd, even);
-                if ((len2 & 1) == 1)
-                    crc1 = gf2_matrix_times(odd, crc1);
-                len2 >>= 1;
-
-
-            } while (len2 != 0);
-
-            crc1 ^= crc2;
-
-            _RunningCrc32Result = ~crc1;
-
-            //return (int) crc1;
-            return;
-        }
-
-        private Int64 _TotalBytesRead;
-        private UInt32 _RunningCrc32Result = 0xFFFFFFFF;
-        private const int BUFFER_SIZE = 8192;
-        private static readonly UInt32[] crc32Table;
         public static int CalculateCrc32(string inputData)
         {
-            CRC32Calculator cal = new CRC32Calculator();
-            byte[] utf8 = System.Text.Encoding.UTF8.GetBytes(inputData);
-            cal.SlurpBlock(utf8, 0, utf8.Length);
-            return cal.Crc32Result;
+            if (s_buffer == null)
+            {
+                s_buffer = new byte[BUFFER_SIZE];
+            }
+
+            if (inputData.Length > 512)
+            {
+                byte[] utf8 = System.Text.Encoding.UTF8.GetBytes(inputData);
+                return SlurpBlock(utf8, 0, utf8.Length);
+            }
+            else
+            {
+                int write = System.Text.Encoding.UTF8.GetBytes(inputData, 0, inputData.Length, s_buffer, 0);
+                if (write >= BUFFER_SIZE)
+                {
+                    throw new System.NotSupportedException("crc32:");
+                }
+                return SlurpBlock(s_buffer, 0, write);
+            }
         }
-        public static int CalculateCrc32(byte[] buffer)
-        {
-            CRC32Calculator cal = new CRC32Calculator();
-            cal.SlurpBlock(buffer, 0, buffer.Length);
-            return cal.Crc32Result;
-        }
+
+        public static int CalculateCrc32(byte[] buffer) => SlurpBlock(buffer, 0, buffer.Length);
     }
 
 }

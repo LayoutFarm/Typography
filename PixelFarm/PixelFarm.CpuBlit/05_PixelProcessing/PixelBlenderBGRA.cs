@@ -28,7 +28,6 @@
 #define USE_BLENDER
 
 using System;
-using PixelFarm.CpuBlit.Imaging;
 using PixelFarm.Drawing;
 using CO = PixelFarm.Drawing.Internal.CO;
 
@@ -311,8 +310,6 @@ namespace PixelFarm.CpuBlit.PixelProcessing
             }
         }
 
-
-
         static unsafe void BlendPixel32Internal(int* dstPtr, Color srcColor, int coverageValue)
         {
             //calculate new alpha
@@ -530,7 +527,6 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                         while (--count != 0);
                     }
                 }
-
             }
         }
 
@@ -542,11 +538,8 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                 {
 
                     int* ptr = (int*)dstBuffer.Ptr + arrayOffset;
-
-                    //fixed (int* ptr_byte = &dstBuffer[arrayOffset])
                     {
-                        //TODO: consider use memcpy() impl***
-                        //int* ptr = ptr_byte;
+                        //TODO: consider use memcpy() impl*** 
                         int argb = srcColor.ToARGB();
                         //---------
                         if ((count % 2) != 0)

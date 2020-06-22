@@ -88,7 +88,7 @@ namespace PixelFarm.Contours
                 new Vector2f(x1, y1));
         }
 
-        public override PartKind Kind { get { return PartKind.Line; } }
+        public override PartKind Kind => PartKind.Line;
 
 #if DEBUG
         public override string ToString()
@@ -134,7 +134,7 @@ namespace PixelFarm.Contours
                 new Vector2f(x1, y1)); //control1
         }
 
-        public override PartKind Kind { get { return PartKind.Curve3; } }
+        public override PartKind Kind => PartKind.Curve3;
 #if DEBUG
         public override string ToString()
         {
@@ -190,7 +190,7 @@ namespace PixelFarm.Contours
                 );
         }
 
-        public override PartKind Kind { get { return PartKind.Curve4; } }
+        public override PartKind Kind => PartKind.Curve4;
 #if DEBUG
         public override string ToString()
         {

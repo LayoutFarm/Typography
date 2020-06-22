@@ -233,8 +233,7 @@ namespace PixelFarm.CpuBlit.Rasterization
                 }
                 else
                 {
-                    _ras.DrawLine(_x1, _y1,
-                             x2, y2);
+                    _ras.DrawLine(_x1, _y1, x2, y2);
                 }
                 _x1 = x2;
                 _y1 = y2;

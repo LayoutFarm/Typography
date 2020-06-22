@@ -33,10 +33,11 @@
 //----------------------------------------------------------------------------
 
 
+using System;
 using poly_subpix = PixelFarm.CpuBlit.Rasterization.PolySubPix;
 namespace PixelFarm.CpuBlit.Rasterization
 {
-    
+
     partial class ScanlineRasterizer
     {
 
@@ -108,15 +109,64 @@ namespace PixelFarm.CpuBlit.Rasterization
         }
 
 
+
+        struct CellAABlob
+        {
+            readonly CellAARasterizer _cellAARas;
+            public CellAABlob(CellAARasterizer aaRas)
+            {
+                _cellAARas = aaRas;
+                _dbugLockSortCell = false;
+            }
+            public int MinX => _cellAARas.MinX;
+            public int MinY => _cellAARas.MinY;
+            //
+            public int MaxX => _cellAARas.MaxX;
+            public int MaxY => _cellAARas.MaxY;
+
+            public void Reset() => _cellAARas.Reset();
+            public bool Sorted => _cellAARas.Sorted;
+
+            /// <summary>
+            /// sort cell, and return total cell count
+            /// </summary>
+            /// <returns></returns>
+            public int SortCells()
+            {
+#if DEBUG
+                if (_dbugLockSortCell)
+                {
+                    throw new NotSupportedException();
+                }
+#endif
+                _cellAARas.SortCells();
+                return _cellAARas.TotalCells;
+            }
+#if DEBUG
+            bool _dbugLockSortCell;
+            public void dbugLockSortCell(bool value)
+            {
+                _dbugLockSortCell = value;
+            }
+#endif
+            public CellAA[] UnsafeGetAllSortedCells() => _cellAARas.UnsafeGetAllSortedCells();
+
+            public void GetCellRange(int y, out int offset, out int num)
+            {
+                _cellAARas.GetCellRange(y, out offset, out num);
+            }
+        }
+
         //-----------------------------------------------------rasterizer_cells_aa
         // An internal class that implements the main rasterization algorithm.
         // Used in the rasterizer. Should not be used directly.
+
         sealed class CellAARasterizer
         {
             int _num_used_cells;
             ArrayList<CellAA> _cells;
-            ArrayList<CellAA> _sorted_cells;
-            ArrayList<SortedY> _sorted_y;
+            readonly ArrayList<CellAA> _sorted_cells;
+            readonly ArrayList<SortedY> _sorted_y;
             //------------------
             int _cCell_x;
             int _cCell_y;
@@ -134,11 +184,13 @@ namespace PixelFarm.CpuBlit.Rasterization
             int _max_x;
             int _max_y;
             bool _sorted;
+
             const int BLOCK_SHIFT = 12;
             const int BLOCK_SIZE = 1 << BLOCK_SHIFT;
             const int BLOCK_MASK = BLOCK_SIZE - 1;
             const int BLOCK_POOL = 256;
             const int BLOCK_LIMIT = BLOCK_SIZE * 1024;
+
             struct SortedY
             {
                 internal int start;
@@ -180,11 +232,11 @@ namespace PixelFarm.CpuBlit.Rasterization
                 _max_y = -0x7FFFFFFF;
             }
 
-
             const int DX_LIMIT = (16384 << PolySubPix.SHIFT);
             const int POLY_SUBPIXEL_SHIFT = PolySubPix.SHIFT;
             const int POLY_SUBPIXEL_MASK = PolySubPix.MASK;
             const int POLY_SUBPIXEL_SCALE = PolySubPix.SCALE;
+
             public void DrawLine(int x1, int y1, int x2, int y2)
             {
                 int dx = x2 - x1;
@@ -325,8 +377,6 @@ namespace PixelFarm.CpuBlit.Rasterization
                 RenderHLine(ey1, x_from, POLY_SUBPIXEL_SCALE - first, x2, fy2);
             }
 
-
-
             public int MinX => _min_x;
             public int MinY => _min_y;
             //
@@ -355,52 +405,76 @@ namespace PixelFarm.CpuBlit.Rasterization
                 SortedY[] sortedYData = _sorted_y.UnsafeInternalArray;
                 CellAA[] sortedCellsData = _sorted_cells.UnsafeInternalArray;
                 // Create the Y-histogram (count the numbers of cells for each Y)
-                for (int i = 0; i < _num_used_cells; ++i)
-                {
-                    int index = cells[i].y - _min_y;
-                    sortedYData[index].start++;
-                }
 
-                // Convert the Y-histogram into the array of starting indexes
-                int start = 0;
-                int sortedYSize = _sorted_y.Count;
-                for (int i = 0; i < sortedYSize; i++)
+                unsafe
                 {
-                    int v = sortedYData[i].start;
-                    sortedYData[i].start = start;
-                    start += v;
-                }
-
-                // Fill the cell pointer array sorted by Y
-                for (int i = 0; i < _num_used_cells; ++i)
-                {
-                    int sortedIndex = cells[i].y - _min_y;
-                    int curr_y_start = sortedYData[sortedIndex].start;
-                    int curr_y_num = sortedYData[sortedIndex].num;
-                    sortedCellsData[curr_y_start + curr_y_num] = cells[i];
-                    sortedYData[sortedIndex].num++;
-                }
-
-                // Finally arrange the X-arrays
-                for (int i = 0; i < sortedYSize; i++)
-                {
-                    var yData = sortedYData[i];
-                    if (yData.num != 0)
+                    fixed (SortedY* sortedY_arr = &sortedYData[0])
                     {
-                        QuickSort.Sort(sortedCellsData,
-                            yData.start,
-                            yData.start + yData.num - 1);
+                        for (int i = 0; i < _num_used_cells; ++i)
+                        {
+                            //int index = cells[i].y - _min_y;//dbug
+                            //sortedYData[index].start++;
+
+                            //sortedYData[cells[i].y - _min_y].start++;
+
+                            //SortedY* sortedY_elem = sortedY_arr + (cells[i].y - _min_y);
+                            //sortedY_elem->start++;
+
+                            (sortedY_arr + (cells[i].y - _min_y))->start++;
+                        }
+
+                        // Convert the Y-histogram into the array of starting indexes
+                        int start = 0;
+                        int sortedYSize = _sorted_y.Count;
+                        for (int i = 0; i < sortedYSize; i++)
+                        {
+                            SortedY* sortedY_elem = sortedY_arr + i;
+                            int v = sortedY_elem->start;
+                            sortedY_elem->start = start;
+                            start += v;
+                        }
+
+                        // Fill the cell pointer array sorted by Y
+                        for (int i = 0; i < _num_used_cells; ++i)
+                        {
+                            //int sortedIndex = cells[i].y - _min_y;
+                            //int curr_y_start = sortedYData[sortedIndex].start;
+                            //int curr_y_num = sortedYData[sortedIndex].num;
+                            //sortedCellsData[curr_y_start + curr_y_num] = cells[i];
+                            //sortedYData[sortedIndex].num++;
+
+                            SortedY* sortedY_elem = sortedY_arr + (cells[i].y - _min_y);
+
+                            sortedCellsData[sortedY_elem->start + sortedY_elem->num] = cells[i];
+
+                            sortedY_elem->num++;
+                        }
+
+                        // Finally arrange the X-arrays
+                        for (int i = 0; i < sortedYSize; i++)
+                        {
+                            SortedY* sortedY_elem = sortedY_arr + i;
+                            if (sortedY_elem->num != 0)
+                            {
+                                QuickSort.Sort(sortedCellsData,
+                                    sortedY_elem->start,
+                                    sortedY_elem->start + sortedY_elem->num - 1);
+                            }
+                        }
                     }
+
                 }
+
                 _sorted = true;
             }
 
             public int TotalCells => _num_used_cells;
 
 
-            public void GetCells(int y, out CellAA[] cellData, out int offset, out int num)
+            public CellAA[] UnsafeGetAllSortedCells() => _sorted_cells.UnsafeInternalArray;
+
+            public void GetCellRange(int y, out int offset, out int num)
             {
-                cellData = _sorted_cells.UnsafeInternalArray;
                 SortedY d = _sorted_y[y - _min_y];
                 offset = d.start;
                 num = d.num;
@@ -581,7 +655,8 @@ namespace PixelFarm.CpuBlit.Rasterization
                     int pivot = begPoint;
                     int m = begPoint + 1;
                     int n = endPoint;
-                    var x_at_PivotPoint = dataToSort[pivot].x;
+                    int x_at_PivotPoint = dataToSort[pivot].x;
+
                     while ((m < endPoint)
                         && x_at_PivotPoint >= dataToSort[m].x)
                     {

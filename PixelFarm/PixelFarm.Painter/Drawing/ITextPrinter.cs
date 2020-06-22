@@ -11,22 +11,10 @@ namespace PixelFarm.Drawing
     {
         //
         TextBaseline TextBaseline { get; set; }
-        void DrawString(char[] text, int startAt, int len, double left, double top);
-        /// <summary>
-        /// render from RenderVxFormattedString object to specific pos
-        /// </summary>
-        /// <param name="renderVx"></param>
-        /// <param name="left"></param>
-        /// <param name="top"></param>
-        void DrawString(RenderVxFormattedString renderVx, double left, double top);
-        //-------------
-        void PrepareStringForRenderVx(RenderVxFormattedString renderVx, char[] text, int startAt, int len);
-        void ChangeFont(RequestFont font);
-        //-------------
+        void DrawString(char[] text, int startAt, int len, double left, double top); 
+        void ChangeFont(RequestFont font);         
         void ChangeFillColor(Color fillColor);
-        void ChangeStrokeColor(Color strokColor);
-       
-        //-------------
+        void ChangeStrokeColor(Color strokColor); 
         void MeasureString(char[] buffer, int startAt, int len, out int w, out int h);
     }
 

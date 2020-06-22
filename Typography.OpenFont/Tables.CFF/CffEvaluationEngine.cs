@@ -70,7 +70,7 @@ namespace Typography.OpenFont.CFF
             }
             //
 
-            public bool IsContourOpened { get { return _is_contour_opened; } }
+            public bool IsContourOpened => _is_contour_opened;
         }
 
         public CffEvaluationEngine()
