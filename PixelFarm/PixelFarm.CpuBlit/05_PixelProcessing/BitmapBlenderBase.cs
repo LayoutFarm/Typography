@@ -693,6 +693,7 @@ namespace PixelFarm.CpuBlit.PixelProcessing
         {
             return dbugTotalId++;
         }
+#endif
 
         byte[] _covers;
         Color _blendColor;
@@ -821,7 +822,7 @@ namespace PixelFarm.CpuBlit.PixelProcessing
 
 
 
-#endif
+
 
 
         //public int[] GetOrgInt32Buffer()
