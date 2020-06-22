@@ -112,7 +112,6 @@ namespace PixelFarm.Drawing
     {
         int StartAt { get; }
         ushort Length { get; }
-        object SpanBreakInfo { get; }
     }
 
 
@@ -141,7 +140,7 @@ namespace PixelFarm.Drawing
         public int StartAt => _startAt;
         public ushort Length => _len;
 
-        public object SpanBreakInfo => breakInfo;
+
 #if DEBUG
         public override string ToString()
         {
@@ -184,7 +183,7 @@ namespace PixelFarm.Drawing
     }
 
 
-    public class TextPrinterWordVisitor  : WordVisitor
+    public class TextPrinterWordVisitor : WordVisitor
     {
         TextPrinterLineSegmentList<TextPrinterLineSegment> _lineSegs;
         public void SetLineSegmentList(TextPrinterLineSegmentList<TextPrinterLineSegment> lineSegs)
@@ -838,8 +837,9 @@ namespace PixelFarm.Drawing
                 for (int i = 0; i < count; ++i)
                 {
                     //
-                    ILineSegment line_seg = _textPrinterLineSegmentList[i];
-                    SpanBreakInfo spBreakInfo = (SpanBreakInfo)line_seg.SpanBreakInfo;
+                    TextPrinterLineSegment line_seg = _textPrinterLineSegmentList.GetLineSegment(i);
+                    SpanBreakInfo spBreakInfo = line_seg.breakInfo;
+
                     TextBufferSpan buff = new TextBufferSpan(textBuffer, line_seg.StartAt, line_seg.Length);
                     if (spBreakInfo.RightToLeft)
                     {
