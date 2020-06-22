@@ -103,14 +103,27 @@ namespace PixelFarm.Drawing
 
     public delegate void SvgBmpBuilderFunc(SvgBmpBuilderReq req);
 
+    public interface ILineSegmentList
+    {
+        int Count { get; }
+        ILineSegment this[int index] { get; }
+    }
+    public interface ILineSegment
+    {
+        int StartAt { get; }
+        ushort Length { get; }
+        object SpanBreakInfo { get; }
+    }
+
 
     //---------
-    public struct TextPrinerLineSegment : ILineSegment
+    public struct TextPrinterLineSegment : ILineSegment
     {
         readonly int _startAt;
         readonly ushort _len;
         public readonly SpanBreakInfo breakInfo;
-        public TextPrinerLineSegment(int startAt, int len, SpanBreakInfo breakInfo)
+
+        public TextPrinterLineSegment(int startAt, int len, SpanBreakInfo breakInfo)
         {
             _startAt = startAt;
             _len = (ushort)len; //***
@@ -137,13 +150,14 @@ namespace PixelFarm.Drawing
 #endif
     }
 
-    public class TextPrinterLineSegmentList : ILineSegmentList
+    public class TextPrinterLineSegmentList<T> : ILineSegmentList
+        where T : ILineSegment
     {
-        List<ILineSegment> _segments = new List<ILineSegment>();
+        List<T> _segments = new List<T>();
         public TextPrinterLineSegmentList()
         {
         }
-        public void AddLineSegment(ILineSegment lineSegment)
+        public void AddLineSegment(T lineSegment)
         {
             _segments.Add(lineSegment);
         }
@@ -151,6 +165,8 @@ namespace PixelFarm.Drawing
         {
             _segments.Clear();
         }
+
+        public T GetLineSegment(int index) => _segments[index];
         //
         public ILineSegment this[int index] => _segments[index];
         //
@@ -168,16 +184,16 @@ namespace PixelFarm.Drawing
     }
 
 
-    public class TextPrinterWordVisitor : WordVisitor
+    public class TextPrinterWordVisitor  : WordVisitor
     {
-        TextPrinterLineSegmentList _lineSegs;
-        public void SetLineSegmentList(TextPrinterLineSegmentList lineSegs)
+        TextPrinterLineSegmentList<TextPrinterLineSegment> _lineSegs;
+        public void SetLineSegmentList(TextPrinterLineSegmentList<TextPrinterLineSegment> lineSegs)
         {
             _lineSegs = lineSegs;
         }
         protected override void OnBreak()
         {
-            _lineSegs.AddLineSegment(new TextPrinerLineSegment(this.LatestSpanStartAt, this.LatestSpanLen, this.SpanBreakInfo));
+            _lineSegs.AddLineSegment(new TextPrinterLineSegment(this.LatestSpanStartAt, this.LatestSpanLen, this.SpanBreakInfo));
         }
     }
 
@@ -773,7 +789,7 @@ namespace PixelFarm.Drawing
 
 
         TextPrinterWordVisitor _textPrinterWordVisitor = new TextPrinterWordVisitor();
-        TextPrinterLineSegmentList _textPrinterLineSegmentList = new TextPrinterLineSegmentList();
+        TextPrinterLineSegmentList<TextPrinterLineSegment> _textPrinterLineSegmentList = new TextPrinterLineSegmentList<TextPrinterLineSegment>();
 
         void InnerDrawString(char[] textBuffer, int startAt, int len, float x, float y)
         {
