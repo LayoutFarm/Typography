@@ -516,14 +516,14 @@ namespace PaintFx
         //    return new MemoryBlock(scan0, GetRowByteOffset(y), (long)width * (long)ColorBgra.SizeOf);
         //}
 
-        public bool IsContiguousMemoryRegion(Rectangle bounds)
-        {
-            bool oneRow = (bounds.Height == 1);
-            bool manyRows = (this.Stride == (this.Width * ColorBgra.SizeOf) &&
-                this.Width == bounds.Width);
+        //public bool IsContiguousMemoryRegion(Rectangle bounds)
+        //{
+        //    bool oneRow = (bounds.Height == 1);
+        //    bool manyRows = (this.Stride == (this.Width * ColorBgra.SizeOf) &&
+        //        this.Width == bounds.Width);
 
-            return oneRow || manyRows;
-        }
+        //    return oneRow || manyRows;
+        //}
 
         /// <summary>
         /// Determines if the requested pixel coordinate is within bounds.

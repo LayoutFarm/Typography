@@ -197,7 +197,7 @@ namespace PixelFarm.Drawing
         public abstract void DrawText(char[] buffer, int x, int y);
         public abstract void DrawText(char[] buffer, Rectangle logicalTextBox, int textAlignment);
         public abstract void DrawText(char[] buffer, int startAt, int len, Rectangle logicalTextBox, int textAlignment);
-        public abstract DrawTextTechnique DrawTextTechnique { get; set; }
+        public abstract TextDrawingTech TextDrawingTech { get; set; }
         //TODO: review here again
         public abstract Color TextBackgroundColorHint { get; set; }//explicit set current text background color hint
         
@@ -227,10 +227,11 @@ namespace PixelFarm.Drawing
 
     }
 
-    public enum DrawTextTechnique : byte
+    public enum TextDrawingTech : byte
     {
         Stencil,//default
         LcdSubPix,
+        Copy,
     }
     public abstract class DrawboardBuffer : System.IDisposable
     {

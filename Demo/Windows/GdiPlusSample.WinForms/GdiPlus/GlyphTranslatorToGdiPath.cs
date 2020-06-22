@@ -99,8 +99,8 @@ namespace SampleWinForms
             lastMoveX = lastMoveY = lastX = lastY = 0;
             contour_is_closed = true;
         }
-        public GraphicsPath ResultGraphicsPath { get { return this.ps; } }
-
+        public GraphicsPath ResultGraphicsPath => this.ps;
     }
+
 }
 

@@ -308,9 +308,7 @@ namespace PixelFarm.Drawing
                   0,//src index
                   _coord_xy,//dst
                   _vertices_count << 1,//*2 //
-                  another._vertices_count << 1);
-
-
+                  another._vertices_count << 1); 
 
                 //B.2 
                 System.Array.Copy(

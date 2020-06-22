@@ -122,6 +122,26 @@ namespace PixelFarm.CpuBlit.PixelProcessing
 
         public int GetBufferOffsetXY32(int x, int y) => _linkedImage.GetBufferOffsetXY32(x, y);
 
+        public void SetBlendColor(Color srcColor)
+        {
+            _linkedImage.SetBlendColor(srcColor);
+        }
+
+        public void SetCovers(byte[] covers)
+        {
+            _linkedImage.SetCovers(covers);
+        }
+
+        public void BlendHL(int x, int y, int x2, int coversIndex)
+        {
+            _linkedImage.BlendHL(x, y, x2, coversIndex);
+        }
+
+        public void BlendSolidHSpan(int x, int y, int len, int coversIndex)
+        {
+            _linkedImage.BlendSolidHSpan(x, y, len, coversIndex);
+        }
+
         public virtual int BytesBetweenPixelsInclusive => _linkedImage.BytesBetweenPixelsInclusive;
 
         public virtual int BitDepth => _linkedImage.BitDepth;

@@ -16,8 +16,7 @@ using Typography.Contours;
 using Typography.WebFont;
 
 using BrotliSharpLib;
-using PaintLab.Svg;
-using LayoutFarm.WebLexer;
+
 
 namespace SampleWinForms
 {
@@ -189,53 +188,6 @@ namespace SampleWinForms
 
         PixelFarm.Drawing.OpenFontTextService _textService;
 
-        VgVisualDocHost _vgDocHost = new VgVisualDocHost();
-        MemBitmap ParseAndRenderSvg(System.Text.StringBuilder svgContent)
-        {
-            //----------
-            //copy from HtmlRenderer's SvgViewer demo
-            //----------  
-            var docBuilder = new VgDocBuilder();
-            var parser = new SvgParser(docBuilder);
-            TextSnapshot textSnapshot = new TextSnapshot(svgContent.ToString());
-            parser.ParseDocument(textSnapshot);
-
-            VgVisualDocBuilder builder = new VgVisualDocBuilder();
-            VgVisualElement vgVisElem = builder.CreateVgVisualDoc(docBuilder.ResultDocument, _vgDocHost).VgRootElem;
-            PixelFarm.CpuBlit.VertexProcessing.Q1RectD bounds = vgVisElem.GetRectBounds();
-            float actualXOffset = (float)-bounds.Left;
-            float actualYOffset = (float)-bounds.Bottom;
-
-            int bmpW = (int)Math.Round(bounds.Width);
-            int bmpH = (int)Math.Round(bounds.Height);
-
-            if (bmpW == 0 || bmpH == 0)
-            {
-                return null;
-            }
-            MemBitmap memBitmap = new MemBitmap(bmpW, bmpH);
-            using (Tools.BorrowAggPainter(memBitmap, out var p))
-            using (Tools.More.BorrowVgPaintArgs(p, out var paintArgs))
-            {
-                float orgX = p.OriginX;
-                float orgY = p.OriginY;
-                p.SetOrigin(actualXOffset, actualYOffset);
-
-                p.Clear(PixelFarm.Drawing.Color.White);
-
-                p.FillColor = PixelFarm.Drawing.Color.Black;
-
-                double prevStrokeW = p.StrokeWidth;
-
-                vgVisElem.Paint(paintArgs);
-
-                p.StrokeWidth = prevStrokeW;//restore 
-
-                p.SetOrigin(orgX, orgY);//restore
-            }
-
-            return memBitmap;
-        }
 
         PixelFarm.Drawing.Color _grayColor = new PixelFarm.Drawing.Color(0xFF, 0x80, 0x80, 0x80);
         PixelFarm.Drawing.MyAlternativeTypefaceSelector _myAlternativeTypefaceSelector = new PixelFarm.Drawing.MyAlternativeTypefaceSelector();
@@ -258,7 +210,7 @@ namespace SampleWinForms
                 _textService.UpdateUnicodeRanges();
 
                 _devVxsTextPrinter = new PixelFarm.Drawing.VxsTextPrinter(_painter, _textService);
-                _devVxsTextPrinter.SetSvgBmpBuilderFunc(ParseAndRenderSvg);
+                _devVxsTextPrinter.SetSvgBmpBuilderFunc(PaintLab.SvgBuilderHelper.ParseAndRenderSvg);
                 _devVxsTextPrinter.ScriptLang = _basicOptions.ScriptLang;
                 _devVxsTextPrinter.PositionTechnique = Typography.TextLayout.PositionTechnique.OpenFont;
 

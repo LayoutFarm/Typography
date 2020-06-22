@@ -30,9 +30,14 @@ namespace PixelFarm.CpuBlit.PixelProcessing
         void SetPixel(int x, int y, Color color);
         PixelBlender32 OutputPixelBlender { get; set; }
 
-        //-------------------------------------------------------------------------------------------
-        void BlendHL(int x, int y, int x2, Color sourceColor, byte cover); //**
-        void BlendVL(int x, int y1, int y2, Color sourceColor, byte cover);
+        ////-------------------------------------------------------------------------------------------
+       void BlendHL(int x, int y, int x2, Color sourceColor, byte cover); //**
+       void BlendVL(int x, int y1, int y2, Color sourceColor, byte cover);
+
+        void SetBlendColor(Color srcColor);
+        void SetCovers(byte[] covers);
+        void BlendHL(int x, int y, int x2, int coversIndex);
+        void BlendSolidHSpan(int x, int y, int len, int coversIndex);//use color from SetBlendColor()
         //------------------------------------------------------------------------------------------- 
 
         void CopyFrom(IBitmapSrc sourceImage, Q1Rect sourceImageRect, int destXOffset, int destYOffset); //not used
@@ -42,7 +47,8 @@ namespace PixelFarm.CpuBlit.PixelProcessing
         // color stuff
         void CopyColorHSpan(int x, int y, int len, Color[] colors, int colorIndex); //**
         void CopyColorVSpan(int x, int y, int len, Color[] colors, int colorIndex); // 
-        void BlendSolidHSpan(int x, int y, int len, Color sourceColor, byte[] covers, int coversIndex);// 
+
+        void BlendSolidHSpan(int x, int y, int len, Color sourceColor, byte[] covers, int coversIndex);//  
         void BlendSolidVSpan(int x, int y, int len, Color sourceColor, byte[] covers, int coversIndex);// 
         void BlendColorHSpan(int x, int y, int len, Color[] colors, int colorsIndex, byte[] covers, int coversIndex, bool firstCoverForAll);// 
         void BlendColorVSpan(int x, int y, int len, Color[] colors, int colorsIndex, byte[] covers, int coversIndex, bool firstCoverForAll); //not used

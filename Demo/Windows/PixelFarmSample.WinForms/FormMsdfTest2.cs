@@ -151,7 +151,6 @@ namespace SampleWinForms
                 builder.BuildFromGlyphIndex(gindex, sizeInPoint);
 
                 var glyphContourBuilder = new ContourBuilder();
-                //glyphToContour.Read(builder.GetOutputPoints(), builder.GetOutputContours());
                 var genParams = new MsdfGenParams();
                 builder.ReadShapes(new GlyphContourBuilder2(glyphContourBuilder));
                 //genParams.shapeScale = 1f / 64; //we scale later (as original C++ code use 1/64)

@@ -81,6 +81,10 @@ namespace Typography.OpenFont
         //for TrueType Font
         public static void Read(this IGlyphTranslator tx, GlyphPointF[] glyphPoints, ushort[] contourEndPoints, float scale = 1)
         {
+            if (glyphPoints == null || contourEndPoints == null)
+            {
+                return;//?
+            }
 
             int startContour = 0;
             int cpoint_index = 0;//current point index

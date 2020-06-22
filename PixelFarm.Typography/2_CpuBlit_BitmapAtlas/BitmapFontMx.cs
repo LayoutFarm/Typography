@@ -117,8 +117,15 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
         {
             _textServices = textServices;
         }
+
         public TextureKind TextureKindForNewFont { get; set; }
 
+
+        SvgBmpBuilderFunc _svgBmpBuilderFunc;
+        public void SetSvgBmpBuilderFunc(SvgBmpBuilderFunc svgBmpBuilderFunc)
+        {
+            _svgBmpBuilderFunc = svgBmpBuilderFunc;
+        }
 
 #if DEBUG
         System.Diagnostics.Stopwatch _dbugStopWatch = new System.Diagnostics.Stopwatch();
@@ -145,6 +152,8 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                 }
             }
         }
+
+
         static object s_loadDataLock = new object();
 
         /// <summary>
@@ -225,14 +234,34 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
 
                 //1. create glyph-texture-bitmap generator
                 var glyphTextureGen = new GlyphTextureBitmapGenerator();
+                glyphTextureGen.SetSvgBmpBuilderFunc(_svgBmpBuilderFunc ?? _textServices.SvgBmpBuilder);
 
                 //2. generate the glyphs
-                SimpleBitmapAtlasBuilder atlasBuilder = glyphTextureGen.CreateTextureFontFromBuildDetail(
-                    resolvedTypeface,
-                    reqFont.SizeInPoints,
-                    TextureKindForNewFont,
-                    GlyphTextureCustomConfigs.TryGetGlyphTextureBuildDetail(reqFont, false, false)
-                );
+                TextureKind textureForNewFont = TextureKindForNewFont;
+                SimpleBitmapAtlasBuilder atlasBuilder = null;
+                if (resolvedTypeface.HasSvgTable())
+                {
+                    //need special mx
+                    textureForNewFont = TextureKind.Bitmap;
+                    GlyphTextureBuildDetail buildDetail = new GlyphTextureBuildDetail();
+                    buildDetail.AllGlyphs = true;
+
+                    atlasBuilder = glyphTextureGen.CreateTextureFontFromBuildDetail(
+                     resolvedTypeface,
+                     reqFont.SizeInPoints,
+                     textureForNewFont,
+                     new GlyphTextureBuildDetail[] { buildDetail }
+                   );
+                }
+                else
+                {
+                    atlasBuilder = glyphTextureGen.CreateTextureFontFromBuildDetail(
+                      resolvedTypeface,
+                      reqFont.SizeInPoints,
+                      textureForNewFont,
+                      GlyphTextureCustomConfigs.TryGetGlyphTextureBuildDetail(reqFont, false, false)
+                    );
+                }
 
                 //3. set information before write to font-info
                 atlasBuilder.FontFilename = reqFont.Name;//TODO: review here, check if we need 'filename' or 'fontname'

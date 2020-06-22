@@ -55,23 +55,16 @@ namespace Typography.TextLayout
     public class UnscaledGlyphPlanList : IUnscaledGlyphPlanList
     {
         readonly List<UnscaledGlyphPlan> _list = new List<UnscaledGlyphPlan>();
-        float _accumAdvanceX;
-
         public int Count => _list.Count;
         public UnscaledGlyphPlan this[int index] => _list[index];
-
         public void Clear()
         {
             _list.Clear();
-            _accumAdvanceX = 0;
         }
         public void Append(UnscaledGlyphPlan glyphPlan)
         {
             _list.Add(glyphPlan);
-            _accumAdvanceX += glyphPlan.AdvanceX;
         }
-        public float AccumAdvanceX => _accumAdvanceX;
-
     }
 
     /// <summary>
@@ -572,11 +565,11 @@ namespace Typography.TextLayout
         }
         public void AddGlyph(ushort o_offset, ushort glyphIndex, Glyph glyph)
         {
-            if (!glyph.HasOriginalAdvancedWidth)
+            if (!Glyph.HasOriginalAdvancedWidth(glyph))
             {
                 //TODO: review here, 
                 //WHY? some glyph dose not have original advanced width
-                glyph.OriginalAdvanceWidth = _typeface.GetHAdvanceWidthFromGlyphIndex(glyphIndex);
+                Glyph.SetOriginalAdvancedWidth(glyph, _typeface.GetAdvanceWidthFromGlyphIndex(glyphIndex));
             }
 
             _glyphPosList.Add(new GlyphPos(o_offset, glyphIndex, glyph.GlyphClass, glyph.OriginalAdvanceWidth));
