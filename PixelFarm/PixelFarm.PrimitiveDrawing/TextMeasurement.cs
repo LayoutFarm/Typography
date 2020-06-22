@@ -41,7 +41,7 @@ namespace PixelFarm.Drawing
         public short minOffsetY;
         public short maxOffsetY;
     }
-    public interface ILineSegmentList : System.IDisposable
+    public interface ILineSegmentList
     {
         int Count { get; }
         ILineSegment this[int index] { get; }
@@ -61,7 +61,7 @@ namespace PixelFarm.Drawing
         float MeasureWhitespace(RequestFont f);
         float MeasureBlankLineHeight(RequestFont f);
         //
-       
+
         //
         Size MeasureString(in TextBufferSpan textBufferSpan, RequestFont font);
 
