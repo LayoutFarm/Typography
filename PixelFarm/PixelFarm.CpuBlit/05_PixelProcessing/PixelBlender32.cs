@@ -118,29 +118,29 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                (byte)((value >> (CO.B_SHIFT)) & 0xff));
 
         }
-        internal Color PixelToColorRGBA(int[] buffer, int bufferOffset32)
-        {
-            //TODO: review here ...             
-            //check if the buffer is pre-multiplied color?
-            //if yes=> this is not correct, 
-            //we must convert the pixel from pre-multiplied color 
-            //to the 'straight alpha color'
+        //internal Color PixelToColorRGBA(int[] buffer, int bufferOffset32)
+        //{
+        //    //TODO: review here ...             
+        //    //check if the buffer is pre-multiplied color?
+        //    //if yes=> this is not correct, 
+        //    //we must convert the pixel from pre-multiplied color 
+        //    //to the 'straight alpha color'
 
-            int value = buffer[bufferOffset32];
-            return new Color(
-               (byte)((value >> (CO.A_SHIFT)) & 0xff),
-               (byte)((value >> (CO.R_SHIFT)) & 0xff),
-               (byte)((value >> (CO.G_SHIFT)) & 0xff),
-               (byte)((value >> (CO.B_SHIFT)) & 0xff));
+        //    int value = buffer[bufferOffset32];
+        //    return new Color(
+        //       (byte)((value >> (CO.A_SHIFT)) & 0xff),
+        //       (byte)((value >> (CO.R_SHIFT)) & 0xff),
+        //       (byte)((value >> (CO.G_SHIFT)) & 0xff),
+        //       (byte)((value >> (CO.B_SHIFT)) & 0xff));
 
-            //        buffer[bufferOffset + CO.A],
-            //        buffer[bufferOffset + CO.R],
-            //        buffer[bufferOffset + CO.G],
-            //        buffer[bufferOffset + CO.B]
-            //        );
-            //}
+        //    //        buffer[bufferOffset + CO.A],
+        //    //        buffer[bufferOffset + CO.R],
+        //    //        buffer[bufferOffset + CO.G],
+        //    //        buffer[bufferOffset + CO.B]
+        //    //        );
+        //    //}
 
-        }
+        //}
     }
 
 }

@@ -17,8 +17,7 @@ namespace PaintFx.Effects
         public int Percentile { get; set; }
         public unsafe override ColorBgra Apply(ColorBgra src, int area, int* hb, int* hg, int* hr, int* ha)
         {
-            ColorBgra c = GetPercentile(this.Percentile, area, hb, hg, hr, ha);
-            return c;
+            return GetPercentile(this.Percentile, area, hb, hg, hr, ha);             
         }
 
         public override void Render(Surface src, Surface dest, Rectangle[] rois, int startIndex, int length)

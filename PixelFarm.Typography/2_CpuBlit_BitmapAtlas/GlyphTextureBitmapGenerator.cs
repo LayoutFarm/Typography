@@ -17,6 +17,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
         public char[] OnlySelectedGlyphIndices;
         public HintTechnique HintTechnique;
 
+        public bool AllGlyphs;
     }
 
     public struct GlyphTextureBitmapGenerator
@@ -53,7 +54,26 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             for (int i = 0; i < j; ++i)
             {
                 GlyphTextureBuildDetail detail = details[i];
-                if (!detail.ScriptLang.IsEmpty())
+                if (detail.AllGlyphs)
+                {
+#if DEBUG
+                               
+#endif
+
+                    int count = typeface.GlyphCount;
+                    ushort[] glyphIndexList = new ushort[count];
+                    for (ushort m = 0; m < count; ++m)
+                    {
+                        glyphIndexList[m] = m;
+                    }
+                    CreateTextureFontFromGlyphIndices(typeface,
+                       sizeInPoint,
+                       detail.HintTechnique,
+                       atlasBuilder,
+                       glyphIndexList
+                       );
+                }
+                else if (!detail.ScriptLang.IsEmpty())
                 {
                     //skip those script lang=null
                     //2. find associated glyph index base on input script langs
@@ -372,8 +392,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                     {
 
 #if DEBUG
-                        System.Diagnostics.Debugger.Break();
-                        System.Diagnostics.Debug.WriteLine("create fallback glyph:");
+                        System.Diagnostics.Debug.WriteLine("bitmap texture,create fallback glyph:" + glyphIndex);
 #endif
 
                         //NESTED

@@ -46,48 +46,20 @@ namespace PixelFarm.CpuBlit.Imaging
         {
             Interpolation = InterpolationMode.Bilinear;
         }
-        public Point ImageLocation
-        {
-            //left bottom?
-            get { return new Point(_destBounds.Left, _destBounds.Bottom); }
-        }
-        public InterpolationMode Interpolation
-        {
-            get;
-            set;
-        }
+
+        //left bottom?
+        public Point ImageLocation => new Point(_destBounds.Left, _destBounds.Bottom);
+
+        public InterpolationMode Interpolation { get; set; }
         //
-        public int ImageWidth => _destBounds.Width;
-        //
+        public int ImageWidth => _destBounds.Width; 
         public int ImageHeight => _destBounds.Height;
         //
-        public PointF VertexLeftTop
-        {
-            get => _p0;
-            set { _p0 = value; UpdateVertices(); }
+        public PointF VertexLeftTop => _p0;
+        public PointF VertexRightTop => _p1;
+        public PointF VertexRightBottom => _p2;
+        public PointF VertexBottomLeft => _p3;
 
-        }
-
-        public PointF VertexRightTop
-        {
-            get => _p1;
-            set { _p1 = value; UpdateVertices(); }
-        }
-
-        public PointF VertexRightBottom
-        {
-            get => _p2;
-            set
-            {
-                _p2 = value;
-                UpdateVertices();
-            }
-        }
-        public PointF VertexBottomLeft
-        {
-            get => _p3;
-            set { _p3 = value; UpdateVertices(); }
-        }
         public void SetFourCorners(PointF leftTop, PointF rightTop, PointF rightBottom, PointF leftBottom)
         {
             _p0 = leftTop;

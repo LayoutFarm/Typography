@@ -43,7 +43,7 @@ namespace PixelFarm.Drawing
 
 
     /// <summary>
-    /// user request font specification
+    /// user-request font specification
     /// </summary>
     public sealed class RequestFont
     {
@@ -63,8 +63,8 @@ namespace PixelFarm.Drawing
             Size = fontSize; //store user font size here
 
             Style = style;
-            float fontSizeInPts = SizeInPoints = fontSize.ToPoints();
-            FontKey = CalculateFontKey(facename, fontSizeInPts, style);
+            
+            FontKey = CalculateFontKey(facename, SizeInPoints = fontSize.ToPoints(), style);
         }
         public Len Size { get; private set; }
         //
@@ -111,7 +111,7 @@ namespace PixelFarm.Drawing
                 fontName = fontName.ToUpper();
                 if (!s_registerFontNames.TryGetValue(fontName, out int found))
                 {
-                    int nameCrc32 = CRC32Calculator.CalculateCrc32(fontName);
+                    int nameCrc32 = TinyCRC32Calculator.CalculateCrc32(fontName);
                     s_registerFontNames.Add(fontName, nameCrc32);
                     return nameCrc32;
                 }

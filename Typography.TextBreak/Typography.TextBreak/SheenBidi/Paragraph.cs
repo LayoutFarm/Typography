@@ -33,7 +33,7 @@ namespace Typography.TextBreak.SheenBidi
         internal CharType[] Types => _types;
         internal byte[] Levels => _levels;
 
-        #region Constructors
+        
 
         public Paragraph(string text, BaseDirection direction)
         {
@@ -56,9 +56,9 @@ namespace Typography.TextBreak.SheenBidi
         {
         }
 
-        #endregion Constructors
+        
 
-        #region Determine Character Types
+        //>>Determine Character Types
 
         private void DetermineTypes(BidiChain chain)
         {
@@ -126,9 +126,10 @@ namespace Typography.TextBreak.SheenBidi
             chain.AddLink(newLink);
         }
 
-        #endregion Determine Character Types
+        //<<Determine Character Types
 
-        #region Determine Base Level
+
+        //>>Determine Base Level
 
         private void DetermineBaseLevel(BidiChain chain)
         {
@@ -220,9 +221,9 @@ namespace Typography.TextBreak.SheenBidi
             return null;
         }
 
-        #endregion Determine Base Level
+        //<<Determine Base Level
 
-        #region Determine Levels
+        //>>Determine Levels
 
         private void DetermineLevels(BidiChain chain)
         {
@@ -472,6 +473,6 @@ namespace Typography.TextBreak.SheenBidi
             }
         }
 
-        #endregion Determine Levels
+        //<<Determine Levels
     }
 }

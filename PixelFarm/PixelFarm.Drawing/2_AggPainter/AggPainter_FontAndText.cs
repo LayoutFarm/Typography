@@ -5,14 +5,25 @@ using PixelFarm.Drawing;
 
 namespace PixelFarm.CpuBlit
 {
+    public interface IAggTextPrinter : ITextPrinter
+    {
+        /// <summary>
+        /// render from RenderVxFormattedString object to specific pos
+        /// </summary>
+        /// <param name="renderVx"></param>
+        /// <param name="left"></param>
+        /// <param name="top"></param>
+        void DrawString(AggRenderVxFormattedString renderVx, double left, double top);
+        void PrepareStringForRenderVx(AggRenderVxFormattedString renderVx, char[] text, int startAt, int len);
+    }
 
     partial class AggPainter
     {
         //font
         RequestFont _currentFont;
-        ITextPrinter _textPrinter;
-         
-        public ITextPrinter TextPrinter
+        IAggTextPrinter _textPrinter;
+
+        public IAggTextPrinter TextPrinter
         {
             get => _textPrinter;
             set
@@ -67,7 +78,8 @@ namespace PixelFarm.CpuBlit
         public override void DrawString(RenderVxFormattedString renderVx, double left, double top)
         {
             //draw string from render vx 
-            _textPrinter?.DrawString(renderVx, left, top);
+
+            _textPrinter?.DrawString((AggRenderVxFormattedString)renderVx, left, top);
         }
         public override RenderVxFormattedString CreateRenderVx(string textspan)
         {

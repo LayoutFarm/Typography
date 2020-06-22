@@ -9,23 +9,9 @@ namespace PixelFarm.CpuBlit.Imaging
             return p[1] + 0.5 * x * (p[2] - p[0] + x * (2.0 * p[0] - 5.0 * p[1] + 4.0 * p[2] - p[3] + x * (3.0 * (p[1] - p[2]) + p[3] - p[0])));
         }
     }
-    public class BicubicInterpolator : CubicInterpolator
-    {
-        double[] _arr = new double[4];
-        public double getValue(double[][] p, double x, double y)
-        {
-            var mm = p[0];
-            _arr[0] = getValue(p[0], y);
-            _arr[1] = getValue(p[1], y);
-            _arr[2] = getValue(p[2], y);
-            _arr[3] = getValue(p[3], y);
-            return getValue(_arr, x);
-        }
-    }
-    //------------------------------------------------------------------------
+ 
     public class CubicInterpolator2
     {
-
         public static double getValue2(double p0, double p1, double p2, double p3, double x)
         {
             return p1 + 0.5 * x * (p2 - p0 + x * (2.0 * p0 - 5.0 * p1 + 4.0 * p2 - p3 +
