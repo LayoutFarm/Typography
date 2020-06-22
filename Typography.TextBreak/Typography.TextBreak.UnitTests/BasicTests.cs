@@ -48,6 +48,7 @@ public class BasicTests
     [DataRow("Hi!", 0, new[] { "Hi", "!" })]
     [DataRow("We are #1", 0, new[] { "We", " ", "are", " ", "#", "1" })]
     [DataRow("1337 5P34K", 0, new[] { "1337", " ", "5", "P34K" })]
+    [DataRow("ščěěščž čšřžščřž čšřžščř", 0, new[] { "ščěěščž", " ", "čšřžščřž"," ", "čšřžščř" })]
     [DataRow("!@#$%^&*()", 0, new[] { "!", "@", "#", "$", "%", "^", "&", "*", "(", ")" })]
     [DataRow("1st line\r2nd line\n3rd line\r\n4th line\u00855th line", 0,
         new[] { "1", "st", " ", "line", "\r", "2", "nd", " ", "line", "\n",
