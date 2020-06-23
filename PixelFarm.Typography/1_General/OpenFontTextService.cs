@@ -304,15 +304,25 @@ namespace PixelFarm.Drawing
                 lineGapInPx,
                 recommedLineSpacingInPx);
 
-            var span = new TextBufferSpan(new char[] { ' ' });
-            Size whiteSpaceW = MeasureString(span, font);
-            PixelFarm.Drawing.Internal.RequestFontCacheAccess.SetWhitespaceWidth(font, _system_id, whiteSpaceW.Width);
+            float advW = typeface.GetAdvanceWidthFromGlyphIndex(typeface.GetGlyphIndex(' ')) * pxscale;
+            PixelFarm.Drawing.Internal.RequestFontCacheAccess.SetWhitespaceWidth(font, _system_id, (int)advW); //rounding?
             return typeface;
         }
+
+
         public float MeasureWhitespace(RequestFont f)
         {
-            ResolveTypeface(f);
-            return PixelFarm.Drawing.Internal.RequestFontCacheAccess.GetWhitespaceWidth(f, _system_id);
+
+            if (!PixelFarm.Drawing.Internal.RequestFontCacheAccess.GetWhitespaceWidth(f,
+                _system_id,
+                out int cacheWidth))
+            {
+                //not have a cache data, new measure here
+                Typeface typeface = ResolveTypeface(f);
+                cacheWidth = (int)(typeface.GetAdvanceWidthFromGlyphIndex(typeface.GetGlyphIndex(' ')) * typeface.CalculateScaleToPixelFromPointSize(f.SizeInPoints));
+                PixelFarm.Drawing.Internal.RequestFontCacheAccess.SetWhitespaceWidth(f, _system_id, cacheWidth);
+            }
+            return cacheWidth;
         }
 
 
@@ -354,7 +364,7 @@ namespace PixelFarm.Drawing
         }
         //
         public bool SupportsWordBreak => true;
-   
+
         public void BreakToLineSegments(in TextBufferSpan textBufferSpan, WordVisitor wordVisitor)
         {
 
