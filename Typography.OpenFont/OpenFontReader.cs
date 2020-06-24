@@ -28,20 +28,20 @@ namespace Typography.OpenFont
         public readonly string TypographicSubFamilyName;
         public readonly Extensions.TranslatedOS2FontStyle OS2TranslatedStyle;
         public readonly ushort Weight;
-        PreviewFontInfo[] _ttcfMembers;
 
+        PreviewFontInfo[] _ttcfMembers;
 
         internal PreviewFontInfo(string fontName, string fontSubFam,
             string tFamilyName, string tSubFamilyName,
             ushort weight,
             Languages langs,
-            Extensions.TranslatedOS2FontStyle os2TranslatedStyle = Extensions.TranslatedOS2FontStyle.UNSET)
+            Extensions.TranslatedOS2FontStyle os2TranslatedStyle = Extensions.TranslatedOS2FontStyle.UNSET
+            )
         {
             Name = fontName;
             SubFamilyName = fontSubFam;
             TypographicFamilyName = tFamilyName;
             TypographicSubFamilyName = tSubFamilyName;
-
 #if DEBUG
             //please note that some fontName != typographicFontName
             //this may effect how to search a font
@@ -126,12 +126,12 @@ namespace Typography.OpenFont
 
     public class OpenFontReader
     {
-
+#if DEBUG
         public OpenFontReader()
         {
 
         }
-
+#endif
         class FontCollectionHeader
         {
             public ushort majorVersion;
@@ -347,8 +347,11 @@ namespace Typography.OpenFont
             GPOS gpos = ReadTableIfExists(tables, input, new GPOS() { OnlyScriptList = true });
             //gsub and gpos contains actual script_list that are in the typeface
 
+            Cmap cmap = ReadTableIfExists(tables, input, new Cmap());
+            
             Languages langs = new Languages();
-            langs.Update(os2Table, metaTable, gsub, gpos);
+
+            langs.Update(os2Table, metaTable, cmap, gsub, gpos);
 
             return new PreviewFontInfo(
               nameEntry.FontName,
@@ -357,7 +360,8 @@ namespace Typography.OpenFont
               nameEntry.TypographyicSubfamilyName,
               os2Table.usWeightClass,
               langs,
-              Extensions.TypefaceExtensions.TranslatedOS2FontStyle(os2Table))
+              Extensions.TypefaceExtensions.TranslatedOS2FontStyle(os2Table)
+              )
             {
                 PostScriptName = nameEntry.PostScriptName,
                 UniqueFontIden = nameEntry.UniqueFontIden,
@@ -384,7 +388,7 @@ namespace Typography.OpenFont
             CFFTable cff = ReadTableIfExists(tables, input, new CFFTable());
 
             //--------------
-            Cmap cmaps = ReadTableIfExists(tables, input, new Cmap());
+            Cmap cmap = ReadTableIfExists(tables, input, new Cmap());
             GlyphLocations glyphLocations = ReadTableIfExists(tables, input, new GlyphLocations(maximumProfile.GlyphCount, header.WideGlyphLocations));
 
             Glyf glyf = ReadTableIfExists(tables, input, new Glyf(glyphLocations));
@@ -497,7 +501,7 @@ namespace Typography.OpenFont
             }
 
             //----------------------------
-            typeface.CmapTable = cmaps;
+            typeface.CmapTable = cmap;
             typeface.KernTable = kern;
             typeface.GaspTable = gaspTable;
             typeface.MaxProfile = maximumProfile;
