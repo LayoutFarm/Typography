@@ -9,9 +9,9 @@ using System.Text;
 using System.Windows.Forms;
 
 using PixelFarm.CpuBlit;
+using PixelFarm.CpuBlit.BitmapAtlas;
 using Typography.OpenFont;
 using Typography.OpenFont.Extensions;
-using PixelFarm.CpuBlit.BitmapAtlas;
 
 namespace SampleWinForms
 {
@@ -56,6 +56,7 @@ namespace SampleWinForms
             this.cmbTextureKind.SelectedIndex = 0;//default
         }
 
+        readonly Dictionary<string, ScriptLang> _collectedScriptLangs = new Dictionary<string, ScriptLang>();
         public void SetFont(Typeface typeface, float fontSizeInPoints)
         {
             _typeface = typeface;
@@ -67,24 +68,32 @@ namespace SampleWinForms
             this.flowLayoutPanel1.Controls.Clear();
             _availableScripts.Clear();
 
-            foreach (ScriptLang scriptLang in ScriptLangs.GetRegiteredScriptLangIter())
+            _collectedScriptLangs.Clear();
+            typeface.Languages.CollectScriptLang(_collectedScriptLangs);
+            foreach (ScriptLang scriptLang in _collectedScriptLangs.Values)
             {
-                if (ScriptLangs.TryGetUnicodeLangBitsArray(scriptLang.shortname, out UnicodeLangBits[] unicodeLangs))
+                ScriptLangInfo scriptLangInfo = ScriptLangs.GetRegisteredScriptLang(scriptLang.GetScriptTagString());
+                if (scriptLangInfo != null)
                 {
-                    foreach (UnicodeLangBits unicodeLang in unicodeLangs)
+                    UnicodeLangBits[] unicodeLangs = scriptLangInfo.unicodeLangs;
+                    if (unicodeLangs != null)
                     {
-                        if (typeface.DoesSupportUnicode(unicodeLang))
+                        foreach (UnicodeLangBits unicodeLang in unicodeLangs)
                         {
-                            //
-                            UIFontScriptOpt customUIFontScript = new UIFontScriptOpt();
-                            customUIFontScript.SetInfo(scriptLang, unicodeLang);
-                            _availableScripts.Add(customUIFontScript);
+                            if (typeface.DoesSupportUnicode(unicodeLang))
+                            {
+                                //
+                                UIFontScriptOpt customUIFontScript = new UIFontScriptOpt();
+                                customUIFontScript.SetInfo(scriptLangInfo, unicodeLang);
+                                _availableScripts.Add(customUIFontScript);
 
-                            this.flowLayoutPanel1.Controls.Add(customUIFontScript);
+                                this.flowLayoutPanel1.Controls.Add(customUIFontScript);
+                            }
                         }
                     }
                 }
             }
+
         }
 
         private void FormFontAtlas_Load(object sender, EventArgs e)

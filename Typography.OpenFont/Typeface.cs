@@ -18,6 +18,8 @@ namespace Typography.OpenFont
         CFFTable _cffTable;
         BitmapFontGlyphSource _bitmapFontGlyphSource;
 
+
+
         internal Typeface(
             NameEntry nameEntry,
             Bounds bounds,
@@ -72,7 +74,9 @@ namespace Typography.OpenFont
             OS2Table = os2Table;
 
             _glyphs = glyphs;
+
         }
+        public Languages Languages { get; } = new Languages();
         /// <summary>
         /// control values in Font unit
         /// </summary>
@@ -218,7 +222,9 @@ namespace Typography.OpenFont
             }
             else
             {
+#if DEBUG
                 System.Diagnostics.Debug.WriteLine("found unknown glyph:" + glyphIndex);
+#endif
                 return _glyphs[0]; //return empty glyph?;
             }
         }
@@ -246,6 +252,8 @@ namespace Typography.OpenFont
         public Bounds Bounds => _bounds;
         public ushort UnitsPerEm => _unitsPerEm;
         public Glyph[] Glyphs => _glyphs;
+        public short UnderlinePosition => PostTable.UnderlinePosition;
+
         //
 
         const int pointsPerInch = 72; //TODO: should be configurable
@@ -287,6 +295,7 @@ namespace Typography.OpenFont
             return (targetPointSize * resolution / pointsPerInch) / this.UnitsPerEm;
         }
 
+
         internal BASE BaseTable { get; set; }
         internal GDEF GDEFTable { get; set; }
 
@@ -294,9 +303,6 @@ namespace Typography.OpenFont
         public CPAL CPALTable { get; set; }
         public GPOS GPOSTable { get; set; }
         public GSUB GSUBTable { get; set; }
-
-        //-------------------------------------------------------
-
 
 
         //experiment
@@ -331,6 +337,7 @@ namespace Typography.OpenFont
 
 
         //---------        
+
         internal PostTable PostTable { get; set; }
         internal bool _evalCffGlyphBounds;
         public bool IsCffFont => _cffTable != null;
@@ -359,7 +366,12 @@ namespace Typography.OpenFont
         {
             _bitmapFontGlyphSource.CopyBitmapContent(glyph, output);
         }
+
+        internal void UpdateLangs(Meta metaTable) => Languages.Update(OS2Table, metaTable, this.GSUBTable, this.GPOSTable);
+
     }
+
+  
 
 
     public interface IGlyphPositions
@@ -436,6 +448,8 @@ namespace Typography.OpenFont
         }
     }
 
+
+
     namespace Extensions
     {
 
@@ -443,78 +457,6 @@ namespace Typography.OpenFont
         {
 
 
-            public static bool DoesSupportUnicode(
-                this PreviewFontInfo previewFontInfo,
-                UnicodeLangBits unicodeLangBits)
-            {
-              
-                long bits = (long)unicodeLangBits;
-                int bitpos = (int)(bits >> 32);
-
-                if (bitpos == 0)
-                {
-                    return true; //default
-                }
-                else if (bitpos < 32)
-                {
-                    //use range 1
-                    return (previewFontInfo.UnicodeRange1 & (1 << bitpos)) != 0;
-                }
-                else if (bitpos < 64)
-                {
-                    return (previewFontInfo.UnicodeRange2 & (1 << (bitpos - 32))) != 0;
-                }
-                else if (bitpos < 96)
-                {
-                    return (previewFontInfo.UnicodeRange3 & (1 << (bitpos - 64))) != 0;
-                }
-                else if (bitpos < 128)
-                {
-                    return (previewFontInfo.UnicodeRange4 & (1 << (bitpos - 96))) != 0;
-                }
-                else
-                {
-                    throw new System.NotSupportedException();
-                }
-            }
-            public static bool DoesSupportUnicode(
-                this Typeface typeface,
-                UnicodeLangBits unicodeLangBits)
-            {
-                if (typeface.OS2Table == null)
-                {
-                    return false;
-                }
-                //-----------------------------
-                long bits = (long)unicodeLangBits;
-                int bitpos = (int)(bits >> 32);
-
-                if (bitpos == 0)
-                {
-                    return true; //default
-                }
-                else if (bitpos < 32)
-                {
-                    //use range 1
-                    return (typeface.OS2Table.ulUnicodeRange1 & (1 << bitpos)) != 0;
-                }
-                else if (bitpos < 64)
-                {
-                    return (typeface.OS2Table.ulUnicodeRange2 & (1 << (bitpos - 32))) != 0;
-                }
-                else if (bitpos < 96)
-                {
-                    return (typeface.OS2Table.ulUnicodeRange3 & (1 << (bitpos - 64))) != 0;
-                }
-                else if (bitpos < 128)
-                {
-                    return (typeface.OS2Table.ulUnicodeRange4 & (1 << (bitpos - 96))) != 0;
-                }
-                else
-                {
-                    throw new System.NotSupportedException();
-                }
-            }
 
             public static bool RecommendToUseTypoMetricsForLineSpacing(this Typeface typeface)
             {
@@ -822,6 +764,7 @@ namespace Typography.OpenFont
                 //TODO: review here
                 return typeface.OS2Table.usWinAscent + typeface.OS2Table.usWinDescent;
             }
+
 
         }
         public enum LineSpacingChoice

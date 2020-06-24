@@ -42,28 +42,30 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Box\AttributesEnum.cs" />
-    <Compile Include="Box\GlyhBoxPainter.cs" />
-    <Compile Include="Box\GlyphBox.cs" />
+    <Compile Include="Impl\GlyphBoxPainter.cs" />
+    <Compile Include="Impl\GlyphBoxes.cs" />
+    <Compile Include="Impl\VxsMathBoxTreeBuilder.cs" />
+    <Compile Include="Tools\OpeatorTableCreator.cs" />
+    <Compile Include="Tools\OperatorInfoDictionary.cs" />
+    <Content Include="Examples\p01.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Examples\p02.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Examples\p28.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Compile Include="Box\StackChild.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
-    <Compile Include="MathMLDom\CodeWriter.cs" />
+    <Compile Include="Tools\CodeWriter.cs" />
     <Compile Include="MathMLDom\DomAutoGen.cs" />
-    <Compile Include="MathMLDom\DomCreator.cs" />
-    <Compile Include="MathMLDom\MathBoxHelper.cs" />
-    <Compile Include="MathMLDom\MathNode.cs" />
+    <Compile Include="Tools\DomCreator.cs" />
     <Compile Include="MathMLDom\MathMLReader.cs" />
-    <Compile Include="Operator Dictionary\OpeatorTableCreator.cs" />
-    <Compile Include="Operator Dictionary\OperatorInfoDictionary.cs" />
-    <Compile Include="Operator Dictionary\OperatorTableAutogen.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Content Include="Examples\p3233_1.html">
@@ -270,10 +272,10 @@
     <Content Include="Examples\p3684_4.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="MathMLDom\DomSpec.xml">
+    <Content Include="Tools\DomSpec.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Operator Dictionary\only_ops_table.html">
+    <Content Include="Tools\only_ops_table.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <EmbeddedResource Include="Form1.resx">
@@ -289,13 +291,19 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <None Include="..\..\TestFonts\Asana-Math.otf">
+      <Link>Fonts\Asana-Math.otf</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\TestFonts\latinmodern-math.otf">
+      <Link>Fonts\latinmodern-math.otf</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\TestFonts\XITSMath-Regular.otf">
+      <Link>Fonts\XITSMath-Regular.otf</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="app.config" />
-    <None Include="Fonts\Asana-Math.otf">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Fonts\latinmodern-math.otf">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -312,9 +320,25 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\..\PixelFarm\src\x_autogen2\PixelFarm.One.HtmlRenderer\PixelFarm.One.HtmlRenderer.csproj">
-      <Project>{5c8275a9-c7b6-42ab-9e53-c14b3a88eee6}</Project>
-      <Name>PixelFarm.One.HtmlRenderer</Name>
+    <ProjectReference Include="..\..\..\..\Build\N20\Typography.GlyphLayout\Typography.GlyphLayout.csproj">
+      <Project>{c6807d05-09be-4313-9f8b-bd2d51c55819}</Project>
+      <Name>Typography.GlyphLayout</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Build\N20\Typography.OpenFont\Typography.OpenFont.csproj">
+      <Project>{f7d71e61-9342-4dd7-9afd-69045f2ec98b}</Project>
+      <Name>Typography.OpenFont</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\PixelFarm.Typography\PixelFarm.Typography.csproj">
+      <Project>{540a2ea6-dae3-4625-8951-b2c3118603a4}</Project>
+      <Name>PixelFarm.Typography</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\x_autogen2\PixelFarm.MiniAgg.One\PixelFarm.MiniAgg.One.csproj">
+      <Project>{18c5fa8f-8579-4616-a1d0-220003627bf8}</Project>
+      <Name>PixelFarm.MiniAgg.One</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PaintLab.MathML\PaintLab.MathML.csproj">
+      <Project>{7cd2a321-4d1d-4c5e-bf3d-5cfb6b423c82}</Project>
+      <Name>PaintLab.MathML</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

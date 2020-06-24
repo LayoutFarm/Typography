@@ -28,8 +28,14 @@ namespace Typography.TextBreak
         }
         public void SetNewBreakHandler(NewWordBreakHandlerDelegate newWordBreakHandler)
         {
-            _visitor = new WordVisitor(newWordBreakHandler);
+            _visitor = new DelegateBaseWordVisitor(newWordBreakHandler);
         }
+        public WordVisitor CurrentVisitor
+        {
+            get => _visitor;
+            set => _visitor = value;
+        }
+
         //
         public EngBreakingEngine EngBreakingEngine => _engBreakingEngine;
         //
@@ -100,7 +106,9 @@ namespace Typography.TextBreak
             _endAt = startAt + len;
             _visitor.LoadText(charBuff, startAt, len);
             //---------------------------------------- 
-            BreakingEngine currentEngine = _breakingEngine = SelectEngine(charBuff[startAt]);
+
+
+            BreakingEngine currentEngine = _breakingEngine = (UseUnicodeRangeBreaker) ? _engBreakingEngine : SelectEngine(charBuff[startAt]);
             //----------------------------------------
             //select breaking engine
             int endAt = startAt + len;
@@ -149,7 +157,15 @@ namespace Typography.TextBreak
         {
             return SelectEngine(c);
         }
-        //
+
+        /// <summary>
+        /// use unicode range breaker 
+        /// </summary>
+        public bool UseUnicodeRangeBreaker
+        {
+            get => _engBreakingEngine.EnableUnicodeRangeBreaker;
+            set => _engBreakingEngine.EnableUnicodeRangeBreaker = value;
+        }
     }
 
 

@@ -28,7 +28,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.cmbScriptLangs = new System.Windows.Forms.ComboBox();
             this.lstFontList = new System.Windows.Forms.ListBox();
             this.lstFontSizes = new System.Windows.Forms.ListBox();
             this.label2 = new System.Windows.Forms.Label();
@@ -36,23 +35,19 @@
             this.cmbRenderChoices = new System.Windows.Forms.ComboBox();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
-            _txtTypefaceInfo = new System.Windows.Forms.TextBox();
+            this._txtTypefaceInfo = new System.Windows.Forms.TextBox();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.lstFontStyle = new System.Windows.Forms.ListBox();
             this.lstFontNameList = new System.Windows.Forms.ListBox();
+            this.lstSupportedUnicodeLangs = new System.Windows.Forms.ListBox();
+            this.lstScriptLangs = new System.Windows.Forms.ListBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
+            this.chkEnableMultiTypefaces = new System.Windows.Forms.CheckBox();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // cmbScriptLangs
-            // 
-            this.cmbScriptLangs.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cmbScriptLangs.FormattingEnabled = true;
-            this.cmbScriptLangs.Location = new System.Drawing.Point(14, 3);
-            this.cmbScriptLangs.Name = "cmbScriptLangs";
-            this.cmbScriptLangs.Size = new System.Drawing.Size(141, 21);
-            this.cmbScriptLangs.TabIndex = 69;
             // 
             // lstFontList
             // 
@@ -65,15 +60,15 @@
             // lstFontSizes
             // 
             this.lstFontSizes.FormattingEnabled = true;
-            this.lstFontSizes.Location = new System.Drawing.Point(13, 43);
+            this.lstFontSizes.Location = new System.Drawing.Point(238, 298);
             this.lstFontSizes.Name = "lstFontSizes";
-            this.lstFontSizes.Size = new System.Drawing.Size(142, 199);
+            this.lstFontSizes.Size = new System.Drawing.Size(145, 95);
             this.lstFontSizes.TabIndex = 67;
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(10, 27);
+            this.label2.Location = new System.Drawing.Point(162, 298);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(70, 13);
             this.label2.TabIndex = 70;
@@ -83,7 +78,7 @@
             // 
             this.cmbPositionTech.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbPositionTech.FormattingEnabled = true;
-            this.cmbPositionTech.Location = new System.Drawing.Point(13, 248);
+            this.cmbPositionTech.Location = new System.Drawing.Point(389, 302);
             this.cmbPositionTech.Name = "cmbPositionTech";
             this.cmbPositionTech.Size = new System.Drawing.Size(142, 21);
             this.cmbPositionTech.TabIndex = 71;
@@ -92,7 +87,7 @@
             // 
             this.cmbRenderChoices.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbRenderChoices.FormattingEnabled = true;
-            this.cmbRenderChoices.Location = new System.Drawing.Point(13, 295);
+            this.cmbRenderChoices.Location = new System.Drawing.Point(389, 329);
             this.cmbRenderChoices.Name = "cmbRenderChoices";
             this.cmbRenderChoices.Size = new System.Drawing.Size(142, 21);
             this.cmbRenderChoices.TabIndex = 72;
@@ -109,7 +104,7 @@
             // 
             // tabPage1
             // 
-            this.tabPage1.Controls.Add(_txtTypefaceInfo);
+            this.tabPage1.Controls.Add(this._txtTypefaceInfo);
             this.tabPage1.Controls.Add(this.lstFontList);
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
@@ -121,11 +116,11 @@
             // 
             // _txtTypefaceInfo
             // 
-            _txtTypefaceInfo.Location = new System.Drawing.Point(185, 7);
-            _txtTypefaceInfo.Multiline = true;
-            _txtTypefaceInfo.Name = "_txtTypefaceInfo";
-            _txtTypefaceInfo.Size = new System.Drawing.Size(181, 250);
-            _txtTypefaceInfo.TabIndex = 69;
+            this._txtTypefaceInfo.Location = new System.Drawing.Point(185, 7);
+            this._txtTypefaceInfo.Multiline = true;
+            this._txtTypefaceInfo.Name = "_txtTypefaceInfo";
+            this._txtTypefaceInfo.Size = new System.Drawing.Size(181, 250);
+            this._txtTypefaceInfo.TabIndex = 69;
             // 
             // tabPage2
             // 
@@ -155,18 +150,66 @@
             this.lstFontNameList.Size = new System.Drawing.Size(169, 251);
             this.lstFontNameList.TabIndex = 69;
             // 
+            // lstSupportedUnicodeLangs
+            // 
+            this.lstSupportedUnicodeLangs.FormattingEnabled = true;
+            this.lstSupportedUnicodeLangs.Location = new System.Drawing.Point(7, 211);
+            this.lstSupportedUnicodeLangs.Name = "lstSupportedUnicodeLangs";
+            this.lstSupportedUnicodeLangs.Size = new System.Drawing.Size(152, 160);
+            this.lstSupportedUnicodeLangs.TabIndex = 74;
+            // 
+            // lstScriptLangs
+            // 
+            this.lstScriptLangs.FormattingEnabled = true;
+            this.lstScriptLangs.Location = new System.Drawing.Point(7, 23);
+            this.lstScriptLangs.Name = "lstScriptLangs";
+            this.lstScriptLangs.Size = new System.Drawing.Size(152, 160);
+            this.lstScriptLangs.TabIndex = 75;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(4, 7);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(109, 13);
+            this.label1.TabIndex = 76;
+            this.label1.Text = "Available ScriptLangs";
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(4, 195);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(133, 13);
+            this.label3.TabIndex = 77;
+            this.label3.Text = "Suppoted UnicodeRanges";
+            // 
+            // chkEnableMultiTypefaces
+            // 
+            this.chkEnableMultiTypefaces.AutoSize = true;
+            this.chkEnableMultiTypefaces.Location = new System.Drawing.Point(7, 375);
+            this.chkEnableMultiTypefaces.Name = "chkEnableMultiTypefaces";
+            this.chkEnableMultiTypefaces.Size = new System.Drawing.Size(137, 17);
+            this.chkEnableMultiTypefaces.TabIndex = 78;
+            this.chkEnableMultiTypefaces.Text = "Enable Multi-Typefaces";
+            this.chkEnableMultiTypefaces.UseVisualStyleBackColor = true;
+            // 
             // BasicFontOptionsUserControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.chkEnableMultiTypefaces);
+            this.Controls.Add(this.label3);
+            this.Controls.Add(this.label1);
+            this.Controls.Add(this.lstScriptLangs);
+            this.Controls.Add(this.lstSupportedUnicodeLangs);
             this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.cmbRenderChoices);
             this.Controls.Add(this.cmbPositionTech);
             this.Controls.Add(this.label2);
-            this.Controls.Add(this.cmbScriptLangs);
             this.Controls.Add(this.lstFontSizes);
             this.Name = "BasicFontOptionsUserControl";
-            this.Size = new System.Drawing.Size(555, 330);
+            this.Size = new System.Drawing.Size(555, 419);
             this.Load += new System.EventHandler(this.OpenFontOptions_Load);
             this.tabControl1.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
@@ -178,8 +221,6 @@
         }
 
         #endregion
-
-        private System.Windows.Forms.ComboBox cmbScriptLangs;
         private System.Windows.Forms.ListBox lstFontList;
         private System.Windows.Forms.ListBox lstFontSizes;
         private System.Windows.Forms.Label label2;
@@ -191,5 +232,10 @@
         private System.Windows.Forms.ListBox lstFontStyle;
         private System.Windows.Forms.ListBox lstFontNameList;
         private System.Windows.Forms.TextBox _txtTypefaceInfo;
+        private System.Windows.Forms.ListBox lstSupportedUnicodeLangs;
+        private System.Windows.Forms.ListBox lstScriptLangs;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.CheckBox chkEnableMultiTypefaces;
     }
 }

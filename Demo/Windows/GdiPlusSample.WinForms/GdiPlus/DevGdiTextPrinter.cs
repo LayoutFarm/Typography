@@ -35,21 +35,11 @@ namespace SampleWinForms
             FillColor = Color.Black;
             OutlineColor = Color.Green;
         }
-
-
-        public override GlyphLayout GlyphLayoutMan
-        {
-            get
-            {
-                return _glyphLayout;
-            }
-        }
+        public override GlyphLayout GlyphLayoutMan => _glyphLayout;
         public override Typeface Typeface
         {
-            get
-            {
-                return _currentTypeface;
-            }
+            get => _currentTypeface;
+
             set
             {
                 //check if we change it or not
@@ -93,10 +83,7 @@ namespace SampleWinForms
         public Color OutlineColor { get; set; }
         public Graphics TargetGraphics { get; set; }
 
-        //public override void DrawCaret(float x, float y)
-        //{
-        //    this.TargetGraphics.DrawLine(Pens.Red, x, y, x, y + this.FontAscendingPx);
-        //}
+
         UnscaledGlyphPlanList _reusableUnscaledGlyphPlanList = new UnscaledGlyphPlanList();
         public override void DrawString(char[] textBuffer, int startAt, int len, float x, float y)
         {
@@ -154,16 +141,16 @@ namespace SampleWinForms
 
             while (snapToPxScale.Read())
             {
-                if (!_glyphMeshCollections.TryGetCacheGlyph(snapToPxScale.CurrentGlyphIndex, out GraphicsPath foundPath))
+                if (!_glyphMeshCollections.TryGetCacheGlyph(snapToPxScale.CurrentGlyphIndex, out GraphicsPath path))
                 {
                     //if not found then create a new one
                     _currentGlyphPathBuilder.BuildFromGlyphIndex(snapToPxScale.CurrentGlyphIndex, sizeInPoints);
                     _txToGdiPath.Reset();
                     _currentGlyphPathBuilder.ReadShapes(_txToGdiPath);
-                    foundPath = _txToGdiPath.ResultGraphicsPath;
+                    path = _txToGdiPath.ResultGraphicsPath;
 
                     //register
-                    _glyphMeshCollections.RegisterCachedGlyph(snapToPxScale.CurrentGlyphIndex, foundPath);
+                    _glyphMeshCollections.RegisterCachedGlyph(snapToPxScale.CurrentGlyphIndex, path);
                 }
                 //------
                 //then move pen point to the position we want to draw a glyph
@@ -176,11 +163,11 @@ namespace SampleWinForms
 
                 if (FillBackground)
                 {
-                    g.FillPath(_fillBrush, foundPath);
+                    g.FillPath(_fillBrush, path);
                 }
                 if (DrawOutline)
                 {
-                    g.DrawPath(_outlinePen, foundPath);
+                    g.DrawPath(_outlinePen, path);
                 }
                 //and then we reset back ***
                 g.TranslateTransform(-cx, -cy);

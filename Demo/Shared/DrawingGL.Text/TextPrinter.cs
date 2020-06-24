@@ -44,7 +44,7 @@ namespace DrawingGL.Text
         public TextPrinter()
         {
             FontSizeInPoints = 14;
-            ScriptLang = ScriptLangs.Latin;
+            ScriptLang = new ScriptLang("latn");
 
             //
             _curveFlattener = new SimpleCurveFlattener();
@@ -199,7 +199,7 @@ namespace DrawingGL.Text
         {
 
         }
-        
+
     }
 
 

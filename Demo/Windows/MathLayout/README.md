@@ -48,16 +48,16 @@ This C# project does develop for rendering simple Mathematical Markup Language (
     
 Basic MathML Rendering
 
-![basic MathML rendering](./Example_Pictures/Sample1.png)
+![basic MathML rendering](https://user-images.githubusercontent.com/7447159/83210237-86f24200-a184-11ea-9d10-ba407a2915ef.PNG)
+ 
 
 ## Dependencies Projects
-[PixelFarm](https://github.com/PaintLab/PixelFarm)
 
 [Typography](https://github.com/LayoutFarm/Typography)
 
 ## Reference Projects
 Thanks these projects for inspire me about layout concept.
 
-[CSharpMath](https://github.com/verybadcat/CSharpMath)
+MIT, 2020, [CSharpMath](https://github.com/verybadcat/CSharpMath)
 
-[Wpf-Math](https://github.com/ForNeVeR/wpf-math)
+MIT, 2020, [Wpf-Math](https://github.com/ForNeVeR/wpf-math)

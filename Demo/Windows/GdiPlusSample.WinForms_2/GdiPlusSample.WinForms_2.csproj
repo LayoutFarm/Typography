@@ -52,6 +52,9 @@
     <Compile Include="..\GdiPlusSample.WinForms\GdiPlus\GlyphTranslatorToGdiPath.cs">
       <Link>GdiPlus\GlyphTranslatorToGdiPath.cs</Link>
     </Compile>
+    <Compile Include="..\GdiPlusSample.WinForms\TypefaceStore.cs">
+      <Link>TypefaceStore.cs</Link>
+    </Compile>
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
