@@ -664,7 +664,7 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
             //            m_ren.blend_color_vspan(x, y, len, colors, null, 0);
         }
 
-        public static bool AccurateJoinOnly { get { return true; } }
+        public static bool AccurateJoinOnly => true;
 
         public override void SemiDot(CompareFunction cmp, int xc1, int yc1, int xc2, int yc2)
         {

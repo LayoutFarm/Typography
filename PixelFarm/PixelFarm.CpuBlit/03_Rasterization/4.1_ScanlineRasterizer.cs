@@ -101,12 +101,13 @@ namespace PixelFarm.CpuBlit.Rasterization
 
     public sealed partial class ScanlineRasterizer
     {
-        CellAARasterizer _cellAARas;
-        VectorClipper _vectorClipper;
+
+        readonly VectorClipper _vectorClipper;
+        readonly CellAABlob _cellAABlob;
 
         int[] _gammaLut;//current gamma lut
         bool _useDefaultGammaLut;
-        int[] _orgGammaLut = new int[AA_SCALE]; //original(built-in) gamma table
+        readonly int[] _orgGammaLut = new int[AA_SCALE]; //original(built-in) gamma table
 
 
         FillingRule _filling_rule;
@@ -140,13 +141,13 @@ namespace PixelFarm.CpuBlit.Rasterization
             Closed
         }
 
-
-
         public ScanlineRasterizer()
         {
 
-            _cellAARas = new CellAARasterizer();
-            _vectorClipper = new VectorClipper(_cellAARas);
+            var cellRas = new CellAARasterizer();
+            _vectorClipper = new VectorClipper(cellRas);
+            _cellAABlob = new CellAABlob(cellRas);
+
             _filling_rule = FillingRule.NonZero;
             _auto_close = true;
             _mul_start_x = 0;
@@ -166,7 +167,7 @@ namespace PixelFarm.CpuBlit.Rasterization
         /// </summary>
         public void Reset()
         {
-            _cellAARas.Reset();
+            _cellAABlob.Reset();
             _status = Status.Initial;
         }
 
@@ -236,9 +237,9 @@ namespace PixelFarm.CpuBlit.Rasterization
             }
         }
         //------------------------------------------------------------------------
-        public void MoveTo(double x, double y)
+        void MoveTo(double x, double y)
         {
-            if (_cellAARas.Sorted) { Reset(); }
+            if (_cellAABlob.Sorted) { Reset(); }
             if (_auto_close) { ClosePolygon(); }
 
             _vectorClipper.MoveTo(
@@ -247,11 +248,16 @@ namespace PixelFarm.CpuBlit.Rasterization
             _status = Status.MoveTo;
         }
         //------------------------------------------------------------------------
-        public void LineTo(double x, double y)
+        void LineTo(double x, double y)
         {
             _vectorClipper.LineTo(upscale(x), upscale(y));
             _status = Status.LineTo;
         }
+
+#if DEBUG
+        public void dbugDevMoveTo(double x, double y) => MoveTo(x, y);
+        public void dbugDevLineTo(double x, double y) => LineTo(x, y);
+#endif
 
         void ClosePolygon()
         {
@@ -293,16 +299,8 @@ namespace PixelFarm.CpuBlit.Rasterization
         //    m_status = Status.MoveTo;
         //}
         //-------------------------------------------------------------------
-        public float OffsetOriginX
-        {
-            get;
-            internal set;
-        }
-        public float OffsetOriginY
-        {
-            get;
-            internal set;
-        }
+        public float OffsetOriginX { get; internal set; }
+        public float OffsetOriginY { get; internal set; }
         /// <summary>
         /// we do NOT store vxs
         /// </summary>
@@ -319,7 +317,7 @@ namespace PixelFarm.CpuBlit.Rasterization
             VertexCmd cmd;
             int index = 0;
 
-            if (_cellAARas.Sorted) { Reset(); }
+            if (_cellAABlob.Sorted) { Reset(); }
             float offsetOrgX = OffsetOriginX;
             float offsetOrgY = OffsetOriginY;
 
@@ -375,7 +373,7 @@ namespace PixelFarm.CpuBlit.Rasterization
             VertexCmd cmd;
             int index = 0;
 
-            if (_cellAARas.Sorted) { Reset(); }
+            if (_cellAABlob.Sorted) { Reset(); }
             float offsetOrgX = OffsetOriginX;
             float offsetOrgY = OffsetOriginY;
 
@@ -414,57 +412,27 @@ namespace PixelFarm.CpuBlit.Rasterization
         bool _extendWidthX3ForSubPixelLcdEffect;
         public bool ExtendWidthX3ForSubPixelLcdEffect
         {
-            get { return _extendWidthX3ForSubPixelLcdEffect; }
-            set
-            {
-                _extendWidthX3ForSubPixelLcdEffect = value;
-                if (value)
-                {
-                    //expand to 3 times
-                    _vectorClipper.SetClipBoxWidthX3ForSubPixelLcdEffect(true);
-                }
-                else
-                {
-                    _vectorClipper.SetClipBoxWidthX3ForSubPixelLcdEffect(false);
-                }
-            }
+            get => _extendWidthX3ForSubPixelLcdEffect;
+            //expand to 3 times
+            set => _vectorClipper.SetClipBoxWidthX3ForSubPixelLcdEffect(_extendWidthX3ForSubPixelLcdEffect = value);
         }
-        ///// <summary>
-        ///// we do NOT store snap ***
-        ///// </summary>
-        ///// <param name="snap"></param>
-        //public void AddPath(VertexStoreSnap snap)
-        //{
-        //    //-----------------------------------------------------
-        //    //*** we extract vertext command and coord(x,y) from
-        //    //the snap but not store the snap inside rasterizer
-        //    //-----------------------------------------------------
-        //    AddPath(VertexStoreSnap.GetInternalVxs(snap));
-
-        //}
-
-        public int MinX => _cellAARas.MinX;
-        public int MinY => _cellAARas.MinY;
-        public int MaxX => _cellAARas.MaxX;
-        public int MaxY => _cellAARas.MaxY;
+        public int MinX => _cellAABlob.MinX;
+        public int MinY => _cellAABlob.MinY;
+        public int MaxX => _cellAABlob.MaxX;
+        public int MaxY => _cellAABlob.MaxY;
 
 
-        //--------------------------------------------------------------------
-        void Sort()
-        {
-            if (_auto_close) { ClosePolygon(); }
-
-            _cellAARas.SortCells();
-        }
-
-        //------------------------------------------------------------------------
         internal bool RewindScanlines()
         {
             if (_auto_close) { ClosePolygon(); }
 
-            _cellAARas.SortCells();
-            if (_cellAARas.TotalCells == 0) return false;
-            _scan_y = _cellAARas.MinY;
+
+            if (_cellAABlob.SortCells() == 0)
+            {
+                return false;
+            }
+
+            _scan_y = _cellAABlob.MinY;
             return true;
         }
 
@@ -516,19 +484,28 @@ namespace PixelFarm.CpuBlit.Rasterization
         //--------------------------------------------------------------------
         internal bool SweepScanline(Scanline scline)
         {
+            //see original agg=> agg_rasterizer_scanline_aa.h => sweep_scanline()
+#if DEBUG
+            _cellAABlob.dbugLockSortCell(true);
+#endif
+
+            CellAA[] cells = _cellAABlob.UnsafeGetAllSortedCells();
+
             for (; ; )
             {
-                if (_scan_y > _cellAARas.MaxY)
+                if (_scan_y > _cellAABlob.MaxY)
                 {
+#if DEBUG
+                    _cellAABlob.dbugLockSortCell(false);
+#endif
                     return false;
                 }
 
-                scline.ResetSpans();
-                //-------------------------
-                CellAA[] cells;
-                int offset;
-                int num_cells;
-                _cellAARas.GetCells(_scan_y, out cells, out offset, out num_cells);
+                scline.ResetSpans();//***
+
+                //
+                _cellAABlob.GetCellRange(_scan_y, out int offset, out int num_cells);
+
                 int cover = 0;
                 while (num_cells != 0)
                 {
@@ -635,11 +612,15 @@ namespace PixelFarm.CpuBlit.Rasterization
 
                 if (scline.SpanCount != 0) { break; }
 
-                ++_scan_y;
+                ++_scan_y;//***
             }
 
             scline.CloseLine(_scan_y);
             ++_scan_y;
+
+#if DEBUG
+            _cellAABlob.dbugLockSortCell(false);
+#endif
             return true;
         }
     }

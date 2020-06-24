@@ -112,7 +112,7 @@ namespace PixelFarm.Drawing
         }
 
 
-
+        public PixelFarm.Drawing.SvgBmpBuilderFunc SvgBmpBuilder { get; set; }
 
         public bool TryGetAlternativeTypefaceFromChar(char c, AlternativeTypefaceSelector selector, out Typeface found)
         {
@@ -147,16 +147,25 @@ namespace PixelFarm.Drawing
             get => _txtServices.CurrentScriptLang;
             set => _txtServices.CurrentScriptLang = value;
         }
-        //
+
+
+        readonly MyWordVisitor _wordVisitor = new MyWordVisitor(); //for internal use only
+        readonly MyLineSegmentList _lineSegmentList = new MyLineSegmentList();
         public void CalculateUserCharGlyphAdvancePos(in TextBufferSpan textBufferSpan, RequestFont font, ref TextSpanMeasureResult measureResult)
         {
-            using (ILineSegmentList lineSegList = this.BreakToLineSegments(textBufferSpan))
-            {
-                CalculateUserCharGlyphAdvancePos(textBufferSpan,
-                lineSegList,
+
+            _lineSegmentList.Clear();
+            _wordVisitor.SetLineSegmentList(_lineSegmentList);
+
+            char[] str = textBufferSpan.GetRawCharBuffer(); //TODO: review here again!
+            _txtServices.BreakToLineSegments(str, textBufferSpan.start, textBufferSpan.len, _wordVisitor);
+
+            _wordVisitor.SetLineSegmentList(null); //clear
+
+            CalculateUserCharGlyphAdvancePos(textBufferSpan,
+                _lineSegmentList,
                 font,
                 ref measureResult);
-            }
         }
         //
         ReusableTextBuffer _reusableTextBuffer = new ReusableTextBuffer();
@@ -173,10 +182,10 @@ namespace PixelFarm.Drawing
             //  
             Typeface typeface = ResolveTypeface(font);
             _txtServices.SetCurrentFont(typeface, font.SizeInPoints);
-            MyLineSegmentList mylineSegs = (MyLineSegmentList)lineSegs;
+           
             float scale = typeface.CalculateScaleToPixelFromPointSize(font.SizeInPoints);
 
-            int j = mylineSegs.Count;
+            int j = lineSegs.Count;
             int pos = 0; //start at 0
 
             _reusableTextBuffer.SetRawCharBuffer(textBufferSpan.GetRawCharBuffer());
@@ -189,7 +198,7 @@ namespace PixelFarm.Drawing
             for (int i = 0; i < j; ++i)
             {
                 //get each segment
-                MyLineSegment lineSeg = (MyLineSegment)mylineSegs.GetSegment(i);
+                ILineSegment lineSeg = lineSegs[i];
 
                 //each line seg may has different script lang
 
@@ -368,8 +377,8 @@ namespace PixelFarm.Drawing
             }
             public int StartAt => _startAt;
             public ushort Length => _len;
-            public object SpanBreakInfo => breakInfo;
 
+            public object SpanBreakInfo => breakInfo;
 #if DEBUG
             public override string ToString()
             {
@@ -381,7 +390,7 @@ namespace PixelFarm.Drawing
         class MyLineSegmentList : ILineSegmentList
         {
             List<ILineSegment> _segments = new List<ILineSegment>();
-            private MyLineSegmentList()
+            public MyLineSegmentList()
             {
             }
             public void AddLineSegment(ILineSegment lineSegment)
@@ -404,39 +413,12 @@ namespace PixelFarm.Drawing
             public int dbugLen;
 #endif
 
-            void IDisposable.Dispose()
-            {
-                if (s_lineSegmentPool.Count > 100)
-                {
-                    _segments.Clear();
-                    _segments = null;
-                }
-                else
-                {
-                    _segments.Clear();
-                    s_lineSegmentPool.Push(this);
-                }
-            }
 
-            [ThreadStatic]
-            static Stack<MyLineSegmentList> s_lineSegmentPool;
-            public static MyLineSegmentList GetFreeLineSegmentList()
-            {
-                if (s_lineSegmentPool == null) s_lineSegmentPool = new Stack<MyLineSegmentList>();
-                if (s_lineSegmentPool.Count == 0)
-                {
-                    return new MyLineSegmentList();
-                }
-                else
-                {
-                    return s_lineSegmentPool.Pop();
-                }
-
-            }
         }
 
         class MyWordVisitor : WordVisitor
         {
+            //internal use only
             MyLineSegmentList _lineSegs;
             public void SetLineSegmentList(MyLineSegmentList lineSegs)
             {
@@ -448,8 +430,8 @@ namespace PixelFarm.Drawing
             }
         }
 
-        readonly MyWordVisitor _wordVisitor = new MyWordVisitor();
-        public ILineSegmentList BreakToLineSegments(in TextBufferSpan textBufferSpan)
+
+        public void BreakToLineSegments(in TextBufferSpan textBufferSpan, WordVisitor wordVisitor)
         {
 
             //a text buffer span is separated into multiple line segment list 
@@ -462,12 +444,7 @@ namespace PixelFarm.Drawing
             int cur_startAt = textBufferSpan.start;
 #endif
 
-            MyLineSegmentList lineSegments = MyLineSegmentList.GetFreeLineSegmentList();
-            _wordVisitor.SetLineSegmentList(lineSegments);
-            _txtServices.BreakToLineSegments(str, textBufferSpan.start, textBufferSpan.len, _wordVisitor);
-            _wordVisitor.SetLineSegmentList(null); //clear
-            //interate result and add to lineSegs
-            return lineSegments;
+            _txtServices.BreakToLineSegments(str, textBufferSpan.start, textBufferSpan.len, wordVisitor);
         }
         //-----------------------------------
         static OpenFontTextService()

@@ -10,6 +10,12 @@ using Typography.OpenFont;
 
 namespace Typography.TextBreak
 {
+    public enum SurrogatePairBreakingOption
+    {
+        OnlySurrogatePair,
+        ConsecutiveSurrogatePairs,
+        ConsecutiveSurrogatePairsAndJoiner
+    }
     public class EngBreakingEngine : BreakingEngine
     {
         enum LexState
@@ -18,12 +24,21 @@ namespace Typography.TextBreak
             Whitespace,
             Text,
             Number,
+            CollectSurrogatePair,
+            CollectConsecutiveUnicode,
         }
 
         public bool BreakNumberAfterText { get; set; }
         public bool BreakPeroidInTextSpan { get; set; }
         public bool EnableCustomAbbrv { get; set; }
         public bool EnableUnicodeRangeBreaker { get; set; }
+
+
+        public bool IncludeLatinExtended { get; set; } = true;
+
+
+        public SurrogatePairBreakingOption SurrogatePairBreakingOption { get; set; } = SurrogatePairBreakingOption.ConsecutiveSurrogatePairsAndJoiner;
+
         public CustomAbbrvDic EngCustomAbbrvDic { get; set; }
         struct BreakBounds
         {
@@ -32,7 +47,8 @@ namespace Typography.TextBreak
             public WordKind kind;
         }
 
-        readonly SpanBreakInfo s_latin = new SpanBreakInfo(false, ScriptTagDefs.Latin.Tag);
+        static readonly SpanBreakInfo s_latin = new SpanBreakInfo(false, ScriptTagDefs.Latin.Tag);
+        static readonly SpanBreakInfo s_unknown = new SpanBreakInfo(false, ScriptTagDefs.Latin.Tag);
 
         public EngBreakingEngine()
         {
@@ -54,8 +70,11 @@ namespace Typography.TextBreak
                    char.IsPunctuation(c) ||
                    char.IsWhiteSpace(c) ||
                    char.IsControl(c) ||
-                   char.IsSymbol(c);
+                   char.IsSymbol(c) ||
+                   (IncludeLatinExtended && (IsLatinExtendedA(c) || IsLatinExtendedB(c)));
         }
+        static bool IsLatinExtendedA(char c) => c >= 0x100 & c <= 0x017F;
+        static bool IsLatinExtendedB(char c) => c >= 0x0180 & c <= 0x024F;
         //
         public override bool CanBeStartChar(char c) => true;
         //
@@ -85,9 +104,67 @@ namespace Typography.TextBreak
             }
             else
             {
-                throw new NotSupportedException();
+                //for unknown,
+                //just collect until turn back to latin
+#if DEBUG
+                System.Diagnostics.Debug.WriteLine("unknown unicode range:");
+#endif
+
+
+                int lim = start + len;
+                for (int i = start; i < lim; ++i)
+                {
+                    c1 = input[i];
+                    if ((c1 >= 0 && c1 < 256) || //eng range
+                        char.IsHighSurrogate(c1) || //surrogate pair
+                        UnicodeRangeFinder.GetUniCodeRangeFor(c1, out startCodePoint, out endCodePoint, out spanBreakInfo)) //or found some wellknown range
+                    {
+                        //break here
+                        start = i;
+                        return;
+                    }
+                }
+
+                start = lim;
+                spanBreakInfo = s_unknown;
             }
         }
+        static void CollectConsecutiveSurrogatePairs(char[] input, ref int start, int len, bool withZeroWidthJoiner)
+        {
+
+            int lim = start + len;
+            for (int i = start; i < lim;) //start+1
+            {
+                char c = input[i];
+
+                if ((i + 1 < lim) &&
+                    char.IsHighSurrogate(c) &&
+                    char.IsLowSurrogate(input[i + 1]))
+                {
+                    i += 2;//**
+                    start = i;
+                }
+                else if (withZeroWidthJoiner && c == 8205)
+                {
+                    //https://en.wikipedia.org/wiki/Zero-width_joiner
+                    i += 1;
+                    start = i;
+                }
+                else
+                {
+                    //stop
+                    start = i;
+                    return;
+                }
+            }
+
+        }
+
+        const char FIRST_CHAR = (char)0;
+        const char LAST_CHAR = (char)255;
+        bool IsInOurLetterRange(char c) => (c >= FIRST_CHAR && c <= LAST_CHAR) || (IncludeLatinExtended && (IsLatinExtendedA(c) || IsLatinExtendedB(c)));
+
+
         void DoBreak(WordVisitor visitor, char[] input, int start, int len)
         {
 
@@ -110,12 +187,10 @@ namespace Typography.TextBreak
             bb.startIndex = start;
 
             bool enableUnicodeRangeBreaker = EnableUnicodeRangeBreaker;
-            bool breakPeroidInTextSpan = BreakPeroidInTextSpan;
+            bool breakPeroidInTextSpan = BreakPeroidInTextSpan; 
 
             visitor.SpanBreakInfo = s_latin;
-            const char first = (char)0;
-            const char last = (char)255;
-
+             
             for (int i = start; i < endBefore; ++i)
             {
                 char c = input[i];
@@ -158,12 +233,11 @@ namespace Typography.TextBreak
                             }
                             else if (char.IsLetter(c))
                             {
-
-                                if (c < first || c > last)
+                                if (!IsInOurLetterRange(c))
                                 {
 
-                                    //letter is out-of-range or not 
-                                    //clear accum state
+                                    //letter is OUT_OF_RANGE
+
                                     if (i > bb.startIndex)
                                     {
                                         //flush
@@ -173,35 +247,18 @@ namespace Typography.TextBreak
                                         bb.startIndex += bb.length;//***
                                     }
 
+                                    if (char.IsHighSurrogate(c))
+                                    {
+                                        lexState = LexState.CollectSurrogatePair;
+                                        goto case LexState.CollectSurrogatePair;
+                                    }
+
                                     if (enableUnicodeRangeBreaker)
                                     {
                                         //collect text until end for specific unicode range eng
                                         //find a proper unicode engine and collect until end of its range 
-                                        int begin = i; //backup** (debug purpose)
-
-                                        bb.startIndex = i;
-                                        bb.kind = WordKind.Text;
-
-                                        CollectConsecutiveUnicodeRange(input, ref begin, len - i, out SpanBreakInfo spBreakInfo);
-
-                                        bb.length = begin - i;
-                                        if (bb.length > 0)
-                                        {
-                                            visitor.SpanBreakInfo = spBreakInfo;
-
-                                            OnBreak(visitor, bb); //flush
-
-                                            bb.startIndex = begin;
-                                            bb.length = 0;
-                                            visitor.SpanBreakInfo = s_latin;//switch back
-                                        }
-                                        else
-                                        {
-                                            throw new NotSupportedException();///???
-                                        }
-                                        i = begin - 1;
-                                        lexState = LexState.Init;
-                                        continue;
+                                        lexState = LexState.CollectConsecutiveUnicode;
+                                        goto case LexState.CollectConsecutiveUnicode;
                                     }
                                     else
                                     {
@@ -221,7 +278,6 @@ namespace Typography.TextBreak
                                 bb.startIndex = i;
                                 bb.kind = WordKind.Number;
                                 lexState = LexState.Number;
-
                             }
                             else if (char.IsWhiteSpace(c))
                             {
@@ -275,41 +331,10 @@ namespace Typography.TextBreak
                             }
                             else if (char.IsHighSurrogate(c))
                             {
-                                if (i < endBefore - 1 && //not the last one
-                                   char.IsLowSurrogate(input[i + 1]))
-                                {
-                                    //surrogate pair 
-                                    //clear accum state
-                                    if (i > bb.startIndex)
-                                    {
-                                        //some remaining data
-                                        bb.length = i - bb.startIndex;
-                                        //
-                                        OnBreak(visitor, bb);
-                                    }
-                                    //-------------------------------
-                                    //surrogate pair
-                                    bb.startIndex = i;
-                                    bb.length = 2;
-                                    bb.kind = WordKind.SurrogatePair;
-
-                                    OnBreak(visitor, bb);
-                                    //-------------------------------
-
-                                    i++;//consume next***
-
-                                    bb.startIndex += 2;//reset
-                                    bb.length = 0; //reset
-                                    lexState = LexState.Init;
-                                    continue; //***
-                                }
-                                else
-                                {
-                                    //error
-                                    throw new System.FormatException($"A high surrogate (U+{((ushort)c).ToString("X4")}) was not followed by a low surrogate.");
-                                }
+                                lexState = LexState.CollectSurrogatePair;
+                                goto case LexState.CollectSurrogatePair;
                             }
-                            else if (c < first || c > last)
+                            else if (!IsInOurLetterRange(c))
                             {
                                 //letter is out-of-range or not 
                                 //clear accum state
@@ -324,33 +349,16 @@ namespace Typography.TextBreak
                                     //TODO: check if we should set startIndex and length
                                     //      like other 'after' onBreak()
                                 }
+                                if (char.IsHighSurrogate(c))
+                                {
+                                    lexState = LexState.CollectSurrogatePair;
+                                    goto case LexState.CollectSurrogatePair;
+                                }
 
                                 if (enableUnicodeRangeBreaker)
                                 {
-                                    int begin = i;
-                                    bb.startIndex = i;
-                                    bb.kind = WordKind.Text;
-
-                                    CollectConsecutiveUnicodeRange(input, ref begin, len - i, out SpanBreakInfo spBreakInfo);
-                                    bb.length = begin - i;
-                                    if (bb.length > 0)
-                                    {
-                                        visitor.SpanBreakInfo = spBreakInfo;
-
-                                        OnBreak(visitor, bb);//flush
-
-                                        visitor.SpanBreakInfo = s_latin;//switch back
-                                        bb.length = 0;
-                                        bb.startIndex = begin;
-                                    }
-                                    else
-                                    {
-                                        throw new NotSupportedException();///???
-                                    }
-
-                                    i = begin - 1;
-                                    lexState = LexState.Init;
-                                    continue;
+                                    lexState = LexState.CollectConsecutiveUnicode;
+                                    goto case LexState.CollectConsecutiveUnicode;
                                 }
                                 else
                                 {
@@ -396,7 +404,7 @@ namespace Typography.TextBreak
                                 //letter is out-of-range or not 
                                 //clear accum state   
 
-                                if (c < first || c > last)
+                                if (!IsInOurLetterRange(c))
                                 {
                                     if (i > bb.startIndex)
                                     {
@@ -405,36 +413,20 @@ namespace Typography.TextBreak
                                         bb.kind = WordKind.Text;
                                         //
                                         OnBreak(visitor, bb);
-                                        //
                                         //TODO: check if we should set startIndex and length
                                         //      like other 'after' onBreak()
                                     }
 
+                                    if (char.IsHighSurrogate(c))
+                                    {
+                                        lexState = LexState.CollectSurrogatePair;
+                                        goto case LexState.CollectSurrogatePair;
+                                    }
+
                                     if (enableUnicodeRangeBreaker)
                                     {
-                                        int begin = i;
-                                        bb.startIndex = i;
-                                        bb.kind = WordKind.Text;
-                                        CollectConsecutiveUnicodeRange(input, ref begin, len - i, out SpanBreakInfo spBreakInfo);
-                                        bb.length = begin - i;
-                                        if (bb.length > 0)
-                                        {
-                                            visitor.SpanBreakInfo = spBreakInfo;
-
-                                            OnBreak(visitor, bb); //flush
-
-                                            visitor.SpanBreakInfo = s_latin;//switch back
-                                            bb.length = 0;
-                                            bb.startIndex = begin;
-                                        }
-                                        else
-                                        {
-                                            throw new NotSupportedException();///???
-                                        }
-
-                                        i = begin - 1;
-                                        lexState = LexState.Init;
-                                        continue;
+                                        lexState = LexState.CollectConsecutiveUnicode;
+                                        goto case LexState.CollectConsecutiveUnicode;
                                     }
                                     else
                                     {
@@ -490,8 +482,83 @@ namespace Typography.TextBreak
                             }
                         }
                         break;
-                }
+                    case LexState.CollectSurrogatePair:
+                        {
 
+                            if (i < endBefore - 1 && //not the last one
+                               char.IsLowSurrogate(input[i + 1]))
+                            {
+                                //surrogate pair 
+                                //clear accum state
+                                if (i > bb.startIndex)
+                                {
+                                    //some remaining data
+                                    bb.length = i - bb.startIndex;
+                                    //
+                                    OnBreak(visitor, bb);
+                                }
+                                //-------------------------------
+                                //surrogate pair
+
+                                if (SurrogatePairBreakingOption == SurrogatePairBreakingOption.OnlySurrogatePair)
+                                {
+                                    bb.startIndex = i;
+                                    bb.length = 2;
+                                    bb.kind = WordKind.SurrogatePair;
+                                    OnBreak(visitor, bb);
+                                    i++;//consume next***
+                                    bb.startIndex += 2;//reset 
+                                }
+                                else
+                                {
+                                    //see https://github.com/LayoutFarm/Typography/issues/18#issuecomment-345480185
+                                    int begin = i + 2;
+                                    CollectConsecutiveSurrogatePairs(input, ref begin, endBefore - begin, SurrogatePairBreakingOption == SurrogatePairBreakingOption.ConsecutiveSurrogatePairsAndJoiner);
+
+                                    bb.startIndex = i;
+                                    bb.length = begin - i;
+                                    bb.kind = WordKind.SurrogatePair;
+                                    OnBreak(visitor, bb);
+                                    i += bb.length - 1;//consume 
+                                    bb.startIndex += bb.length;//reset 
+                                }
+                                bb.length = 0; //reset
+                                lexState = LexState.Init;
+                                continue; //***
+                            }
+                            else
+                            {
+                                //error
+                                throw new System.FormatException($"A high surrogate (U+{((ushort)c).ToString("X4")}) was not followed by a low surrogate.");
+                            }
+                        }
+                    case LexState.CollectConsecutiveUnicode:
+                        {
+                            int begin = i;
+                            bb.startIndex = i;
+                            bb.kind = WordKind.Text;
+                            CollectConsecutiveUnicodeRange(input, ref begin, len - i, out SpanBreakInfo spBreakInfo);
+                            bb.length = begin - i;
+                            if (bb.length > 0)
+                            {
+                                visitor.SpanBreakInfo = spBreakInfo;
+
+                                OnBreak(visitor, bb); //flush
+
+                                visitor.SpanBreakInfo = s_latin;//switch back
+                                bb.length = 0;
+                                bb.startIndex = begin;
+                            }
+                            else
+                            {
+                                throw new NotSupportedException();///???
+                            }
+
+                            i = begin - 1;
+                            lexState = LexState.Init;
+                        }
+                        break;
+                }
             }
 
             if (lexState != LexState.Init &&

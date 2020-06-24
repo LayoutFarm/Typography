@@ -106,18 +106,10 @@ namespace ClipperLib
             m_Childs.Clear();
         }
 
-        public PolyNode GetFirst()
-        {
-            if (m_Childs.Count > 0)
-                return m_Childs[0];
-            else
-                return null;
-        }
+        public PolyNode GetFirst() => (m_Childs.Count > 0) ? m_Childs[0] : null;
 
-        public int Total
-        {
-            get { return m_AllPolys.Count; }
-        }
+        public int Total => m_AllPolys.Count;
+
     }
 
     public class PolyNode
@@ -140,15 +132,9 @@ namespace ClipperLib
             return result;
         }
 
-        public int ChildCount
-        {
-            get { return m_Childs.Count; }
-        }
+        public int ChildCount => m_Childs.Count;
 
-        public Path Contour
-        {
-            get { return m_polygon; }
-        }
+        public Path Contour => m_polygon;
 
         internal void AddChild(PolyNode Child)
         {
@@ -158,13 +144,7 @@ namespace ClipperLib
             Child.m_Index = cnt;
         }
 
-        public PolyNode GetNext()
-        {
-            if (m_Childs.Count > 0)
-                return m_Childs[0];
-            else
-                return GetNextSiblingUp();
-        }
+        public PolyNode GetNext() => (m_Childs.Count > 0) ? m_Childs[0] : GetNextSiblingUp();               
 
         internal PolyNode GetNextSiblingUp()
         {
@@ -176,20 +156,11 @@ namespace ClipperLib
                 return m_Parent.m_Childs[m_Index + 1];
         }
 
-        public List<PolyNode> Childs
-        {
-            get { return m_Childs; }
-        }
+        public List<PolyNode> Childs => m_Childs;
 
-        public PolyNode Parent
-        {
-            get { return m_Parent; }
-        }
+        public PolyNode Parent => m_Parent;
 
-        public bool IsHole
-        {
-            get { return IsHoleNode(); }
-        }
+        public bool IsHole => IsHoleNode();
 
         public bool IsOpen { get; set; }
     }

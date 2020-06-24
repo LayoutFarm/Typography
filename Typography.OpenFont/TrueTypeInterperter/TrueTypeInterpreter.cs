@@ -43,7 +43,7 @@ namespace Typography.OpenFont
             Glyph glyph = _currentTypeFace.GetGlyph(glyphIndex);
             //-------------------------------------------
             //1. start with original points/contours from glyph 
-            int horizontalAdv = _currentTypeFace.GetHAdvanceWidthFromGlyphIndex(glyphIndex);
+            int horizontalAdv = _currentTypeFace.GetAdvanceWidthFromGlyphIndex(glyphIndex);
             int hFrontSideBearing = _currentTypeFace.GetHFrontSideBearingFromGlyphIndex(glyphIndex);
 
             return HintGlyph(horizontalAdv,
@@ -1791,13 +1791,13 @@ namespace Typography.OpenFont
                 current[i].UpdateY(pos);
             }
         }
-        static float F2Dot14ToFloat(int value) { return (short)value / 16384.0f; }
-        static int FloatToF2Dot14(float value) { return (int)(uint)(short)Math.Round(value * 16384.0f); }
-        static float F26Dot6ToFloat(int value) { return value / 64.0f; }
-        static int FloatToF26Dot6(float value) { return (int)Math.Round(value * 64.0f); }
+        static float F2Dot14ToFloat(int value) => (short)value / 16384.0f;
+        static int FloatToF2Dot14(float value) => (int)(uint)(short)Math.Round(value * 16384.0f);
+        static float F26Dot6ToFloat(int value) => value / 64.0f;
+        static int FloatToF26Dot6(float value) => (int)Math.Round(value * 64.0f);
 
         //TODO: review here again
-        unsafe static float* GetPoint(byte* data, int index) { return (float*)(data + sizeof(GlyphPointF) * index); }
+        unsafe static float* GetPoint(byte* data, int index) => (float*)(data + sizeof(GlyphPointF) * index);
 
         static readonly float Sqrt2Over2 = (float)(Math.Sqrt(2) / 2);
 
@@ -1809,8 +1809,8 @@ namespace Typography.OpenFont
             byte[] instructions;
             int ip;
 
-            public bool IsValid { get { return instructions != null; } }
-            public bool Done { get { return ip >= instructions.Length; } }
+            public bool IsValid => instructions != null;
+            public bool Done => ip >= instructions.Length;
 
             public InstructionStream(byte[] instructions)
             {
@@ -1825,8 +1825,8 @@ namespace Typography.OpenFont
                 return instructions[ip++];
             }
 
-            public OpCode NextOpCode() { return (OpCode)NextByte(); }
-            public int NextWord() { return (short)(ushort)(NextByte() << 8 | NextByte()); }
+            public OpCode NextOpCode() => (OpCode)NextByte();
+            public int NextWord() => (short)(ushort)(NextByte() << 8 | NextByte());
             public void Jump(int offset) { ip += offset; }
         }
 
@@ -1878,19 +1878,19 @@ namespace Typography.OpenFont
                 _s = new int[maxStack];
             }
 
-            public int Peek() { return Peek(0); }
-            public bool PopBool() { return Pop() != 0; }
-            public float PopFloat() { return F26Dot6ToFloat(Pop()); }
-            public void Push(bool value) { Push(value ? 1 : 0); }
-            public void Push(float value) { Push(FloatToF26Dot6(value)); }
+            public int Peek() => Peek(0); 
+            public bool PopBool() => Pop() != 0; 
+            public float PopFloat()=> F26Dot6ToFloat(Pop()); 
+            public void Push(bool value) => Push(value ? 1 : 0); 
+            public void Push(float value) => Push(FloatToF26Dot6(value)); 
 
-            public void Clear() { _count = 0; }
-            public void Depth() { Push(_count); }
-            public void Duplicate() { Push(Peek()); }
-            public void Copy() { Copy(Pop() - 1); }
-            public void Copy(int index) { Push(Peek(index)); }
-            public void Move() { Move(Pop() - 1); }
-            public void Roll() { Move(2); }
+            public void Clear() => _count = 0; 
+            public void Depth() => Push(_count); 
+            public void Duplicate() =>Push(Peek()); 
+            public void Copy() => Copy(Pop() - 1); 
+            public void Copy(int index) => Push(Peek(index)); 
+            public void Move() => Move(Pop() - 1); 
+            public void Roll() => Move(2); 
 
             public void Move(int index)
             {

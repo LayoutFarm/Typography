@@ -361,7 +361,7 @@ namespace Typography.FontManagement
             return fontGroup;
         }
 
-        bool AddFontPreview(PreviewFontInfo previewFont, string srcPath)
+        public InstalledTypeface AddFontPreview(PreviewFontInfo previewFont, string srcPath)
         {
             _onlyFontNames[previewFont.Name] = true;
 
@@ -407,11 +407,15 @@ namespace Typography.FontManagement
                     case "ITALIC": typefaceStyle = TypefaceStyle.Italic; break;
                 }
             }
-            return Register(new InstalledTypeface(
+
+            InstalledTypeface installedTypeface = new InstalledTypeface(
                 previewFont,
                 typefaceStyle,
                 srcPath)
-            { ActualStreamOffset = previewFont.ActualStreamOffset });
+            { ActualStreamOffset = previewFont.ActualStreamOffset };
+
+
+            return Register(installedTypeface) ? installedTypeface : null;
         }
         public bool AddFontStreamSource(IFontStreamSource src)
         {
@@ -434,16 +438,18 @@ namespace Typography.FontManagement
                         for (int i = 0; i < mbCount; ++i)
                         {
                             //extract and each members
-                            if (!AddFontPreview(previewFont.GetMember(i), src.PathName))
+                            InstalledTypeface instTypeface = AddFontPreview(previewFont.GetMember(i), src.PathName);
+                            if (instTypeface == null)
                             {
                                 totalResult = false;
                             }
+
                         }
                         return totalResult;
                     }
                     else
                     {
-                        return AddFontPreview(previewFont, src.PathName);
+                        return AddFontPreview(previewFont, src.PathName) != null;
                     }
 
                 }
@@ -609,11 +615,10 @@ namespace Typography.FontManagement
             string upperCaseFontName = fontName.ToUpper();
             string upperCaseSubFamName = subFamName.ToUpper();
 
-            InstalledTypeface foundInstalledFont;
 
             //find font group  
             if (_subFamToFontGroup.TryGetValue(upperCaseSubFamName, out InstalledTypefaceGroup foundFontGroup) &&
-                foundFontGroup.TryGetValue(upperCaseFontName, out foundInstalledFont))
+                foundFontGroup.TryGetValue(upperCaseFontName, out InstalledTypeface foundInstalledFont))
             {
                 return foundInstalledFont;
             }

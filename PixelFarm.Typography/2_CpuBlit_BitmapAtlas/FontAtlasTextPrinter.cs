@@ -16,7 +16,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
         GreyscaleStencil,
         None,
     }
-    public sealed class FontAtlasTextPrinter : TextPrinterBase, ITextPrinter, IDisposable
+    public sealed class FontAtlasTextPrinter : TextPrinterBase, IAggTextPrinter, IDisposable
     {
         PixelBlenderWithMask _maskPixelBlender = new PixelBlenderWithMask();
         PixelBlenderPerColorComponentWithMask _maskPixelBlenderPerCompo = new PixelBlenderPerColorComponentWithMask();
@@ -28,10 +28,9 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
 
         AggPainter _painter;
         RequestFont _font;
-        //-----------------------------------------------------------  
+
         Typeface _currentTypeface;
         Color _fontColor;
-
 
         OpenFontTextService _textServices;
         BitmapFontManager<MemBitmap> _bmpFontMx;
@@ -72,8 +71,9 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             _textServices.ResolveTypeface(font); //resolve for 'actual' font
             _fontAtlas = _bmpFontMx.GetFontAtlas(_font, out _fontBmp);
             FontSizeInPoints = font.SizeInPoints;
-
         }
+
+        public void SetSvgBmpBuilderFunc(SvgBmpBuilderFunc svgBmpBuilderFunc) => _bmpFontMx.SetSvgBmpBuilderFunc(svgBmpBuilderFunc);
 
         public RequestFont CurrentFont => _font;
 
@@ -107,15 +107,12 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             get => _currentTypeface;
             set
             {
-
                 if (_currentTypeface == value) return;
                 //
                 _currentTypeface = value;
                 OnFontSizeChanged();
             }
         }
-
-        //public TextBaseline TextBaseline { get; set; }
 
         void SetupMaskPixelBlender(int width, int height)
         {
@@ -133,7 +130,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             _maskPixelBlender.SetMaskBitmap(_alphaBmp);
             _maskPixelBlenderPerCompo.SetMaskBitmap(_alphaBmp);
         }
-        public void PrepareStringForRenderVx(RenderVxFormattedString renderVx, char[] text, int startAt, int len)
+        public void PrepareStringForRenderVx(AggRenderVxFormattedString renderVx, char[] text, int startAt, int len)
         {
 
             //1. update some props.. 
@@ -141,7 +138,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             UpdateGlyphLayoutSettings();
             //Typeface typeface = _currentTypeface;
         }
-        public void PrepareStringForRenderVx(RenderVxFormattedString renderVx)
+        public void PrepareStringForRenderVx(AggRenderVxFormattedString renderVx)
         {
 
             //1. update some props.. 
@@ -170,19 +167,11 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             w = s.Width;
             h = s.Height;
         }
-        ///// <summary>
-        ///// draw specfic glyph with current settings, at specific position
-        ///// </summary>
-        ///// <param name="glyph"></param>
-        ///// <param name="x"></param>
-        ///// <param name="y"></param>
-        //public void DrawGlyph(Glyph glyph, double x, double y)
-        //{
-        //    //TODO...
-        //}
-        public void DrawString(RenderVxFormattedString renderVx, double x, double y)
+
+
+        public void DrawString(AggRenderVxFormattedString renderVx, double x, double y)
         {
-            //TODO...
+
         }
         public override void DrawFromGlyphPlans(GlyphPlanSequence glyphPlanSeq, int startAt, int len, float left, float top)
         {
@@ -296,7 +285,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                     case AntialiasTechnique.GreyscaleStencil:
                         {
                             //fill once
-                            //we choose greeh channel (middle)
+                            //we choose green channel (middle)
                             _maskPixelBlenderPerCompo.SelectedMaskComponent = PixelBlenderColorComponent.G;
                             _maskPixelBlenderPerCompo.EnableOutputColorComponent = EnableOutputColorComponent.EnableAll;
                             _painter.FillRect(gx + 1, gy, srcW, srcH);
@@ -323,6 +312,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             //with specific request font      
             DrawFromGlyphPlans(_textServices.CreateGlyphPlanSeq(textBufferSpan, _font), startAt, len, x, y);
         }
+
 
     }
 }
