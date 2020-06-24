@@ -361,7 +361,7 @@ namespace Typography.OpenFont
             _bitmapFontGlyphSource.CopyBitmapContent(glyph, output);
         }
 
-        internal void UpdateLangs(Meta metaTable) => Languages.Update(OS2Table, metaTable, this.GSUBTable, this.GPOSTable);
+        internal void UpdateLangs(Meta metaTable) => Languages.Update(OS2Table, metaTable, this.CmapTable, this.GSUBTable, this.GPOSTable);
 
     }
 

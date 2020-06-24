@@ -17,6 +17,8 @@ namespace PixelFarm.Drawing
     public class MyAlternativeTypefaceSelector : AlternativeTypefaceSelector
     {
         readonly Dictionary<string, PreferTypefaceList> _dics = new Dictionary<string, PreferTypefaceList>();
+        PreferTypefaceList _emojiPreferList = new PreferTypefaceList();
+
 #if DEBUG
         public MyAlternativeTypefaceSelector() { }
 #endif
@@ -28,19 +30,34 @@ namespace PixelFarm.Drawing
         {
             _dics[scriptTag.StringTag] = typefaceNames;
         }
+
+        public void SetPerferEmoji(PreferTypefaceList typefaceNames)
+        {
+            _emojiPreferList = typefaceNames;
+        }
+
         public PreferTypefaceList GetPreferTypefaces(string scriptTag) => _dics.TryGetValue(scriptTag, out PreferTypefaceList foundList) ? foundList : null;
 
-        public override InstalledTypeface Select(List<InstalledTypeface> choices, ScriptLangInfo scriptLangInfo, char hintChar)
+        public override InstalledTypeface Select(List<InstalledTypeface> choices, ScriptLangInfo scriptLangInfo, int hintCodePoint, AddtionalHint additionalHint)
         {
-            if (_dics.TryGetValue(scriptLangInfo.shortname, out PreferTypefaceList foundList))
+            List<PreferTypeface> list = null;
+            if (additionalHint.UnicodeHint == UnicodeHint.Emoji)
             {
-                //select only resolved font
-                List<PreferTypeface> list = foundList._list;
+                list = _emojiPreferList._list;
+            }
+            else if (_dics.TryGetValue(scriptLangInfo.shortname, out PreferTypefaceList foundList))
+            {
+                list = foundList._list;
+            }
+
+            if (list != null)
+            {
                 int j = list.Count;
                 for (int i = 0; i < j; ++i)
                 {
+                    //select that first one
                     PreferTypeface p = list[i];
-                    //-------
+
                     if (p.InstalledTypeface == null && !p.ResolvedInstalledTypeface)
                     {
                         //find
@@ -66,7 +83,8 @@ namespace PixelFarm.Drawing
                     }
                 }
             }
-            return base.Select(choices, scriptLangInfo, hintChar);
+
+            return base.Select(choices, scriptLangInfo, hintCodePoint, additionalHint);
         }
 
         public class PreferTypeface
@@ -118,33 +136,21 @@ namespace PixelFarm.Drawing
     //---------
     public struct TextPrinterLineSegment : ILineSegment
     {
-        readonly int _startAt;
-        readonly ushort _len;
-        public readonly SpanBreakInfo breakInfo;
-
-        public TextPrinterLineSegment(int startAt, int len, SpanBreakInfo breakInfo)
+        public TextPrinterLineSegment(int startAt, int len, WordKind wordKind, SpanBreakInfo breakInfo)
         {
-            _startAt = startAt;
-            _len = (ushort)len; //***
-
-#if DEBUG
-            if (breakInfo == null)
-            {
-
-            }
-#endif
-            this.breakInfo = breakInfo;
-
-
+            StartAt = startAt;
+            Length = (ushort)len; //***
+            WordKind = wordKind;
+            BreakInfo = breakInfo;
         }
-        public int StartAt => _startAt;
-        public ushort Length => _len;
-
-
+        public int StartAt { get; }
+        public ushort Length { get; }
+        public WordKind WordKind { get; }
+        public SpanBreakInfo BreakInfo { get; }
 #if DEBUG
         public override string ToString()
         {
-            return _startAt + ":" + _len + (breakInfo.RightToLeft ? "(rtl)" : "");
+            return StartAt + ":" + Length + (BreakInfo.RightToLeft ? "(rtl)" : "");
         }
 #endif
     }
@@ -152,7 +158,7 @@ namespace PixelFarm.Drawing
     public class TextPrinterLineSegmentList<T> : ILineSegmentList
         where T : ILineSegment
     {
-        List<T> _segments = new List<T>();
+        readonly List<T> _segments = new List<T>();
         public TextPrinterLineSegmentList()
         {
         }
@@ -192,7 +198,11 @@ namespace PixelFarm.Drawing
         }
         protected override void OnBreak()
         {
-            _lineSegs.AddLineSegment(new TextPrinterLineSegment(this.LatestSpanStartAt, this.LatestSpanLen, this.SpanBreakInfo));
+            _lineSegs.AddLineSegment(new TextPrinterLineSegment(
+                this.LatestSpanStartAt,
+                this.LatestSpanLen,
+                this.LatestWordKind,
+                this.SpanBreakInfo));
         }
     }
 
@@ -838,13 +848,14 @@ namespace PixelFarm.Drawing
                 {
                     //
                     TextPrinterLineSegment line_seg = _textPrinterLineSegmentList.GetLineSegment(i);
-                    SpanBreakInfo spBreakInfo = line_seg.breakInfo;
 
-                    TextBufferSpan buff = new TextBufferSpan(textBuffer, line_seg.StartAt, line_seg.Length);
+                    SpanBreakInfo spBreakInfo = line_seg.BreakInfo;
                     if (spBreakInfo.RightToLeft)
                     {
                         needRightToLeftArr = true;
                     }
+
+                    TextBufferSpan buff = new TextBufferSpan(textBuffer, line_seg.StartAt, line_seg.Length);
 
                     //each line segment may have different unicode range 
                     //and the current typeface may not support that range
@@ -853,26 +864,20 @@ namespace PixelFarm.Drawing
 
                     ushort glyphIndex = 0;
                     char sample_char = textBuffer[line_seg.StartAt];
-                    bool contains_surrogate_pair = false;
-                    if (line_seg.Length > 1)
-                    {
-                        //high serogate pair or not
-                        int codepoint = sample_char;
-                        if (sample_char >= 0xd800 && sample_char <= 0xdbff) //high surrogate 
-                        {
-                            char nextCh = textBuffer[line_seg.StartAt + 1];
-                            if (nextCh >= 0xdc00 && nextCh <= 0xdfff) //low surrogate
-                            {
-                                codepoint = char.ConvertToUtf32(sample_char, nextCh);
-                                contains_surrogate_pair = true;
-                            }
-                        }
+                    int codepoint = sample_char;
 
-                        glyphIndex = curTypeface.GetGlyphIndex(codepoint);
+                    bool contains_surrogate_pair = false;
+
+                    if (line_seg.Length > 1 && line_seg.WordKind == WordKind.SurrogatePair)
+                    {
+                        contains_surrogate_pair = true;//***
+                        //bind 2 char to utf32=> codepoint
+                        //and get glyphIndex from current typeface
+                        glyphIndex = curTypeface.GetGlyphIndex(char.ConvertToUtf32(sample_char, textBuffer[line_seg.StartAt + 1]));
                     }
                     else
                     {
-                        glyphIndex = curTypeface.GetGlyphIndex(sample_char);
+                        glyphIndex = curTypeface.GetGlyphIndex(codepoint);
                     }
 
 
@@ -886,10 +891,9 @@ namespace PixelFarm.Drawing
                             AlternativeTypefaceSelector.LatestTypeface = curTypeface;
                         }
 
-                        if (_textServices.TryGetAlternativeTypefaceFromChar(sample_char, AlternativeTypefaceSelector, out Typeface alternative))
+                        if (_textServices.TryGetAlternativeTypefaceFromCodepoint(codepoint, AlternativeTypefaceSelector, out Typeface alternative))
                         {
                             curTypeface = alternative;
-
                         }
                         else
                         {

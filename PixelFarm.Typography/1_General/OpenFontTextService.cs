@@ -12,24 +12,19 @@ using Typography.TextBreak;
 
 namespace PixelFarm.Drawing
 {
-
-
-
-
     public class OpenFontTextService : ITextService
     {
         /// <summary>
         /// instance of Typography lib's text service
         /// </summary>
-        TextServices _txtServices;
-        Dictionary<int, Typeface> _resolvedTypefaceCache = new Dictionary<int, Typeface>(); //similar to TypefaceStore
-        readonly int _system_id;
+        readonly TextServices _txtServices;
+        readonly Dictionary<int, Typeface> _resolvedTypefaceCache = new Dictionary<int, Typeface>(); //similar to TypefaceStore
+
         //
         public static ScriptLang DefaultScriptLang { get; set; }
 
         public OpenFontTextService()
         {
-            _system_id = PixelFarm.Drawing.Internal.RequestFontCacheAccess.GetNewCacheSystemId();
 
             //set up typography text service
             _txtServices = new TextServices();
@@ -114,29 +109,19 @@ namespace PixelFarm.Drawing
 
         public PixelFarm.Drawing.SvgBmpBuilderFunc SvgBmpBuilder { get; set; }
 
-        public bool TryGetAlternativeTypefaceFromChar(char c, AlternativeTypefaceSelector selector, out Typeface found)
+        /// <summary>
+        /// get alternative typeface from a given unicode codepoint
+        /// </summary>
+        /// <param name="codepoint"></param>
+        /// <param name="selector"></param>
+        /// <param name="found"></param>
+        /// <returns></returns>
+        public bool TryGetAlternativeTypefaceFromCodepoint(int codepoint, AlternativeTypefaceSelector selector, out Typeface found)
         {
-            //find a typeface that supported input char c
-            if (_txtServices.InstalledFontCollection.TryGetAlternativeTypefaceFromChar(c,
-                out ScriptLangInfo scriptLangInfo,
-                out List<InstalledTypeface> installedTypefaceList))
+            if (_txtServices.InstalledFontCollection.TryGetAlternativeTypefaceFromCodepoint(codepoint, selector, out InstalledTypeface foundInstalledTypeface))
             {
-                //select a prefer font
-                if (selector != null)
-                {
-                    InstalledTypeface selected = selector.Select(installedTypefaceList, scriptLangInfo, c);
-                    if (selected != null)
-                    {
-                        found = _txtServices.GetTypeface(selected.FontName, TypefaceStyle.Regular);
-                        return true;
-                    }
-                }
-                else
-                {
-                    InstalledTypeface selected = installedTypefaceList[0];//default
-                    found = _txtServices.GetTypeface(selected.FontName, TypefaceStyle.Regular);
-                    return true;
-                }
+                found = _txtServices.GetTypeface(foundInstalledTypeface.FontName, TypefaceStyle.Regular);
+                return true;
             }
             found = null;
             return false;
@@ -148,9 +133,9 @@ namespace PixelFarm.Drawing
             set => _txtServices.CurrentScriptLang = value;
         }
 
+        readonly TextPrinterWordVisitor _wordVisitor = new TextPrinterWordVisitor();
+        readonly TextPrinterLineSegmentList<TextPrinterLineSegment> _lineSegmentList = new TextPrinterLineSegmentList<TextPrinterLineSegment>();
 
-        readonly MyWordVisitor _wordVisitor = new MyWordVisitor(); //for internal use only
-        readonly MyLineSegmentList _lineSegmentList = new MyLineSegmentList();
         public void CalculateUserCharGlyphAdvancePos(in TextBufferSpan textBufferSpan, RequestFont font, ref TextSpanMeasureResult measureResult)
         {
 
@@ -182,7 +167,7 @@ namespace PixelFarm.Drawing
             //  
             Typeface typeface = ResolveTypeface(font);
             _txtServices.SetCurrentFont(typeface, font.SizeInPoints);
-           
+
             float scale = typeface.CalculateScaleToPixelFromPointSize(font.SizeInPoints);
 
             int j = lineSegs.Count;
@@ -263,16 +248,17 @@ namespace PixelFarm.Drawing
         {
             return ResolveTypeface(font).CalculateScaleToPixelFromPointSize(font.SizeInPoints);
         }
+
         public Typeface ResolveTypeface(RequestFont font)
         {
             //from user's request font
             //resolve to actual Typeface
             //get data from... 
             //cache level-1 (attached inside the request font)
-            Typeface typeface = PixelFarm.Drawing.Internal.RequestFontCacheAccess.GetActualFont<Typeface>(font, _system_id);
+            Typeface typeface = PixelFarm.Drawing.Internal.RequestFontCacheAccess.GetActualFont<Typeface>(font);
             if (typeface != null) return typeface;
             //
-            //cache level-2 (stored in this Ifonts)
+            //cache level-2 (stored in this openfont service)
             if (!_resolvedTypefaceCache.TryGetValue(font.FontKey, out typeface))
             {
                 //not found ask the typeface store to load that font
@@ -296,7 +282,7 @@ namespace PixelFarm.Drawing
             float ascentInPx = typeface.Ascender * pxscale;
             float lineGapInPx = typeface.LineGap * pxscale;
 
-            PixelFarm.Drawing.Internal.RequestFontCacheAccess.SetActualFont(font, _system_id, typeface);
+            PixelFarm.Drawing.Internal.RequestFontCacheAccess.SetActualFont(font, typeface);
             PixelFarm.Drawing.Internal.RequestFontCacheAccess.SetGeneralFontMetricInfo(font,
                 pxSize,
                 ascentInPx,
@@ -304,15 +290,23 @@ namespace PixelFarm.Drawing
                 lineGapInPx,
                 recommedLineSpacingInPx);
 
-            var span = new TextBufferSpan(new char[] { ' ' });
-            Size whiteSpaceW = MeasureString(span, font);
-            PixelFarm.Drawing.Internal.RequestFontCacheAccess.SetWhitespaceWidth(font, _system_id, whiteSpaceW.Width);
+            float advW = typeface.GetAdvanceWidthFromGlyphIndex(typeface.GetGlyphIndex(' ')) * pxscale;
+            PixelFarm.Drawing.Internal.RequestFontCacheAccess.SetWhitespaceWidth(font, (int)advW); //rounding?
             return typeface;
         }
+
+
         public float MeasureWhitespace(RequestFont f)
         {
-            ResolveTypeface(f);
-            return PixelFarm.Drawing.Internal.RequestFontCacheAccess.GetWhitespaceWidth(f, _system_id);
+
+            if (!PixelFarm.Drawing.Internal.RequestFontCacheAccess.GetWhitespaceWidth(f, out int cacheWidth))
+            {
+                //not have a cache data, new measure here
+                Typeface typeface = ResolveTypeface(f);
+                cacheWidth = (int)(typeface.GetAdvanceWidthFromGlyphIndex(typeface.GetGlyphIndex(' ')) * typeface.CalculateScaleToPixelFromPointSize(f.SizeInPoints));
+                PixelFarm.Drawing.Internal.RequestFontCacheAccess.SetWhitespaceWidth(f, cacheWidth);
+            }
+            return cacheWidth;
         }
 
 
@@ -340,8 +334,6 @@ namespace PixelFarm.Drawing
         {
             Typeface typeface = ResolveTypeface(font);
             _txtServices.SetCurrentFont(typeface, font.SizeInPoints);
-
-            charFit = 0;
             _txtServices.MeasureString(textBufferSpan.GetRawCharBuffer(), textBufferSpan.start, textBufferSpan.len, limitWidth, out charFit, out charFitWidth);
 
         }
@@ -354,97 +346,15 @@ namespace PixelFarm.Drawing
         }
         //
         public bool SupportsWordBreak => true;
-        //
-        struct MyLineSegment : ILineSegment
-        {
-            readonly int _startAt;
-            readonly ushort _len;
-            public readonly SpanBreakInfo breakInfo;
-            public MyLineSegment(int startAt, int len, SpanBreakInfo breakInfo)
-            {
-                _startAt = startAt;
-                _len = (ushort)len; //***
-
-#if DEBUG
-                if (breakInfo == null)
-                {
-
-                }
-#endif
-                this.breakInfo = breakInfo;
-
-
-            }
-            public int StartAt => _startAt;
-            public ushort Length => _len;
-
-            public object SpanBreakInfo => breakInfo;
-#if DEBUG
-            public override string ToString()
-            {
-                return _startAt + ":" + _len + (breakInfo.RightToLeft ? "(rtl)" : "");
-            }
-#endif
-        }
-
-        class MyLineSegmentList : ILineSegmentList
-        {
-            List<ILineSegment> _segments = new List<ILineSegment>();
-            public MyLineSegmentList()
-            {
-            }
-            public void AddLineSegment(ILineSegment lineSegment)
-            {
-                _segments.Add(lineSegment);
-            }
-            public void Clear()
-            {
-                _segments.Clear();
-            }
-            //
-            public ILineSegment this[int index] => _segments[index];
-            //
-            public int Count => _segments.Count;
-            //
-            public ILineSegment GetSegment(int index) => _segments[index];
-            //
-#if DEBUG
-            public int dbugStartAt;
-            public int dbugLen;
-#endif
-
-
-        }
-
-        class MyWordVisitor : WordVisitor
-        {
-            //internal use only
-            MyLineSegmentList _lineSegs;
-            public void SetLineSegmentList(MyLineSegmentList lineSegs)
-            {
-                _lineSegs = lineSegs;
-            }
-            protected override void OnBreak()
-            {
-                _lineSegs.AddLineSegment(new MyLineSegment(this.LatestSpanStartAt, this.LatestSpanLen, this.SpanBreakInfo));
-            }
-        }
-
 
         public void BreakToLineSegments(in TextBufferSpan textBufferSpan, WordVisitor wordVisitor)
         {
-
-            //a text buffer span is separated into multiple line segment list 
-            char[] str = textBufferSpan.GetRawCharBuffer();
-#if DEBUG
-            if (str.Length > 10)
-            {
-
-            }
-            int cur_startAt = textBufferSpan.start;
-#endif
-
-            _txtServices.BreakToLineSegments(str, textBufferSpan.start, textBufferSpan.len, wordVisitor);
+            //a text buffer span is separated into multiple line segment list  
+            _txtServices.BreakToLineSegments(
+                textBufferSpan.GetRawCharBuffer(),
+                textBufferSpan.start,
+                textBufferSpan.len,
+                wordVisitor);
         }
         //-----------------------------------
         static OpenFontTextService()
