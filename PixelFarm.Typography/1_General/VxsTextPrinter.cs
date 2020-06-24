@@ -30,7 +30,7 @@ namespace PixelFarm.Drawing
         }
         public PreferTypefaceList GetPreferTypefaces(string scriptTag) => _dics.TryGetValue(scriptTag, out PreferTypefaceList foundList) ? foundList : null;
 
-        public override InstalledTypeface Select(List<InstalledTypeface> choices, ScriptLangInfo scriptLangInfo, char hintChar)
+        public override InstalledTypeface Select(List<InstalledTypeface> choices, ScriptLangInfo scriptLangInfo, int hintCodePoint)
         {
             if (_dics.TryGetValue(scriptLangInfo.shortname, out PreferTypefaceList foundList))
             {
@@ -66,7 +66,7 @@ namespace PixelFarm.Drawing
                     }
                 }
             }
-            return base.Select(choices, scriptLangInfo, hintChar);
+            return base.Select(choices, scriptLangInfo, hintCodePoint);
         }
 
         public class PreferTypeface
@@ -846,6 +846,8 @@ namespace PixelFarm.Drawing
 
                     ushort glyphIndex = 0;
                     char sample_char = textBuffer[line_seg.StartAt];
+                    int codepoint = sample_char;
+
                     bool contains_surrogate_pair = false;
 
                     if (line_seg.Length > 1 && line_seg.WordKind == WordKind.SurrogatePair)
@@ -857,7 +859,7 @@ namespace PixelFarm.Drawing
                     }
                     else
                     {
-                        glyphIndex = curTypeface.GetGlyphIndex(sample_char);
+                        glyphIndex = curTypeface.GetGlyphIndex(codepoint);
                     }
 
 
@@ -871,10 +873,9 @@ namespace PixelFarm.Drawing
                             AlternativeTypefaceSelector.LatestTypeface = curTypeface;
                         }
 
-                        if (_textServices.TryGetAlternativeTypefaceFromChar(sample_char, AlternativeTypefaceSelector, out Typeface alternative))
+                        if (_textServices.TryGetAlternativeTypefaceFromCodepoint(codepoint, AlternativeTypefaceSelector, out Typeface alternative))
                         {
                             curTypeface = alternative;
-
                         }
                         else
                         {
