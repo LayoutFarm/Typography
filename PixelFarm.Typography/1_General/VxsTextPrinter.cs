@@ -17,6 +17,8 @@ namespace PixelFarm.Drawing
     public class MyAlternativeTypefaceSelector : AlternativeTypefaceSelector
     {
         readonly Dictionary<string, PreferTypefaceList> _dics = new Dictionary<string, PreferTypefaceList>();
+        PreferTypefaceList _emojiPreferList = new PreferTypefaceList();
+
 #if DEBUG
         public MyAlternativeTypefaceSelector() { }
 #endif
@@ -28,19 +30,34 @@ namespace PixelFarm.Drawing
         {
             _dics[scriptTag.StringTag] = typefaceNames;
         }
+
+        public void SetPerferEmoji(PreferTypefaceList typefaceNames)
+        {
+            _emojiPreferList = typefaceNames;
+        }
+
         public PreferTypefaceList GetPreferTypefaces(string scriptTag) => _dics.TryGetValue(scriptTag, out PreferTypefaceList foundList) ? foundList : null;
 
-        public override InstalledTypeface Select(List<InstalledTypeface> choices, ScriptLangInfo scriptLangInfo, int hintCodePoint)
+        public override InstalledTypeface Select(List<InstalledTypeface> choices, ScriptLangInfo scriptLangInfo, int hintCodePoint, AddtionalHint additionalHint)
         {
-            if (_dics.TryGetValue(scriptLangInfo.shortname, out PreferTypefaceList foundList))
+            List<PreferTypeface> list = null;
+            if (additionalHint.UnicodeHint == UnicodeHint.Emoji)
             {
-                //select only resolved font
-                List<PreferTypeface> list = foundList._list;
+                list = _emojiPreferList._list;
+            }
+            else if (_dics.TryGetValue(scriptLangInfo.shortname, out PreferTypefaceList foundList))
+            {
+                list = foundList._list;
+            }
+
+            if (list != null)
+            {
                 int j = list.Count;
                 for (int i = 0; i < j; ++i)
                 {
+                    //select that first one
                     PreferTypeface p = list[i];
-                    //-------
+
                     if (p.InstalledTypeface == null && !p.ResolvedInstalledTypeface)
                     {
                         //find
@@ -66,7 +83,8 @@ namespace PixelFarm.Drawing
                     }
                 }
             }
-            return base.Select(choices, scriptLangInfo, hintCodePoint);
+
+            return base.Select(choices, scriptLangInfo, hintCodePoint, additionalHint);
         }
 
         public class PreferTypeface

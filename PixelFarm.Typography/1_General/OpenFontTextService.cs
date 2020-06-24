@@ -123,27 +123,10 @@ namespace PixelFarm.Drawing
         /// <returns></returns>
         public bool TryGetAlternativeTypefaceFromCodepoint(int codepoint, AlternativeTypefaceSelector selector, out Typeface found)
         {
-            //find a typeface that supported input char c
-            if (_txtServices.InstalledFontCollection.TryGetAlternativeTypefaceFromChar(codepoint,
-                out ScriptLangInfo scriptLangInfo,
-                out List<InstalledTypeface> installedTypefaceList))
+            if (_txtServices.InstalledFontCollection.TryGetAlternativeTypefaceFromCodepoint(codepoint, selector, out InstalledTypeface foundInstalledTypeface))
             {
-                //select a prefer font
-                if (selector != null)
-                {
-                    InstalledTypeface selected = selector.Select(installedTypefaceList, scriptLangInfo, codepoint);
-                    if (selected != null)
-                    {
-                        found = _txtServices.GetTypeface(selected.FontName, TypefaceStyle.Regular);
-                        return true;
-                    }
-                }
-                else
-                {
-                    InstalledTypeface selected = installedTypefaceList[0];//default
-                    found = _txtServices.GetTypeface(selected.FontName, TypefaceStyle.Regular);
-                    return true;
-                }
+                found = _txtServices.GetTypeface(foundInstalledTypeface.FontName, TypefaceStyle.Regular);
+                return true;
             }
             found = null;
             return false;
