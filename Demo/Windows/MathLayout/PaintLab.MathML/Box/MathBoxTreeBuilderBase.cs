@@ -922,19 +922,9 @@ namespace MathLayout
                             Bounds bounds = _glyphBounding[glyphIndex];
                             glyphBox.AdvanceWidthScale += (int)((bounds.XMin) * GetPixelScale());
                         }
-                        //else
-                        //{
-                        //    if (!allIsLetter && cur_codepoint != 32)
-                        //    {
-                        //        Bounds bounds = _glyphBounding[glyphIndex];
-                        //        glyphBox.AdvanceWidthScale = (int)((bounds.XMax) * GetPixelScale());
-                        //    }
-                        //}
                     }
                     if (skipNextCodepoint)
                     {
-                        // Maybe this is a UVS sequence; in that case,
-                        //***SKIP*** the second codepoint 
                         GlyphBox glyphBox = textSpan.GetChild(i + 1) as GlyphBox;//next glyph
                         glyphBox.Character = '\0';
                         ++i;
@@ -951,18 +941,23 @@ namespace MathLayout
                     glyphBox.MathNode = node;
                     glyphBox.Character = text_buff[0];
                     glyphBox.IsInvisible = _isPhantom;
-                    //if (!char.IsLetter(glyphBox.Character))
-                    if (glyphBox.Character == '(' || glyphBox.Character == ')')
+
+                    if (node.Name == "mo")
                     {
-                        //AssignGlyphVxs(glyphBox);
-                        //Bounds bounds = _glyphBounding[glyphBox.GlyphIndex];
-                        //glyphBox.AdvanceWidthScale = (int)((bounds.XMax) * GetPixelScale());
-                        //glyphBox.AdvanceWidthScale = (int)glyphBox.GetBoundingRect().Width;
+                        switch (glyphBox.Character)
+                        {
+                            case '-':
+                                glyphBox.Character = (char)0x2212;
+                                break;
+                            case '*':
+                                glyphBox.Character = (char)0x2217;
+                                break;
+                        }
                     }
-                    else if (glyphBox.Character == '-' && node.Name == "mo")
-                    {
-                        glyphBox.Character = (char)0x2212;
-                    }
+                    //if (glyphBox.Character == '-' && node.Name == "mo")
+                    //{
+                    //    glyphBox.Character = (char)0x2212;
+                    //}
                     return glyphBox;
                 }
                 return null;
