@@ -156,9 +156,9 @@ namespace TypographyTest.WinForms
 
             lstSupportedUnicodeLangs.Items.Clear();
 
-            foreach (UnicodeLangBits unicodeLangBit in installedTypeface.GetSupportedUnicodeLangBitIter())
+            foreach (BitposAndAssciatedUnicodeRanges bitposAndUnicodeRanges in installedTypeface.GetSupportedUnicodeLangIter())
             {
-                lstSupportedUnicodeLangs.Items.Add(unicodeLangBit.ToString());
+                lstSupportedUnicodeLangs.Items.Add(bitposAndUnicodeRanges.ToString());
             }
         }
 
