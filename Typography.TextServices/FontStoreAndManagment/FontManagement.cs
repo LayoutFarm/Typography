@@ -761,7 +761,8 @@ namespace Typography.FontManagement
         //unicode 13:
         //https://unicode.org/emoji/charts/full-emoji-list.html
         //emoji start at U+1F600 	
-        const int UNICODE_EMOJI_EXAMPLE = 0x1F600; //"😁" //first emoji
+        const int UNICODE_EMOJI_START = 0x1F600; //"😁" //first emoji
+        const int UNICODE_EMOJI_END = 0x1F64F;
 
         //https://www.unicode.org/charts/PDF/U1D400.pdf
         const int UNICODE_MATH_ALPHANUM_EXAMPLE = 0x1D400; //1D400–1D7FF;
@@ -788,7 +789,7 @@ namespace Typography.FontManagement
                         if (range == UnicodeLangRanges.Non_Plane_0)
                         {
                             //special search
-                            if (instFont.ContainGlyphForUnicode(UNICODE_EMOJI_EXAMPLE))
+                            if (instFont.ContainGlyphForUnicode(UNICODE_EMOJI_START))
                             {
                                 _emojiSupportedTypefaces.Add(instFont);
                             }
@@ -800,18 +801,20 @@ namespace Typography.FontManagement
                     }
                 }
             }
+            //------
+            //select perfer unicode font
+
         }
 
-
-        public bool TryGetAlternativeTypefaceFromChar(int codepoint, out ScriptLangInfo foundScriptLang, out List<InstalledTypeface> found)
+        public bool TryGetAlternativeTypefaceFromChar(int codepoint, out ScriptLangInfo scripLangInfo, out List<InstalledTypeface> found)
         {
             //find a typeface that supported input char c
             //1. unicode to lang=> to script
             //2. then find typeface the support it 
 
-            if (ScriptLangs.TryGetScriptLang(codepoint, out foundScriptLang) && foundScriptLang.unicodeLangs != null)
+            if (ScriptLangs.TryGetScriptLang(codepoint, out scripLangInfo) && scripLangInfo.unicodeLangs != null)
             {
-                foreach (UnicodeLangRange unicodeLangRange in foundScriptLang.unicodeLangs)
+                foreach (UnicodeLangRange unicodeLangRange in scripLangInfo.unicodeLangs)
                 {
                     if (_regisiterWithUnicodeRangeDic.TryGetValue(unicodeLangRange, out List<InstalledTypeface> typefaceList) && typefaceList.Count > 0)
                     {
@@ -821,6 +824,18 @@ namespace Typography.FontManagement
                     }
                 }
             }
+
+            //not found
+            if (codepoint >= UNICODE_EMOJI_START && codepoint <= UNICODE_EMOJI_END)
+            {
+                if (_emojiSupportedTypefaces.Count > 0)
+                {
+                    scripLangInfo = null;
+                    found = _emojiSupportedTypefaces;
+                    return true;
+                }
+            }
+
             found = null;
             return false;
         }
