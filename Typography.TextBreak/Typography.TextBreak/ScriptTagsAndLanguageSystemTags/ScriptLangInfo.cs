@@ -1036,10 +1036,10 @@ Zanabazar_Square__Zanabazarin_Dörböljin_Useg__Xewtee_Dörböljin_Bicig__Horizo
         {
             return s_registeredScriptTagsToUnicodeLangRanges.TryGetValue(langShortName, out unicodeLangRanges);
         }
-        public static bool TryGetScriptLang(char c, out ScriptLangInfo scLang)
+        public static bool TryGetScriptLang(int codepoint, out ScriptLangInfo scLang)
         {
             //temp fix
-            return UnicodeRangeFinder2.GetUniCodeRangeFor(c, out var _, out var _, out scLang);
+            return UnicodeRangeFinder2.GetUniCodeRangeFor(codepoint, out var _, out var _, out scLang);
             //foreach (var v in s_unicodeLangToScriptLang)
             //{
 
@@ -1144,11 +1144,11 @@ Zanabazar_Square__Zanabazarin_Dörböljin_Useg__Xewtee_Dörböljin_Bicig__Horizo
             0xFE30,0xFE4F
         };
 
-        public static bool GetUniCodeRangeFor(char c1, out int startCodePoint, out int endCodePoint, out ScriptLangInfo spanBreakInfo)
+        public static bool GetUniCodeRangeFor(int c1, out int startCodePoint, out int endCodePoint, out ScriptLangInfo spanBreakInfo)
         {
             //find proper unicode range (and its lang)
             //Thai
-            //TODO: review this again, with AUTOGEN code
+            //TODO: review this again, with AUTOGEN code***
             {
 
                 if (c1 >= 0 && c1 < 255)

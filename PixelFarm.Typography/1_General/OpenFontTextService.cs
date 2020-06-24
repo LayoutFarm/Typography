@@ -114,17 +114,24 @@ namespace PixelFarm.Drawing
 
         public PixelFarm.Drawing.SvgBmpBuilderFunc SvgBmpBuilder { get; set; }
 
-        public bool TryGetAlternativeTypefaceFromChar(char c, AlternativeTypefaceSelector selector, out Typeface found)
+        /// <summary>
+        /// get alternative typeface from a given unicode codepoint
+        /// </summary>
+        /// <param name="codepoint"></param>
+        /// <param name="selector"></param>
+        /// <param name="found"></param>
+        /// <returns></returns>
+        public bool TryGetAlternativeTypefaceFromCodepoint(int codepoint, AlternativeTypefaceSelector selector, out Typeface found)
         {
             //find a typeface that supported input char c
-            if (_txtServices.InstalledFontCollection.TryGetAlternativeTypefaceFromChar(c,
+            if (_txtServices.InstalledFontCollection.TryGetAlternativeTypefaceFromChar(codepoint,
                 out ScriptLangInfo scriptLangInfo,
                 out List<InstalledTypeface> installedTypefaceList))
             {
                 //select a prefer font
                 if (selector != null)
                 {
-                    InstalledTypeface selected = selector.Select(installedTypefaceList, scriptLangInfo, c);
+                    InstalledTypeface selected = selector.Select(installedTypefaceList, scriptLangInfo, codepoint);
                     if (selected != null)
                     {
                         found = _txtServices.GetTypeface(selected.FontName, TypefaceStyle.Regular);
@@ -182,7 +189,7 @@ namespace PixelFarm.Drawing
             //  
             Typeface typeface = ResolveTypeface(font);
             _txtServices.SetCurrentFont(typeface, font.SizeInPoints);
-           
+
             float scale = typeface.CalculateScaleToPixelFromPointSize(font.SizeInPoints);
 
             int j = lineSegs.Count;
