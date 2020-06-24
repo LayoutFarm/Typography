@@ -153,12 +153,25 @@ namespace Typography.FontManagement
 
     public abstract class AlternativeTypefaceSelector
     {
+        //TODO: review here
+        public enum UnicodeHint
+        {
+            Unknown,
+            Emoji,
+            Math,
+        }
+        public class AddtionalHint
+        {
+            public UnicodeHint UnicodeHint { get; set; }
+            public UnicodeLangRange UnicodeLangRange { get; set; }
+        }
+
 #if DEBUG
         public AlternativeTypefaceSelector() { }
 #endif
 
         public Typeface LatestTypeface { get; set; }
-        public virtual InstalledTypeface Select(List<InstalledTypeface> choices, ScriptLangInfo scriptLangInfo, int codepoint)
+        public virtual InstalledTypeface Select(List<InstalledTypeface> choices, ScriptLangInfo scriptLangInfo, int codepoint, AddtionalHint additionalHint)
         {
             if (choices.Count > 0)
             {
@@ -806,37 +819,58 @@ namespace Typography.FontManagement
 
         }
 
-        public bool TryGetAlternativeTypefaceFromChar(int codepoint, out ScriptLangInfo scripLangInfo, out List<InstalledTypeface> found)
+
+        /// <summary>
+        /// get alternative typeface from a given unicode codepoint
+        /// </summary>
+        /// <param name="codepoint"></param>
+        /// <param name="selector"></param>
+        /// <param name="found"></param>
+        /// <returns></returns>
+        public bool TryGetAlternativeTypefaceFromCodepoint(int codepoint, AlternativeTypefaceSelector selector, out InstalledTypeface selectedTypeface)
         {
             //find a typeface that supported input char c
-            //1. unicode to lang=> to script
-            //2. then find typeface the support it 
 
-            if (ScriptLangs.TryGetScriptLang(codepoint, out scripLangInfo) && scripLangInfo.unicodeLangs != null)
+            List<InstalledTypeface> installedTypefaceList = null;
+            if (ScriptLangs.TryGetScriptLang(codepoint, out ScriptLangInfo scripLangInfo) && scripLangInfo.unicodeLangs != null)
             {
                 foreach (UnicodeLangRange unicodeLangRange in scripLangInfo.unicodeLangs)
                 {
                     if (_regisiterWithUnicodeRangeDic.TryGetValue(unicodeLangRange, out List<InstalledTypeface> typefaceList) && typefaceList.Count > 0)
                     {
                         //select a proper typeface                        
-                        found = typefaceList;
-                        return true;
+                        installedTypefaceList = typefaceList;
+                        break;
                     }
                 }
             }
 
+            var additionHint = new AlternativeTypefaceSelector.AddtionalHint();
             //not found
-            if (codepoint >= UNICODE_EMOJI_START && codepoint <= UNICODE_EMOJI_END)
+            if (installedTypefaceList == null && codepoint >= UNICODE_EMOJI_START && codepoint <= UNICODE_EMOJI_END)
             {
                 if (_emojiSupportedTypefaces.Count > 0)
                 {
-                    scripLangInfo = null;
-                    found = _emojiSupportedTypefaces;
+                    installedTypefaceList = _emojiSupportedTypefaces;
+                    additionHint.UnicodeHint = AlternativeTypefaceSelector.UnicodeHint.Emoji;
+                }
+            }
+            //-------------
+            if (installedTypefaceList != null)
+            {
+                //select a prefer font
+
+                if (selector != null)
+                {
+                    return (selectedTypeface = selector.Select(installedTypefaceList, scripLangInfo, codepoint, additionHint)) != null;
+                }
+                else if (installedTypefaceList.Count > 0)
+                {
+                    selectedTypeface = installedTypefaceList[0];//default
                     return true;
                 }
             }
-
-            found = null;
+            selectedTypeface = null;
             return false;
         }
     }

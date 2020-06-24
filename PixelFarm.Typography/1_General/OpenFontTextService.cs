@@ -123,27 +123,10 @@ namespace PixelFarm.Drawing
         /// <returns></returns>
         public bool TryGetAlternativeTypefaceFromCodepoint(int codepoint, AlternativeTypefaceSelector selector, out Typeface found)
         {
-            //find a typeface that supported input char c
-            if (_txtServices.InstalledFontCollection.TryGetAlternativeTypefaceFromChar(codepoint,
-                out ScriptLangInfo scriptLangInfo,
-                out List<InstalledTypeface> installedTypefaceList))
+            if (_txtServices.InstalledFontCollection.TryGetAlternativeTypefaceFromCodepoint(codepoint, selector, out InstalledTypeface foundInstalledTypeface))
             {
-                //select a prefer font
-                if (selector != null)
-                {
-                    InstalledTypeface selected = selector.Select(installedTypefaceList, scriptLangInfo, codepoint);
-                    if (selected != null)
-                    {
-                        found = _txtServices.GetTypeface(selected.FontName, TypefaceStyle.Regular);
-                        return true;
-                    }
-                }
-                else
-                {
-                    InstalledTypeface selected = installedTypefaceList[0];//default
-                    found = _txtServices.GetTypeface(selected.FontName, TypefaceStyle.Regular);
-                    return true;
-                }
+                found = _txtServices.GetTypeface(foundInstalledTypeface.FontName, TypefaceStyle.Regular);
+                return true;
             }
             found = null;
             return false;
@@ -155,9 +138,9 @@ namespace PixelFarm.Drawing
             set => _txtServices.CurrentScriptLang = value;
         }
 
+        readonly TextPrinterWordVisitor _wordVisitor = new TextPrinterWordVisitor();
+        readonly TextPrinterLineSegmentList<TextPrinterLineSegment> _lineSegmentList = new TextPrinterLineSegmentList<TextPrinterLineSegment>();
 
-        readonly MyWordVisitor _wordVisitor = new MyWordVisitor(); //for internal use only
-        readonly MyLineSegmentList _lineSegmentList = new MyLineSegmentList();
         public void CalculateUserCharGlyphAdvancePos(in TextBufferSpan textBufferSpan, RequestFont font, ref TextSpanMeasureResult measureResult)
         {
 
@@ -311,15 +294,25 @@ namespace PixelFarm.Drawing
                 lineGapInPx,
                 recommedLineSpacingInPx);
 
-            var span = new TextBufferSpan(new char[] { ' ' });
-            Size whiteSpaceW = MeasureString(span, font);
-            PixelFarm.Drawing.Internal.RequestFontCacheAccess.SetWhitespaceWidth(font, _system_id, whiteSpaceW.Width);
+            float advW = typeface.GetAdvanceWidthFromGlyphIndex(typeface.GetGlyphIndex(' ')) * pxscale;
+            PixelFarm.Drawing.Internal.RequestFontCacheAccess.SetWhitespaceWidth(font, _system_id, (int)advW); //rounding?
             return typeface;
         }
+
+
         public float MeasureWhitespace(RequestFont f)
         {
-            ResolveTypeface(f);
-            return PixelFarm.Drawing.Internal.RequestFontCacheAccess.GetWhitespaceWidth(f, _system_id);
+
+            if (!PixelFarm.Drawing.Internal.RequestFontCacheAccess.GetWhitespaceWidth(f,
+                _system_id,
+                out int cacheWidth))
+            {
+                //not have a cache data, new measure here
+                Typeface typeface = ResolveTypeface(f);
+                cacheWidth = (int)(typeface.GetAdvanceWidthFromGlyphIndex(typeface.GetGlyphIndex(' ')) * typeface.CalculateScaleToPixelFromPointSize(f.SizeInPoints));
+                PixelFarm.Drawing.Internal.RequestFontCacheAccess.SetWhitespaceWidth(f, _system_id, cacheWidth);
+            }
+            return cacheWidth;
         }
 
 
@@ -361,82 +354,6 @@ namespace PixelFarm.Drawing
         }
         //
         public bool SupportsWordBreak => true;
-        //
-        struct MyLineSegment : ILineSegment
-        {
-            readonly int _startAt;
-            readonly ushort _len;
-            public readonly SpanBreakInfo breakInfo;
-            public MyLineSegment(int startAt, int len, SpanBreakInfo breakInfo)
-            {
-                _startAt = startAt;
-                _len = (ushort)len; //***
-
-#if DEBUG
-                if (breakInfo == null)
-                {
-
-                }
-#endif
-                this.breakInfo = breakInfo;
-
-
-            }
-            public int StartAt => _startAt;
-            public ushort Length => _len;
-
-            public object SpanBreakInfo => breakInfo;
-#if DEBUG
-            public override string ToString()
-            {
-                return _startAt + ":" + _len + (breakInfo.RightToLeft ? "(rtl)" : "");
-            }
-#endif
-        }
-
-        class MyLineSegmentList : ILineSegmentList
-        {
-            List<ILineSegment> _segments = new List<ILineSegment>();
-            public MyLineSegmentList()
-            {
-            }
-            public void AddLineSegment(ILineSegment lineSegment)
-            {
-                _segments.Add(lineSegment);
-            }
-            public void Clear()
-            {
-                _segments.Clear();
-            }
-            //
-            public ILineSegment this[int index] => _segments[index];
-            //
-            public int Count => _segments.Count;
-            //
-            public ILineSegment GetSegment(int index) => _segments[index];
-            //
-#if DEBUG
-            public int dbugStartAt;
-            public int dbugLen;
-#endif
-
-
-        }
-
-        class MyWordVisitor : WordVisitor
-        {
-            //internal use only
-            MyLineSegmentList _lineSegs;
-            public void SetLineSegmentList(MyLineSegmentList lineSegs)
-            {
-                _lineSegs = lineSegs;
-            }
-            protected override void OnBreak()
-            {
-                _lineSegs.AddLineSegment(new MyLineSegment(this.LatestSpanStartAt, this.LatestSpanLen, this.SpanBreakInfo));
-            }
-        }
-
 
         public void BreakToLineSegments(in TextBufferSpan textBufferSpan, WordVisitor wordVisitor)
         {

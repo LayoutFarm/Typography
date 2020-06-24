@@ -57,13 +57,13 @@ namespace PixelFarm.Drawing
         }
         public RequestFont(string facename, Len fontSize, FontStyle style = FontStyle.Regular)
         {
-            
+
             //Lang = "en";//default
             Name = facename;
             Size = fontSize; //store user font size here
 
             Style = style;
-            
+
             FontKey = CalculateFontKey(facename, SizeInPoints = fontSize.ToPoints(), style);
         }
         public Len Size { get; private set; }
@@ -213,14 +213,16 @@ namespace PixelFarm.Drawing
                 }
                 return null;
             }
-            public static int GetWhitespaceWidth(RequestFont reqFont, int platform_id)
+            public static bool GetWhitespaceWidth(RequestFont reqFont, int platform_id, out int width)
             {
                 if (reqFont._platform_id == platform_id &&
                     reqFont._latestResolved != null)
                 {
-                    return reqFont._whitespace_width;
+                    width = reqFont._whitespace_width;
+                    return true;
                 }
-                return 0;
+                width = 0;
+                return false; 
             }
             public static void SetWhitespaceWidth(RequestFont reqFont,
                 int platform_id,
