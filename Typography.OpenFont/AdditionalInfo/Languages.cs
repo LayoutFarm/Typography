@@ -34,8 +34,9 @@ namespace Typography.OpenFont
         /// </summary>
         public ScriptList GPOSScriptList { get; private set; }
 
+        Cmap _cmap;
 
-        internal void Update(OS2Table os2Tabble, Meta meta, GSUB gsub, GPOS gpos)
+        internal void Update(OS2Table os2Tabble, Meta meta, Cmap cmap, GSUB gsub, GPOS gpos)
         {
             //https://docs.microsoft.com/en-us/typography/opentype/spec/os2#ur
 
@@ -140,10 +141,16 @@ namespace Typography.OpenFont
             //gsub and gpos contains actual script_list that are in the typeface
             GSUBScriptList = gsub?.ScriptList;
             GPOSScriptList = gpos?.ScriptList;
+
+            _cmap = cmap;
         }
 
-
-
+        /// <summary>
+        /// contains glyph for the given unicode code point or not
+        /// </summary>
+        /// <param name="codepoint"></param>
+        /// <returns></returns>
+        public bool ContainGlyphForUnicode(int codepoint) => (_cmap != null) ? (_cmap.GetGlyphIndex(codepoint, 0, out bool skipNextCodePoint) > 0) : false;
     }
 
 

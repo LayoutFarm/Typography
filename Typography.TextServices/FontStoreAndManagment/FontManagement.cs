@@ -170,6 +170,8 @@ namespace Typography.FontManagement
 
     public class InstalledTypeface
     {
+        readonly PreviewFontInfo _previewFontInfo;
+
         internal InstalledTypeface(PreviewFontInfo previewFontInfo, TypefaceStyle style, string fontPath)
         {
             FontName = previewFontInfo.Name;
@@ -183,6 +185,8 @@ namespace Typography.FontManagement
             UniqueFontIden = previewFontInfo.UniqueFontIden;
             Languages = previewFontInfo.Languages;
             TypefaceStyle = style;
+
+            _previewFontInfo = previewFontInfo;
         }
 
         public string FontName { get; internal set; }
@@ -195,13 +199,19 @@ namespace Typography.FontManagement
         public TypefaceStyle TypefaceStyle { get; internal set; }
         public ushort Weight { get; internal set; }
         public Languages Languages { get; }
-
         public string FontPath { get; internal set; }
         public int ActualStreamOffset { get; internal set; }
 
         //TODO: UnicodeLangBits vs UnicodeLangBits5_1
         public bool DoesSupportUnicode(BitposAndAssciatedUnicodeRanges bitposAndAssocUnicode) => TypefaceExtension3.DoesSupportUnicode(Languages, bitposAndAssocUnicode.Bitpos);
         public bool DoesSupportUnicode(int bitpos) => TypefaceExtension3.DoesSupportUnicode(Languages, bitpos);
+
+        /// <summary>
+        /// check if this font has glyph for the given code point or not
+        /// </summary>
+        /// <returns></returns>
+        public bool ContainGlyphForUnicode(int codepoint) => _previewFontInfo.Languages.ContainGlyphForUnicode(codepoint);
+
 #if DEBUG
         public override string ToString()
         {
@@ -761,6 +771,11 @@ namespace Typography.FontManagement
 
                 }
 #endif
+                if (instFont.ContainGlyphForUnicode(codepoint))
+                {
+
+                }
+
 
                 foreach (BitposAndAssciatedUnicodeRanges bitposAndAssocUnicodeRanges in instFont.GetSupportedUnicodeLangIter())
                 {
