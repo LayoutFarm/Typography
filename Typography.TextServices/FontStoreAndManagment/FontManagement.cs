@@ -754,40 +754,55 @@ namespace Typography.FontManagement
             }
         }
 
+        readonly Dictionary<UnicodeLangRange, List<InstalledTypeface>> _regisiterWithUnicodeRangeDic = new Dictionary<UnicodeLangRange, List<InstalledTypeface>>();
+        readonly List<InstalledTypeface> _emojiSupportedTypefaces = new List<InstalledTypeface>();
+        readonly List<InstalledTypeface> _mathTypefaces = new List<InstalledTypeface>();
+
+        //unicode 13:
+        //https://unicode.org/emoji/charts/full-emoji-list.html
+        //emoji start at U+1F600 	
+        const int UNICODE_EMOJI_EXAMPLE = 0x1F600; //"😁" //first emoji
+
+        //https://www.unicode.org/charts/PDF/U1D400.pdf
+        const int UNICODE_MATH_ALPHANUM_EXAMPLE = 0x1D400; //1D400–1D7FF;
+
         public void UpdateUnicodeRanges()
         {
             _regisiterWithUnicodeRangeDic.Clear();
+            _emojiSupportedTypefaces.Clear();
+            _mathTypefaces.Clear();
 
-#if DEBUG
-            string emoji = "😁";
-            char[] chars = emoji.ToCharArray();
-            int codepoint = char.ConvertToUtf32(chars[0], chars[1]);
-#endif
             foreach (InstalledTypeface instFont in GetInstalledFontIter())
             {
-#if DEBUG
-                if (instFont.FontName.Contains("Emoji"))
-                {
-
-                }
-#endif
-                if (instFont.ContainGlyphForUnicode(codepoint))
-                {
-
-                }
-
-
                 foreach (BitposAndAssciatedUnicodeRanges bitposAndAssocUnicodeRanges in instFont.GetSupportedUnicodeLangIter())
                 {
-                    //if (bitposAndAssocUnicodeRanges.IsInRange(codepoint))
-                    //{
-                    //    //even in range but the font may not contains this code point
-                    //}
+                    foreach (UnicodeLangRange range in bitposAndAssocUnicodeRanges.Ranges)
+                    {
+                        if (!_regisiterWithUnicodeRangeDic.TryGetValue(range, out List<InstalledTypeface> found))
+                        {
+                            found = new List<InstalledTypeface>();
+                            _regisiterWithUnicodeRangeDic.Add(range, found);
+                        }
+                        found.Add(instFont);
 
-                    RegisterUnicodeSupport(bitposAndAssocUnicodeRanges, instFont);
+                        if (range == UnicodeLangRanges.Non_Plane_0)
+                        {
+                            //special search
+                            if (instFont.ContainGlyphForUnicode(UNICODE_EMOJI_EXAMPLE))
+                            {
+                                _emojiSupportedTypefaces.Add(instFont);
+                            }
+                            if (instFont.ContainGlyphForUnicode(UNICODE_MATH_ALPHANUM_EXAMPLE))
+                            {
+                                _mathTypefaces.Add(instFont);
+                            }
+                        }
+                    }
                 }
             }
         }
+
+
         public bool TryGetAlternativeTypefaceFromChar(char c, out ScriptLangInfo foundScriptLang, out List<InstalledTypeface> found)
         {
             //find a typeface that supported input char c
@@ -809,21 +824,6 @@ namespace Typography.FontManagement
             found = null;
             return false;
         }
-
-        readonly Dictionary<UnicodeLangRange, List<InstalledTypeface>> _regisiterWithUnicodeRangeDic = new Dictionary<UnicodeLangRange, List<InstalledTypeface>>();
-        void RegisterUnicodeSupport(BitposAndAssciatedUnicodeRanges bitposAndAssocUnicodeRanges, InstalledTypeface instFont)
-        {
-            foreach (UnicodeLangRange range in bitposAndAssocUnicodeRanges.Ranges)
-            {
-                if (!_regisiterWithUnicodeRangeDic.TryGetValue(range, out List<InstalledTypeface> found))
-                {
-                    found = new List<InstalledTypeface>();
-                    _regisiterWithUnicodeRangeDic.Add(range, found);
-                }
-                found.Add(instFont);
-            }
-        }
-
     }
 
 
