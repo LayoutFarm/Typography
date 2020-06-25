@@ -25,9 +25,8 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
         MemBitmap _fontBmp;
         MemBitmap _alphaBmp;
 
-
         AggPainter _painter;
-        RequestFont _font;
+        ResolvedFont _font;
 
         Typeface _currentTypeface;
         Color _fontColor;
@@ -64,18 +63,20 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
         public AntialiasTechnique AntialiasTech { get; set; }
 
 
+        RequestFont _reqFont;
         public void ChangeFont(RequestFont font)
         {
-            //call to service
-            _font = font;
-            _textServices.ResolveTypeface(font); //resolve for 'actual' font
+            //call to service             
+            _font = _textServices.ResolveFont(_reqFont = font); //resolve for 'actual' font
+
             _fontAtlas = _bmpFontMx.GetFontAtlas(_font, out _fontBmp);
             FontSizeInPoints = font.SizeInPoints;
         }
 
         public void SetSvgBmpBuilderFunc(SvgBmpBuilderFunc svgBmpBuilderFunc) => _bmpFontMx.SetSvgBmpBuilderFunc(svgBmpBuilderFunc);
 
-        public RequestFont CurrentFont => _font;
+        public RequestFont CurrentFont => _reqFont;
+        public ResolvedFont CurrentResolvedFont => _font;
 
         public void ChangeFillColor(Color fontColor)
         {
@@ -176,10 +177,9 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
         public override void DrawFromGlyphPlans(GlyphPlanSequence glyphPlanSeq, int startAt, int len, float left, float top)
         {
 
-            Typeface typeface = _textServices.ResolveTypeface(_font);
-
+            Typeface typeface = _font.Typeface;
             float scale = typeface.CalculateScaleToPixelFromPointSize(_font.SizeInPoints);
-            int recommendLineSpacing = (int)_font.LineSpacingInPixels;
+
             //--------------------------
             //TODO:
             //if (x,y) is left top

@@ -363,6 +363,18 @@ namespace Typography.OpenFont
 
         internal void UpdateLangs(Meta metaTable) => Languages.Update(OS2Table, metaTable, this.CmapTable, this.GSUBTable, this.GPOSTable);
 
+
+        internal ushort _whitespaceWidth; //common used value
+
+        internal void UpdateCommonUsedValues()
+        {
+            //whitespace
+            ushort whitespace_glyphIndex = this.GetGlyphIndex(' ');
+            if (whitespace_glyphIndex > 0)
+            {
+                _whitespaceWidth = this.GetAdvanceWidthFromGlyphIndex(whitespace_glyphIndex);
+            }
+        }
     }
 
 
@@ -450,7 +462,7 @@ namespace Typography.OpenFont
         public static class TypefaceExtensions
         {
 
-
+            public static ushort GetWhitespaceWidth(this Typeface typeface) => typeface._whitespaceWidth;
 
             public static bool RecommendToUseTypoMetricsForLineSpacing(this Typeface typeface)
             {

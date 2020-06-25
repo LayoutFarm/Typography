@@ -7,7 +7,7 @@ namespace PixelFarm.Drawing
         public readonly int start;
         public readonly int len;
 
-        char[] _rawString;
+        readonly char[] _rawString;
 
         public TextBufferSpan(char[] rawCharBuffer)
         {

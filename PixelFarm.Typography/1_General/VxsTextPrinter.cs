@@ -216,11 +216,9 @@ namespace PixelFarm.Drawing
         /// target canvas
         /// </summary>
         Painter _painter;
-
-        Typeface _currentTypeface;
         GlyphMeshStore _glyphMeshStore;
         float _currentFontSizePxScale;
-
+        Typeface _currentTypeface;
         GlyphBitmapStore _glyphBitmapStore;
 
         public VxsTextPrinter(Painter painter, OpenFontTextService textService)
@@ -252,8 +250,17 @@ namespace PixelFarm.Drawing
         public void ChangeFont(RequestFont font)
         {
             //1.  resolve actual font file             
-            this.Typeface = _textServices.ResolveTypeface(font); //resolve for 'actual' font 
-            this.FontSizeInPoints = font.SizeInPoints;
+            ResolvedFont resolvedFont = _textServices.ResolveFont(font);
+            if (resolvedFont != null)
+            {
+                this.Typeface = resolvedFont.Typeface;
+                this.FontSizeInPoints = resolvedFont.SizeInPoints;
+            }
+            else
+            {
+                throw new NotSupportedException();
+            }
+
         }
         public void ChangeFillColor(Color fontColor)
         {
@@ -290,17 +297,16 @@ namespace PixelFarm.Drawing
             }
         }
 
-
         Typography.OpenFont.Tables.COLR _colrTable;
         Typography.OpenFont.Tables.CPAL _cpalTable;
         bool _hasColorInfo;
+
         public override Typeface Typeface
         {
             get => _currentTypeface;
 
             set
             {
-
                 if (_currentTypeface == value) return;
                 // 
                 _currentTypeface = value;
@@ -914,7 +920,7 @@ namespace PixelFarm.Drawing
 
                     FormattedGlyphPlanSeq formattedGlyphPlanSeq = _pool.GetFreeFmtGlyphPlanSeqs();
                     formattedGlyphPlanSeq.seq = seq;
-                    formattedGlyphPlanSeq.Typeface = curTypeface; 
+                    formattedGlyphPlanSeq.Typeface = curTypeface;
 
                     _tmpGlyphPlanSeqs.Add(formattedGlyphPlanSeq);
 
@@ -993,7 +999,7 @@ namespace PixelFarm.Drawing
         public GlyphPlanSequence seq;
 
         public Typeface Typeface;
-        
+
         public bool IsEmpty() => Typeface == null;
         public void Reset()
         {

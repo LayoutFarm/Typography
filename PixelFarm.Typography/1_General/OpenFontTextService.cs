@@ -12,13 +12,56 @@ using Typography.TextBreak;
 
 namespace PixelFarm.Drawing
 {
+    public class ResolvedFont
+    {
+        public Typeface Typeface { get; }
+        public float SizeInPoints { get; }
+        public FontStyle FontStyle { get; }
+        public int FontKey { get; }
+        public float ScaleToPixel { get; }
+
+        public float WhitespaceWidthF { get; }
+        public int WhitespaceWidth { get; }
+
+        public float AscentInPixels { get; }
+        public float DescentInPixels { get; }
+        public int LineSpacingInPixels { get; }
+        public float LineGapInPx { get; }
+
+        public ResolvedFont(Typeface typeface, float sizeInPoints, FontStyle fontStyle, int fontKey)
+        {
+            Typeface = typeface;
+            SizeInPoints = sizeInPoints;
+            FontStyle = fontStyle;
+            FontKey = fontKey;
+
+            if (typeface != null)
+            {
+
+                ScaleToPixel = typeface.CalculateScaleToPixelFromPointSize(sizeInPoints);//pxscale
+                WhitespaceWidthF = typeface.GetWhitespaceWidth() * ScaleToPixel;
+                WhitespaceWidth = (int)Math.Round(WhitespaceWidthF);
+
+                LineSpacingInPixels = (int)(Math.Round(typeface.CalculateRecommendLineSpacing() * ScaleToPixel));
+                AscentInPixels = typeface.Ascender * ScaleToPixel;
+                DescentInPixels = typeface.Descender * ScaleToPixel;
+                LineGapInPx = typeface.LineGap * ScaleToPixel;
+            }
+        }
+
+        public string Name => (Typeface is Typeface typeface) ? typeface.Name : "";
+        internal static ResolvedFont s_empty = new ResolvedFont(null, 0, FontStyle.Regular, 0);
+
+    }
+
+
     public class OpenFontTextService : ITextService
     {
         /// <summary>
         /// instance of Typography lib's text service
         /// </summary>
         readonly TextServices _txtServices;
-        readonly Dictionary<int, Typeface> _resolvedTypefaceCache = new Dictionary<int, Typeface>(); //similar to TypefaceStore
+        readonly Dictionary<int, ResolvedFont> _resolvedTypefaceCache = new Dictionary<int, ResolvedFont>(); //similar to TypefaceStore
 
         //
         public static ScriptLang DefaultScriptLang { get; set; }
@@ -165,7 +208,7 @@ namespace PixelFarm.Drawing
             //from font
             //resolve for typeface
             //  
-            Typeface typeface = ResolveTypeface(font);
+            Typeface typeface = ResolveFont(font).Typeface;
             _txtServices.SetCurrentFont(typeface, font.SizeInPoints);
 
             float scale = typeface.CalculateScaleToPixelFromPointSize(font.SizeInPoints);
@@ -244,73 +287,136 @@ namespace PixelFarm.Drawing
             _reusableTextBuffer.SetRawCharBuffer(null);
         }
 
-        public float CalculateScaleToPixelsFromPoint(RequestFont font)
-        {
-            return ResolveTypeface(font).CalculateScaleToPixelFromPointSize(font.SizeInPoints);
-        }
+        public float CalculateScaleToPixelsFromPoint(RequestFont font) => (ResolveFont(font) is ResolvedFont resolvedFont) ? resolvedFont.ScaleToPixel : 0;
 
-        public Typeface ResolveTypeface(RequestFont font)
+        public ResolvedFont ResolveFont(RequestFont font)
         {
-            //from user's request font
-            //resolve to actual Typeface
-            //get data from... 
             //cache level-1 (attached inside the request font)
-            Typeface typeface = PixelFarm.Drawing.Internal.RequestFontCacheAccess.GetActualFont<Typeface>(font);
-            if (typeface != null) return typeface;
-            //
+            ResolvedFont resolvedFont = PixelFarm.Drawing.Internal.RequestFontCacheAccess.GetResolvedFont1<ResolvedFont>(font);
+            if (resolvedFont != null) return resolvedFont;
+
             //cache level-2 (stored in this openfont service)
-            if (!_resolvedTypefaceCache.TryGetValue(font.FontKey, out typeface))
+            if (_resolvedTypefaceCache.TryGetValue(font.FontKey, out resolvedFont))
             {
-                //not found ask the typeface store to load that font
-                //....
-                typeface = _txtServices.GetTypeface(font.Name, PixelFarm.Drawing.FontStyleExtensions.ConvToInstalledFontStyle(font.Style));
+                if (resolvedFont.Typeface == null)
+                {
+                    //this is 'not found' resovled font
+                    //so don't return it
+                    return null;
+                }
+                //----
+                //cache to level-1
+                PixelFarm.Drawing.Internal.RequestFontCacheAccess.SetResolvedFont1(font, resolvedFont);
+                return resolvedFont;
+            }
+            //-----
+            //when not found
+            //find it
+            RequestFont.OtherChoice otherChoice = null;
+            Typeface typeface;
+            if ((typeface = _txtServices.GetTypeface(font.Name, PixelFarm.Drawing.FontStyleExtensions.ConvToInstalledFontStyle(font.Style))) == null)
+            {
+                //not found!
+                //select other font?
+                int otherChoiceCount;
+                if ((otherChoiceCount = font.OtherChoicesCount) > 0)
+                {
+                    for (int i = 0; i < otherChoiceCount; ++i)
+                    {
+                        otherChoice = font.GetOtherChoice(i);
+                        if ((typeface = _txtServices.GetTypeface(otherChoice.Name, PixelFarm.Drawing.FontStyleExtensions.ConvToInstalledFontStyle(otherChoice.Style))) != null)
+                        {
+                            break;
+                        }
+                    }
+                }
+                //still not found
                 if (typeface == null)
                 {
-                    throw new NotSupportedException(font.Name);
+                    //register this font key => not found
+                    _resolvedTypefaceCache.Add(font.FontKey, PixelFarm.Drawing.ResolvedFont.s_empty);
+                    return null;
                 }
-                //
-                //cache here (level-1)
-                _resolvedTypefaceCache.Add(font.FontKey, typeface);
             }
-            //and cache into level-0
 
-            float pxSize = Typeface.ConvPointsToPixels(font.SizeInPoints);
-            float pxscale = typeface.CalculateScaleToPixelFromPointSize(font.SizeInPoints);
+            //-----------
+            //Here, we found some typeface for the request,
+            //it may come from primary or other choice
 
-            float recommedLineSpacingInPx = typeface.CalculateRecommendLineSpacing() * pxscale;
-            float descentInPx = typeface.Descender * pxscale;
-            float ascentInPx = typeface.Ascender * pxscale;
-            float lineGapInPx = typeface.LineGap * pxscale;
 
-            PixelFarm.Drawing.Internal.RequestFontCacheAccess.SetActualFont(font, typeface);
-            PixelFarm.Drawing.Internal.RequestFontCacheAccess.SetGeneralFontMetricInfo(font,
-                pxSize,
-                ascentInPx,
-                descentInPx,
-                lineGapInPx,
-                recommedLineSpacingInPx);
+            if (otherChoice != null)
+            {
+                //this come from other choice
+                resolvedFont = new ResolvedFont(typeface, otherChoice.SizeInPoints, otherChoice.Style, otherChoice.FontKey);
+            }
+            else
+            {
+                resolvedFont = new ResolvedFont(typeface, font.SizeInPoints, font.Style, font.FontKey);
+            }
+            //cache to level2
+            _resolvedTypefaceCache.Add(resolvedFont.FontKey, resolvedFont);
+            //cache to level 1
+            PixelFarm.Drawing.Internal.RequestFontCacheAccess.SetResolvedFont1(font, resolvedFont);
 
-            float advW = typeface.GetAdvanceWidthFromGlyphIndex(typeface.GetGlyphIndex(' ')) * pxscale;
-            PixelFarm.Drawing.Internal.RequestFontCacheAccess.SetWhitespaceWidth(font, (int)advW); //rounding?
-            return typeface;
+            return resolvedFont;
+
         }
+        //public Typeface ResolveTypeface(RequestFont font)
+        //{
+        //    //from user's request font
+        //    //resolve to actual Typeface
+        //    //get data from... 
+        //    //cache level-1 (attached inside the request font)
+        //    Typeface typeface = PixelFarm.Drawing.Internal.RequestFontCacheAccess.GetActualFont<Typeface>(font);
+        //    if (typeface != null) return typeface;
+        //    //
+        //    //cache level-2 (stored in this openfont service)
+        //    if (!_resolvedTypefaceCache.TryGetValue(font.FontKey, out typeface))
+        //    {
+        //        //not found ask the typeface store to load that font
+        //        //....
+        //        typeface = _txtServices.GetTypeface(font.Name, PixelFarm.Drawing.FontStyleExtensions.ConvToInstalledFontStyle(font.Style));
+        //        if (typeface == null)
+        //        {
+        //            throw new NotSupportedException(font.Name);
+        //        }
+        //        //
+        //        //cache here (level-1)
+        //        _resolvedTypefaceCache.Add(font.FontKey, typeface);
+        //    }
+        //    //and cache into level-0
+
+        //    float pxSize = Typeface.ConvPointsToPixels(font.SizeInPoints);
+        //    float pxscale = typeface.CalculateScaleToPixelFromPointSize(font.SizeInPoints);
+
+        //    float recommedLineSpacingInPx = typeface.CalculateRecommendLineSpacing() * pxscale;
+        //    float descentInPx = typeface.Descender * pxscale;
+        //    float ascentInPx = typeface.Ascender * pxscale;
+        //    float lineGapInPx = typeface.LineGap * pxscale;
+
+        //    PixelFarm.Drawing.Internal.RequestFontCacheAccess.SetActualFont(font, typeface);
+        //    PixelFarm.Drawing.Internal.RequestFontCacheAccess.SetGeneralFontMetricInfo(font,
+        //        pxSize,
+        //        ascentInPx,
+        //        descentInPx,
+        //        lineGapInPx,
+        //        recommedLineSpacingInPx);
+
+        //    float advW = typeface.GetWhitespaceWidth() * pxscale;
+        //    PixelFarm.Drawing.Internal.RequestFontCacheAccess.SetWhitespaceWidth(font, (int)advW); //rounding?
+        //    return typeface;
+        //}
 
 
         public float MeasureWhitespace(RequestFont f)
         {
-
-            if (!PixelFarm.Drawing.Internal.RequestFontCacheAccess.GetWhitespaceWidth(f, out int cacheWidth))
+            ResolvedFont resolvedFont = this.ResolveFont(f);
+            if (resolvedFont != null)
             {
-                //not have a cache data, new measure here
-                Typeface typeface = ResolveTypeface(f);
-                cacheWidth = (int)(typeface.GetAdvanceWidthFromGlyphIndex(typeface.GetGlyphIndex(' ')) * typeface.CalculateScaleToPixelFromPointSize(f.SizeInPoints));
-                PixelFarm.Drawing.Internal.RequestFontCacheAccess.SetWhitespaceWidth(f, cacheWidth);
+                return resolvedFont.WhitespaceWidthF;
             }
-            return cacheWidth;
+            return 0;
         }
-
-
-
         public GlyphPlanSequence CreateGlyphPlanSeq(in TextBufferSpan textBufferSpan, Typeface typeface, float sizeInPts)
         {
             _txtServices.SetCurrentFont(typeface, sizeInPts);
@@ -321,28 +427,33 @@ namespace PixelFarm.Drawing
         }
         public GlyphPlanSequence CreateGlyphPlanSeq(in TextBufferSpan textBufferSpan, RequestFont font)
         {
-            return CreateGlyphPlanSeq(textBufferSpan, ResolveTypeface(font), font.SizeInPoints);
+            return CreateGlyphPlanSeq(textBufferSpan, ResolveFont(font).Typeface, font.SizeInPoints);
+        }
+        public GlyphPlanSequence CreateGlyphPlanSeq(in TextBufferSpan textBufferSpan, ResolvedFont font)
+        {
+            return CreateGlyphPlanSeq(textBufferSpan, font.Typeface, font.SizeInPoints);
         }
         public Size MeasureString(in TextBufferSpan textBufferSpan, RequestFont font)
         {
-            Typeface typeface = ResolveTypeface(font);
+            //TODO: review here
+            Typeface typeface = ResolveFont(font).Typeface;
             _txtServices.SetCurrentFont(typeface, font.SizeInPoints);
             _txtServices.MeasureString(textBufferSpan.GetRawCharBuffer(), textBufferSpan.start, textBufferSpan.len, out int w, out int h);
             return new Size(w, h);
         }
         public void MeasureString(in TextBufferSpan textBufferSpan, RequestFont font, int limitWidth, out int charFit, out int charFitWidth)
         {
-            Typeface typeface = ResolveTypeface(font);
+            Typeface typeface = ResolveFont(font).Typeface;
             _txtServices.SetCurrentFont(typeface, font.SizeInPoints);
             _txtServices.MeasureString(textBufferSpan.GetRawCharBuffer(), textBufferSpan.start, textBufferSpan.len, limitWidth, out charFit, out charFitWidth);
 
         }
         float ITextService.MeasureBlankLineHeight(RequestFont font)
         {
-            Typeface typeface = ResolveTypeface(font);
+            ResolvedFont resolvedFont = ResolveFont(font);
+            Typeface typeface = resolvedFont.Typeface;
 
-            return (int)(Math.Round(typeface.CalculateMaxLineClipHeight() *
-                                    typeface.CalculateScaleToPixelFromPointSize(font.SizeInPoints)));
+            return (int)(Math.Round(typeface.CalculateMaxLineClipHeight() * resolvedFont.ScaleToPixel));
         }
         //
         public bool SupportsWordBreak => true;

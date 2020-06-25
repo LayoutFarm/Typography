@@ -348,7 +348,7 @@ namespace Typography.OpenFont
             //gsub and gpos contains actual script_list that are in the typeface
 
             Cmap cmap = ReadTableIfExists(tables, input, new Cmap());
-            
+
             Languages langs = new Languages();
 
             langs.Update(os2Table, metaTable, cmap, gsub, gpos);
@@ -565,6 +565,7 @@ namespace Typography.OpenFont
 
 
             typeface.UpdateLangs(meta);
+            typeface.UpdateCommonUsedValues();
 
             return typeface;
         }
