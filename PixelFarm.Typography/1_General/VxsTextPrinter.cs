@@ -914,8 +914,7 @@ namespace PixelFarm.Drawing
 
                     FormattedGlyphPlanSeq formattedGlyphPlanSeq = _pool.GetFreeFmtGlyphPlanSeqs();
                     formattedGlyphPlanSeq.seq = seq;
-                    formattedGlyphPlanSeq.Typeface = curTypeface;
-                    formattedGlyphPlanSeq.ContainsSurrogatePair = contains_surrogate_pair;
+                    formattedGlyphPlanSeq.Typeface = curTypeface; 
 
                     _tmpGlyphPlanSeqs.Add(formattedGlyphPlanSeq);
 
@@ -994,7 +993,7 @@ namespace PixelFarm.Drawing
         public GlyphPlanSequence seq;
 
         public Typeface Typeface;
-        public bool ContainsSurrogatePair;
+        
         public bool IsEmpty() => Typeface == null;
         public void Reset()
         {

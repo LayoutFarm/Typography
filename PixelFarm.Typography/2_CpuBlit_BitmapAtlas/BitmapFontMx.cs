@@ -170,7 +170,6 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
 #endif
 
             int fontKey = reqFont.FontKey;
-
             if (_createdAtlases.TryGetValue(fontKey, out SimpleBitmapAtlas fontAtlas))
             {
                 outputBitmap = _loadAtlases.GetOrCreateNewOne(fontAtlas);
@@ -185,10 +184,10 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                 return msdfTexture;
             }
 
-
             //--------------------------------
             //check from pre-built cache (if availiable)     
             Typeface resolvedTypeface = _textServices.ResolveTypeface(reqFont);
+
             string fontTextureFile = reqFont.Name + "_" + fontKey;
             string resolveFontFile = fontTextureFile + ".info";
             string fontTextureInfoFile = resolveFontFile;
@@ -284,26 +283,13 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                 //    totalGlyphsImg.Width, totalGlyphsImg.Height,
                 //    "total_" + reqFont.Name + "_" + reqFont.SizeInPoints + ".png");
                 ////save image to cache                 
-                totalGlyphsImg.SaveImage(fontTextureImgFilename);
+                //totalGlyphsImg.SaveImage(fontTextureImgFilename);
 #endif
 
 
                 //6. cache this in the memory,
-                _createdAtlases.Add(fontKey, fontAtlas);
+                _createdAtlases.Add(fontKey, fontAtlas); 
 
-                //
-                ////calculate some commonly used values
-                //fontAtlas.SetTextureScaleInfo(
-                //    resolvedTypeface.CalculateScaleToPixelFromPointSize(fontAtlas.OriginalFontSizePts),
-                //    resolvedTypeface.CalculateScaleToPixelFromPointSize(reqFont.SizeInPoints));
-                ////TODO: review here, use scaled or unscaled values
-                //fontAtlas.SetCommonFontMetricValues(
-                //    resolvedTypeface.Ascender,
-                //    resolvedTypeface.Descender,
-                //    resolvedTypeface.LineGap,
-                //    resolvedTypeface.CalculateRecommendLineSpacing());
-
-                ///
 #if DEBUG
 
                 _dbugStopWatch.Stop();
