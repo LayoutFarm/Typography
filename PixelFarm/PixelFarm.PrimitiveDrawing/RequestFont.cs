@@ -183,11 +183,9 @@ namespace PixelFarm.Drawing
                 reqFont._whitespace_width = reqFont._generalLineSpacingInPx = 0;
             }
             public static void SetActualFont(RequestFont reqFont,
-                int platform_id,
                 object platformFont)
             {
-                //replace 
-                reqFont._platform_id = platform_id;
+
                 reqFont._latestResolved = platformFont;
             }
             public static void SetGeneralFontMetricInfo(
@@ -203,32 +201,28 @@ namespace PixelFarm.Drawing
                 reqFont._generalLineSpacingInPx = (int)Math.Round(lineHeight);
             }
 
-            public static T GetActualFont<T>(RequestFont reqFont, int platform_id)
+            public static T GetActualFont<T>(RequestFont reqFont)
                where T : class
             {
-                if (reqFont._platform_id == platform_id &&
-                    reqFont._latestResolved != null)
+                if (reqFont._latestResolved != null)
                 {
                     return reqFont._latestResolved as T;
                 }
                 return null;
             }
-            public static bool GetWhitespaceWidth(RequestFont reqFont, int platform_id, out int width)
+            public static bool GetWhitespaceWidth(RequestFont reqFont, out int width)
             {
-                if (reqFont._platform_id == platform_id &&
-                    reqFont._latestResolved != null)
+                if (reqFont._latestResolved != null)
                 {
                     width = reqFont._whitespace_width;
                     return true;
                 }
                 width = 0;
-                return false; 
+                return false;
             }
             public static void SetWhitespaceWidth(RequestFont reqFont,
-                int platform_id,
                 int whitespaceW)
             {
-                reqFont._platform_id = platform_id;
                 reqFont._whitespace_width = whitespaceW;
             }
             public static int GetLinespaceHeight(RequestFont reqFont, int platform_id)
