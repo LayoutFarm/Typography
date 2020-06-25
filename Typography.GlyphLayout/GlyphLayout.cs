@@ -491,17 +491,15 @@ namespace Typography.TextLayout
                     //so which is that cut-point value
                     //I use assumption that if the correction value is too small 
                     //after scale less than 1 px it should not be significant,
+
                     //but inside GlyphLayout, we use unscale version,
-                    //so assume if font is 8pts, if correction give value less than 0.33px (subpixel width)=> NOT sig.
+                    //so assume if font is 8pts, if correction give value less than 0.33px (subpixel width)=> NOT sig.                     
 
-
-                    float scale_to_px = _typeface.CalculateScaleToPixelFromPointSize(8);
                     //none_sig_correction > scale_to_px * original_correction
                     //0.33f > scale_to_px(8pt) * original_correction
                     //(0.33f/ scale_to_px(8pt)) > original_correction
 
-                    float none_sig_correction = 0.33f / _typeface.CalculateScaleToPixelFromPointSize(8);
-
+                    float none_sig_correction = 0.33f / _typeface.CalculateScaleToPixelFromPointSize(8);//assume at 8 pt size font
 
                     short prevGlyph_italic_correction = 0;
 
@@ -535,7 +533,7 @@ namespace Typography.TextLayout
             //at this point, all positions are layouted at its original scale ***
             //then we will scale it to target scale later 
             //----------------------------------------------   
-        } 
+        }
 
         /// <summary>
         /// generate map from user codepoint buffer to output glyph index, from latest layout result
