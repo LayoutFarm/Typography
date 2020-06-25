@@ -180,7 +180,7 @@ namespace DrawingGL.Text
 
                     //-------
                     //do tess   
-                    float[] flattenPoints = _curveFlattener.Flatten(writablePath._points, int[]  out endContours);
+                    float[] flattenPoints = _curveFlattener.Flatten(writablePath._points, out int[] endContours);
 
                     float[] tessData = _tessTool.TessAsTriVertexArray(flattenPoints, endContours, out int vertexCount);
                     processGlyph = new ProcessedGlyph(tessData, (ushort)vertexCount);

@@ -1,5 +1,5 @@
 ﻿//MIT, 2018-present, WinterDev
-//https://www.microsoft.com/typography/otspec/math.htm
+//https://docs.microsoft.com/en-us/typography/opentype/spec/math
 
 
 using System.IO;
@@ -527,10 +527,7 @@ namespace Typography.OpenFont.MathGlyphs
             BottomRight = bottomRight;
             BottomLeft = bottomLeft;
         }
-
     }
-
-
 }
 
 namespace Typography.OpenFont.Tables
@@ -1292,15 +1289,7 @@ namespace Typography.OpenFont.Tables
                     );
             }
         }
-
-
     }
-
-
-
-
-
-
 
     class MathItalicsCorrectonInfoTable
     {
@@ -1319,7 +1308,6 @@ namespace Typography.OpenFont.Tables
 
         public MathValueRecord[] ItalicCorrections;
         public CoverageTable CoverageTable;
-
 
     }
     class MathTopAccentAttachmentTable

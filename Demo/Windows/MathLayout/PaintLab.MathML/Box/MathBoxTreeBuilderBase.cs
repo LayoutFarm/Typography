@@ -34,10 +34,10 @@ namespace MathLayout
                 {
                     _scriptScale = _mathConstants.ScriptPercentScaleDown / 100f;
                     _scriptScriptScale = _mathConstants.ScriptScriptPercentScaleDown / 100f;
-                } 
-                FontChanged(); 
+                }
+                FontChanged();
             }
-        } 
+        }
 
         protected abstract GlyphBox NewGlyphBox();
         protected abstract CustomNotationVsxBox NewCustomVxsBox();
@@ -510,7 +510,7 @@ namespace MathLayout
 
         void AssignGlyphVxs(GlyphBox glyphBox)
         {
-          
+
             char ch = glyphBox.Character;
             if (ch == 0 || glyphBox.HasVxs || MathMLOperatorTable.IsInvicibleCharacter(ch))
             {
@@ -534,7 +534,7 @@ namespace MathLayout
         Dictionary<ushort, Bounds> _glyphBounding = new Dictionary<ushort, Bounds>();
         void AssignGlyphVxsByGlyphIndex(GlyphBox glyphBox, ushort glyphIndex)
         {
-           
+
             float font_size_in_Point = GetCurrentLevelFontSize();
             float px_scale = GetPixelScale();
             if (glyphBox.HasVxs)
@@ -901,10 +901,7 @@ namespace MathLayout
                         AssignGlyphVxsByGlyphIndex(glyphBox, glyphIndex);
                         if (i + 1 >= codeEnd)
                         {
-                            if ((cur_codepoint >= 0x1d434 && cur_codepoint <= 0x1d49b)//MATHEMATICAL ITALIC & MATHEMATICAL BOLD ITALIC 
-                             || (cur_codepoint >= 0x1d608 && cur_codepoint <= 0x1d66f)//MATHEMATICAL SANS-SERIF ITALIC & MATHEMATICAL SANS-SERIF BOLD ITALIC
-                             || (cur_codepoint >= 0x1d6e2 && cur_codepoint <= 0x1d755)//MATHEMATICAL ITALIC PI SYMBOL & MATHEMATICAL BOLD ITALIC PI SYMBOL
-                             || (cur_codepoint >= 0x1d790 && cur_codepoint <= 0x1d7c9))//MATHEMATICAL SANS-SERIF ITALIC PI SYMBOL & MATHEMATICAL SANS-SERIF BOLD ITALIC PI SYMBOL
+                            if (MathGlyphUnicodeInfo.IsItalic(cur_codepoint))
                             {
                                 Bounds bounds = _glyphBounding[glyphIndex];
                                 glyphBox.AdvanceWidthScale = (int)((bounds.XMax - bounds.XMin) * GetPixelScale());
@@ -914,10 +911,7 @@ namespace MathLayout
                                 glyphBox.AdvanceWidthScale = (int)glyphBox.GetBoundingRect().Width;
                             }
                         }
-                        else if ((cur_codepoint >= 0x1d434 && cur_codepoint <= 0x1d49b)//MATHEMATICAL ITALIC & MATHEMATICAL BOLD ITALIC 
-                                 || (cur_codepoint >= 0x1d608 && cur_codepoint <= 0x1d66f)//MATHEMATICAL SANS-SERIF ITALIC & MATHEMATICAL SANS-SERIF BOLD ITALIC
-                                 || (cur_codepoint >= 0x1d6e2 && cur_codepoint <= 0x1d755)//MATHEMATICAL ITALIC PI SYMBOL & MATHEMATICAL BOLD ITALIC PI SYMBOL
-                                 || (cur_codepoint >= 0x1d790 && cur_codepoint <= 0x1d7c9))//MATHEMATICAL SANS-SERIF ITALIC PI SYMBOL & MATHEMATICAL SANS-SERIF BOLD ITALIC PI SYMBOL
+                        else if (MathGlyphUnicodeInfo.IsItalic(cur_codepoint))
                         {
                             Bounds bounds = _glyphBounding[glyphIndex];
                             glyphBox.AdvanceWidthScale += (int)((bounds.XMin) * GetPixelScale());
@@ -1680,5 +1674,22 @@ namespace MathLayout
 
             return carryBox;
         }
+    }
+
+
+    static class MathGlyphUnicodeInfo
+    {
+        //NOTE: additional info
+        //not found in openfont spec
+        //from @brezza92's MathLayout project
+
+        public static bool IsItalic(int codepoint)
+        {
+            return ((codepoint >= 0x1d434 && codepoint <= 0x1d49b) || //MATHEMATICAL ITALIC & MATHEMATICAL BOLD ITALIC 
+                    (codepoint >= 0x1d608 && codepoint <= 0x1d66f) || //MATHEMATICAL SANS-SERIF ITALIC & MATHEMATICAL SANS-SERIF BOLD ITALIC
+                    (codepoint >= 0x1d6e2 && codepoint <= 0x1d755) ||//MATHEMATICAL ITALIC PI SYMBOL & MATHEMATICAL BOLD ITALIC PI SYMBOL
+                    (codepoint >= 0x1d790 && codepoint <= 0x1d7c9));//MATHEMATICAL SANS-SERIF ITALIC PI SYMBOL & MATHEMATICAL SANS-SERIF BOLD ITALIC PI SYMBOL
+        }
+
     }
 }
