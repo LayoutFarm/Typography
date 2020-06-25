@@ -544,7 +544,7 @@ namespace LayoutFarm.MathLayout
         public bool Stretched { get; set; }
         public ushort GlyphIndex { get; set; }
         public bool IsInvisible { get; set; }
-
+        public bool IsItalic { get; set; }
 
         public abstract void ScaleToFitWidth(float width);
         public abstract void ScalteToFitHeight(float height);

@@ -22,8 +22,6 @@ namespace Typography.TextServices
         Dictionary<TextShapingContextKey, GlyphPlanCacheForTypefaceAndScriptLang> _registerShapingContexts = new Dictionary<TextShapingContextKey, GlyphPlanCacheForTypefaceAndScriptLang>();
 
         readonly GlyphLayout _glyphLayout;
-
-
         float _fontSizeInPts;
 
         ScriptLang _defaultScriptLang;
@@ -49,8 +47,20 @@ namespace Typography.TextServices
             set => _scLang = _glyphLayout.ScriptLang = value;
         }
 
+
+        Typeface _latestTypeface;
+        float _latestFontSizeInPts;
         public void SetCurrentFont(Typeface typeface, float fontSizeInPts)
         {
+            if (_latestTypeface == typeface && fontSizeInPts == _latestFontSizeInPts)
+            {
+                //no change
+                return;
+            }
+
+            _latestTypeface = typeface;
+            _latestFontSizeInPts = fontSizeInPts;
+
             //check if we have the cache-key or create a new one.
             var key = new TextShapingContextKey(typeface, _glyphLayout.ScriptLang);
             if (!_registerShapingContexts.TryGetValue(key, out _currentGlyphPlanSeqCache))

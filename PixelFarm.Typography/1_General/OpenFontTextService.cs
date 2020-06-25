@@ -12,24 +12,19 @@ using Typography.TextBreak;
 
 namespace PixelFarm.Drawing
 {
-
-
-
-
     public class OpenFontTextService : ITextService
     {
         /// <summary>
         /// instance of Typography lib's text service
         /// </summary>
-        TextServices _txtServices;
-        Dictionary<int, Typeface> _resolvedTypefaceCache = new Dictionary<int, Typeface>(); //similar to TypefaceStore
-        readonly int _system_id;
+        readonly TextServices _txtServices;
+        readonly Dictionary<int, Typeface> _resolvedTypefaceCache = new Dictionary<int, Typeface>(); //similar to TypefaceStore
+
         //
         public static ScriptLang DefaultScriptLang { get; set; }
 
         public OpenFontTextService()
         {
-            _system_id = PixelFarm.Drawing.Internal.RequestFontCacheAccess.GetNewCacheSystemId();
 
             //set up typography text service
             _txtServices = new TextServices();
@@ -253,16 +248,17 @@ namespace PixelFarm.Drawing
         {
             return ResolveTypeface(font).CalculateScaleToPixelFromPointSize(font.SizeInPoints);
         }
+
         public Typeface ResolveTypeface(RequestFont font)
         {
             //from user's request font
             //resolve to actual Typeface
             //get data from... 
             //cache level-1 (attached inside the request font)
-            Typeface typeface = PixelFarm.Drawing.Internal.RequestFontCacheAccess.GetActualFont<Typeface>(font, _system_id);
+            Typeface typeface = PixelFarm.Drawing.Internal.RequestFontCacheAccess.GetActualFont<Typeface>(font);
             if (typeface != null) return typeface;
             //
-            //cache level-2 (stored in this Ifonts)
+            //cache level-2 (stored in this openfont service)
             if (!_resolvedTypefaceCache.TryGetValue(font.FontKey, out typeface))
             {
                 //not found ask the typeface store to load that font
@@ -286,7 +282,7 @@ namespace PixelFarm.Drawing
             float ascentInPx = typeface.Ascender * pxscale;
             float lineGapInPx = typeface.LineGap * pxscale;
 
-            PixelFarm.Drawing.Internal.RequestFontCacheAccess.SetActualFont(font, _system_id, typeface);
+            PixelFarm.Drawing.Internal.RequestFontCacheAccess.SetActualFont(font, typeface);
             PixelFarm.Drawing.Internal.RequestFontCacheAccess.SetGeneralFontMetricInfo(font,
                 pxSize,
                 ascentInPx,
@@ -295,7 +291,7 @@ namespace PixelFarm.Drawing
                 recommedLineSpacingInPx);
 
             float advW = typeface.GetAdvanceWidthFromGlyphIndex(typeface.GetGlyphIndex(' ')) * pxscale;
-            PixelFarm.Drawing.Internal.RequestFontCacheAccess.SetWhitespaceWidth(font, _system_id, (int)advW); //rounding?
+            PixelFarm.Drawing.Internal.RequestFontCacheAccess.SetWhitespaceWidth(font, (int)advW); //rounding?
             return typeface;
         }
 
@@ -303,14 +299,12 @@ namespace PixelFarm.Drawing
         public float MeasureWhitespace(RequestFont f)
         {
 
-            if (!PixelFarm.Drawing.Internal.RequestFontCacheAccess.GetWhitespaceWidth(f,
-                _system_id,
-                out int cacheWidth))
+            if (!PixelFarm.Drawing.Internal.RequestFontCacheAccess.GetWhitespaceWidth(f, out int cacheWidth))
             {
                 //not have a cache data, new measure here
                 Typeface typeface = ResolveTypeface(f);
                 cacheWidth = (int)(typeface.GetAdvanceWidthFromGlyphIndex(typeface.GetGlyphIndex(' ')) * typeface.CalculateScaleToPixelFromPointSize(f.SizeInPoints));
-                PixelFarm.Drawing.Internal.RequestFontCacheAccess.SetWhitespaceWidth(f, _system_id, cacheWidth);
+                PixelFarm.Drawing.Internal.RequestFontCacheAccess.SetWhitespaceWidth(f, cacheWidth);
             }
             return cacheWidth;
         }
@@ -340,8 +334,6 @@ namespace PixelFarm.Drawing
         {
             Typeface typeface = ResolveTypeface(font);
             _txtServices.SetCurrentFont(typeface, font.SizeInPoints);
-
-            charFit = 0;
             _txtServices.MeasureString(textBufferSpan.GetRawCharBuffer(), textBufferSpan.start, textBufferSpan.len, limitWidth, out charFit, out charFitWidth);
 
         }
@@ -357,18 +349,12 @@ namespace PixelFarm.Drawing
 
         public void BreakToLineSegments(in TextBufferSpan textBufferSpan, WordVisitor wordVisitor)
         {
-
-            //a text buffer span is separated into multiple line segment list 
-            char[] str = textBufferSpan.GetRawCharBuffer();
-#if DEBUG
-            if (str.Length > 10)
-            {
-
-            }
-            int cur_startAt = textBufferSpan.start;
-#endif
-
-            _txtServices.BreakToLineSegments(str, textBufferSpan.start, textBufferSpan.len, wordVisitor);
+            //a text buffer span is separated into multiple line segment list  
+            _txtServices.BreakToLineSegments(
+                textBufferSpan.GetRawCharBuffer(),
+                textBufferSpan.start,
+                textBufferSpan.len,
+                wordVisitor);
         }
         //-----------------------------------
         static OpenFontTextService()

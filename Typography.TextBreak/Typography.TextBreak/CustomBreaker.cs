@@ -104,10 +104,7 @@ namespace Typography.TextBreak
                 return;
             }
             _endAt = startAt + len;
-            _visitor.LoadText(charBuff, startAt, len);
-            //---------------------------------------- 
-
-
+            _visitor.LoadText(charBuff, startAt, len); 
             BreakingEngine currentEngine = _breakingEngine = (UseUnicodeRangeBreaker) ? _engBreakingEngine : SelectEngine(charBuff[startAt]);
             //----------------------------------------
             //select breaking engine

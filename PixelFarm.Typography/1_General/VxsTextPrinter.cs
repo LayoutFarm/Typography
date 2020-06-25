@@ -158,7 +158,7 @@ namespace PixelFarm.Drawing
     public class TextPrinterLineSegmentList<T> : ILineSegmentList
         where T : ILineSegment
     {
-        List<T> _segments = new List<T>();
+        readonly List<T> _segments = new List<T>();
         public TextPrinterLineSegmentList()
         {
         }

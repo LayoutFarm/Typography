@@ -240,7 +240,8 @@ namespace Typography.TextLayout
         GlyphIndexList _inputGlyphs = new GlyphIndexList();//reusable input glyph
         GlyphPosStream _glyphPositions = new GlyphPosStream();
 
-        static ScriptLang s_latin = new ScriptLang("latn");
+        readonly static ScriptLang s_latin = new ScriptLang("latn");
+        readonly static ScriptLang s_math = new ScriptLang("math");
 
         public GlyphLayout()
         {
@@ -265,13 +266,17 @@ namespace Typography.TextLayout
                 {
                     _needPlanUpdate = true;
                 }
-
                 _scriptLang = value;
             }
         }
 
         public bool EnableLigature { get; set; }
         public bool EnableComposition { get; set; }
+
+
+        //for some built-in mathlayout
+        public bool EnableBuiltinMathItalicCorrection { get; set; } = true;
+
 
         public Typeface Typeface
         {
@@ -325,15 +330,20 @@ namespace Typography.TextLayout
             _reusableUserCodePoints.Clear();
 #if DEBUG
             _dbugReusableCodePointFromUserCharList.Clear();
+            if (str.Length > 2)
+            {
+
+            }
+
 #endif
             for (int i = 0; i < len; ++i)
             {
                 char ch = str[startAt + i];
                 int codepoint = ch;
-                if (ch >= 0xd800 && ch <= 0xdbff && i + 1 < len)
+                if (ch >= 0xd800 && ch <= 0xdbff && i + 1 < len)//high surrogate
                 {
                     char nextCh = str[startAt + i + 1];
-                    if (nextCh >= 0xdc00 && nextCh <= 0xdfff)
+                    if (nextCh >= 0xdc00 && nextCh <= 0xdfff) //low-surrogate 
                     {
                         //please note: 
                         //num of codepoint may be less than  original user input char 
@@ -452,12 +462,78 @@ namespace Typography.TextLayout
             {
                 _gpos.DoGlyphPosition(_glyphPositions);
             }
+
+
+            //----------------------------------------------  
+            //[E] 
+            //some math correction
+            if (_scriptLang.scriptTag == s_math.scriptTag) //***
+            {
+                if (EnableBuiltinMathItalicCorrection)
+                {
+                    int pos_count = _glyphPositions.Count;
+
+                    //from https://docs.microsoft.com/en-us/typography/opentype/spec/math
+
+                    //Italics correction can be used in the following situations:
+                    //...
+                    //...
+                    //When a run of slanted characters is followed by a straight character (such as an operator or a delimiter), the italics correction of the last glyph is added to its advance width.
+                    //...
+                    //...
+
+                    //@prepare: note, by observation.
+                    //in math font (eg. like latin modern) glyph some glyph look upright (regular glyph)
+                    //but it has italic correction value
+                    //but value is very small when compare to actual italic glyph
+                    //so in this case we assume it is not italic
+
+                    //so which is that cut-point value
+                    //I use assumption that if the correction value is too small 
+                    //after scale less than 1 px it should not be significant,
+
+                    //but inside GlyphLayout, we use unscale version,
+                    //so assume if font is 8pts, if correction give value less than 0.33px (subpixel width)=> NOT sig.                     
+
+                    //none_sig_correction > scale_to_px * original_correction
+                    //0.33f > scale_to_px(8pt) * original_correction
+                    //(0.33f/ scale_to_px(8pt)) > original_correction
+
+                    float none_sig_correction = 0.33f / _typeface.CalculateScaleToPixelFromPointSize(8);//assume at 8 pt size font
+
+                    short prevGlyph_italic_correction = 0;
+
+                    for (int i = 0; i < pos_count; ++i)
+                    {
+                        Glyph glyph = _typeface.GetGlyph(_glyphPositions[i].glyphIndex);
+
+                        if (glyph?.MathGlyphInfo?.ItalicCorrection is OpenFont.MathGlyphs.MathValueRecord value &&
+                            value.Value > none_sig_correction)
+                        {
+                            //sig correction 
+                            prevGlyph_italic_correction = value.Value;
+                        }
+                        else
+                        {
+                            //no correct (or from nonsignificant correct above)
+                            if (prevGlyph_italic_correction != 0)
+                            {
+                                _glyphPositions.AppendGlyphAdvance(i - 1, prevGlyph_italic_correction, 0);
+                            }
+
+                            prevGlyph_italic_correction = 0;
+                        }
+                    }
+                }
+                //other correction...
+
+            }
+
             //----------------------------------------------  
             //at this point, all positions are layouted at its original scale ***
             //then we will scale it to target scale later 
             //----------------------------------------------   
         }
-
 
         /// <summary>
         /// generate map from user codepoint buffer to output glyph index, from latest layout result
