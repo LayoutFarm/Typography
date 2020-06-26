@@ -62,7 +62,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             s_default = defaultDetails;
         }
 
-        public static GlyphTextureBuildDetail[] TryGetGlyphTextureBuildDetail(ResolvedFontBase font, bool forAnySize = true, bool forAnyStyle = true)
+        public static GlyphTextureBuildDetail[] TryGetGlyphTextureBuildDetail(ResolvedFont font, bool forAnySize = true, bool forAnyStyle = true)
         {
 
             if (s_registerDetails == null)
