@@ -9,7 +9,7 @@ namespace Typography.OpenFont.Tables
         public const string _N = "VDMX";
         public override string Name => _N;
         //
-        //https://www.microsoft.com/typography/otspec/vdmx.htm
+        //https://docs.microsoft.com/en-us/typography/opentype/spec/vdmx
         //VDMX - Vertical Device Metrics 
         //The VDMX table relates to OpenType™ fonts with TrueType outlines.
         //Under Windows, the usWinAscent and usWinDescent values from the 'OS/2' table
