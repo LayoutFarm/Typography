@@ -167,28 +167,7 @@ namespace PixelFarm.Drawing
 
         //preserve 2 field user cache their actual here
         internal ResolvedFontBase _resolvedFont1;
-        internal object _resolvedFont2;
-
-        //internal object _latestResolved; //result of the actual font
-        //internal int _whitespace_width;
-        //internal int _generalLineSpacingInPx;
-
-
-        ////TODO: review here again
-        //internal float _sizeInPx;
-        //internal float _descentInPx;
-        //internal float _ascentInPx;
-        //internal float _lineGapInPx;
-
-        //public float SizeInPixels => _sizeInPx;
-        //public float DescentInPixels => _descentInPx;
-        //public float AscentInPixels => _ascentInPx;
-        //public float LineGapInPixels => _lineGapInPx;
-
-        ///// <summary>
-        ///// already in pixels
-        ///// </summary>
-        //public int LineSpacingInPixels => _generalLineSpacingInPx;
+        internal object _resolvedFont2; 
 
 #if DEBUG
         public override string ToString()
@@ -244,54 +223,7 @@ namespace PixelFarm.Drawing
                where T : class
             {
                 return reqFont._resolvedFont2 as T;
-            }
-
-
-            //public static void SetGeneralFontMetricInfo(
-            //   RequestFont reqFont,
-            //   float sizeInPx, float ascentInPx,
-            //   float descentInPx, float lineGapInPx,
-            //   float lineHeight)
-            //{
-            //    reqFont._sizeInPx = sizeInPx;
-            //    reqFont._ascentInPx = ascentInPx;
-            //    reqFont._descentInPx = descentInPx;
-            //    reqFont._lineGapInPx = lineGapInPx;
-            //    reqFont._generalLineSpacingInPx = (int)Math.Round(lineHeight);
-            //}
-
-            //public static T GetActualFont<T>(RequestFont reqFont)
-            //   where T : class
-            //{
-            //    return reqFont._latestResolved as T;
-            //}
-            //public static bool GetWhitespaceWidth(RequestFont reqFont, out int cacheWhitespaceWidth)
-            //{
-            //    if (reqFont._latestResolved != null)
-            //    {
-            //        cacheWhitespaceWidth = reqFont._whitespace_width;
-            //        return true;
-            //    }
-            //    cacheWhitespaceWidth = 0;
-            //    return false;
-            //}
-            //public static void SetWhitespaceWidth(RequestFont reqFont, int whitespaceW)
-            //{
-            //    reqFont._whitespace_width = whitespaceW;
-            //}
-            //public static int GetLinespaceHeight(RequestFont reqFont)
-            //{
-            //    if (reqFont._latestResolved != null)
-            //    {
-            //        return reqFont._generalLineSpacingInPx;
-            //    }
-            //    return 0;
-            //}
-            //public static void SetLineSpaceHeight(RequestFont reqFont, int height)
-            //{
-            //    reqFont._generalLineSpacingInPx = height;
-            //}
+            } 
         }
     }
-
 }
