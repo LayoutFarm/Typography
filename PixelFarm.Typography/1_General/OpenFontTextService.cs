@@ -275,6 +275,8 @@ namespace PixelFarm.Drawing
 
         public float CalculateScaleToPixelsFromPoint(RequestFont font) => (ResolveFont(font) is ResolvedFontBase resolvedFont) ? resolvedFont.ScaleToPixel : 0;
 
+        ResolvedFontBase ITextService.ResolveFont(RequestFont f) => this.ResolveFont(f);
+
         public ResolvedFont ResolveFont(RequestFont font)
         {
             //cache level-1 (attached inside the request font)
