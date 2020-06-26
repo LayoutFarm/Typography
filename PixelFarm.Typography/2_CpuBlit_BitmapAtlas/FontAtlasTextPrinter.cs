@@ -9,7 +9,6 @@ using Typography.Contours;
 
 namespace PixelFarm.CpuBlit.BitmapAtlas
 {
-
     public enum AntialiasTechnique
     {
         LcdStencil,
@@ -76,7 +75,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
         public void SetSvgBmpBuilderFunc(SvgBmpBuilderFunc svgBmpBuilderFunc) => _bmpFontMx.SetSvgBmpBuilderFunc(svgBmpBuilderFunc);
 
         public RequestFont CurrentFont => _reqFont;
-        public ResolvedFont CurrentResolvedFont => _font;
+        public ResolvedFontBase CurrentResolvedFont => _font;
 
         public void ChangeFillColor(Color fontColor)
         {

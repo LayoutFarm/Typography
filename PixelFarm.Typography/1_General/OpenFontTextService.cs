@@ -12,32 +12,15 @@ using Typography.TextBreak;
 
 namespace PixelFarm.Drawing
 {
-    public class ResolvedFont
+    public class ResolvedFont : ResolvedFontBase
     {
-        public Typeface Typeface { get; }
-        public float SizeInPoints { get; }
-        public FontStyle FontStyle { get; }
-        public int FontKey { get; }
-        public float ScaleToPixel { get; }
-
-        public float WhitespaceWidthF { get; }
-        public int WhitespaceWidth { get; }
-
-        public float AscentInPixels { get; }
-        public float DescentInPixels { get; }
-        public int LineSpacingInPixels { get; }
-        public float LineGapInPx { get; }
-
         public ResolvedFont(Typeface typeface, float sizeInPoints, FontStyle fontStyle, int fontKey)
+            : base(sizeInPoints, fontStyle, fontKey)
         {
             Typeface = typeface;
-            SizeInPoints = sizeInPoints;
-            FontStyle = fontStyle;
-            FontKey = fontKey;
 
             if (typeface != null)
             {
-
                 ScaleToPixel = typeface.CalculateScaleToPixelFromPointSize(sizeInPoints);//pxscale
                 WhitespaceWidthF = typeface.GetWhitespaceWidth() * ScaleToPixel;
                 WhitespaceWidth = (int)Math.Round(WhitespaceWidthF);
@@ -46,15 +29,18 @@ namespace PixelFarm.Drawing
                 AscentInPixels = typeface.Ascender * ScaleToPixel;
                 DescentInPixels = typeface.Descender * ScaleToPixel;
                 LineGapInPx = typeface.LineGap * ScaleToPixel;
+                Name = typeface.Name;
             }
         }
+        public Typeface Typeface { get; }
 
-        public string Name => (Typeface is Typeface typeface) ? typeface.Name : "";
-        internal static ResolvedFont s_empty = new ResolvedFont(null, 0, FontStyle.Regular, 0);
+        class EmptyResolvedFont : ResolvedFont
+        {
+            public EmptyResolvedFont() : base(null, 0, FontStyle.Regular, 0) { }
+        }
 
+        internal static readonly ResolvedFont s_empty = new EmptyResolvedFont();
     }
-
-
     public class OpenFontTextService : ITextService
     {
         /// <summary>
@@ -287,7 +273,7 @@ namespace PixelFarm.Drawing
             _reusableTextBuffer.SetRawCharBuffer(null);
         }
 
-        public float CalculateScaleToPixelsFromPoint(RequestFont font) => (ResolveFont(font) is ResolvedFont resolvedFont) ? resolvedFont.ScaleToPixel : 0;
+        public float CalculateScaleToPixelsFromPoint(RequestFont font) => (ResolveFont(font) is ResolvedFontBase resolvedFont) ? resolvedFont.ScaleToPixel : 0;
 
         public ResolvedFont ResolveFont(RequestFont font)
         {
@@ -334,7 +320,7 @@ namespace PixelFarm.Drawing
                 if (typeface == null)
                 {
                     //register this font key => not found
-                    _resolvedTypefaceCache.Add(font.FontKey, PixelFarm.Drawing.ResolvedFont.s_empty);
+                    _resolvedTypefaceCache.Add(font.FontKey, ResolvedFont.s_empty);
                     return null;
                 }
             }
@@ -410,7 +396,7 @@ namespace PixelFarm.Drawing
 
         public float MeasureWhitespace(RequestFont f)
         {
-            ResolvedFont resolvedFont = this.ResolveFont(f);
+            ResolvedFontBase resolvedFont = this.ResolveFont(f);
             if (resolvedFont != null)
             {
                 return resolvedFont.WhitespaceWidthF;

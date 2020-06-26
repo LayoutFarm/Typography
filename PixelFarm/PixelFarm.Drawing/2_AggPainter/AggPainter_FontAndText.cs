@@ -20,7 +20,7 @@ namespace PixelFarm.CpuBlit
     partial class AggPainter
     {
         //font
-        ResolvedFont _resolvedFont;
+        ResolvedFontBase _resolvedFont;
         RequestFont _currentFont;
         IAggTextPrinter _textPrinter;
 
@@ -37,7 +37,7 @@ namespace PixelFarm.CpuBlit
             }
         }
 
-        public ResolvedFont CurrentResolvedFont
+        public ResolvedFontBase CurrentResolvedFont
         {
             get
             {
@@ -64,7 +64,7 @@ namespace PixelFarm.CpuBlit
                 }
                 else
                 {
-                    _resolvedFont = null;
+                   // _resolvedFont = null;
                 }
 
                 //this request font must resolve to actual font

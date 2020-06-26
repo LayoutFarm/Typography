@@ -166,8 +166,8 @@ namespace PixelFarm.Drawing
         //caching ...
 
         //preserve 2 field user cache their actual here
-        internal object _resolvedFont1;
-        internal object _resolvedFont2; 
+        internal ResolvedFontBase _resolvedFont1;
+        internal object _resolvedFont2;
 
         //internal object _latestResolved; //result of the actual font
         //internal int _whitespace_width;
@@ -198,11 +198,36 @@ namespace PixelFarm.Drawing
 #endif
     }
 
+    public abstract class ResolvedFontBase
+    {
+        public float SizeInPoints { get; protected set; }
+        public FontStyle FontStyle { get; protected set; }
+        public int FontKey { get; protected set; }
+        public float ScaleToPixel { get; protected set; }
+
+        public float WhitespaceWidthF { get; protected set; }
+        public int WhitespaceWidth { get; protected set; }
+
+        public float AscentInPixels { get; protected set; }
+        public float DescentInPixels { get; protected set; }
+        public int LineSpacingInPixels { get; protected set; }
+        public float LineGapInPx { get; protected set; }
+
+
+        public ResolvedFontBase(float sizeInPoints, FontStyle fontStyle, int fontKey)
+        {
+            SizeInPoints = sizeInPoints;
+            FontStyle = fontStyle;
+            FontKey = fontKey;
+        }
+        public string Name { get; protected set; }
+    }
+
     namespace Internal
     {
         public static class RequestFontCacheAccess
         {
-            public static void SetResolvedFont1(RequestFont reqFont, object resolvedFont)
+            public static void SetResolvedFont1(RequestFont reqFont, ResolvedFontBase resolvedFont)
             {
                 reqFont._resolvedFont1 = resolvedFont;
             }
@@ -211,7 +236,7 @@ namespace PixelFarm.Drawing
                 reqFont._resolvedFont2 = resolvedFont;
             }
             public static T GetResolvedFont1<T>(RequestFont reqFont)
-               where T : class
+               where T : ResolvedFontBase
             {
                 return reqFont._resolvedFont1 as T;
             }
@@ -221,7 +246,7 @@ namespace PixelFarm.Drawing
                 return reqFont._resolvedFont2 as T;
             }
 
-         
+
             //public static void SetGeneralFontMetricInfo(
             //   RequestFont reqFont,
             //   float sizeInPx, float ascentInPx,
