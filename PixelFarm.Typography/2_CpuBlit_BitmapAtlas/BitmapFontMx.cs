@@ -145,6 +145,30 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
 
         static object s_loadDataLock = new object();
 
+        public SimpleBitmapAtlas GetFontAtlas(RequestFont font, out B outputBitmap)
+        {
+#if DEBUG
+            _dbugStopWatch.Reset();
+            _dbugStopWatch.Start();
+#endif
+
+            //try get from fontkey
+            int fontKey = font.FontKey;
+            if (_createdAtlases.TryGetValue(fontKey, out SimpleBitmapAtlas fontAtlas))
+            {
+                outputBitmap = _loadAtlases.GetOrCreateNewOne(fontAtlas);
+                return fontAtlas;
+            }
+            //check if we have small msdf texture or not
+            if (_msdfTextureFonts.TryGetValue(font.Name, out SimpleBitmapAtlas msdfTexture))
+            {
+                //use this
+                outputBitmap = _loadAtlases.GetOrCreateNewOne(msdfTexture);
+                return msdfTexture;
+            }
+            return InternalGetFontAtlas(_textServices.ResolveFont(font), out outputBitmap);
+        }
+
         /// <summary>
         /// get from cache or create a new one
         /// </summary>
@@ -173,9 +197,16 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                 return msdfTexture;
             }
 
+            return InternalGetFontAtlas(font, out outputBitmap);
+        }
+        SimpleBitmapAtlas InternalGetFontAtlas(ResolvedFont font, out B outputBitmap)
+        {
             //--------------------------------
             //check from pre-built cache (if availiable)     
-             
+
+            int fontKey = font.FontKey;
+            SimpleBitmapAtlas fontAtlas = null;
+
             Typeface typeface = font.Typeface;
 
             string fontTextureFile = typeface.Name + "_" + fontKey;
@@ -307,8 +338,9 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
 
             outputBitmap = _loadAtlases.GetOrCreateNewOne(fontAtlas);
             return fontAtlas;
-        }
 
+        }
+        
         static PixelFarm.CpuBlit.MemBitmap ReadGlyphImages(System.IO.Stream stream)
         {
             return PixelFarm.CpuBlit.MemBitmap.LoadBitmap(stream);
