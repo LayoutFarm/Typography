@@ -19,7 +19,7 @@ namespace Typography.OpenFont
         BitmapFontGlyphSource _bitmapFontGlyphSource;
 
 
-
+        
         internal Typeface(
             NameEntry nameEntry,
             Bounds bounds,
@@ -347,11 +347,11 @@ namespace Typography.OpenFont
 
         //svg and bitmap font
         internal SvgTable _svgTable;
-        public void ReadSvgContent(Glyph glyph, System.Text.StringBuilder output)
+        public void ReadSvgContent(ushort glyphIndex, System.Text.StringBuilder output)
         {
             if (_svgTable != null)
             {
-                _svgTable.ReadSvgContent(glyph.GlyphIndex, output);
+                _svgTable.ReadSvgContent(glyphIndex, output);
             }
         }
 
@@ -361,6 +361,10 @@ namespace Typography.OpenFont
             _bitmapFontGlyphSource.CopyBitmapContent(glyph, output);
         }
 
+        /// <summary>
+        /// undate lang info
+        /// </summary>
+        /// <param name="metaTable"></param>
         internal void UpdateLangs(Meta metaTable) => Languages.Update(OS2Table, metaTable, this.GSUBTable, this.GPOSTable);
 
     }
