@@ -429,6 +429,14 @@ namespace PixelFarm.Drawing
             _txtServices.MeasureString(textBufferSpan.GetRawCharBuffer(), textBufferSpan.start, textBufferSpan.len, out int w, out int h);
             return new Size(w, h);
         }
+        public Size MeasureString(in TextBufferSpan textBufferSpan, ResolvedFontBase font)
+        {
+            //TODO: review here
+            Typeface typeface = ((ResolvedFont)font).Typeface;
+            _txtServices.SetCurrentFont(typeface, font.SizeInPoints);
+            _txtServices.MeasureString(textBufferSpan.GetRawCharBuffer(), textBufferSpan.start, textBufferSpan.len, out int w, out int h);
+            return new Size(w, h);
+        }
         public void MeasureString(in TextBufferSpan textBufferSpan, RequestFont font, int limitWidth, out int charFit, out int charFitWidth)
         {
             Typeface typeface = ResolveFont(font).Typeface;
