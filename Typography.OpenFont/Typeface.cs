@@ -328,15 +328,10 @@ namespace Typography.OpenFont
 
             }
         }
-
-
-        //---------        
-
+         
         internal PostTable PostTable { get; set; }
         internal bool _evalCffGlyphBounds;
-        public bool IsCffFont => _cffTable != null;
-
-        //---------
+        public bool IsCffFont => _cffTable != null; 
         internal MathTable _mathTable;
         internal MathGlyphs.MathGlyphInfo[] _mathGlyphInfos;
         internal Glyph[] GetRawGlyphList() => _glyphs;

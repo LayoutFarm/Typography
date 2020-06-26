@@ -1,5 +1,5 @@
 ﻿//Apache2, 2017-present, WinterDev
-//https://www.microsoft.com/typography/otspec/vhea.htm
+//https://docs.microsoft.com/en-us/typography/opentype/spec/vhea
 
 using System;
 using System.IO;
