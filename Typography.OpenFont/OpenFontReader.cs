@@ -28,7 +28,7 @@ namespace Typography.OpenFont
         public readonly string TypographicSubFamilyName;
         public readonly Extensions.TranslatedOS2FontStyle OS2TranslatedStyle;
         public readonly ushort Weight;
-        PreviewFontInfo[] _ttcfMembers;
+        readonly PreviewFontInfo[] _ttcfMembers;
 
 
         internal PreviewFontInfo(string fontName, string fontSubFam,
@@ -119,10 +119,6 @@ namespace Typography.OpenFont
             (((u2) & 0xff) == (byte)'2'); //0x32 
         }
     }
-
-
-
-
 
     public class OpenFontReader
     {
@@ -363,38 +359,47 @@ namespace Typography.OpenFont
                 UniqueFontIden = nameEntry.UniqueFontIden,
                 VersionString = nameEntry.VersionString
             };
-
         }
+
         internal Typeface ReadTableEntryCollection(TableEntryCollection tables, BinaryReader input)
         {
 
+            //PART 1: basic information
             OS2Table os2Table = ReadTableIfExists(tables, input, new OS2Table());
             Meta meta = ReadTableIfExists(tables, input, new Meta());
             NameEntry nameEntry = ReadTableIfExists(tables, input, new NameEntry());
 
             Head header = ReadTableIfExists(tables, input, new Head());
             MaxProfile maximumProfile = ReadTableIfExists(tables, input, new MaxProfile());
+
             HorizontalHeader horizontalHeader = ReadTableIfExists(tables, input, new HorizontalHeader());
             HorizontalMetrics horizontalMetrics = ReadTableIfExists(tables, input, new HorizontalMetrics(horizontalHeader.HorizontalMetricsCount, maximumProfile.GlyphCount));
 
+            VerticalHeader vhea = ReadTableIfExists(tables, input, new VerticalHeader());
+            if (vhea != null)
+            {
+                VerticalMetrics vmtx = ReadTableIfExists(tables, input, new VerticalMetrics(vhea.NumOfLongVerMetrics));
+            }
 
+            Cmap cmaps = ReadTableIfExists(tables, input, new Cmap());
 
-            //---
+            //PART 2: glyphs detail 
+
+            //2.1 True type font
+            GlyphLocations glyphLocations = ReadTableIfExists(tables, input, new GlyphLocations(maximumProfile.GlyphCount, header.WideGlyphLocations));
+            Glyf glyf = ReadTableIfExists(tables, input, new Glyf(glyphLocations));
+            Gasp gaspTable = ReadTableIfExists(tables, input, new Gasp());
+            VerticalDeviceMetrics vdmx = ReadTableIfExists(tables, input, new VerticalDeviceMetrics());
+            COLR colr = ReadTableIfExists(tables, input, new COLR());
+            CPAL cpal = ReadTableIfExists(tables, input, new CPAL());
+
+            //2.2 Cff font
             PostTable postTable = ReadTableIfExists(tables, input, new PostTable());
             CFFTable cff = ReadTableIfExists(tables, input, new CFFTable());
 
-            //--------------
-            Cmap cmaps = ReadTableIfExists(tables, input, new Cmap());
-            GlyphLocations glyphLocations = ReadTableIfExists(tables, input, new GlyphLocations(maximumProfile.GlyphCount, header.WideGlyphLocations));
 
-            Glyf glyf = ReadTableIfExists(tables, input, new Glyf(glyphLocations));
-            //--------------
-            Gasp gaspTable = ReadTableIfExists(tables, input, new Gasp());
-            VerticalDeviceMetrics vdmx = ReadTableIfExists(tables, input, new VerticalDeviceMetrics());
-            //--------------
+            Kern kern = ReadTableIfExists(tables, input, new Kern());
 
-
-            Kern kern = ReadTableIfExists(tables, input, new Kern()); //deprecated
             //--------------
             //advanced typography
             GDEF gdef = ReadTableIfExists(tables, input, new GDEF());
@@ -402,14 +407,6 @@ namespace Typography.OpenFont
             GPOS gpos = ReadTableIfExists(tables, input, new GPOS());
             BASE baseTable = ReadTableIfExists(tables, input, new BASE());
             JSTF jstf = ReadTableIfExists(tables, input, new JSTF());
-
-            COLR colr = ReadTableIfExists(tables, input, new COLR());
-            CPAL cpal = ReadTableIfExists(tables, input, new CPAL());
-            VerticalHeader vhea = ReadTableIfExists(tables, input, new VerticalHeader());
-            if (vhea != null)
-            {
-                VerticalMetrics vmtx = ReadTableIfExists(tables, input, new VerticalMetrics(vhea.NumOfLongVerMetrics));
-            }
 
             STAT stat = ReadTableIfExists(tables, input, new STAT());
             if (stat != null)
@@ -426,12 +423,9 @@ namespace Typography.OpenFont
             }
 
 
-            //test math table
             MathTable mathtable = ReadTableIfExists(tables, input, new MathTable());
-
             //---------------------------------------------
             //about truetype instruction init 
-
             //--------------------------------------------- 
             Typeface typeface = null;
             bool isPostScriptOutline = false;
@@ -441,7 +435,6 @@ namespace Typography.OpenFont
                 //check if this is cff table ?
                 if (cff == null)
                 {
-
                     //check  cbdt/cblc ?
                     CBLC cblcTable = ReadTableIfExists(tables, input, new CBLC());
                     if (cblcTable != null)
@@ -473,8 +466,6 @@ namespace Typography.OpenFont
                 }
                 else
                 {
-                    //...  
-                    //PostScript outline font 
                     isPostScriptOutline = true;
                     typeface = new Typeface(
                           nameEntry,
@@ -574,9 +565,11 @@ namespace Typography.OpenFont
                 input.ReadUInt32(),
                 input.ReadUInt32());
         }
+
         static T ReadTableIfExists<T>(TableEntryCollection tables, BinaryReader reader, T resultTable)
             where T : TableEntry
         {
+
 
             if (tables.TryGetTable(resultTable.Name, out TableEntry found))
             {
@@ -600,8 +593,14 @@ namespace Typography.OpenFont
                 }
                 else
                 {
-                    //we have read this table
-                    throw new NotSupportedException();
+#if DEBUG
+                    System.Diagnostics.Debug.WriteLine("this table is already loaded");
+                    if (!(found is T))
+                    {
+                        throw new NotSupportedException();
+                    }
+#endif
+                    return found as T;
                 }
             }
             //not found
