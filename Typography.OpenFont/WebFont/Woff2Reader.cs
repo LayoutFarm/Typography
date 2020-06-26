@@ -1535,18 +1535,8 @@ namespace Typography.WebFont
 
                 //interprete flags 
                 int knowTable = flags & 0x1F; //5 bits => known table or not  
-                string tableName = null;
-                if (knowTable < 63)
-                {
-                    //this is known table
-                    tableName = s_knownTableTags[knowTable];
-                }
-                else
-                {
-                    tableName = Utils.TagToString(reader.ReadUInt32()); //other tag 
-                }
 
-                table.Name = tableName;
+                table.Name = (knowTable < 63) ? s_knownTableTags[knowTable] : Utils.TagToString(reader.ReadUInt32()); //other tag 
 
                 //Bits 6 and 7 indicate the preprocessing transformation version number(0 - 3) that was applied to each table.
 

@@ -28,7 +28,6 @@ namespace Typography.OpenFont.Tables
         }
         protected override void ReadContentFrom(BinaryReader reader)
         {
-
             uint tableOffset = this.Header.Offset;
             GlyphLocations locations = _glyphLocations;
             int glyphCount = locations.GlyphCount;

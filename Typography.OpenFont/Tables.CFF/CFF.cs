@@ -622,16 +622,13 @@ namespace Typography.OpenFont.CFF
 
         List<CffDataDicEntry> _topDic;
 
-        uint _cffStartAt;
+        long _cffStartAt;
 
         int _charStringsOffset;
         int _charsetOffset;
-        int _encodingOffset;
+        int _encodingOffset; 
 
-
-
-
-        public void ParseAfterHeader(uint cffStartAt, BinaryReader reader)
+        public void ParseAfterHeader(long cffStartAt, BinaryReader reader)
         {
             _cffStartAt = cffStartAt;
             _cff1FontSet = new Cff1FontSet();
