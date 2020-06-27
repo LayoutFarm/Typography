@@ -1,6 +1,5 @@
 ﻿//MIT, 2018-present, WinterDev
-//https://www.microsoft.com/typography/otspec/math.htm
-
+//https://docs.microsoft.com/en-us/typography/opentype/spec/math
 
 using System.IO;
 

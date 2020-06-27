@@ -1,9 +1,7 @@
 ﻿//MIT, 2019-present, WinterDev
 using System;
 using System.IO;
-
-using Typography.OpenFont.Tables.BitmapFonts;
-
+ 
 namespace Typography.OpenFont.Tables
 {
 

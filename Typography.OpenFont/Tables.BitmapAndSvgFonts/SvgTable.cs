@@ -7,12 +7,10 @@ namespace Typography.OpenFont.Tables
 {
     class SvgTable : TableEntry
     {
-
-
         public const string _N = "SVG "; //with 1 whitespace ***
         public override string Name => _N;
         //
-        // https://www.microsoft.com/typography/otspec/svg.htm
+        //https://docs.microsoft.com/en-us/typography/opentype/spec/svg
         //OpenType fonts with either TrueType or CFF outlines may also contain an optional 'SVG ' table, 
         //which allows some or all glyphs in the font to be defined with color, gradients, or animation.
 
