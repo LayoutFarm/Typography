@@ -252,11 +252,10 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
         GlyphBitmap GetGlyphBitmapFromSvg(Typeface typeface, float sizeInPoint, ushort glyphIndex)
         {
 
-            //TODO: use string builder from pool? 
-            Glyph glyph = typeface.GetGlyph(glyphIndex);
-
+            //TODO: use string builder from pool?  
+           
             var stbuilder = new System.Text.StringBuilder();
-            typeface.ReadSvgContent(glyph, stbuilder);
+            typeface.ReadSvgContent(glyphIndex, stbuilder);
 
             float bmpScale = typeface.CalculateScaleToPixelFromPointSize(sizeInPoint);
             float target_advW = typeface.GetAdvanceWidthFromGlyphIndex(glyphIndex) * bmpScale;

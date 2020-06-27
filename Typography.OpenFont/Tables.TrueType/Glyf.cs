@@ -10,7 +10,7 @@ namespace Typography.OpenFont.Tables
         public override string Name => _N;
         //
         Glyph[] _glyphs;
-        GlyphLocations _glyphLocations;
+        readonly GlyphLocations _glyphLocations;
 
         //--------------------
         //both ttf and cff
@@ -28,7 +28,6 @@ namespace Typography.OpenFont.Tables
         }
         protected override void ReadContentFrom(BinaryReader reader)
         {
-
             uint tableOffset = this.Header.Offset;
             GlyphLocations locations = _glyphLocations;
             int glyphCount = locations.GlyphCount;
@@ -77,10 +76,9 @@ namespace Typography.OpenFont.Tables
             {
 
 #if DEBUG
-                if (glyphIndex == 7)
-                {
-
-                }
+                //if (glyphIndex == 7)
+                //{ 
+                //}
 #endif
                 _glyphs[glyphIndex] = ReadCompositeGlyph(_glyphs, reader, tableOffset, glyphIndex);
 
@@ -220,8 +218,7 @@ namespace Typography.OpenFont.Tables
             GlyphPointF[] glyphPoints = new GlyphPointF[n];
             for (int i = n - 1; i >= 0; --i)
             {
-                bool onCurve = HasFlag(flags[i], SimpleGlyphFlag.OnCurve);
-                glyphPoints[i] = new GlyphPointF(xs[i], ys[i], onCurve);
+                glyphPoints[i] = new GlyphPointF(xs[i], ys[i], HasFlag(flags[i], SimpleGlyphFlag.OnCurve));
             }
             //-----------
             //lets build GlyphPoint set
@@ -307,7 +304,7 @@ namespace Typography.OpenFont.Tables
                     createdGlyphs[glyphIndex] = missingGlyph;
                     reader.BaseStream.Position = storedOffset;
                 }
-                Glyph newGlyph = Glyph.Clone(createdGlyphs[glyphIndex], compositeGlyphIndex);
+                Glyph newGlyph = Glyph.TtfOutlineGlyphClone(createdGlyphs[glyphIndex], compositeGlyphIndex);
 
                 int arg1 = 0;//arg1, arg2 may be int8,uint8,int16,uint 16 
                 int arg2 = 0;//arg1, arg2 may be int8,uint8,int16,uint 16
@@ -399,6 +396,8 @@ namespace Typography.OpenFont.Tables
                     scale10 = reader.ReadF2Dot14();/* Format 2.14 */
                     yscale = reader.ReadF2Dot14(); /* Format 2.14 */
 
+#if DEBUG
+                    //TODO: review here
                     if (HasFlag(flags, CompositeGlyphFlags.UNSCALED_COMPONENT_OFFSET))
                     {
 
@@ -413,6 +412,7 @@ namespace Typography.OpenFont.Tables
                     {
 
                     }
+#endif
                 }
 
                 //Argument1 and argument2 can be either...
@@ -432,7 +432,7 @@ namespace Typography.OpenFont.Tables
                     if (useMatrix)
                     {
                         //use this matrix  
-                        Glyph.TransformNormalWith2x2Matrix(newGlyph, xscale, scale01, scale10, yscale);
+                        Glyph.TtfTxNormalWith2x2Matrix(newGlyph, xscale, scale01, scale10, yscale);
                         Glyph.OffsetXY(newGlyph, (short)arg1, (short)arg2);
                     }
                     else
@@ -445,7 +445,7 @@ namespace Typography.OpenFont.Tables
                             }
                             else
                             {
-                                Glyph.TransformNormalWith2x2Matrix(newGlyph, xscale, 0, 0, yscale);
+                                Glyph.TtfTxNormalWith2x2Matrix(newGlyph, xscale, 0, 0, yscale);
                             }
                             Glyph.OffsetXY(newGlyph, (short)arg1, (short)arg2);
                         }
@@ -480,7 +480,7 @@ namespace Typography.OpenFont.Tables
                 else
                 {
                     //merge 
-                    Glyph.AppendGlyph(finalGlyph, newGlyph);
+                    Glyph.TtfAppendGlyph(finalGlyph, newGlyph);
                 }
 
 

@@ -18,6 +18,7 @@ namespace Typography.OpenFont.Tables
         public abstract string Name { get; }
         internal void LoadDataFrom(BinaryReader reader)
         {
+            //ensure that we always start at the correct offset***
             reader.BaseStream.Seek(this.Header.Offset, SeekOrigin.Begin);
             ReadContentFrom(reader);
         }

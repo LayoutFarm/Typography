@@ -8,73 +8,66 @@ namespace Typography.OpenFont
 
     public class Typeface
     {
-        readonly Bounds _bounds;
-        readonly ushort _unitsPerEm;
-        readonly Glyph[] _glyphs;
+
         //TODO: implement vertical metrics
-        readonly HorizontalMetrics _horizontalMetrics;
+        readonly HorizontalMetrics _hMetrics;
         readonly NameEntry _nameEntry;
         //
+
+        Glyph[] _glyphs;
         CFFTable _cffTable;
-        BitmapFontGlyphSource _bitmapFontGlyphSource;
-
 
 
         internal Typeface(
+            OS2Table os2Table,
             NameEntry nameEntry,
-            Bounds bounds,
-            ushort unitsPerEm,
-            Glyph[] glyphs,
+            Head head,
             HorizontalMetrics horizontalMetrics,
-            OS2Table os2Table)
+            Glyph[] glyphs
+           )
         {
-
-            _nameEntry = nameEntry;
-            _bounds = bounds;
-            _unitsPerEm = unitsPerEm;
-            _glyphs = glyphs;
-            _horizontalMetrics = horizontalMetrics;
             OS2Table = os2Table;
+            _nameEntry = nameEntry;
+            Bounds = head.Bounds;
+            UnitsPerEm = head.UnitsPerEm;
+            _hMetrics = horizontalMetrics;
+
+            _glyphs = glyphs;
         }
         internal Typeface(
+           OS2Table os2Table,
            NameEntry nameEntry,
-           Bounds bounds,
-           ushort unitsPerEm,
-           CFFTable cffTable,
+           Head head,
            HorizontalMetrics horizontalMetrics,
-           OS2Table os2Table)
+           CFFTable cffTable)
         {
 
-            _nameEntry = nameEntry;
-            _bounds = bounds;
-            _unitsPerEm = unitsPerEm;
-            _cffTable = cffTable;
-            _horizontalMetrics = horizontalMetrics;
             OS2Table = os2Table;
+            _nameEntry = nameEntry;
+            Bounds = head.Bounds;
+            UnitsPerEm = head.UnitsPerEm;
+            _hMetrics = horizontalMetrics;
 
-
-            //------
-            _glyphs = _cffTable.Cff1FontSet._fonts[0]._glyphs;
+            _cffTable = cffTable;
+            _glyphs = _cffTable.Cff1FontSet._fonts[0]._glyphs; //TODO: review _fonts[0]
         }
         internal Typeface(
+             OS2Table os2Table,
              NameEntry nameEntry,
-             Bounds bounds,
-             ushort unitsPerEm,
-             BitmapFontGlyphSource bitmapFontGlyphSource,
-             Glyph[] glyphs,
+             Head head,
              HorizontalMetrics horizontalMetrics,
-             OS2Table os2Table)
+             Glyph[] glyphs,
+             BitmapFontGlyphSource bitmapFontGlyphSource
+             )
         {
-
-            _nameEntry = nameEntry;
-            _bounds = bounds;
-            _unitsPerEm = unitsPerEm;
-            _bitmapFontGlyphSource = bitmapFontGlyphSource;
-            _horizontalMetrics = horizontalMetrics;
             OS2Table = os2Table;
+            _nameEntry = nameEntry;
+            Bounds = head.Bounds;
+            UnitsPerEm = head.UnitsPerEm;
+            _hMetrics = horizontalMetrics;
 
             _glyphs = glyphs;
-
+            _bitmapFontGlyphSource = bitmapFontGlyphSource;
         }
         public Languages Languages { get; } = new Languages();
         /// <summary>
@@ -228,26 +221,18 @@ namespace Typography.OpenFont
                 return _glyphs[0]; //return empty glyph?;
             }
         }
-        public ushort GetAdvanceWidthFromGlyphIndex(ushort glyphIndex)
-        {
-            return _horizontalMetrics.GetAdvanceWidth(glyphIndex);
-        }
 
-        public short GetHFrontSideBearingFromGlyphIndex(ushort glyphIndex)
-        {
-            return _horizontalMetrics.GetLeftSideBearing(glyphIndex);
-        }
+        public ushort GetAdvanceWidthFromGlyphIndex(ushort glyphIndex) => _hMetrics.GetAdvanceWidth(glyphIndex);
+        public short GetLeftSideBearing(ushort glyphIndex) => _hMetrics.GetLeftSideBearing(glyphIndex);
         public short GetKernDistance(ushort leftGlyphIndex, ushort rightGlyphIndex)
         {
             //DEPRECATED -> use OpenFont layout instead
             return this.KernTable.GetKerningDistance(leftGlyphIndex, rightGlyphIndex);
         }
         //
-        public Bounds Bounds => _bounds;
-        public ushort UnitsPerEm => _unitsPerEm;
-        public Glyph[] Glyphs => _glyphs;
-        public short UnderlinePosition => PostTable.UnderlinePosition;
-
+        public Bounds Bounds { get; }
+        public ushort UnitsPerEm { get; }
+        public short UnderlinePosition => PostTable.UnderlinePosition; //TODO: review here
         //
 
         const int pointsPerInch = 72; //TODO: should be configurable
@@ -293,13 +278,12 @@ namespace Typography.OpenFont
         internal BASE BaseTable { get; set; }
         internal GDEF GDEFTable { get; set; }
 
-        public COLR COLRTable { get; set; }
-        public CPAL CPALTable { get; set; }
-        public GPOS GPOSTable { get; set; }
-        public GSUB GSUBTable { get; set; }
+        public COLR COLRTable { get; internal set; }
+        public CPAL CPALTable { get; internal set; }
+        public GPOS GPOSTable { get; internal set; }
+        public GSUB GSUBTable { get; internal set; }
 
 
-        //experiment
         internal void LoadOpenFontLayoutInfo(GDEF gdefTable, GSUB gsubTable, GPOS gposTable, BASE baseTable, COLR colrTable, CPAL cpalTable)
         {
 
@@ -311,56 +295,54 @@ namespace Typography.OpenFont
             this.COLRTable = colrTable;
             this.CPALTable = cpalTable;
             //---------------------------
-            //1. fill glyph definition            
+            //fill glyph definition            
             if (gdefTable != null)
             {
-                gdefTable.FillGlyphData(this.Glyphs);
-                //if (this.Glyphs != null)
-                //{
-
-                //}
-                //else if (_cffTable != null)
-                //{
-                //    //post script outline
-                //    //TODO: fill gdef for cff font
-
-                //}
-
+                gdefTable.FillGlyphData(_glyphs);
             }
         }
-
-
-        //---------        
 
         internal PostTable PostTable { get; set; }
         internal bool _evalCffGlyphBounds;
         public bool IsCffFont => _cffTable != null;
 
-        //---------
+        //Math Table
+
+        MathGlyphs.MathGlyphInfo[] _mathGlyphInfos;
         internal MathTable _mathTable;
-        internal MathGlyphs.MathGlyphInfo[] _mathGlyphInfos;
-        internal Glyph[] GetRawGlyphList() => _glyphs;
         //
-        public MathGlyphs.MathConstants MathConsts => (_mathTable != null) ? _mathTable._mathConstTable : null;
-        //---------
-
-
-        //svg and bitmap font
-        internal SvgTable _svgTable;
-        public void ReadSvgContent(Glyph glyph, System.Text.StringBuilder output)
+        public MathGlyphs.MathConstants MathConsts => _mathTable?._mathConstTable;
+        internal void LoadMathGlyphInfos(MathGlyphs.MathGlyphInfo[] mathGlyphInfos)
         {
-            if (_svgTable != null)
+            _mathGlyphInfos = mathGlyphInfos;
+            if (mathGlyphInfos != null)
             {
-                _svgTable.ReadSvgContent(glyph.GlyphIndex, output);
+                //fill to original glyph?
+                for (int glyphIndex = 0; glyphIndex < _glyphs.Length; ++glyphIndex)
+                {
+                    _glyphs[glyphIndex].MathGlyphInfo = mathGlyphInfos[glyphIndex];
+                }
             }
         }
+        public MathGlyphs.MathGlyphInfo GetMathGlyphInfo(ushort glyphIndex) => _mathGlyphInfos[glyphIndex];
 
+        //-------------------------
+        //svg and bitmap font
+        internal SvgTable _svgTable;
+        public void ReadSvgContent(ushort glyphIndex, System.Text.StringBuilder output) => _svgTable?.ReadSvgContent(glyphIndex, output);
+
+
+        BitmapFontGlyphSource _bitmapFontGlyphSource;
         public bool IsBitmapFont => _bitmapFontGlyphSource != null;
         public void ReadBitmapContent(Glyph glyph, System.IO.Stream output)
         {
             _bitmapFontGlyphSource.CopyBitmapContent(glyph, output);
         }
 
+        /// <summary>
+        /// undate lang info
+        /// </summary>
+        /// <param name="metaTable"></param>
         internal void UpdateLangs(Meta metaTable) => Languages.Update(OS2Table, metaTable, this.GSUBTable, this.GPOSTable);
 
     }
@@ -810,14 +792,12 @@ namespace Typography.OpenFont
 
     public static class TypefaceExtension2
     {
-
-
         public static IEnumerable<GlyphNameMap> GetGlyphNameIter(this Typeface typeface)
         {
             if (typeface.IsCffFont)
             {
                 CFF.Cff1Font cff1Font = typeface.CffTable.Cff1FontSet._fonts[0];
-                foreach (var kp in cff1Font.GetGlyphNameIter())
+                foreach (GlyphNameMap kp in cff1Font.GetGlyphNameIter())
                 {
                     yield return kp;
                 }

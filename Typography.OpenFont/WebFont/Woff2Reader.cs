@@ -765,7 +765,7 @@ namespace Typography.WebFont
                     reader.BaseStream.Position = storedOffset;
                 }
 
-                Glyph newGlyph = Glyph.Clone(createdGlyphs[glyphIndex], compositeGlyphIndex);
+                Glyph newGlyph = Glyph.TtfOutlineGlyphClone(createdGlyphs[glyphIndex], compositeGlyphIndex);
 
                 short arg1 = 0;
                 short arg2 = 0;
@@ -854,7 +854,7 @@ namespace Typography.WebFont
                     if (useMatrix)
                     {
                         //use this matrix  
-                        Glyph.TransformNormalWith2x2Matrix(newGlyph, xscale, scale01, scale10, yscale);
+                        Glyph.TtfTxNormalWith2x2Matrix(newGlyph, xscale, scale01, scale10, yscale);
                         Glyph.OffsetXY(newGlyph, arg1, arg2);
                     }
                     else
@@ -867,7 +867,7 @@ namespace Typography.WebFont
                             }
                             else
                             {
-                                Glyph.TransformNormalWith2x2Matrix(newGlyph, xscale, 0, 0, yscale);
+                                Glyph.TtfTxNormalWith2x2Matrix(newGlyph, xscale, 0, 0, yscale);
                             }
                             Glyph.OffsetXY(newGlyph, arg1, arg2);
                         }
@@ -902,7 +902,7 @@ namespace Typography.WebFont
                 else
                 {
                     //merge 
-                    Glyph.AppendGlyph(finalGlyph, newGlyph);
+                    Glyph.TtfAppendGlyph(finalGlyph, newGlyph);
                 }
 
             } while (Glyf.HasFlag(flags, Glyf.CompositeGlyphFlags.MORE_COMPONENTS));
@@ -1535,18 +1535,8 @@ namespace Typography.WebFont
 
                 //interprete flags 
                 int knowTable = flags & 0x1F; //5 bits => known table or not  
-                string tableName = null;
-                if (knowTable < 63)
-                {
-                    //this is known table
-                    tableName = s_knownTableTags[knowTable];
-                }
-                else
-                {
-                    tableName = Utils.TagToString(reader.ReadUInt32()); //other tag 
-                }
 
-                table.Name = tableName;
+                table.Name = (knowTable < 63) ? s_knownTableTags[knowTable] : Utils.TagToString(reader.ReadUInt32()); //other tag 
 
                 //Bits 6 and 7 indicate the preprocessing transformation version number(0 - 3) that was applied to each table.
 
