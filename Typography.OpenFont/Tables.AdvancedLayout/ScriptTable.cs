@@ -1,5 +1,5 @@
 ﻿//Apache2, 2016-present, WinterDev
-https://docs.microsoft.com/en-us/typography/opentype/spec/chapter2#script-table-and-language-system-record
+//https://docs.microsoft.com/en-us/typography/opentype/spec/chapter2#script-table-and-language-system-record
 
 using System.IO;
 

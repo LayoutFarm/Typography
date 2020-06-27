@@ -21,17 +21,15 @@ namespace Typography.OpenFont
         internal Typeface(
             OS2Table os2Table,
             NameEntry nameEntry,
-            Bounds bounds,
-            ushort unitsPerEm,
+            Head head,
             HorizontalMetrics horizontalMetrics,
-
             Glyph[] glyphs
            )
         {
             OS2Table = os2Table;
             _nameEntry = nameEntry;
-            Bounds = bounds;
-            UnitsPerEm = unitsPerEm;
+            Bounds = head.Bounds;
+            UnitsPerEm = head.UnitsPerEm;
             _horizontalMetrics = horizontalMetrics;
 
             _glyphs = glyphs;
@@ -39,16 +37,15 @@ namespace Typography.OpenFont
         internal Typeface(
            OS2Table os2Table,
            NameEntry nameEntry,
-           Bounds bounds,
-           ushort unitsPerEm,
+           Head head,
            HorizontalMetrics horizontalMetrics,
            CFFTable cffTable)
         {
 
             OS2Table = os2Table;
             _nameEntry = nameEntry;
-            Bounds = bounds;
-            UnitsPerEm = unitsPerEm;
+            Bounds = head.Bounds;
+            UnitsPerEm = head.UnitsPerEm;
             _horizontalMetrics = horizontalMetrics;
 
             _cffTable = cffTable;
@@ -57,8 +54,7 @@ namespace Typography.OpenFont
         internal Typeface(
              OS2Table os2Table,
              NameEntry nameEntry,
-             Bounds bounds,
-             ushort unitsPerEm,
+             Head head,
              HorizontalMetrics horizontalMetrics,
              Glyph[] glyphs,
              BitmapFontGlyphSource bitmapFontGlyphSource
@@ -66,8 +62,8 @@ namespace Typography.OpenFont
         {
             OS2Table = os2Table;
             _nameEntry = nameEntry;
-            Bounds = bounds;
-            UnitsPerEm = unitsPerEm;
+            Bounds = head.Bounds;
+            UnitsPerEm = head.UnitsPerEm;
             _horizontalMetrics = horizontalMetrics;
 
             _glyphs = glyphs;
@@ -295,7 +291,7 @@ namespace Typography.OpenFont
         public GPOS GPOSTable { get; internal set; }
         public GSUB GSUBTable { get; internal set; }
 
-         
+
         internal void LoadOpenFontLayoutInfo(GDEF gdefTable, GSUB gsubTable, GPOS gposTable, BASE baseTable, COLR colrTable, CPAL cpalTable)
         {
 

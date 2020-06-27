@@ -369,11 +369,11 @@ namespace Typography.OpenFont
             Meta meta = ReadTableIfExists(tables, input, new Meta());
             NameEntry nameEntry = ReadTableIfExists(tables, input, new NameEntry());
 
-            Head header = ReadTableIfExists(tables, input, new Head());
-            MaxProfile maximumProfile = ReadTableIfExists(tables, input, new MaxProfile());
+            Head head = ReadTableIfExists(tables, input, new Head());
+            MaxProfile maxProfile = ReadTableIfExists(tables, input, new MaxProfile());
 
             HorizontalHeader horizontalHeader = ReadTableIfExists(tables, input, new HorizontalHeader());
-            HorizontalMetrics horizontalMetrics = ReadTableIfExists(tables, input, new HorizontalMetrics(horizontalHeader.NumberOfHMetrics, maximumProfile.GlyphCount));
+            HorizontalMetrics horizontalMetrics = ReadTableIfExists(tables, input, new HorizontalMetrics(horizontalHeader.NumberOfHMetrics, maxProfile.GlyphCount));
 
             VerticalHeader vhea = ReadTableIfExists(tables, input, new VerticalHeader());
             if (vhea != null)
@@ -386,7 +386,7 @@ namespace Typography.OpenFont
             //------------------------------------
             //PART 2: glyphs detail 
             //2.1 True type font
-            GlyphLocations glyphLocations = ReadTableIfExists(tables, input, new GlyphLocations(maximumProfile.GlyphCount, header.WideGlyphLocations));
+            GlyphLocations glyphLocations = ReadTableIfExists(tables, input, new GlyphLocations(maxProfile.GlyphCount, head.WideGlyphLocations));
             Glyf glyf = ReadTableIfExists(tables, input, new Glyf(glyphLocations));
             Gasp gaspTable = ReadTableIfExists(tables, input, new Gasp());
             VerticalDeviceMetrics vdmx = ReadTableIfExists(tables, input, new VerticalDeviceMetrics());
@@ -449,8 +449,7 @@ namespace Typography.OpenFont
                         typeface = new Typeface(
                           os2Table,
                           nameEntry,
-                          header.Bounds,
-                          header.UnitsPerEm,
+                          head,
                           horizontalMetrics,
                           glyphs,
                           bmpFontGlyphSrc);
@@ -469,8 +468,7 @@ namespace Typography.OpenFont
                     typeface = new Typeface(
                           os2Table,
                           nameEntry,
-                          header.Bounds,
-                          header.UnitsPerEm,
+                          head,
                           horizontalMetrics,
                           cff
                           );
@@ -481,8 +479,7 @@ namespace Typography.OpenFont
                 typeface = new Typeface(
                     os2Table,
                     nameEntry,
-                    header.Bounds,
-                    header.UnitsPerEm,
+                    head,
                     horizontalMetrics,
                     glyf.Glyphs
                     );
@@ -492,7 +489,7 @@ namespace Typography.OpenFont
             typeface.CmapTable = cmaps;
             typeface.KernTable = kern;
             typeface.GaspTable = gaspTable;
-            typeface.MaxProfile = maximumProfile;
+            typeface.MaxProfile = maxProfile;
             typeface.HheaTable = horizontalHeader;
 
             //----------------------------
