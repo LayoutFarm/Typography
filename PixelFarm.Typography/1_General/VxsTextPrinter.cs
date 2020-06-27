@@ -404,14 +404,11 @@ namespace PixelFarm.Drawing
             {
                 return glyphBmp;
             }
-
-
-            Glyph glyph = _currentTypeface.GetGlyph(glyphIndex);
-
+             
 
             //TODO: use string builder from pool?
             var stbuilder = new System.Text.StringBuilder();
-            _currentTypeface.ReadSvgContent(glyph, stbuilder);
+            _currentTypeface.ReadSvgContent(glyphIndex, stbuilder);
 
             float bmpScale = _currentTypeface.CalculateScaleToPixelFromPointSize(FontSizeInPoints);
             float target_advW = _currentTypeface.GetAdvanceWidthFromGlyphIndex(glyphIndex) * bmpScale;

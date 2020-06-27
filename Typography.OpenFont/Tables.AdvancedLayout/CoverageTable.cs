@@ -5,7 +5,8 @@ using System.IO;
 
 namespace Typography.OpenFont.Tables
 {
-    // https://www.microsoft.com/typography/otspec/chapter2.htm
+    //https://docs.microsoft.com/en-us/typography/opentype/spec/chapter2
+
     public abstract class CoverageTable
     {
         public abstract int FindPosition(ushort glyphIndex);
@@ -14,7 +15,7 @@ namespace Typography.OpenFont.Tables
 #if DEBUG
 
 #endif
-     
+
         public static CoverageTable CreateFrom(BinaryReader reader, long beginAt)
         {
             reader.BaseStream.Seek(beginAt, SeekOrigin.Begin);
@@ -29,12 +30,12 @@ namespace Typography.OpenFont.Tables
 
         public static CoverageTable[] CreateMultipleCoverageTables(long initPos, ushort[] offsets, BinaryReader reader)
         {
-            List<CoverageTable> results = new List<CoverageTable>(offsets.Length);
-            foreach (ushort offset in offsets)
+            CoverageTable[] results = new CoverageTable[offsets.Length];
+            for (int i = 0; i < results.Length; ++i)
             {
-                results.Add(CoverageTable.CreateFrom(reader, initPos + offset));
+                results[i] = CoverageTable.CreateFrom(reader, initPos + offsets[i]);
             }
-            return results.ToArray();
+            return results;
         }
     }
 
