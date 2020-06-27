@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace Typography.OpenFont.Tables
 {
-    //https://www.microsoft.com/typography/otspec/post.htm
+    //https://docs.microsoft.com/en-us/typography/opentype/spec/post
 
     //post — PostScript Table 
     //This table contains additional information needed to use TrueType or OpenType™ fonts on PostScript printers. 

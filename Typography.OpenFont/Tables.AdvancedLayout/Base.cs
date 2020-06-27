@@ -1,5 +1,5 @@
 ﻿//Apache2, 2016-present, WinterDev
-//https://www.microsoft.com/typography/otspec/base.htm
+//https://docs.microsoft.com/en-us/typography/opentype/spec/base
 //BASE - Baseline Table
 //The Baseline table (BASE) provides information used to align glyphs of different scripts and sizes in a line of text, 
 //whether the glyphs are in the same font or in different fonts.

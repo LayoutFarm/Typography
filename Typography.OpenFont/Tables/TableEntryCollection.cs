@@ -14,6 +14,5 @@ namespace Typography.OpenFont.Tables
         public bool TryGetTable(string tableName, out TableEntry entry) => _tables.TryGetValue(tableName, out entry);
 
         public void ReplaceTable(TableEntry table) => _tables[table.Name] = table;
-
     }
 }

@@ -1,6 +1,4 @@
-﻿// Copyright © 2017-present Sam Hocevar <sam@hocevar.net>, WinterDev
-// Apache2
-
+﻿//Apache2, 2017-present Sam Hocevar <sam@hocevar.net>, WinterDev
 
 using System.IO;
 
