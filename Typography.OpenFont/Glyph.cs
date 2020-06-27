@@ -242,24 +242,20 @@ namespace Typography.OpenFont
 #endif 
 
         //--------------------
-        //cff 
-
-        internal CFF.Cff1Font _ownerCffFont;
+        //cff  
         internal CFF.Cff1GlyphData _cff1GlyphData; //temp
-        internal Glyph(CFF.Cff1Font owner, CFF.Cff1GlyphData cff1Glyph, ushort glyphIndex)
+        internal Glyph(CFF.Cff1GlyphData cff1Glyph, ushort glyphIndex)
         {
 #if DEBUG
             this.dbugId = s_debugTotalId++;
             cff1Glyph.dbugGlyphIndex = glyphIndex;
 #endif
 
-            _ownerCffFont = owner;
             //create from CFF 
             _cff1GlyphData = cff1Glyph;
             this.GlyphIndex = glyphIndex;
         }
-        public bool IsCffGlyph => _ownerCffFont != null;
-        public CFF.Cff1Font GetOwnerCff() => _ownerCffFont;
+        public bool IsCffGlyph => _cff1GlyphData != null;
         public CFF.Cff1GlyphData GetCff1GlyphData() => _cff1GlyphData;
 
         //math glyph info, temp , TODO: review here again

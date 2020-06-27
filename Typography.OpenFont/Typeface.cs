@@ -1009,9 +1009,7 @@ namespace Typography.OpenFont
                     Glyph g = typeface.GetGlyph(i);
                     boundFinder.Reset();
 
-                    evalEngine.Run(boundFinder,
-                        g._ownerCffFont,
-                        g._cff1GlyphData.GlyphInstructions);
+                    evalEngine.Run(boundFinder, g._cff1GlyphData.GlyphInstructions);
 
                     g.Bounds = boundFinder.GetResultBounds();
                 }
