@@ -16,7 +16,7 @@ namespace Typography.OpenFont
 
         Glyph[] _glyphs;
         CFFTable _cffTable;
-        BitmapFontGlyphSource _bitmapFontGlyphSource;
+
 
         internal Typeface(
             OS2Table os2Table,
@@ -224,9 +224,6 @@ namespace Typography.OpenFont
 
         public ushort GetAdvanceWidthFromGlyphIndex(ushort glyphIndex) => _hMetrics.GetAdvanceWidth(glyphIndex);
         public short GetLeftSideBearing(ushort glyphIndex) => _hMetrics.GetLeftSideBearing(glyphIndex);
-
-
-
         public short GetKernDistance(ushort leftGlyphIndex, ushort rightGlyphIndex)
         {
             //DEPRECATED -> use OpenFont layout instead
@@ -235,11 +232,7 @@ namespace Typography.OpenFont
         //
         public Bounds Bounds { get; }
         public ushort UnitsPerEm { get; }
-        public Glyph[] Glyphs => _glyphs;
-        
-
-        public short UnderlinePosition => PostTable.UnderlinePosition;
-
+        public short UnderlinePosition => PostTable.UnderlinePosition; //TODO: review here
         //
 
         const int pointsPerInch = 72; //TODO: should be configurable
@@ -305,27 +298,41 @@ namespace Typography.OpenFont
             //fill glyph definition            
             if (gdefTable != null)
             {
-                gdefTable.FillGlyphData(this.Glyphs);
+                gdefTable.FillGlyphData(_glyphs);
             }
         }
 
         internal PostTable PostTable { get; set; }
         internal bool _evalCffGlyphBounds;
         public bool IsCffFont => _cffTable != null;
+
+        //Math Table
+
+        MathGlyphs.MathGlyphInfo[] _mathGlyphInfos;
         internal MathTable _mathTable;
-        internal MathGlyphs.MathGlyphInfo[] _mathGlyphInfos;
-      
         //
         public MathGlyphs.MathConstants MathConsts => _mathTable?._mathConstTable;
-
+        internal void LoadMathGlyphInfos(MathGlyphs.MathGlyphInfo[] mathGlyphInfos)
+        {
+            _mathGlyphInfos = mathGlyphInfos;
+            if (mathGlyphInfos != null)
+            {
+                //fill to original glyph?
+                for (int glyphIndex = 0; glyphIndex < _glyphs.Length; ++glyphIndex)
+                {
+                    _glyphs[glyphIndex].MathGlyphInfo = mathGlyphInfos[glyphIndex];
+                }
+            }
+        }
+        public MathGlyphs.MathGlyphInfo GetMathGlyphInfo(ushort glyphIndex) => _mathGlyphInfos[glyphIndex];
 
         //-------------------------
         //svg and bitmap font
-
-
         internal SvgTable _svgTable;
         public void ReadSvgContent(ushort glyphIndex, System.Text.StringBuilder output) => _svgTable?.ReadSvgContent(glyphIndex, output);
 
+
+        BitmapFontGlyphSource _bitmapFontGlyphSource;
         public bool IsBitmapFont => _bitmapFontGlyphSource != null;
         public void ReadBitmapContent(Glyph glyph, System.IO.Stream output)
         {

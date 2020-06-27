@@ -533,11 +533,10 @@ namespace Typography.OpenFont
             }
 
             typeface.PostTable = postTable;
+
             if (mathtable != null)
             {
-                var mathGlyphLoader = new MathGlyphLoader();
-                mathGlyphLoader.LoadMathGlyph(typeface, mathtable);
-
+                MathGlyphLoader.LoadMathGlyph(typeface, mathtable);
             }
 #if DEBUG
             //test

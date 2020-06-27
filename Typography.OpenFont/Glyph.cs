@@ -15,8 +15,6 @@ namespace Typography.OpenFont
 
         ushort _orgAdvWidth;
         bool _hasOrgAdvWidth;
-
-
         Bounds _bounds;
 
         internal Glyph(
@@ -47,7 +45,8 @@ namespace Typography.OpenFont
             get => _bounds;
             internal set => _bounds = value;
         }
-        //
+
+        public ushort GlyphIndex { get; }
         public ushort[] EndPoints => _contourEndPoints;
         public GlyphPointF[] GlyphPoints => glyphPoints;
         //
@@ -195,22 +194,16 @@ namespace Typography.OpenFont
         }
 
         //
-        public GlyphClassKind GlyphClass { get; set; }
+        public GlyphClassKind GlyphClass { get; internal set; }
         internal ushort MarkClassDef { get; set; }
         public short MinX => _bounds.XMin;
         public short MaxX => _bounds.XMax;
         public short MinY => _bounds.YMin;
         public short MaxY => _bounds.YMax;
 
-
 #if DEBUG
         public readonly int dbugId;
         static int s_debugTotalId;
-#endif
-
-        public ushort GlyphIndex { get; }
-
-#if DEBUG
         public override string ToString()
         {
             var stbuilder = new StringBuilder();
@@ -235,7 +228,7 @@ namespace Typography.OpenFont
 #endif 
 
         //--------------------
-        //cff
+        //cff 
 
         internal CFF.Cff1Font _ownerCffFont;
         internal CFF.Cff1GlyphData _cff1GlyphData; //temp
@@ -257,7 +250,6 @@ namespace Typography.OpenFont
         public MathGlyphs.MathGlyphInfo MathGlyphInfo { get; internal set; }
         public bool HasMathGlyphInfo { get; internal set; }
 
-
         //--------------------
         //Bitmap and Svg
 
@@ -274,15 +266,10 @@ namespace Typography.OpenFont
         }
         internal uint BitmapStreamOffset => _streamOffset;
         internal uint BitmapFormat => _imgFormat;
-
-        //public void CopyBitmapContent(System.IO.Stream output)
-        //{
-        //    _bmpGlyphSource.CopyBitmapContent(this, output);
-        //}
     }
 
 
-    //https://www.microsoft.com/typography/otspec/gdef.htm
+    //https://docs.microsoft.com/en-us/typography/opentype/spec/gdef
     public enum GlyphClassKind : byte
     {
         //1 	Base glyph (single character, spacing glyph)

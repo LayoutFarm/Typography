@@ -561,17 +561,18 @@ namespace Typography.OpenFont.Tables
         {
             return mathGlyphInfos[glyphIndex] ?? (mathGlyphInfos[glyphIndex] = new MathGlyphInfo(glyphIndex));
         }
-        public void LoadMathGlyph(Typeface typeface, MathTable mathTable)
+
+        public static void LoadMathGlyph(Typeface typeface, MathTable mathTable)
         {
             //expand math info to each glyph in typeface
 
             typeface._mathTable = mathTable;
-            Glyph[] allGlyphs = typeface.Glyphs;
+            
 
-            //expand all information to the glyph 
-            int glyphCount = allGlyphs.Length;
+            //expand all information to the glyph  
+            int glyphCount = typeface.GlyphCount;
             MathGlyphInfo[] mathGlyphInfos = new MathGlyphInfo[glyphCount];
-            typeface._mathGlyphInfos = mathGlyphInfos;
+           
 
             int index = 0;
             //-----------------
@@ -655,14 +656,8 @@ namespace Typography.OpenFont.Tables
                         index++;
                     }
                 }
-            }
-
-            //-------
-            //fill to original glyph?
-            for (int n = 0; n < allGlyphs.Length; ++n)
-            {
-                allGlyphs[n].MathGlyphInfo = mathGlyphInfos[n];
-            }
+            }           
+            typeface.LoadMathGlyphInfos(mathGlyphInfos);           
         }
 
     }
