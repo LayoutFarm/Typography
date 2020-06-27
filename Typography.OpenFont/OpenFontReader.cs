@@ -397,7 +397,8 @@ namespace Typography.OpenFont
             PostTable postTable = ReadTableIfExists(tables, input, new PostTable());
             CFFTable cff = ReadTableIfExists(tables, input, new CFFTable());
 
-
+            //additional math table (if available)
+            MathTable mathtable = ReadTableIfExists(tables, input, new MathTable());
 
             Kern kern = ReadTableIfExists(tables, input, new Kern());
 
@@ -422,10 +423,6 @@ namespace Typography.OpenFont
                     AVar avar = ReadTableIfExists(tables, input, new AVar());
                 }
             }
-
-
-            MathTable mathtable = ReadTableIfExists(tables, input, new MathTable());
-
 
             //---------------------------------------------
             //about truetype instruction init 
@@ -475,7 +472,7 @@ namespace Typography.OpenFont
                           header.Bounds,
                           header.UnitsPerEm,
                           horizontalMetrics,
-                          cff                          
+                          cff
                           );
                 }
             }
@@ -485,7 +482,7 @@ namespace Typography.OpenFont
                     os2Table,
                     nameEntry,
                     header.Bounds,
-                    header.UnitsPerEm,                    
+                    header.UnitsPerEm,
                     horizontalMetrics,
                     glyf.Glyphs
                     );
@@ -502,6 +499,7 @@ namespace Typography.OpenFont
 
             if (!isPostScriptOutline && !isBitmapFont)
             {
+                //for true-type font outline
                 FpgmTable fpgmTable = ReadTableIfExists(tables, input, new FpgmTable());
                 //control values table
                 CvtTable cvtTable = ReadTableIfExists(tables, input, new CvtTable());

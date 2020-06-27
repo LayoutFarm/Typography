@@ -1,7 +1,7 @@
 ﻿//MIT, 2019-present, WinterDev
 using System;
 using System.IO;
- 
+
 namespace Typography.OpenFont.Tables
 {
 
