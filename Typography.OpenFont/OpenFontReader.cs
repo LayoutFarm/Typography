@@ -470,7 +470,7 @@ namespace Typography.OpenFont
                           nameEntry,
                           head,
                           horizontalMetrics,
-                          cff
+                          cff.Cff1FontSet
                           );
                 }
             }

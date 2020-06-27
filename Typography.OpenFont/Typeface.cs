@@ -38,7 +38,7 @@ namespace Typography.OpenFont
            NameEntry nameEntry,
            Head head,
            HorizontalMetrics horizontalMetrics,
-           CFFTable cffTable)
+           CFF.Cff1FontSet cff1FontSet)
         {
 
             OS2Table = os2Table;
@@ -47,8 +47,8 @@ namespace Typography.OpenFont
             UnitsPerEm = head.UnitsPerEm;
             _hMetrics = horizontalMetrics;
 
-            _cff1FontSet = cffTable.Cff1FontSet;
-            _glyphs = _cff1FontSet._fonts[0]._glyphs; //TODO: review _fonts[0]
+            _cff1FontSet = cff1FontSet;
+            _glyphs = cff1FontSet._fonts[0]._glyphs; //TODO: review _fonts[0]
         }
         internal Typeface(
              OS2Table os2Table,
