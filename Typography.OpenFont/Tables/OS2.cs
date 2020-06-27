@@ -4,7 +4,7 @@ using System.IO;
 namespace Typography.OpenFont.Tables
 {
 
-    //https://www.microsoft.com/typography/otspec/os2.htm
+    //https://docs.microsoft.com/en-us/typography/opentype/spec/os2
     /// <summary>
     /// OS2 and Windows metrics, 
     /// consists of a set of metrics and other data

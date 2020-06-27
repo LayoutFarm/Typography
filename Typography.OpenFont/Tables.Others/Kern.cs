@@ -10,7 +10,11 @@ namespace Typography.OpenFont.Tables
         public const string _N = "kern";
         public override string Name => _N;
         // 
-        //https://www.microsoft.com/typography/otspec/kern.htm
+        //https://docs.microsoft.com/en-us/typography/opentype/spec/kern
+
+        //Note: Apple has extended the definition of the 'kern' table to provide additional functionality.
+        //The Apple extensions are not supported on Windows.Fonts intended for cross-platform use or 
+        //for the Windows platform in general should conform to the 'kern' table format specified here.
 
         List<KerningSubTable> _kernSubTables = new List<KerningSubTable>();
         public short GetKerningDistance(ushort left, ushort right)
@@ -166,7 +170,7 @@ namespace Typography.OpenFont.Tables
             {
                 //find if we have this left & right ?
                 uint key = (uint)((left << 16) | right);
-              
+
                 _kernDic.TryGetValue(key, out short found);
                 return found;
             }

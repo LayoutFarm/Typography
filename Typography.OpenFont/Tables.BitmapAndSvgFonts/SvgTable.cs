@@ -1,22 +1,21 @@
 ﻿//Apache2, 2017-present, WinterDev 
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 namespace Typography.OpenFont.Tables
 {
     class SvgTable : TableEntry
     {
-
-
         public const string _N = "SVG "; //with 1 whitespace ***
         public override string Name => _N;
         //
-        // https://www.microsoft.com/typography/otspec/svg.htm
+        //https://docs.microsoft.com/en-us/typography/opentype/spec/svg
         //OpenType fonts with either TrueType or CFF outlines may also contain an optional 'SVG ' table, 
         //which allows some or all glyphs in the font to be defined with color, gradients, or animation.
 
 
-        Dictionary<ushort, byte[]> _dicSvgEntries;
+        Dictionary<ushort, int> _dicSvgEntries;
         SvgDocumentEntry[] _entries; //TODO: review again
         protected override void ReadContentFrom(BinaryReader reader)
         {
@@ -94,6 +93,11 @@ namespace Typography.OpenFont.Tables
                 //
                 byte[] svgData = reader.ReadBytes((int)entry.svgDocLength);
                 _entries[i].svgBuffer = svgData;
+
+#if DEBUG
+                if (svgData.Length == 0) { throw new NotSupportedException(); }
+#endif
+
                 if (svgData[0] == (byte)'<')
                 {
                     //should be plain-text
@@ -104,9 +108,7 @@ namespace Typography.OpenFont.Tables
                 }
                 else
                 {
-                    //TODO: gzip-encoded
                     _entries[i].compressed = true;
-                    //decompress...
                 }
             }
         }
@@ -116,16 +118,24 @@ namespace Typography.OpenFont.Tables
         {
             if (_dicSvgEntries == null)
             {
-                _dicSvgEntries = new Dictionary<ushort, byte[]>();
+                _dicSvgEntries = new Dictionary<ushort, int>();
                 for (int i = 0; i < _entries.Length; ++i)
                 {
-                    SvgDocumentEntry en = _entries[i];
-                    _dicSvgEntries.Add(en.startGlyphID, en.svgBuffer);
+                    _dicSvgEntries.Add(_entries[i].startGlyphID, i);
                 }
             }
-            if (_dicSvgEntries.TryGetValue(glyphIndex, out byte[] svgData))
+
+            if (_dicSvgEntries.TryGetValue(glyphIndex, out int entryIndex))
             {
-                outputStBuilder.Append(System.Text.Encoding.UTF8.GetString(svgData));
+                SvgDocumentEntry docEntry = _entries[entryIndex];
+
+                if (docEntry.compressed)
+                {
+                    throw new NotSupportedException();
+                    //TODO: decompress this
+                }
+
+                outputStBuilder.Append(System.Text.Encoding.UTF8.GetString(docEntry.svgBuffer));
                 return true;
             }
             return false;

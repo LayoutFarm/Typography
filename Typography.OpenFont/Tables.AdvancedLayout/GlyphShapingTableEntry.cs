@@ -4,7 +4,7 @@ using System.IO;
 
 namespace Typography.OpenFont.Tables
 {
-    //from https://www.microsoft.com/typography/otspec/otff.htm#otttables
+    //from https://docs.microsoft.com/en-us/typography/opentype/spec/otff#otttables
     //Data Types
 
     // The following data types are used in the OpenType font file.All OpenType fonts use Motorola-style byte ordering (Big Endian):
@@ -25,8 +25,8 @@ namespace Typography.OpenFont.Tables
     // Offset16   Short offset to a table, same as uint16, NULL offset = 0x0000
     // Offset32   Long offset to a table, same as uint32, NULL offset = 0x00000000
 
-    // https://www.microsoft.com/typography/otspec/GPOS.htm
-    // https://www.microsoft.com/typography/otspec/GSUB.htm
+    // https://docs.microsoft.com/en-us/typography/opentype/spec/gpos
+    // https://docs.microsoft.com/en-us/typography/opentype/spec/gsub
 
     public abstract class GlyphShapingTableEntry : TableEntry
     {
@@ -103,7 +103,7 @@ namespace Typography.OpenFont.Tables
 
         void ReadLookupListTable(BinaryReader reader, long lookupListBeginAt)
         {
-            // https://www.microsoft.com/typography/otspec/chapter2.htm
+            //https://docs.microsoft.com/en-us/typography/opentype/spec/chapter2
             // -----------------------
             // LookupList table
             // -----------------------
@@ -183,7 +183,7 @@ namespace Typography.OpenFont.Tables
 
             //----------------------------------------------
             //load each sub table
-            //https://www.microsoft.com/typography/otspec/chapter2.htm
+            
             foreach (ushort lookupTableOffset in lookupTableOffsets)
             {
                 long lookupTablePos = lookupListBeginAt + lookupTableOffset;

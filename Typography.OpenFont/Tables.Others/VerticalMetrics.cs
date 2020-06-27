@@ -12,7 +12,7 @@ namespace Typography.OpenFont.Tables
         public const string _N = "vmtx";
         public override string Name => _N;
 
-        // https://www.microsoft.com/typography/otspec/vmtx.htm
+        // https://docs.microsoft.com/en-us/typography/opentype/spec/vmtx
         // vmtx - Vertical Metrics Table
 
         //The vertical metrics table allows you to specify the vertical spacing for each glyph in a vertical font.
