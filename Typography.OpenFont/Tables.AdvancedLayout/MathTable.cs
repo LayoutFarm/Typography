@@ -566,7 +566,7 @@ namespace Typography.OpenFont.Tables
             //expand math info to each glyph in typeface
 
             typeface._mathTable = mathTable;
-            Glyph[] allGlyphs = typeface.GetRawGlyphList();
+            Glyph[] allGlyphs = typeface.Glyphs;
 
             //expand all information to the glyph 
             int glyphCount = allGlyphs.Length;

@@ -10,7 +10,7 @@ namespace Typography.OpenFont
     {
 
         //TODO: implement vertical metrics
-        readonly HorizontalMetrics _horizontalMetrics;
+        readonly HorizontalMetrics _hMetrics;
         readonly NameEntry _nameEntry;
         //
 
@@ -30,7 +30,7 @@ namespace Typography.OpenFont
             _nameEntry = nameEntry;
             Bounds = head.Bounds;
             UnitsPerEm = head.UnitsPerEm;
-            _horizontalMetrics = horizontalMetrics;
+            _hMetrics = horizontalMetrics;
 
             _glyphs = glyphs;
         }
@@ -46,7 +46,7 @@ namespace Typography.OpenFont
             _nameEntry = nameEntry;
             Bounds = head.Bounds;
             UnitsPerEm = head.UnitsPerEm;
-            _horizontalMetrics = horizontalMetrics;
+            _hMetrics = horizontalMetrics;
 
             _cffTable = cffTable;
             _glyphs = _cffTable.Cff1FontSet._fonts[0]._glyphs; //TODO: review _fonts[0]
@@ -64,7 +64,7 @@ namespace Typography.OpenFont
             _nameEntry = nameEntry;
             Bounds = head.Bounds;
             UnitsPerEm = head.UnitsPerEm;
-            _horizontalMetrics = horizontalMetrics;
+            _hMetrics = horizontalMetrics;
 
             _glyphs = glyphs;
             _bitmapFontGlyphSource = bitmapFontGlyphSource;
@@ -221,15 +221,12 @@ namespace Typography.OpenFont
                 return _glyphs[0]; //return empty glyph?;
             }
         }
-        public ushort GetAdvanceWidthFromGlyphIndex(ushort glyphIndex)
-        {
-            return _horizontalMetrics.GetAdvanceWidth(glyphIndex);
-        }
 
-        public short GetHFrontSideBearingFromGlyphIndex(ushort glyphIndex)
-        {
-            return _horizontalMetrics.GetLeftSideBearing(glyphIndex);
-        }
+        public ushort GetAdvanceWidthFromGlyphIndex(ushort glyphIndex) => _hMetrics.GetAdvanceWidth(glyphIndex);
+        public short GetLeftSideBearing(ushort glyphIndex) => _hMetrics.GetLeftSideBearing(glyphIndex);
+
+
+
         public short GetKernDistance(ushort leftGlyphIndex, ushort rightGlyphIndex)
         {
             //DEPRECATED -> use OpenFont layout instead
@@ -239,6 +236,8 @@ namespace Typography.OpenFont
         public Bounds Bounds { get; }
         public ushort UnitsPerEm { get; }
         public Glyph[] Glyphs => _glyphs;
+        
+
         public short UnderlinePosition => PostTable.UnderlinePosition;
 
         //
@@ -303,21 +302,10 @@ namespace Typography.OpenFont
             this.COLRTable = colrTable;
             this.CPALTable = cpalTable;
             //---------------------------
-            //1. fill glyph definition            
+            //fill glyph definition            
             if (gdefTable != null)
             {
                 gdefTable.FillGlyphData(this.Glyphs);
-                //if (this.Glyphs != null)
-                //{
-
-                //}
-                //else if (_cffTable != null)
-                //{
-                //    //post script outline
-                //    //TODO: fill gdef for cff font
-
-                //}
-
             }
         }
 
@@ -326,21 +314,17 @@ namespace Typography.OpenFont
         public bool IsCffFont => _cffTable != null;
         internal MathTable _mathTable;
         internal MathGlyphs.MathGlyphInfo[] _mathGlyphInfos;
-        internal Glyph[] GetRawGlyphList() => _glyphs;
+      
         //
-        public MathGlyphs.MathConstants MathConsts => (_mathTable != null) ? _mathTable._mathConstTable : null;
-        //---------
+        public MathGlyphs.MathConstants MathConsts => _mathTable?._mathConstTable;
 
 
+        //-------------------------
         //svg and bitmap font
+
+
         internal SvgTable _svgTable;
-        public void ReadSvgContent(ushort glyphIndex, System.Text.StringBuilder output)
-        {
-            if (_svgTable != null)
-            {
-                _svgTable.ReadSvgContent(glyphIndex, output);
-            }
-        }
+        public void ReadSvgContent(ushort glyphIndex, System.Text.StringBuilder output) => _svgTable?.ReadSvgContent(glyphIndex, output);
 
         public bool IsBitmapFont => _bitmapFontGlyphSource != null;
         public void ReadBitmapContent(Glyph glyph, System.IO.Stream output)
