@@ -792,14 +792,12 @@ namespace Typography.OpenFont
 
     public static class TypefaceExtension2
     {
-
-
         public static IEnumerable<GlyphNameMap> GetGlyphNameIter(this Typeface typeface)
         {
             if (typeface.IsCffFont)
             {
                 CFF.Cff1Font cff1Font = typeface.CffTable.Cff1FontSet._fonts[0];
-                foreach (var kp in cff1Font.GetGlyphNameIter())
+                foreach (GlyphNameMap kp in cff1Font.GetGlyphNameIter())
                 {
                     yield return kp;
                 }

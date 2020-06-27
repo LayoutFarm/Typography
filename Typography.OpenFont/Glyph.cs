@@ -83,7 +83,15 @@ namespace Typography.OpenFont
 
         public bool HasGlyphInstructions => this.GlyphInstructions != null;
 
-        internal static void TransformNormalWith2x2Matrix(Glyph glyph, float m00, float m01, float m10, float m11)
+        /// <summary>
+        ///TrueType outline, transform normal
+        /// </summary>
+        /// <param name="glyph"></param>
+        /// <param name="m00"></param>
+        /// <param name="m01"></param>
+        /// <param name="m10"></param>
+        /// <param name="m11"></param>
+        internal static void TtfTxNormalWith2x2Matrix(Glyph glyph, float m00, float m01, float m10, float m11)
         {
 
             //http://stackoverflow.com/questions/13188156/whats-the-different-between-vector2-transform-and-vector2-transformnormal-i
@@ -94,7 +102,6 @@ namespace Typography.OpenFont
             float new_ymin = 0;
             float new_xmax = 0;
             float new_ymax = 0;
-
 
             GlyphPointF[] glyphPoints = glyph.glyphPoints;
             for (int i = glyphPoints.Length - 1; i >= 0; --i)
@@ -137,8 +144,15 @@ namespace Typography.OpenFont
                (short)new_xmax, (short)new_ymax);
         }
 
-        internal static Glyph Clone(Glyph original, ushort newGlyphIndex)
+        /// <summary>
+        /// TrueType outline glyph clone
+        /// </summary>
+        /// <param name="original"></param>
+        /// <param name="newGlyphIndex"></param>
+        /// <returns></returns>
+        internal static Glyph TtfOutlineGlyphClone(Glyph original, ushort newGlyphIndex)
         {
+            //for true type instruction glyph***
             return new Glyph(
                 Utils.CloneArray(original.glyphPoints),
                 Utils.CloneArray(original._contourEndPoints),
@@ -152,7 +166,7 @@ namespace Typography.OpenFont
         /// </summary>
         /// <param name="src"></param>
         /// <param name="dest"></param>
-        internal static void AppendGlyph(Glyph dest, Glyph src)
+        internal static void TtfAppendGlyph(Glyph dest, Glyph src)
         {
             int org_dest_len = dest._contourEndPoints.Length;
 #if DEBUG
@@ -232,20 +246,22 @@ namespace Typography.OpenFont
 
         internal CFF.Cff1Font _ownerCffFont;
         internal CFF.Cff1GlyphData _cff1GlyphData; //temp
-        internal Glyph(CFF.Cff1Font owner, CFF.Cff1GlyphData cff1Glyph)
+        internal Glyph(CFF.Cff1Font owner, CFF.Cff1GlyphData cff1Glyph, ushort glyphIndex)
         {
 #if DEBUG
             this.dbugId = s_debugTotalId++;
+            cff1Glyph.dbugGlyphIndex = glyphIndex;
 #endif
 
             _ownerCffFont = owner;
             //create from CFF 
             _cff1GlyphData = cff1Glyph;
-            this.GlyphIndex = cff1Glyph.GlyphIndex;
+            this.GlyphIndex = glyphIndex;
         }
         public bool IsCffGlyph => _ownerCffFont != null;
         public CFF.Cff1Font GetOwnerCff() => _ownerCffFont;
         public CFF.Cff1GlyphData GetCff1GlyphData() => _cff1GlyphData;
+
         //math glyph info, temp , TODO: review here again
         public MathGlyphs.MathGlyphInfo MathGlyphInfo { get; internal set; }
         public bool HasMathGlyphInfo { get; internal set; }

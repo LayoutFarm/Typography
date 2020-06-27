@@ -304,7 +304,7 @@ namespace Typography.OpenFont.Tables
                     createdGlyphs[glyphIndex] = missingGlyph;
                     reader.BaseStream.Position = storedOffset;
                 }
-                Glyph newGlyph = Glyph.Clone(createdGlyphs[glyphIndex], compositeGlyphIndex);
+                Glyph newGlyph = Glyph.TtfOutlineGlyphClone(createdGlyphs[glyphIndex], compositeGlyphIndex);
 
                 int arg1 = 0;//arg1, arg2 may be int8,uint8,int16,uint 16 
                 int arg2 = 0;//arg1, arg2 may be int8,uint8,int16,uint 16
@@ -432,7 +432,7 @@ namespace Typography.OpenFont.Tables
                     if (useMatrix)
                     {
                         //use this matrix  
-                        Glyph.TransformNormalWith2x2Matrix(newGlyph, xscale, scale01, scale10, yscale);
+                        Glyph.TtfTxNormalWith2x2Matrix(newGlyph, xscale, scale01, scale10, yscale);
                         Glyph.OffsetXY(newGlyph, (short)arg1, (short)arg2);
                     }
                     else
@@ -445,7 +445,7 @@ namespace Typography.OpenFont.Tables
                             }
                             else
                             {
-                                Glyph.TransformNormalWith2x2Matrix(newGlyph, xscale, 0, 0, yscale);
+                                Glyph.TtfTxNormalWith2x2Matrix(newGlyph, xscale, 0, 0, yscale);
                             }
                             Glyph.OffsetXY(newGlyph, (short)arg1, (short)arg2);
                         }
@@ -480,7 +480,7 @@ namespace Typography.OpenFont.Tables
                 else
                 {
                     //merge 
-                    Glyph.AppendGlyph(finalGlyph, newGlyph);
+                    Glyph.TtfAppendGlyph(finalGlyph, newGlyph);
                 }
 
 

@@ -558,17 +558,16 @@ namespace Typography.OpenFont.CFF
         {
         }
 
-        public string Name { get; set; }
-        public ushort SIDName { get; set; }
-
-        public ushort GlyphIndex { get; set; }
+        public string Name { get; internal set; }
+        public ushort SIDName { get; internal set; }
         internal Type2Instruction[] GlyphInstructions { get; set; }
 
 #if DEBUG
+        public ushort dbugGlyphIndex { get; internal set; }
         public override string ToString()
         {
             StringBuilder stbuilder = new StringBuilder();
-            stbuilder.Append(GlyphIndex);
+            stbuilder.Append(dbugGlyphIndex);
             if (Name != null)
             {
                 stbuilder.Append(" ");
@@ -626,7 +625,7 @@ namespace Typography.OpenFont.CFF
 
         int _charStringsOffset;
         int _charsetOffset;
-        int _encodingOffset; 
+        int _encodingOffset;
 
         public void ParseAfterHeader(long cffStartAt, BinaryReader reader)
         {
@@ -1445,13 +1444,16 @@ namespace Typography.OpenFont.CFF
 
             _reader.BaseStream.Position = _cffStartAt + _charStringsOffset;
             CffIndexOffset[] offsets = ReadIndexDataOffsets();
-            int glyphCount = offsets.Length;
-            //assume Type2
-            //TODO: review here 
 
+
+#if DEBUG
+            if (offsets.Length >= ushort.MaxValue) { throw new NotSupportedException(); }
+#endif
+            int glyphCount =  offsets.Length;
+            //assume Type2
+            //TODO: review here  
 
             Glyph[] glyphs = new Glyph[glyphCount];
-
             _currentCff1Font._glyphs = glyphs;
             Type2CharStringParser type2Parser = new Type2CharStringParser();
             type2Parser.SetCurrentCff1Font(_currentCff1Font);
@@ -1486,9 +1488,8 @@ namespace Typography.OpenFont.CFF
                 //now we can parse the raw glyph instructions 
 
                 Cff1GlyphData glyphData = new Cff1GlyphData();
-                glyphData.GlyphIndex = (ushort)i;
 #if DEBUG
-                type2Parser.dbugCurrentGlyphIndex = glyphData.GlyphIndex;
+                type2Parser.dbugCurrentGlyphIndex = (ushort)i;
 #endif
 
                 if (isCidFont)
@@ -1522,7 +1523,7 @@ namespace Typography.OpenFont.CFF
 
                     }
                 }
-                glyphs[i] = new Glyph(_currentCff1Font, glyphData);
+                glyphs[i] = new Glyph(_currentCff1Font, glyphData, (ushort)i);
             }
 
 #if DEBUG

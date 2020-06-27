@@ -765,7 +765,7 @@ namespace Typography.WebFont
                     reader.BaseStream.Position = storedOffset;
                 }
 
-                Glyph newGlyph = Glyph.Clone(createdGlyphs[glyphIndex], compositeGlyphIndex);
+                Glyph newGlyph = Glyph.TtfOutlineGlyphClone(createdGlyphs[glyphIndex], compositeGlyphIndex);
 
                 short arg1 = 0;
                 short arg2 = 0;
@@ -854,7 +854,7 @@ namespace Typography.WebFont
                     if (useMatrix)
                     {
                         //use this matrix  
-                        Glyph.TransformNormalWith2x2Matrix(newGlyph, xscale, scale01, scale10, yscale);
+                        Glyph.TtfTxNormalWith2x2Matrix(newGlyph, xscale, scale01, scale10, yscale);
                         Glyph.OffsetXY(newGlyph, arg1, arg2);
                     }
                     else
@@ -867,7 +867,7 @@ namespace Typography.WebFont
                             }
                             else
                             {
-                                Glyph.TransformNormalWith2x2Matrix(newGlyph, xscale, 0, 0, yscale);
+                                Glyph.TtfTxNormalWith2x2Matrix(newGlyph, xscale, 0, 0, yscale);
                             }
                             Glyph.OffsetXY(newGlyph, arg1, arg2);
                         }
@@ -902,7 +902,7 @@ namespace Typography.WebFont
                 else
                 {
                     //merge 
-                    Glyph.AppendGlyph(finalGlyph, newGlyph);
+                    Glyph.TtfAppendGlyph(finalGlyph, newGlyph);
                 }
 
             } while (Glyf.HasFlag(flags, Glyf.CompositeGlyphFlags.MORE_COMPONENTS));
