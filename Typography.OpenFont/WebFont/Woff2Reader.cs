@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Typography.OpenFont;
 using Typography.OpenFont.IO;
 using Typography.OpenFont.Tables;
+using Typography.OpenFont.Trimable;
 
 //see https://www.w3.org/TR/WOFF2/
 
@@ -12,28 +13,28 @@ namespace Typography.WebFont
     class Woff2Header
     {
         //WOFF2 Header
-        //UInt32 signature   0x774F4632 'wOF2'
-        //UInt32 flavor  The "sfnt version" of the input font.
-        //UInt32 length  Total size of the WOFF file.
-        //UInt16 numTables   Number of entries in directory of font tables.
-        //UInt16 reserved    Reserved; set to 0.
-        //UInt32 totalSfntSize   Total size needed for the uncompressed font data, including the sfnt header,
-        //directory, and font tables(including padding).
-        //UInt32  totalCompressedSize Total length of the compressed data block.
-        //UInt16  majorVersion    Major version of the WOFF file.
-        //UInt16  minorVersion    Minor version of the WOFF file.
-        //UInt32  metaOffset  Offset to metadata block, from beginning of WOFF file.
-        //UInt32  metaLength  Length of compressed metadata block.
-        //UInt32  metaOrigLength  Uncompressed size of metadata block.
-        //UInt32  privOffset  Offset to private data block, from beginning of WOFF file.
-        //UInt32  privLength Length of private data block.
+        //UInt32 signature              0x774F4632 'wOF2'
+        //UInt32 flavor                 The "sfnt version" of the input font.
+        //UInt32 length                 Total size of the WOFF file.
+        //UInt16 numTables              Number of entries in directory of font tables.
+        //UInt16 reserved               Reserved; set to 0.
+        //UInt32 totalSfntSize          Total size needed for the uncompressed font data, including the sfnt header,
+        //                              directory, and font tables(including padding).
+        //UInt32  totalCompressedSize   Total length of the compressed data block.
+        //UInt16  majorVersion          Major version of the WOFF file.
+        //UInt16  minorVersion          Minor version of the WOFF file.
+        //UInt32  metaOffset            Offset to metadata block, from beginning of WOFF file.
+        //UInt32  metaLength            Length of compressed metadata block.
+        //UInt32  metaOrigLength        Uncompressed size of metadata block.
+        //UInt32  privOffset            Offset to private data block, from beginning of WOFF file.
+        //UInt32  privLength            Length of private data block.
 
         public uint flavor;
         public uint length;
         public uint numTables;
         //public ushort reserved;
         public uint totalSfntSize;
-        public uint totalCompressSize; //***
+        public uint totalCompressedSize; //***
         public ushort majorVersion;
         public ushort minorVersion;
         public uint metaOffset;
@@ -86,9 +87,7 @@ namespace Typography.WebFont
 
         public override T CreateTableEntry<T>(BinaryReader reader, T expectedResult)
         {
-            Glyf glyfTable = expectedResult as Glyf;
-
-            if (glyfTable == null) throw new System.NotSupportedException();
+            if (!(expectedResult is Glyf glyfTable)) throw new System.NotSupportedException();
 
             ReconstructGlyfTable(reader, TableDir, glyfTable);
 
@@ -854,8 +853,8 @@ namespace Typography.WebFont
                     if (useMatrix)
                     {
                         //use this matrix  
-                        Glyph.TtfTxNormalWith2x2Matrix(newGlyph, xscale, scale01, scale10, yscale);
-                        Glyph.OffsetXY(newGlyph, arg1, arg2);
+                        Glyph.TtfTransformWith2x2Matrix(newGlyph, xscale, scale01, scale10, yscale);
+                        Glyph.TtfOffsetXY(newGlyph, arg1, arg2);
                     }
                     else
                     {
@@ -867,9 +866,9 @@ namespace Typography.WebFont
                             }
                             else
                             {
-                                Glyph.TtfTxNormalWith2x2Matrix(newGlyph, xscale, 0, 0, yscale);
+                                Glyph.TtfTransformWith2x2Matrix(newGlyph, xscale, 0, 0, yscale);
                             }
-                            Glyph.OffsetXY(newGlyph, arg1, arg2);
+                            Glyph.TtfOffsetXY(newGlyph, arg1, arg2);
                         }
                         else
                         {
@@ -879,7 +878,7 @@ namespace Typography.WebFont
                                 //----------------------------
                             }
                             //just offset***
-                            Glyph.OffsetXY(newGlyph, arg1, arg2);
+                            Glyph.TtfOffsetXY(newGlyph, arg1, arg2);
                         }
                     }
 
@@ -1372,8 +1371,8 @@ namespace Typography.WebFont
             }
 
             //try read each compressed tables
-            byte[] compressedBuffer = reader.ReadBytes((int)_header.totalCompressSize);
-            if (compressedBuffer.Length != _header.totalCompressSize)
+            byte[] compressedBuffer = reader.ReadBytes((int)_header.totalCompressedSize);
+            if (compressedBuffer.Length != _header.totalCompressedSize)
             {
                 //error!
                 return null; //can't read this, notify user too.
@@ -1400,10 +1399,12 @@ namespace Typography.WebFont
                 }
             }
         }
-        internal Typeface Read(BinaryReader reader)
+
+        internal bool Read(Typeface typeface, BinaryReader reader, RestoreTicket ticket)
         {
             _header = ReadHeader(reader);
-            if (_header == null) return null;  //=> return here and notify user too.  
+            if (_header == null) { return false; }  //=> return here and notify user too.
+
             Woff2TableDirectory[] woff2TablDirs = ReadTableDirectories(reader);
             if (DecompressHandler == null)
             {
@@ -1415,16 +1416,15 @@ namespace Typography.WebFont
                 else
                 {
                     //return here and notify user too. 
-                    return null;
+                    return false;
                 }
             }
 
-            //try read each compressed tables
-            byte[] compressedBuffer = reader.ReadBytes((int)_header.totalCompressSize);
-            if (compressedBuffer.Length != _header.totalCompressSize)
+            byte[] compressedBuffer = reader.ReadBytes((int)_header.totalCompressedSize);
+            if (compressedBuffer.Length != _header.totalCompressedSize)
             {
                 //error!
-                return null; //can't read this, notify user too.
+                return false; //can't read this, notify user too.
             }
 
             using (MemoryStream decompressedStream = new MemoryStream())
@@ -1436,7 +1436,7 @@ namespace Typography.WebFont
 
                     //if not pass set to null
                     //decompressedBuffer = null;
-                    return null;
+                    return false;
                 }
                 //from decoded stream we read each table
                 decompressedStream.Position = 0;//reset pos
@@ -1445,19 +1445,10 @@ namespace Typography.WebFont
                 {
                     TableEntryCollection tableEntryCollection = CreateTableEntryCollection(woff2TablDirs);
                     OpenFontReader openFontReader = new OpenFontReader();
-                    return openFontReader.ReadTableEntryCollection(tableEntryCollection, reader2);
+                    return openFontReader.ReadTableEntryCollection(typeface, ticket, tableEntryCollection, reader2);
                 }
             }
         }
-        public Typeface Read(Stream inputstream)
-        {
-            using (ByteOrderSwappingBinaryReader reader = new ByteOrderSwappingBinaryReader(inputstream))
-            {
-                return Read(reader);
-            }
-        }
-
-
 
         Woff2Header ReadHeader(BinaryReader reader)
         {
@@ -1494,7 +1485,7 @@ namespace Typography.WebFont
             header.numTables = reader.ReadUInt16();
             ushort reserved = reader.ReadUInt16();
             header.totalSfntSize = reader.ReadUInt32();
-            header.totalCompressSize = reader.ReadUInt32();//***
+            header.totalCompressedSize = reader.ReadUInt32();//***
 
             header.majorVersion = reader.ReadUInt16();
             header.minorVersion = reader.ReadUInt16();

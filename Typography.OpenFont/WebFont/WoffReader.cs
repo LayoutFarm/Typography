@@ -1,10 +1,12 @@
 ﻿//MIT, 2019-present, WinterDev 
 //see https://www.w3.org/TR/2012/REC-WOFF-20121213/
 
+using System;
 using System.IO;
 using Typography.OpenFont;
 using Typography.OpenFont.IO;
 using Typography.OpenFont.Tables;
+using Typography.OpenFont.Trimable;
 
 namespace Typography.WebFont
 {
@@ -142,9 +144,10 @@ namespace Typography.WebFont
             }
 
             return fontPreviewInfo;
-
         }
-        internal Typeface Read(BinaryReader reader)
+
+
+        internal bool Read(Typeface typeface, BinaryReader reader, RestoreTicket ticket)
         {
             //WOFF File
             //WOFFHeader        File header with basic font type and version, along with offsets to metadata and private data blocks.
@@ -158,14 +161,14 @@ namespace Typography.WebFont
 #if DEBUG
                 System.Diagnostics.Debug.WriteLine("can't read ");
 #endif
-                return null; //notify user too
+                return false;
             }
 
             //
             WoffTableDirectory[] woffTableDirs = ReadTableDirectories(reader);
             if (woffTableDirs == null)
             {
-                return null;
+                return false;
             }
             //
             //try read each compressed table
@@ -180,7 +183,7 @@ namespace Typography.WebFont
 #if DEBUG
                     System.Diagnostics.Debug.WriteLine("no Zlib DecompressHandler ");
 #endif
-                    return null; //notify user too
+                    return false;
                 }
             }
 
@@ -194,19 +197,13 @@ namespace Typography.WebFont
                     {
                         decompressStream.Position = 0;
                         OpenFontReader openFontReader = new OpenFontReader();
-                        return openFontReader.ReadTableEntryCollection(tableEntryCollection, reader2);
+                        return openFontReader.ReadTableEntryCollection(typeface, ticket, tableEntryCollection, reader2);
                     }
                 }
             }
-            return null;
+            return false;
         }
-        public Typeface Read(Stream inputStream)
-        {
-            using (ByteOrderSwappingBinaryReader reader = new ByteOrderSwappingBinaryReader(inputStream))
-            {
-                return Read(reader);
-            } 
-        }
+
 
         static TableEntryCollection CreateTableEntryCollection(WoffTableDirectory[] woffTableDirs)
         {

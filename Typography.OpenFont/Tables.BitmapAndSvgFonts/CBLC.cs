@@ -32,6 +32,9 @@ namespace Typography.OpenFont.Tables
     //The numSizes in the CblcHeader indicates the number of BitmapSize tables in the array.
     //Each strike is defined by one BitmapSize table.
 
+    /// <summary>
+    /// embeded bitmap locator
+    /// </summary>
     class CBLC : TableEntry
     {
         BitmapSizeTable[] _bmpSizeTables;

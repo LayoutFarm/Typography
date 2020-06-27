@@ -64,7 +64,7 @@ namespace Typography.OpenFont.CFF
 
     class Cff1FontSet
     {
-        internal List<string> _fontNames;
+        internal string[] _fontNames;
         internal List<Cff1Font> _fonts = new List<Cff1Font>();
         internal string[] _uniqueStringTable;
         //
@@ -484,15 +484,12 @@ namespace Typography.OpenFont.CFF
         internal string FontName { get; set; }
         internal Glyph[] _glyphs;
 
-
         internal List<byte[]> _localSubrRawBufferList;
         internal List<byte[]> _globalSubrRawBufferList;
 
         internal int _defaultWidthX;
         internal int _nominalWidthX;
         internal List<FontDict> _cidFontDict;
-
-        Dictionary<string, Glyph> _cachedGlyphDicByName;
 
         public string Version { get; set; } //CFF SID
         public string Notice { get; set; }//CFF SID
@@ -509,34 +506,7 @@ namespace Typography.OpenFont.CFF
         }
 
 #endif
-
-        public Glyph GetGlyphByName(string name)
-        {
-            if (_cachedGlyphDicByName == null)
-            {
-                _cachedGlyphDicByName = new Dictionary<string, Glyph>();
-                int j = _glyphs.Length;
-                for (int i = 1; i < j; ++i)
-                {
-                    Glyph cff1Glyph = _glyphs[i];
-                    if (cff1Glyph._cff1GlyphData.Name != null)
-                    {
-                        _cachedGlyphDicByName.Add(cff1Glyph._cff1GlyphData.Name, cff1Glyph);
-                    }
-                    else
-                    {
-#if DEBUG
-                        // System.Diagnostics.Debug.WriteLine("Cff unknown glyphname");
-#endif
-                    }
-
-                }
-            }
-
-            _cachedGlyphDicByName.TryGetValue(name, out Glyph found);
-            return found;
-        }
-
+         
         internal IEnumerable<GlyphNameMap> GetGlyphNameIter()
         {
             int j = _glyphs.Length;
@@ -631,9 +601,8 @@ namespace Typography.OpenFont.CFF
             _cffStartAt = cffStartAt;
             _cff1FontSet = new Cff1FontSet();
             _cidFontInfo = new CIDFontInfo();
-
-
             _reader = reader;
+
             //
             ReadNameIndex();
             ReadTopDICTIndex();
@@ -652,9 +621,6 @@ namespace Typography.OpenFont.CFF
             ReadCharStringsIndex();
             ReadCharsets();
             ReadEncodings();
-
-
-
 
             //...
         }
@@ -701,14 +667,14 @@ namespace Typography.OpenFont.CFF
             //
 
             int count = nameIndexElems.Length;
-            List<string> fontNames = new List<string>();
+            string[] fontNames = new string[count];
             for (int i = 0; i < count; ++i)
             {
                 //read each FontName or CIDFontName
                 CffIndexOffset indexElem = nameIndexElems[i];
                 //TODO: review here again, 
                 //check if we need to set _reader.BaseStream.Position or not
-                fontNames.Add(Encoding.UTF8.GetString(_reader.ReadBytes(indexElem.len), 0, indexElem.len));
+                fontNames[i] = Encoding.UTF8.GetString(_reader.ReadBytes(indexElem.len), 0, indexElem.len);
             }
 
             //
@@ -758,8 +724,8 @@ namespace Typography.OpenFont.CFF
             for (int i = 0; i < count; ++i)
             {
                 //read DICT data
-                CffIndexOffset offset = offsets[i];
-                List<CffDataDicEntry> dicData = ReadDICTData(offset.len);
+
+                List<CffDataDicEntry> dicData = ReadDICTData(offsets[i].len);
                 _topDic = dicData;
             }
 
@@ -831,13 +797,31 @@ namespace Typography.OpenFont.CFF
             //
 
             _uniqueStringTable = new string[offsets.Length];
+
+            byte[] buff = new byte[512];//reusable
+
             for (int i = 0; i < offsets.Length; ++i)
             {
-                CffIndexOffset offset = offsets[i];
+                int len = offsets[i].len;
                 //TODO: review here again, 
                 //check if we need to set _reader.BaseStream.Position or not 
-                //TODO: Is Charsets.ISO_8859_1 Encoding supported in .netcore 
-                _uniqueStringTable[i] = Encoding.UTF8.GetString(_reader.ReadBytes(offset.len), 0, offset.len);
+                //TODO: Is Charsets.ISO_8859_1 Encoding supported in .netcore  
+                if (len < buff.Length)
+                {
+                    int actualRead = _reader.Read(buff, 0, len);
+#if DEBUG
+                    if (actualRead != len)
+                    {
+                        throw new NotSupportedException();
+                    }
+#endif
+                    _uniqueStringTable[i] = Encoding.UTF8.GetString(buff, 0, len);
+                }
+                else
+                {
+                    _uniqueStringTable[i] = Encoding.UTF8.GetString(_reader.ReadBytes(len), 0, len);
+                }
+
             }
 
             _cff1FontSet._uniqueStringTable = _uniqueStringTable;

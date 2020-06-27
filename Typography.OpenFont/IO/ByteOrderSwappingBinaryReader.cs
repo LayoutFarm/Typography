@@ -37,7 +37,7 @@ namespace Typography.OpenFont.IO
         public override int ReadInt32() => BitConverter.ToInt32(RR(4), 8 - 4);
 
         //
-        byte[] _reusable_buffer = new byte[8]; //fix buffer size to 8 bytes
+        readonly byte[] _reusable_buffer = new byte[8]; //fix buffer size to 8 bytes
         /// <summary>
         /// read and reverse 
         /// </summary>
@@ -53,7 +53,7 @@ namespace Typography.OpenFont.IO
         //we don't use these methods in our OpenFont, so => throw the exception
         public override int PeekChar() { throw new NotImplementedException(); }
         public override int Read() { throw new NotImplementedException(); }
-        public override int Read(byte[] buffer, int index, int count) { throw new NotImplementedException(); }
+        public override int Read(byte[] buffer, int index, int count) => base.Read(buffer, index, count);
         public override int Read(char[] buffer, int index, int count) { throw new NotImplementedException(); }
         public override bool ReadBoolean() { throw new NotImplementedException(); }
         public override char ReadChar() { throw new NotImplementedException(); }

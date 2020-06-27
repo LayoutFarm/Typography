@@ -2,7 +2,8 @@
 
 using System;
 using Typography.OpenFont;
-using Typography.OpenFont.Tables;
+using Typography.OpenFont.Trimable;
+
 namespace Typography.Contours
 {
     //-----------------------------------
@@ -18,15 +19,13 @@ namespace Typography.Contours
         protected GlyphPointF[] _outputGlyphPoints;
         protected ushort[] _outputContours;
 
-   
-        protected OpenFont.CFF.Cff1GlyphData _cffGlyphData;
+        OpenFont.CFF.Cff1GlyphData _cffGlyphData;
 
         /// <summary>
         /// scale for converting latest glyph points to latest request font size
         /// </summary>
         float _recentPixelScale;
-        Typography.OpenFont.CFF.CffEvaluationEngine _cffEvalEngine;
-
+        readonly Typography.OpenFont.CFF.CffEvaluationEngine _cffEvalEngine;
 
         public GlyphOutlineBuilderBase(Typeface typeface)
         {
@@ -61,7 +60,15 @@ namespace Typography.Contours
         /// <param name="sizeInPoints"></param>
         public void BuildFromGlyphIndex(ushort glyphIndex, float sizeInPoints)
         {
-            BuildFromGlyph(_typeface.GetGlyph(glyphIndex), sizeInPoints);
+            if (!_typeface.IsTrimmed())
+            {
+                BuildFromGlyph(_typeface.GetGlyph(glyphIndex), sizeInPoints);
+            }
+            else
+            {
+                //other mode=> can't build
+                throw new NotSupportedException("the typeface was trimmed");
+            }
         }
         /// <summary>
         /// build glyph shape from glyph to be read
@@ -70,7 +77,7 @@ namespace Typography.Contours
         /// <param name="sizeInPoints"></param>
         public void BuildFromGlyph(Glyph glyph, float sizeInPoints)
         {
-            //for true type font
+            //for TrueType font
             _outputGlyphPoints = glyph.GlyphPoints;
             _outputContours = glyph.EndPoints;
 
@@ -79,7 +86,7 @@ namespace Typography.Contours
             if (glyph.IsCffGlyph)
             {
                 _cffGlyphData = glyph.GetCff1GlyphData();
-               
+
             }
 
             //---------------
