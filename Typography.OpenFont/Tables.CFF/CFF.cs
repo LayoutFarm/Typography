@@ -1449,7 +1449,7 @@ namespace Typography.OpenFont.CFF
 #if DEBUG
             if (offsets.Length >= ushort.MaxValue) { throw new NotSupportedException(); }
 #endif
-            int glyphCount =  offsets.Length;
+            int glyphCount = offsets.Length;
             //assume Type2
             //TODO: review here  
 
@@ -1523,7 +1523,7 @@ namespace Typography.OpenFont.CFF
 
                     }
                 }
-                glyphs[i] = new Glyph(_currentCff1Font, glyphData, (ushort)i);
+                glyphs[i] = new Glyph(glyphData, (ushort)i);
             }
 
 #if DEBUG
