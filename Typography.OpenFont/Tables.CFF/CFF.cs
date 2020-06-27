@@ -543,7 +543,7 @@ namespace Typography.OpenFont.CFF
 #if DEBUG
             if (j > ushort.MaxValue) { throw new NotSupportedException(); }
 #endif
-            for (int i = 1; i < j; ++i)
+            for (int i = 0; i < j; ++i)
             {
                 Glyph cff1Glyph = _glyphs[i];
                 yield return new GlyphNameMap((ushort)i, cff1Glyph._cff1GlyphData.Name);
@@ -553,8 +553,7 @@ namespace Typography.OpenFont.CFF
     }
     public class Cff1GlyphData
     {
-
-        public Cff1GlyphData()
+        internal Cff1GlyphData()
         {
         }
 
@@ -1449,7 +1448,7 @@ namespace Typography.OpenFont.CFF
 #if DEBUG
             if (offsets.Length >= ushort.MaxValue) { throw new NotSupportedException(); }
 #endif
-            int glyphCount =  offsets.Length;
+            int glyphCount = offsets.Length;
             //assume Type2
             //TODO: review here  
 
