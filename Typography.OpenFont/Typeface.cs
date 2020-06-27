@@ -15,8 +15,7 @@ namespace Typography.OpenFont
         //
 
         Glyph[] _glyphs;
-        CFFTable _cffTable;
-
+        internal CFF.Cff1FontSet _cff1FontSet;
 
         internal Typeface(
             OS2Table os2Table,
@@ -48,8 +47,8 @@ namespace Typography.OpenFont
             UnitsPerEm = head.UnitsPerEm;
             _hMetrics = horizontalMetrics;
 
-            _cffTable = cffTable;
-            _glyphs = _cffTable.Cff1FontSet._fonts[0]._glyphs; //TODO: review _fonts[0]
+            _cff1FontSet = cffTable.Cff1FontSet;
+            _glyphs = _cff1FontSet._fonts[0]._glyphs; //TODO: review _fonts[0]
         }
         internal Typeface(
              OS2Table os2Table,
@@ -84,7 +83,7 @@ namespace Typography.OpenFont
         internal OS2Table OS2Table { get; set; }
         //
         public bool HasPrepProgramBuffer => PrepProgramBuffer != null;
-        internal CFFTable CffTable => _cffTable;
+        internal CFF.Cff1FontSet CffTable => _cff1FontSet;
         /// <summary>
         /// actual font filename
         /// </summary>
@@ -161,10 +160,10 @@ namespace Typography.OpenFont
         public Glyph GetGlyphByName(string glyphName)
         {
             if (glyphName == null) return null;
-            if (_cffTable != null)
+            if (_cff1FontSet != null)
             {
                 //early preview ...
-                List<CFF.Cff1Font> cff1Fonts = _cffTable.Cff1FontSet._fonts;
+                List<CFF.Cff1Font> cff1Fonts = _cff1FontSet._fonts;
                 for (int i = 0; i < cff1Fonts.Count; i++)
                 {
                     Glyph glyph = cff1Fonts[i].GetGlyphByName(glyphName);
@@ -180,7 +179,7 @@ namespace Typography.OpenFont
         }
         public ushort GetGlyphIndexByName(string glyphName)
         {
-            if (_cffTable != null)
+            if (_cff1FontSet != null)
             {
                 return GetGlyphByName(glyphName)?.GlyphIndex ?? 0;
             }
@@ -304,7 +303,7 @@ namespace Typography.OpenFont
 
         internal PostTable PostTable { get; set; }
         internal bool _evalCffGlyphBounds;
-        public bool IsCffFont => _cffTable != null;
+        public bool IsCffFont => _cff1FontSet != null;
 
         //Math Table
 
@@ -796,7 +795,7 @@ namespace Typography.OpenFont
         {
             if (typeface.IsCffFont)
             {
-                CFF.Cff1Font cff1Font = typeface.CffTable.Cff1FontSet._fonts[0];
+                CFF.Cff1Font cff1Font = typeface._cff1FontSet._fonts[0];
                 foreach (GlyphNameMap kp in cff1Font.GetGlyphNameIter())
                 {
                     yield return kp;
