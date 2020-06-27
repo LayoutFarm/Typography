@@ -373,7 +373,7 @@ namespace Typography.OpenFont
             MaxProfile maximumProfile = ReadTableIfExists(tables, input, new MaxProfile());
 
             HorizontalHeader horizontalHeader = ReadTableIfExists(tables, input, new HorizontalHeader());
-            HorizontalMetrics horizontalMetrics = ReadTableIfExists(tables, input, new HorizontalMetrics(horizontalHeader.HorizontalMetricsCount, maximumProfile.GlyphCount));
+            HorizontalMetrics horizontalMetrics = ReadTableIfExists(tables, input, new HorizontalMetrics(horizontalHeader.NumberOfHMetrics, maximumProfile.GlyphCount));
 
             VerticalHeader vhea = ReadTableIfExists(tables, input, new VerticalHeader());
             if (vhea != null)
@@ -383,8 +383,8 @@ namespace Typography.OpenFont
 
             Cmap cmaps = ReadTableIfExists(tables, input, new Cmap());
 
+            //------------------------------------
             //PART 2: glyphs detail 
-
             //2.1 True type font
             GlyphLocations glyphLocations = ReadTableIfExists(tables, input, new GlyphLocations(maximumProfile.GlyphCount, header.WideGlyphLocations));
             Glyf glyf = ReadTableIfExists(tables, input, new Glyf(glyphLocations));
@@ -398,10 +398,11 @@ namespace Typography.OpenFont
             CFFTable cff = ReadTableIfExists(tables, input, new CFFTable());
 
 
+
             Kern kern = ReadTableIfExists(tables, input, new Kern());
 
-            //--------------
-            //advanced typography
+            //------------------------------------
+            //PART 3: advanced typography             
             GDEF gdef = ReadTableIfExists(tables, input, new GDEF());
             GSUB gsub = ReadTableIfExists(tables, input, new GSUB());
             GPOS gpos = ReadTableIfExists(tables, input, new GPOS());
@@ -424,6 +425,8 @@ namespace Typography.OpenFont
 
 
             MathTable mathtable = ReadTableIfExists(tables, input, new MathTable());
+
+
             //---------------------------------------------
             //about truetype instruction init 
             //--------------------------------------------- 
@@ -441,20 +444,19 @@ namespace Typography.OpenFont
                     {
                         CBDT cbdtTable = ReadTableIfExists(tables, input, new CBDT());
                         //read cbdt 
-                        //bitmap font 
+                        //bitmap font
 
                         BitmapFontGlyphSource bmpFontGlyphSrc = new BitmapFontGlyphSource(cblcTable, cbdtTable);
                         Glyph[] glyphs = bmpFontGlyphSrc.BuildGlyphList();
 
-
                         typeface = new Typeface(
+                          os2Table,
                           nameEntry,
                           header.Bounds,
                           header.UnitsPerEm,
-                          bmpFontGlyphSrc,
-                          glyphs,
                           horizontalMetrics,
-                          os2Table);
+                          glyphs,
+                          bmpFontGlyphSrc);
                         isBitmapFont = true;
                     }
                     else
@@ -468,23 +470,25 @@ namespace Typography.OpenFont
                 {
                     isPostScriptOutline = true;
                     typeface = new Typeface(
+                          os2Table,
                           nameEntry,
                           header.Bounds,
                           header.UnitsPerEm,
-                          cff,
                           horizontalMetrics,
-                          os2Table);
+                          cff                          
+                          );
                 }
             }
             else
             {
                 typeface = new Typeface(
+                    os2Table,
                     nameEntry,
                     header.Bounds,
-                    header.UnitsPerEm,
-                    glyf.Glyphs,
+                    header.UnitsPerEm,                    
                     horizontalMetrics,
-                    os2Table);
+                    glyf.Glyphs
+                    );
             }
 
             //----------------------------
