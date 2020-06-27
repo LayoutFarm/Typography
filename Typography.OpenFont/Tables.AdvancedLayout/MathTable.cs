@@ -1,6 +1,6 @@
 ﻿//MIT, 2018-present, WinterDev
 //https://docs.microsoft.com/en-us/typography/opentype/spec/math
- 
+
 using System.IO;
 
 
@@ -564,12 +564,12 @@ namespace Typography.OpenFont.Tables
             //expand math info to each glyph in typeface
 
             typeface._mathTable = mathTable;
-            
+
 
             //expand all information to the glyph  
             int glyphCount = typeface.GlyphCount;
             MathGlyphInfo[] mathGlyphInfos = new MathGlyphInfo[glyphCount];
-           
+
 
             int index = 0;
             //-----------------
@@ -653,8 +653,8 @@ namespace Typography.OpenFont.Tables
                         index++;
                     }
                 }
-            }           
-            typeface.LoadMathGlyphInfos(mathGlyphInfos);           
+            }
+            typeface.LoadMathGlyphInfos(mathGlyphInfos);
         }
 
     }

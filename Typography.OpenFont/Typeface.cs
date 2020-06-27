@@ -337,13 +337,12 @@ namespace Typography.OpenFont
         public void ReadBitmapContent(Glyph glyph, System.IO.Stream output)
         {
             _bitmapFontGlyphSource.CopyBitmapContent(glyph, output);
-        }
-
- 
+        } 
+  
         internal void UpdateLangs(Meta metaTable) => Languages.Update(OS2Table, metaTable, this.CmapTable, this.GSUBTable, this.GPOSTable);
  
         internal ushort _whitespaceWidth; //common used value
-
+ 
         internal void UpdateCommonUsedValues()
         {
             //whitespace

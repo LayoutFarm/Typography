@@ -29,7 +29,7 @@ namespace Typography.OpenFont
         public readonly Extensions.TranslatedOS2FontStyle OS2TranslatedStyle;
         public readonly ushort Weight;
         readonly PreviewFontInfo[] _ttcfMembers;
-
+ 
         internal PreviewFontInfo(string fontName, string fontSubFam,
             string tFamilyName, string tSubFamilyName,
             ushort weight,
