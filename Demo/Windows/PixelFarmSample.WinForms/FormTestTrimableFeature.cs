@@ -4,24 +4,26 @@ using System.IO;
 using System.Windows.Forms;
 
 using Typography.OpenFont;
-using Typography.OpenFont.Trimable;
+using Typography.OpenFont.Trimmable;
 
 
 namespace SampleWinForms
 {
-    public partial class FormTestTrimableFeature : Form
+    public partial class FormTestTrimmableFeature : Form
     {
-        public FormTestTrimableFeature()
+        public FormTestTrimmableFeature()
         {
             InitializeComponent();
         }
 
-        private void FormTestTrimableFeature_Load(object sender, EventArgs e)
+        private void FormTestTrimmableFeature_Load(object sender, EventArgs e)
         {
 
         }
         static void TestLoadAndReload(string filename)
         {
+
+            //Trimmable feature tests:
 
             Typeface typeface = null;
             using (FileStream fs = new FileStream(filename, FileMode.Open))
