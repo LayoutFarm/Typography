@@ -11,7 +11,7 @@ using PixelFarm.CpuBlit.BitmapAtlas;
 using PixelFarm.Contours;
 
 using Typography.OpenFont;
-using Typography.OpenFont.Trimable;
+using Typography.OpenFont.Trimmable;
 using Typography.TextLayout;
 using Typography.Contours;
 using Typography.WebFont;
@@ -822,7 +822,7 @@ namespace SampleWinForms
 
         private void cmdTestReloadGlyphs_Click(object sender, EventArgs e)
         {
-            (new FormTestTrimableFeature()).Show();
+            (new FormTestTrimmableFeature()).Show();
         }
     }
 }
