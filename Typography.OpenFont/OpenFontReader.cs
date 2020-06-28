@@ -682,9 +682,8 @@ namespace Typography.OpenFont
                 typeface.UpdateAllCffGlyphBounds();
             }
 #endif
-
-
             typeface.UpdateLangs(meta);
+            typeface.UpdateFrequentlyUsedValues();
             return true;
         }
 
