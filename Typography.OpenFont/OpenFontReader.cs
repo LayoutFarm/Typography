@@ -121,14 +121,9 @@ namespace Typography.OpenFont
         }
     }
 
-    public class OpenFontReader
+    public struct OpenFontReader
     {
-#if DEBUG
-        public OpenFontReader()
-        {
 
-        }
-#endif
         class FontCollectionHeader
         {
             public ushort majorVersion;
