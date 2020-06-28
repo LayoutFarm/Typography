@@ -2,7 +2,8 @@
 
 using System;
 using Typography.OpenFont;
-using Typography.OpenFont.Tables;
+using Typography.OpenFont.Trimable;
+
 namespace Typography.Contours
 {
     //-----------------------------------
@@ -18,15 +19,13 @@ namespace Typography.Contours
         protected GlyphPointF[] _outputGlyphPoints;
         protected ushort[] _outputContours;
 
-        protected OpenFont.CFF.Cff1Font _ownerCff;
-        protected OpenFont.CFF.Cff1GlyphData _cffGlyphData;
+        OpenFont.CFF.Cff1GlyphData _cffGlyphData;
 
         /// <summary>
         /// scale for converting latest glyph points to latest request font size
         /// </summary>
         float _recentPixelScale;
-        Typography.OpenFont.CFF.CffEvaluationEngine _cffEvalEngine;
-
+        readonly Typography.OpenFont.CFF.CffEvaluationEngine _cffEvalEngine;
 
         public GlyphOutlineBuilderBase(Typeface typeface)
         {
@@ -61,7 +60,26 @@ namespace Typography.Contours
         /// <param name="sizeInPoints"></param>
         public void BuildFromGlyphIndex(ushort glyphIndex, float sizeInPoints)
         {
-            BuildFromGlyph(_typeface.GetGlyph(glyphIndex), sizeInPoints);
+            //------------
+            //Trimable feature note:
+            //in this mode, 
+            //if _typeface is trimmed=> the glyph from _typeface has no building details
+            //so can't build it.
+            //you have 2 choices:
+            //1. restore the typeface 
+            //2. use a glyph that has full build instructions => see void BuildFromGlyph(Glyph glyph, float sizeInPoints)
+            //------------
+
+
+            if (!_typeface.IsTrimmed())
+            {
+                BuildFromGlyph(_typeface.GetGlyph(glyphIndex), sizeInPoints);
+            }
+            else
+            {
+                //other mode=> can't build
+                throw new NotSupportedException("the typeface was trimmed");
+            }
         }
         /// <summary>
         /// build glyph shape from glyph to be read
@@ -70,7 +88,13 @@ namespace Typography.Contours
         /// <param name="sizeInPoints"></param>
         public void BuildFromGlyph(Glyph glyph, float sizeInPoints)
         {
-            //for true type font
+            //------------
+            //Trimable feature note:
+            //in this mode
+            //we build from input glyphs 
+            //please ensure that the glyph has full build instructions
+            //------------
+             
             _outputGlyphPoints = glyph.GlyphPoints;
             _outputContours = glyph.EndPoints;
 
@@ -79,7 +103,6 @@ namespace Typography.Contours
             if (glyph.IsCffGlyph)
             {
                 _cffGlyphData = glyph.GetCff1GlyphData();
-                _ownerCff = glyph.GetOwnerCff();
             }
 
             //---------------
@@ -137,7 +160,7 @@ namespace Typography.Contours
             //read output from glyph points
             if (_cffGlyphData != null)
             {
-                _cffEvalEngine.Run(tx, _ownerCff, _cffGlyphData, _recentPixelScale);
+                _cffEvalEngine.Run(tx, _cffGlyphData, _recentPixelScale);
             }
             else
             {

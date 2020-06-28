@@ -20,6 +20,7 @@ namespace PixelFarm.CpuBlit
     partial class AggPainter
     {
         //font
+        ResolvedFontBase _resolvedFont;
         RequestFont _currentFont;
         IAggTextPrinter _textPrinter;
 
@@ -36,12 +37,36 @@ namespace PixelFarm.CpuBlit
             }
         }
 
+        public ResolvedFontBase CurrentResolvedFont
+        {
+            get
+            {
+                if (_resolvedFont == null)
+                {
+
+                }
+                return _resolvedFont;
+            }
+            set
+            {
+                _resolvedFont = value;
+            }
+        }
         public override RequestFont CurrentFont
         {
             get => _currentFont;
             set
             {
                 _currentFont = value;
+                if (value != null)
+                {
+                    //resolve 
+                }
+                else
+                {
+                   // _resolvedFont = null;
+                }
+
                 //this request font must resolve to actual font
                 //within canvas *** 
                 //TODO: review drawing string  with agg here 

@@ -263,14 +263,14 @@ namespace MathLayout
             //Glyph oneGlyph = _latinModernMathFont.GetGlyphByName("one"); //for get glyph by name
 
             ushort glyphIndex = _latinModernMathFont.GetGlyphIndex((int)'1');
-            Glyph oneGlyph = _latinModernMathFont.GetGlyph(glyphIndex);
+            
 
             //a glyph contains coordinates of line and curves
             //we transform data inside it to vxs
             //this is done by GlyphContour builder
             GlyphTranslatorToVxs glyphTxToVxs = new GlyphTranslatorToVxs();
             GlyphOutlineBuilder outlineBuilder = new GlyphOutlineBuilder(_latinModernMathFont);
-            outlineBuilder.BuildFromGlyph(oneGlyph, 20); //read data into outline builder
+            outlineBuilder.BuildFromGlyphIndex(glyphIndex, 20); //read data into outline builder
             outlineBuilder.ReadShapes(glyphTxToVxs);//translate data inside outline builder to vxs
             using (Tools.BorrowVxs(out var v1, out var v2))
             using (Tools.BorrowAggPainter(_memBmp, out var p))

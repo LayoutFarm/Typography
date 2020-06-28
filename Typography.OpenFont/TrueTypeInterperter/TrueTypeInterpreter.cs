@@ -44,7 +44,7 @@ namespace Typography.OpenFont
             //-------------------------------------------
             //1. start with original points/contours from glyph 
             int horizontalAdv = _currentTypeFace.GetAdvanceWidthFromGlyphIndex(glyphIndex);
-            int hFrontSideBearing = _currentTypeFace.GetHFrontSideBearingFromGlyphIndex(glyphIndex);
+            int hFrontSideBearing = _currentTypeFace.GetLeftSideBearing(glyphIndex);
 
             return HintGlyph(horizontalAdv,
                 hFrontSideBearing,

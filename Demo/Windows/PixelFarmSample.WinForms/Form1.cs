@@ -11,6 +11,7 @@ using PixelFarm.CpuBlit.BitmapAtlas;
 using PixelFarm.Contours;
 
 using Typography.OpenFont;
+using Typography.OpenFont.Trimable;
 using Typography.TextLayout;
 using Typography.Contours;
 using Typography.WebFont;
@@ -810,14 +811,18 @@ namespace SampleWinForms
         }
         private void button3_Click(object sender, EventArgs e)
         {
-            string filename = "Sarabun-Regular.woff2";
-
-            OpenFontReader openFontReader = new OpenFontReader();
+            string filename = "Test/Sarabun-Regular.woff2";
             using (FileStream fs = new FileStream(filename, FileMode.Open))
             {
+                OpenFontReader openFontReader = new OpenFontReader();
                 PreviewFontInfo previewFontInfo = openFontReader.ReadPreview(fs);
             }
-        }
+        } 
+   
 
+        private void cmdTestReloadGlyphs_Click(object sender, EventArgs e)
+        {
+            (new FormTestTrimableFeature()).Show();
+        }
     }
 }

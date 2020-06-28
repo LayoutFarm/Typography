@@ -5,7 +5,7 @@ using System.IO;
 namespace Typography.OpenFont.Tables
 {
 
-    //from https://www.microsoft.com/typography/otfntdev/standot/features.aspx
+    //https://docs.microsoft.com/en-us/typography/opentype/spec/featurelist
     //The order for applying standard features encoded in OpenType fonts:
 
     //Feature   	Feature function 	                                Layout operation 	Required
@@ -32,7 +32,7 @@ namespace Typography.OpenFont.Tables
         public FeatureTable[] featureTables;
         public static FeatureList CreateFrom(BinaryReader reader, long beginAt)
         {
-            //https://www.microsoft.com/typography/otspec/chapter2.htm
+            //https://docs.microsoft.com/en-us/typography/opentype/spec/chapter2
 
             //------------------
             //FeatureList table                      
@@ -123,16 +123,6 @@ namespace Typography.OpenFont.Tables
 
         public class FeatureTable
         {
-            //--------------------------
-            //Feature table
-            //--------------------------
-            //Type 	    Name 	        Description
-            //Offset16 	FeatureParams 	= NULL (reserved for offset to FeatureParams)
-            //uint16 	LookupCount 	Number of LookupList indices for this feature
-            //uint16 	LookupListIndex[LookupCount] 	Array of LookupList indices for this feature -zero-based (first lookup is LookupListIndex = 0)
-            //--------------------------
-
-            ushort[] _lookupListIndices;
             public static FeatureTable CreateFrom(BinaryReader reader, long beginAt)
             {
                 reader.BaseStream.Seek(beginAt, SeekOrigin.Begin);
@@ -141,10 +131,10 @@ namespace Typography.OpenFont.Tables
                 ushort lookupCount = reader.ReadUInt16();
 
                 FeatureTable featureTable = new FeatureTable();
-                featureTable._lookupListIndices = Utils.ReadUInt16Array(reader, lookupCount);
+                featureTable.LookupListIndices = Utils.ReadUInt16Array(reader, lookupCount);
                 return featureTable;
             }
-            public ushort[] LookupListIndices => _lookupListIndices;
+            public ushort[] LookupListIndices { get; private set; }
             public uint FeatureTag { get; set; }
             public string TagName => Utils.TagToString(this.FeatureTag);
 #if DEBUG

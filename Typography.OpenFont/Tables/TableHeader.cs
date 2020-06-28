@@ -6,38 +6,35 @@ namespace Typography.OpenFont.Tables
     class TableHeader
     {
         readonly uint _tag;
-        readonly uint _checkSum;
-        readonly uint _offset;
-        readonly uint _length;
-        readonly string _tagName;
 
         public TableHeader(uint tag, uint checkSum, uint offset, uint len)
         {
             _tag = tag;
-            _checkSum = checkSum;
-            _offset = offset;
-            _length = len;
-            _tagName = Utils.TagToString(_tag);
+            CheckSum = checkSum;
+            Offset = offset;
+            Length = len;
+            Tag = Utils.TagToString(_tag);
         }
         public TableHeader(string tag, uint checkSum, uint offset, uint len)
         {
             _tag = 0;
-            _checkSum = checkSum;
-            _offset = offset;
-            _length = len;
-            _tagName = tag;
+            CheckSum = checkSum;
+            Offset = offset;
+            Length = len;
+            Tag = tag;
         }
         //
-        public string Tag => _tagName;
+        public string Tag { get; }
+        public uint Offset { get; }
+        public uint CheckSum { get; }
+        public uint Length { get; }
 
-
-        public uint Offset => _offset;
-        public uint CheckSum => _checkSum;
-        public uint Length => _length;
-
+        public TableHeader Clone() => (_tag != 0) ? new TableHeader(_tag, CheckSum, Offset, Length) : new TableHeader(Tag, CheckSum, Offset, Length);
+#if DEBUG
         public override string ToString()
         {
             return "{" + Tag + "}";
         }
+#endif
     }
 }
