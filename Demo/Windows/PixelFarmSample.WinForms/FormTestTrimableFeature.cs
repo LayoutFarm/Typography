@@ -1,22 +1,10 @@
 ﻿//MIT, 2016-present, WinterDev
 using System;
-using System.Collections.Generic;
-using System.Drawing;
-
 using System.IO;
 using System.Windows.Forms;
 
-using PixelFarm.CpuBlit;
-using PixelFarm.CpuBlit.BitmapAtlas;
-using PixelFarm.Contours;
-
 using Typography.OpenFont;
 using Typography.OpenFont.Trimable;
-using Typography.TextLayout;
-using Typography.Contours;
-using Typography.WebFont;
-
-using BrotliSharpLib;
 
 
 namespace SampleWinForms
@@ -107,8 +95,8 @@ namespace SampleWinForms
             foreach (string filename in files)
             {
                 TestLoadAndReload(filename);
-            } 
-            
+            }
+
         }
     }
 }
