@@ -112,62 +112,14 @@ namespace PixelFarm.Drawing
             return (new InternalFontKey(typefaceName, fontSizeInPts, style)).GetHashCode();
         }
 
-        struct InternalFontKey
-        {
 
-            public readonly int FontNameIndex;
-            public readonly float FontSize;
-            public readonly FontStyle FontStyle;
-
-            public InternalFontKey(string typefaceName, float fontSize, FontStyle fs)
-            {
-                //font name/ not filename
-                this.FontNameIndex = RegisterFontName(typefaceName.ToLower());
-                this.FontSize = fontSize;
-                this.FontStyle = fs;
-            }
-
-            static Dictionary<string, int> s_registerFontNames = new Dictionary<string, int>();
-
-            static InternalFontKey()
-            {
-                RegisterFontName(""); //blank font name
-            }
-            static int RegisterFontName(string fontName)
-            {
-                fontName = fontName.ToUpper();
-                if (!s_registerFontNames.TryGetValue(fontName, out int found))
-                {
-                    int nameCrc32 = TinyCRC32Calculator.CalculateCrc32(fontName);
-                    s_registerFontNames.Add(fontName, nameCrc32);
-                    return nameCrc32;
-                }
-                return found;
-            }
-            public override int GetHashCode()
-            {
-                return CalculateGetHasCode(this.FontNameIndex, this.FontSize, (int)this.FontStyle);
-            }
-            static int CalculateGetHasCode(int nameIndex, float fontSize, int fontstyle)
-            {
-                //modified from https://stackoverflow.com/questions/1646807/quick-and-simple-hash-code-combinations
-                unchecked
-                {
-                    int hash = 17;
-                    hash = hash * 31 + nameIndex.GetHashCode();
-                    hash = hash * 31 + fontSize.GetHashCode();
-                    hash = hash * 31 + fontstyle.GetHashCode();
-                    return hash;
-                }
-            }
-        }
 
         //------------------ 
         //caching ...
 
         //preserve 2 field user cache their actual here
         internal ResolvedFontBase _resolvedFont1;
-        internal object _resolvedFont2; 
+        internal object _resolvedFont2;
 
 #if DEBUG
         public override string ToString()
@@ -175,6 +127,57 @@ namespace PixelFarm.Drawing
             return Name + "," + SizeInPoints + "," + Style;
         }
 #endif
+    }
+
+
+    struct InternalFontKey
+    {
+
+        public readonly int FontNameIndex;
+        public readonly float FontSize;
+        public readonly FontStyle FontStyle;
+
+        public InternalFontKey(string typefaceName, float fontSize, FontStyle fs)
+        {
+            //font name/ not filename
+            this.FontNameIndex = RegisterFontName(typefaceName.ToLower());
+            this.FontSize = fontSize;
+            this.FontStyle = fs;
+        }
+
+        static Dictionary<string, int> s_registerFontNames = new Dictionary<string, int>();
+
+        static InternalFontKey()
+        {
+            RegisterFontName(""); //blank font name
+        }
+        static int RegisterFontName(string fontName)
+        {
+            fontName = fontName.ToUpper();
+            if (!s_registerFontNames.TryGetValue(fontName, out int found))
+            {
+                int nameCrc32 = TinyCRC32Calculator.CalculateCrc32(fontName);
+                s_registerFontNames.Add(fontName, nameCrc32);
+                return nameCrc32;
+            }
+            return found;
+        }
+        public override int GetHashCode()
+        {
+            return CalculateGetHasCode(this.FontNameIndex, this.FontSize, (int)this.FontStyle);
+        }
+        static int CalculateGetHasCode(int nameIndex, float fontSize, int fontstyle)
+        {
+            //modified from https://stackoverflow.com/questions/1646807/quick-and-simple-hash-code-combinations
+            unchecked
+            {
+                int hash = 17;
+                hash = hash * 31 + nameIndex.GetHashCode();
+                hash = hash * 31 + fontSize.GetHashCode();
+                hash = hash * 31 + fontstyle.GetHashCode();
+                return hash;
+            }
+        }
     }
 
     public abstract class ResolvedFontBase
@@ -193,13 +196,21 @@ namespace PixelFarm.Drawing
         public float LineGapInPx { get; protected set; }
 
 
-        public ResolvedFontBase(float sizeInPoints, FontStyle fontStyle, int fontKey)
+        public ResolvedFontBase(string name, float sizeInPoints, FontStyle fontStyle, int fontKey)
         {
+            Name = name;
             SizeInPoints = sizeInPoints;
             FontStyle = fontStyle;
             FontKey = fontKey;
         }
-        public string Name { get; protected set; }
+        public ResolvedFontBase(string name, float sizeInPoints, FontStyle fontStyle)
+        {
+            SizeInPoints = sizeInPoints;
+            FontStyle = fontStyle;
+            Name = name;
+            FontKey = (new InternalFontKey(name ?? "", sizeInPoints, fontStyle)).GetHashCode();
+        }
+        public string Name { get; }
     }
 
     namespace Internal
@@ -223,7 +234,7 @@ namespace PixelFarm.Drawing
                where T : class
             {
                 return reqFont._resolvedFont2 as T;
-            } 
+            }
         }
     }
 }
