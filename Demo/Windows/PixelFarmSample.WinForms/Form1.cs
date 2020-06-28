@@ -11,6 +11,7 @@ using PixelFarm.CpuBlit.BitmapAtlas;
 using PixelFarm.Contours;
 
 using Typography.OpenFont;
+using Typography.OpenFont.Trimable;
 using Typography.TextLayout;
 using Typography.Contours;
 using Typography.WebFont;
@@ -810,14 +811,66 @@ namespace SampleWinForms
         }
         private void button3_Click(object sender, EventArgs e)
         {
-            string filename = "Sarabun-Regular.woff2";
-
-            OpenFontReader openFontReader = new OpenFontReader();
+            string filename = "Test/Sarabun-Regular.woff2";
             using (FileStream fs = new FileStream(filename, FileMode.Open))
             {
+                OpenFontReader openFontReader = new OpenFontReader();
                 PreviewFontInfo previewFontInfo = openFontReader.ReadPreview(fs);
             }
         }
 
+
+        static void TestLoadAndReload(string filename)
+        {
+
+            OpenFontReader openFontReader = new OpenFontReader();
+
+            Typeface typeface = null;
+            using (FileStream fs = new FileStream(filename, FileMode.Open))
+            {
+                //read in full mode
+                typeface = openFontReader.Read(fs);
+            }
+
+            //before
+            bool hasColor1 = typeface.HasColorTable();
+            bool hasSvg1 = typeface.HasSvgTable();
+            bool hasCff1 = typeface.IsCffFont;
+
+            TrimMode glyphMode1 = typeface.GetGlyphBuildingDetailMode();
+            RestoreTicket ticket = typeface.TrimDown();
+
+            //after reload with a fewer version
+            //test get glyph again, you will get a new instance of glyph (with the same glyph index)
+            Glyph g1 = typeface.GetGlyph(1);
+
+            bool hasColor2 = typeface.HasColorTable();
+            bool hasSvg2 = typeface.HasSvgTable();
+            bool hasCff2 = typeface.IsCffFont;
+
+            TrimMode glyphMode2 = typeface.GetGlyphBuildingDetailMode();
+
+            //can we load glyph detail again?
+            using (FileStream fs = new FileStream(filename, FileMode.Open))
+            {
+                typeface.RestoreUp(ticket, fs);
+            }
+
+        }
+        private void cmdTestReloadGlyphs_Click(object sender, EventArgs e)
+        {
+            // string filename = "Test/SourceSansPro-Regular.ttf";
+            string[] files = new string[]
+            {
+                "Test/latinmodern-math.otf",
+                "Test/Sarabun-Regular.woff2",
+
+            };
+
+            foreach (string filename in files)
+            {
+                TestLoadAndReload(filename);
+            }
+        }
     }
 }

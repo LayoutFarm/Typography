@@ -432,8 +432,8 @@ namespace Typography.OpenFont.Tables
                     if (useMatrix)
                     {
                         //use this matrix  
-                        Glyph.TtfTxNormalWith2x2Matrix(newGlyph, xscale, scale01, scale10, yscale);
-                        Glyph.OffsetXY(newGlyph, (short)arg1, (short)arg2);
+                        Glyph.TtfTransformWith2x2Matrix(newGlyph, xscale, scale01, scale10, yscale);
+                        Glyph.TtfOffsetXY(newGlyph, (short)arg1, (short)arg2);
                     }
                     else
                     {
@@ -445,9 +445,9 @@ namespace Typography.OpenFont.Tables
                             }
                             else
                             {
-                                Glyph.TtfTxNormalWith2x2Matrix(newGlyph, xscale, 0, 0, yscale);
+                                Glyph.TtfTransformWith2x2Matrix(newGlyph, xscale, 0, 0, yscale);
                             }
-                            Glyph.OffsetXY(newGlyph, (short)arg1, (short)arg2);
+                            Glyph.TtfOffsetXY(newGlyph, (short)arg1, (short)arg2);
                         }
                         else
                         {
@@ -457,7 +457,7 @@ namespace Typography.OpenFont.Tables
                                 //----------------------------
                             }
                             //just offset***
-                            Glyph.OffsetXY(newGlyph, (short)arg1, (short)arg2);
+                            Glyph.TtfOffsetXY(newGlyph, (short)arg1, (short)arg2);
                         }
                     }
                 }

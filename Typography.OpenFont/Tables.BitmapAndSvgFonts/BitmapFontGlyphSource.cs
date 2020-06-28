@@ -5,17 +5,30 @@ namespace Typography.OpenFont.Tables
 {
     class BitmapFontGlyphSource
     {
-        readonly CBLC _cblc;
-        readonly CBDT _cbdt;
-        public BitmapFontGlyphSource(CBLC cblc, CBDT cbdt)
+        readonly CBLC _cblc; //bitmap locator
+        CBDT _cbdt;
+        public BitmapFontGlyphSource(CBLC cblc) => _cblc = cblc;
+
+        /// <summary>
+        /// load new bitmap embeded data
+        /// </summary>
+        /// <param name="cbdt"></param>
+        public void LoadCBDT(CBDT cbdt) => _cbdt = cbdt;
+
+        /// <summary>
+        /// clear and remove existing bitmap embeded data
+        /// </summary>
+        public void UnloadCBDT()
         {
-            _cblc = cblc;
-            _cbdt = cbdt;
+            if (_cbdt != null)
+            {
+                _cbdt.RemoveOldMemoryStreamAndReaders();
+                _cbdt = null;
+            }
         }
-        public void CopyBitmapContent(Glyph glyph, System.IO.Stream outputStream)
-        {
-            _cbdt.CopyBitmapContent(glyph, outputStream);
-        }
+
+        public void CopyBitmapContent(Glyph glyph, System.IO.Stream outputStream) => _cbdt.CopyBitmapContent(glyph, outputStream);
+
         public Glyph[] BuildGlyphList()
         {
             Glyph[] glyphs = _cblc.BuildGlyphList();

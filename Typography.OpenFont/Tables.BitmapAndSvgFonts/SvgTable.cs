@@ -113,11 +113,22 @@ namespace Typography.OpenFont.Tables
             }
         }
 
+        public void UnloadSvgData()
+        {
+            if (_dicSvgEntries != null)
+            {
+                _dicSvgEntries.Clear();
+                _dicSvgEntries = null;
+            }
+
+            _entries = null;
+        }
 
         public bool ReadSvgContent(ushort glyphIndex, System.Text.StringBuilder outputStBuilder)
         {
             if (_dicSvgEntries == null)
             {
+                //create index
                 _dicSvgEntries = new Dictionary<ushort, int>();
                 for (int i = 0; i < _entries.Length; ++i)
                 {

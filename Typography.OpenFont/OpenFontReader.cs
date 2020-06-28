@@ -6,6 +6,7 @@ using System.IO;
 
 using Typography.OpenFont.IO;
 using Typography.OpenFont.Tables;
+using Typography.OpenFont.Trimable;
 
 namespace Typography.OpenFont
 {
@@ -14,7 +15,7 @@ namespace Typography.OpenFont
     {
         Full = 0,
         Name = 1,
-        Matrix = 1 << 2,
+        Metrics = 1 << 2,
         AdvancedLayout = 1 << 3,
         Variation = 1 << 4
     }
@@ -29,18 +30,19 @@ namespace Typography.OpenFont
         public readonly Extensions.TranslatedOS2FontStyle OS2TranslatedStyle;
         public readonly ushort Weight;
         readonly PreviewFontInfo[] _ttcfMembers;
- 
+
+
         internal PreviewFontInfo(string fontName, string fontSubFam,
             string tFamilyName, string tSubFamilyName,
             ushort weight,
             Languages langs,
-            Extensions.TranslatedOS2FontStyle os2TranslatedStyle = Extensions.TranslatedOS2FontStyle.UNSET
-            )
+            Extensions.TranslatedOS2FontStyle os2TranslatedStyle = Extensions.TranslatedOS2FontStyle.UNSET)
         {
             Name = fontName;
             SubFamilyName = fontSubFam;
             TypographicFamilyName = tFamilyName;
             TypographicSubFamilyName = tSubFamilyName;
+
 #if DEBUG
             //please note that some fontName != typographicFontName
             //this may effect how to search a font
@@ -121,12 +123,12 @@ namespace Typography.OpenFont
 
     public class OpenFontReader
     {
-#if DEBUG
+
         public OpenFontReader()
         {
 
         }
-#endif
+
         class FontCollectionHeader
         {
             public ushort majorVersion;
@@ -279,6 +281,16 @@ namespace Typography.OpenFont
         }
         public Typeface Read(Stream stream, int streamStartOffset = 0, ReadFlags readFlags = ReadFlags.Full)
         {
+            Typeface typeface = new Typeface();
+            if (Read(typeface, null, stream, streamStartOffset, readFlags))
+            {
+                return typeface;
+            }
+            return null;
+        }
+
+        internal bool Read(Typeface typeface, RestoreTicket ticket, Stream stream, int streamStartOffset = 0, ReadFlags readFlags = ReadFlags.Full)
+        {
             //bool little = BitConverter.IsLittleEndian; 
 
             if (streamStartOffset > 0)
@@ -296,22 +308,21 @@ namespace Typography.OpenFont
                     //this font stream is 'The Font Collection'                    
                     //To read content of ttc=> one must specific the offset
                     //so use read preview first=> you will know that what are inside the ttc.                    
-
-                    return null;
+                    return false;
                 }
                 else if (KnownFontFiles.IsWoff(majorVersion, minorVersion))
                 {
                     //check if we enable woff or not
                     WebFont.WoffReader woffReader = new WebFont.WoffReader();
                     input.BaseStream.Position = 0;
-                    return woffReader.Read(input);
+                    return woffReader.Read(typeface, input, ticket);
                 }
                 else if (KnownFontFiles.IsWoff2(majorVersion, minorVersion))
                 {
                     //check if we enable woff2 or not
                     WebFont.Woff2Reader woffReader = new WebFont.Woff2Reader();
                     input.BaseStream.Position = 0;
-                    return woffReader.Read(input);
+                    return woffReader.Read(typeface, input, ticket);
                 }
                 //-----------------------------------------------------------------
 
@@ -327,26 +338,86 @@ namespace Typography.OpenFont
                     tables.AddEntry(new UnreadTableEntry(ReadTableHeader(input)));
                 }
                 //------------------------------------------------------------------ 
-                return ReadTableEntryCollection(tables, input);
+
+                return ReadTableEntryCollection(typeface, ticket, tables, input);
             }
         }
 
+
+        struct EntriesReaderHelper
+        {
+            //a simple helper class
+            readonly TableEntryCollection _tables;
+            readonly BinaryReader _input;
+            public EntriesReaderHelper(TableEntryCollection tables, BinaryReader input)
+            {
+                _tables = tables;
+                _input = input;
+            }
+            /// <summary>
+            /// read table if exists
+            /// </summary>
+            /// <typeparam name="T"></typeparam>
+            /// <param name="tableName"></param>
+            /// <param name="tables"></param>
+            /// <param name="reader"></param>
+            /// <param name="newTableDel"></param>
+            /// <returns></returns>
+            public T Read<T>(T resultTable) where T : TableEntry
+            {
+                if (_tables.TryGetTable(resultTable.Name, out TableEntry found))
+                {
+                    //found table name
+                    //check if we have read this table or not
+                    if (found is UnreadTableEntry unreadTableEntry)
+                    {
+                        //set header before actal read 
+                        resultTable.Header = found.Header;
+                        if (unreadTableEntry.HasCustomContentReader)
+                        {
+                            resultTable = unreadTableEntry.CreateTableEntry(_input, resultTable);
+                        }
+                        else
+                        {
+                            resultTable.LoadDataFrom(_input);
+                        }
+                        //then replace
+                        _tables.ReplaceTable(resultTable);
+                        return resultTable;
+                    }
+                    else
+                    {
+#if DEBUG
+                        System.Diagnostics.Debug.WriteLine("this table is already loaded");
+                        if (!(found is T))
+                        {
+                            throw new NotSupportedException();
+                        }
+#endif
+                        return found as T;
+                    }
+                }
+                //not found
+                return null;
+            }
+        }
+
+
         internal PreviewFontInfo ReadPreviewFontInfo(TableEntryCollection tables, BinaryReader input)
         {
-            NameEntry nameEntry = ReadTableIfExists(tables, input, new NameEntry());
-            OS2Table os2Table = ReadTableIfExists(tables, input, new OS2Table());
+            var rd = new EntriesReaderHelper(tables, input);
 
+            NameEntry nameEntry = rd.Read(new NameEntry());
+            OS2Table os2Table = rd.Read(new OS2Table());
             //for preview, read ONLY  script list from gsub and gpos (set OnlyScriptList).
-            Meta metaTable = ReadTableIfExists(tables, input, new Meta());
-            GSUB gsub = ReadTableIfExists(tables, input, new GSUB() { OnlyScriptList = true });
-            GPOS gpos = ReadTableIfExists(tables, input, new GPOS() { OnlyScriptList = true });
+            Meta metaTable = rd.Read(new Meta());
+
+            GSUB gsub = rd.Read(new GSUB() { OnlyScriptList = true });
+            GPOS gpos = rd.Read(new GPOS() { OnlyScriptList = true });
             //gsub and gpos contains actual script_list that are in the typeface
 
-            Cmap cmap = ReadTableIfExists(tables, input, new Cmap());
-
             Languages langs = new Languages();
-
-            langs.Update(os2Table, metaTable, cmap, gsub, gpos);
+            langs.Update(os2Table, metaTable, gsub, gpos);
 
             return new PreviewFontInfo(
               nameEntry.FontName,
@@ -355,8 +426,7 @@ namespace Typography.OpenFont
               nameEntry.TypographyicSubfamilyName,
               os2Table.usWeightClass,
               langs,
-              Extensions.TypefaceExtensions.TranslatedOS2FontStyle(os2Table)
-              )
+              Extensions.TypefaceExtensions.TranslatedOS2FontStyle(os2Table))
             {
                 PostScriptName = nameEntry.PostScriptName,
                 UniqueFontIden = nameEntry.UniqueFontIden,
@@ -364,158 +434,227 @@ namespace Typography.OpenFont
             };
         }
 
-        internal Typeface ReadTableEntryCollection(TableEntryCollection tables, BinaryReader input)
+        bool ReadTableEntryCollectionOnRestoreMode(Typeface typeface, RestoreTicket ticket, TableEntryCollection tables, BinaryReader input)
         {
+            //RESTORE MODE
 
+            //check header matches
+
+
+
+            var rd = new EntriesReaderHelper(tables, input);
             //PART 1: basic information
-            OS2Table os2Table = ReadTableIfExists(tables, input, new OS2Table());
-            Meta meta = ReadTableIfExists(tables, input, new Meta());
-            NameEntry nameEntry = ReadTableIfExists(tables, input, new NameEntry());
-
-            Head head = ReadTableIfExists(tables, input, new Head());
-            MaxProfile maxProfile = ReadTableIfExists(tables, input, new MaxProfile());
-
-            HorizontalHeader horizontalHeader = ReadTableIfExists(tables, input, new HorizontalHeader());
-            HorizontalMetrics horizontalMetrics = ReadTableIfExists(tables, input, new HorizontalMetrics(horizontalHeader.NumberOfHMetrics, maxProfile.GlyphCount));
-
-            VerticalHeader vhea = ReadTableIfExists(tables, input, new VerticalHeader());
-            if (vhea != null)
-            {
-                VerticalMetrics vmtx = ReadTableIfExists(tables, input, new VerticalMetrics(vhea.NumOfLongVerMetrics));
-            }
-
-            Cmap cmap = ReadTableIfExists(tables, input, new Cmap());
+            //..
             //------------------------------------
             //PART 2: glyphs detail 
             //2.1 True type font
-            GlyphLocations glyphLocations = ReadTableIfExists(tables, input, new GlyphLocations(maxProfile.GlyphCount, head.WideGlyphLocations));
-            Glyf glyf = ReadTableIfExists(tables, input, new Glyf(glyphLocations));
-            Gasp gaspTable = ReadTableIfExists(tables, input, new Gasp());
-            VerticalDeviceMetrics vdmx = ReadTableIfExists(tables, input, new VerticalDeviceMetrics());
-            COLR colr = ReadTableIfExists(tables, input, new COLR());
-            CPAL cpal = ReadTableIfExists(tables, input, new CPAL());
+            GlyphLocations glyphLocations = ticket.HasTtf ? rd.Read(new GlyphLocations(typeface.MaxProfile.GlyphCount, typeface.Head.WideGlyphLocations)) : null;
+            Glyf glyf = ticket.HasTtf ? rd.Read(new Glyf(glyphLocations)) : null;
 
-            //2.2 Cff font
-            PostTable postTable = ReadTableIfExists(tables, input, new PostTable());
-            CFFTable cff = ReadTableIfExists(tables, input, new CFFTable());
+            typeface.GaspTable = ticket.GaspTable ? rd.Read(new Gasp()) : null;
 
-            //additional math table (if available)
-            MathTable mathtable = ReadTableIfExists(tables, input, new MathTable());
+            typeface.SetColorAndPalTable(
+                ticket.COLRTable ? rd.Read(new COLR()) : null,
+                ticket.CPALTable ? rd.Read(new CPAL()) : null);
 
-            Kern kern = ReadTableIfExists(tables, input, new Kern());
 
-            //------------------------------------
-            //PART 3: advanced typography             
-            GDEF gdef = ReadTableIfExists(tables, input, new GDEF());
-            GSUB gsub = ReadTableIfExists(tables, input, new GSUB());
-            GPOS gpos = ReadTableIfExists(tables, input, new GPOS());
-            BASE baseTable = ReadTableIfExists(tables, input, new BASE());
-            JSTF jstf = ReadTableIfExists(tables, input, new JSTF());
+            //2.2 Cff font             
+            CFFTable cff = ticket.HasCff ? rd.Read(new CFFTable()) : null;
 
-            STAT stat = ReadTableIfExists(tables, input, new STAT());
-            if (stat != null)
-            {
-                FVar fvar = ReadTableIfExists(tables, input, new FVar());
-                if (fvar != null)
-                {
-                    GVar gvar = ReadTableIfExists(tables, input, new GVar());
-                    CVar cvar = ReadTableIfExists(tables, input, new CVar());
-                    HVar hvar = ReadTableIfExists(tables, input, new HVar());
-                    MVar mvar = ReadTableIfExists(tables, input, new MVar());
-                    AVar avar = ReadTableIfExists(tables, input, new AVar());
-                }
-            }
-
-            //---------------------------------------------
-            //about truetype instruction init 
-            //--------------------------------------------- 
-            Typeface typeface = null;
             bool isPostScriptOutline = false;
             bool isBitmapFont = false;
+
             if (glyf == null)
             {
                 //check if this is cff table ?
                 if (cff == null)
                 {
                     //check  cbdt/cblc ?
-                    CBLC cblcTable = ReadTableIfExists(tables, input, new CBLC());
-                    if (cblcTable != null)
+                    if (ticket.HasBitmapSource)
                     {
-                        CBDT cbdtTable = ReadTableIfExists(tables, input, new CBDT());
-                        //read cbdt 
-                        //bitmap font
-
-                        BitmapFontGlyphSource bmpFontGlyphSrc = new BitmapFontGlyphSource(cblcTable, cbdtTable);
-                        Glyph[] glyphs = bmpFontGlyphSrc.BuildGlyphList();
-
-                        typeface = new Typeface(
-                          os2Table,
-                          nameEntry,
-                          head,
-                          horizontalMetrics,
-                          glyphs,
-                          bmpFontGlyphSrc);
+                        //reload only CBDT (embeded bitmap)
+                        CBDT cbdt = rd.Read(new CBDT());
+                        typeface._bitmapFontGlyphSource.LoadCBDT(cbdt);
+                        //just clone existing glyph 
                         isBitmapFont = true;
                     }
                     else
                     {
-                        //TODO:
-                        EBLC fontBmpTable = ReadTableIfExists(tables, input, new EBLC());
+                        //?
                         throw new NotSupportedException();
                     }
                 }
                 else
                 {
                     isPostScriptOutline = true;
-                    typeface = new Typeface(
-                          os2Table,
-                          nameEntry,
-                          head,
-                          horizontalMetrics,
-                          cff.Cff1FontSet
-                          );
+                    typeface.SetCffFontSet(cff.Cff1FontSet);
                 }
             }
             else
             {
-                typeface = new Typeface(
-                    os2Table,
-                    nameEntry,
-                    head,
-                    horizontalMetrics,
-                    glyf.Glyphs
-                    );
+                typeface.SetTtfGlyphs(glyf.Glyphs);
             }
-
-            //----------------------------
-            typeface.CmapTable = cmap;
-            typeface.KernTable = kern;
-            typeface.GaspTable = gaspTable;
-            typeface.MaxProfile = maxProfile;
-            typeface.HheaTable = horizontalHeader;
-
-            //----------------------------
 
             if (!isPostScriptOutline && !isBitmapFont)
             {
                 //for true-type font outline
-                FpgmTable fpgmTable = ReadTableIfExists(tables, input, new FpgmTable());
+                FpgmTable fpgmTable = rd.Read(new FpgmTable());
                 //control values table
-                CvtTable cvtTable = ReadTableIfExists(tables, input, new CvtTable());
-                if (cvtTable != null)
+                CvtTable cvtTable = rd.Read(new CvtTable());
+                PrepTable propProgramTable = rd.Read(new PrepTable());
+
+                typeface.ControlValues = cvtTable?._controlValues;
+                typeface.FpgmProgramBuffer = fpgmTable?._programBuffer;
+                typeface.PrepProgramBuffer = propProgramTable?._programBuffer;
+            }
+
+            if (ticket.HasSvg)
+            {
+                typeface.SetSvgTable(rd.Read(new SvgTable()));
+            }
+
+
+#if DEBUG
+            //test
+            //int found = typeface.GetGlyphIndexByName("Uacute");
+            if (typeface.IsCffFont)
+            {
+                //optional???
+                typeface.UpdateAllCffGlyphBounds();
+            }
+#endif
+
+            return true;
+        }
+        internal bool ReadTableEntryCollection(Typeface typeface, RestoreTicket ticket, TableEntryCollection tables, BinaryReader input)
+        {
+            if (ticket != null)
+            {
+                return ReadTableEntryCollectionOnRestoreMode(typeface, ticket, tables, input);
+            }
+
+            typeface.SetTableEntryCollection(tables.CloneTableHeaders());
+
+            var rd = new EntriesReaderHelper(tables, input);
+            //PART 1: basic information
+            OS2Table os2Table = rd.Read(new OS2Table());
+            Meta meta = rd.Read(new Meta());
+            NameEntry nameEntry = rd.Read(new NameEntry());
+            Head head = rd.Read(new Head());
+            MaxProfile maxProfile = rd.Read(new MaxProfile());
+            HorizontalHeader horizontalHeader = rd.Read(new HorizontalHeader());
+            HorizontalMetrics horizontalMetrics = rd.Read(new HorizontalMetrics(horizontalHeader.NumberOfHMetrics, maxProfile.GlyphCount));
+            VerticalHeader vhea = rd.Read(new VerticalHeader());
+            if (vhea != null)
+            {
+                VerticalMetrics vmtx = rd.Read(new VerticalMetrics(vhea.NumOfLongVerMetrics));
+            }
+
+            Cmap cmaps = rd.Read(new Cmap());
+            VerticalDeviceMetrics vdmx = rd.Read(new VerticalDeviceMetrics());
+            Kern kern = rd.Read(new Kern());
+            //------------------------------------
+            //PART 2: glyphs detail 
+            //2.1 True type font
+
+            GlyphLocations glyphLocations = rd.Read(new GlyphLocations(maxProfile.GlyphCount, head.WideGlyphLocations));
+            Glyf glyf = rd.Read(new Glyf(glyphLocations));
+            Gasp gaspTable = rd.Read(new Gasp());
+            COLR colr = rd.Read(new COLR());
+            CPAL cpal = rd.Read(new CPAL());
+
+            //2.2 Cff font
+            PostTable postTable = rd.Read(new PostTable());
+            CFFTable cff = rd.Read(new CFFTable());
+
+            //additional math table (if available)
+            MathTable mathtable = rd.Read(new MathTable());
+            //------------------------------------
+
+            //PART 3: advanced typography             
+            GDEF gdef = rd.Read(new GDEF());
+            GSUB gsub = rd.Read(new GSUB());
+            GPOS gpos = rd.Read(new GPOS());
+            BASE baseTable = rd.Read(new BASE());
+            JSTF jstf = rd.Read(new JSTF());
+
+            STAT stat = rd.Read(new STAT());
+            if (stat != null)
+            {
+                //variable font
+                FVar fvar = rd.Read(new FVar());
+                if (fvar != null)
                 {
-                    typeface.ControlValues = cvtTable._controlValues;
-                }
-                if (fpgmTable != null)
-                {
-                    typeface.FpgmProgramBuffer = fpgmTable._programBuffer;
-                }
-                PrepTable propProgramTable = ReadTableIfExists(tables, input, new PrepTable());
-                if (propProgramTable != null)
-                {
-                    typeface.PrepProgramBuffer = propProgramTable._programBuffer;
+                    GVar gvar = rd.Read(new GVar());
+                    CVar cvar = rd.Read(new CVar());
+                    HVar hvar = rd.Read(new HVar());
+                    MVar mvar = rd.Read(new MVar());
+                    AVar avar = rd.Read(new AVar());
                 }
             }
+
+            bool isPostScriptOutline = false;
+            bool isBitmapFont = false;
+
+            typeface.SetBasicTypefaceTables(os2Table, nameEntry, head, horizontalMetrics);
+            if (glyf == null)
+            {
+                //check if this is cff table ?
+                if (cff == null)
+                {
+                    //check  cbdt/cblc ?
+                    CBLC cblcTable = rd.Read(new CBLC());
+                    if (cblcTable != null)
+                    {
+                        CBDT cbdtTable = rd.Read(new CBDT());
+                        //read cbdt 
+                        //bitmap font
+
+                        BitmapFontGlyphSource bmpFontGlyphSrc = new BitmapFontGlyphSource(cblcTable);
+                        bmpFontGlyphSrc.LoadCBDT(cbdtTable);
+                        Glyph[] glyphs = bmpFontGlyphSrc.BuildGlyphList();
+                        typeface.SetBitmapGlyphs(glyphs, bmpFontGlyphSrc);
+                        isBitmapFont = true;
+                    }
+                    else
+                    {
+                        //TODO:
+                        EBLC fontBmpTable = rd.Read(new EBLC());
+                        throw new NotSupportedException();
+                    }
+                }
+                else
+                {
+                    isPostScriptOutline = true;
+                    typeface.SetCffFontSet(cff.Cff1FontSet);
+                }
+            }
+            else
+            {
+                typeface.SetTtfGlyphs(glyf.Glyphs);
+            }
+
+            //----------------------------
+            typeface.CmapTable = cmaps;
+            typeface.KernTable = kern;
+            typeface.MaxProfile = maxProfile;
+            typeface.HheaTable = horizontalHeader;
+            //----------------------------
+            typeface.GaspTable = gaspTable;
+
+            if (!isPostScriptOutline && !isBitmapFont)
+            {
+                //for true-type font outline
+                FpgmTable fpgmTable = rd.Read(new FpgmTable());
+                //control values table
+                CvtTable cvtTable = rd.Read(new CvtTable());
+                PrepTable propProgramTable = rd.Read(new PrepTable());
+
+                typeface.ControlValues = cvtTable?._controlValues;
+                typeface.FpgmProgramBuffer = fpgmTable?._programBuffer;
+                typeface.PrepProgramBuffer = propProgramTable?._programBuffer;
+            }
+
             //-------------------------
             typeface.LoadOpenFontLayoutInfo(
                 gdef,
@@ -526,14 +665,7 @@ namespace Typography.OpenFont
                 cpal);
             //------------
 
-            {
-                SvgTable svgTable = ReadTableIfExists(tables, input, new SvgTable());
-                if (svgTable != null)
-                {
-                    typeface._svgTable = svgTable;
-                }
-            }
-
+            typeface.SetSvgTable(rd.Read(new SvgTable()));
             typeface.PostTable = postTable;
 
             if (mathtable != null)
@@ -552,11 +684,8 @@ namespace Typography.OpenFont
 
 
             typeface.UpdateLangs(meta);
-            typeface.UpdateCommonUsedValues();
-
-            return typeface;
+            return true;
         }
-
 
         static TableHeader ReadTableHeader(BinaryReader input)
         {
@@ -567,50 +696,8 @@ namespace Typography.OpenFont
                 input.ReadUInt32());
         }
 
-        static T ReadTableIfExists<T>(TableEntryCollection tables, BinaryReader reader, T resultTable)
-            where T : TableEntry
-        {
-
-
-            if (tables.TryGetTable(resultTable.Name, out TableEntry found))
-            {
-                //found table name
-                //check if we have read this table or not
-                if (found is UnreadTableEntry unreadTableEntry)
-                {
-                    //set header before actal read
-                    resultTable.Header = found.Header;
-                    if (unreadTableEntry.HasCustomContentReader)
-                    {
-                        resultTable = unreadTableEntry.CreateTableEntry(reader, resultTable);
-                    }
-                    else
-                    {
-                        resultTable.LoadDataFrom(reader);
-                    }
-                    //then replace
-                    tables.ReplaceTable(resultTable);
-                    return resultTable;
-                }
-                else
-                {
-#if DEBUG
-                    System.Diagnostics.Debug.WriteLine("this table is already loaded");
-                    if (!(found is T))
-                    {
-                        throw new NotSupportedException();
-                    }
-#endif
-                    return found as T;
-                }
-            }
-            //not found
-            return null;
-        }
 
 
     }
-
-
 
 }
