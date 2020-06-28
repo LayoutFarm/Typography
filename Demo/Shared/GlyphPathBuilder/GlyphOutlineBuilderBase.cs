@@ -17,7 +17,7 @@ namespace Typography.Contours
         protected GlyphPointF[] _outputGlyphPoints;
         protected ushort[] _outputContours;
 
-        protected OpenFont.CFF.Cff1Font _ownerCff;
+
         protected OpenFont.CFF.Cff1GlyphData _cffGlyphData;
 
         /// <summary>
@@ -74,7 +74,6 @@ namespace Typography.Contours
             if (glyph.IsCffGlyph)
             {
                 _cffGlyphData = glyph.GetCff1GlyphData();
-                _ownerCff = glyph.GetOwnerCff();
             }
 
             //---------------
@@ -131,7 +130,7 @@ namespace Typography.Contours
             //read output from glyph points
             if (_cffGlyphData != null)
             {
-                _cffEvalEngine.Run(tx, _ownerCff, _cffGlyphData, _recentPixelScale);
+                _cffEvalEngine.Run(tx, _cffGlyphData, _recentPixelScale);
             }
             else
             {

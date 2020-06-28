@@ -267,9 +267,9 @@ namespace SampleWinForms
             for (int i = 0; i < j; ++i)
             {
                 UnscaledGlyphPlan glyphPlan = glyphPlans[i];
-                Typography.OpenFont.Glyph glyph = typeface.GetGlyph(glyphPlan.glyphIndex);
+                Glyph glyph = typeface.GetGlyph(glyphPlan.glyphIndex);
                 //
-                Typography.OpenFont.Bounds b = glyph.Bounds;
+                Bounds b = glyph.Bounds;
                 //
                 float xmin = b.XMin * pxscale;
                 float ymin = b.YMin * pxscale;

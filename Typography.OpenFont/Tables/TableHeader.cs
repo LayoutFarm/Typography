@@ -29,6 +29,7 @@ namespace Typography.OpenFont.Tables
         public uint CheckSum { get; }
         public uint Length { get; }
 
+        public TableHeader Clone() => (_tag != 0) ? new TableHeader(_tag, CheckSum, Offset, Length) : new TableHeader(Tag, CheckSum, Offset, Length);
 #if DEBUG
         public override string ToString()
         {
