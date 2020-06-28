@@ -298,7 +298,7 @@ namespace PixelFarm.Drawing
         public ResolvedFont ResolveFont(RequestFont font)
         {
             //cache level-1 (attached inside the request font)
-            ResolvedFont resolvedFont = PixelFarm.Drawing.Internal.RequestFontCacheAccess.GetResolvedFont1<ResolvedFont>(font);
+            ResolvedFont resolvedFont = RequestFont.GetResolvedFont1<ResolvedFont>(font);
             if (resolvedFont != null) return resolvedFont;
 
             //cache level-2 (stored in this openfont service)
@@ -312,7 +312,7 @@ namespace PixelFarm.Drawing
                 }
                 //----
                 //cache to level-1
-                PixelFarm.Drawing.Internal.RequestFontCacheAccess.SetResolvedFont1(font, resolvedFont);
+                RequestFont.SetResolvedFont1(font, resolvedFont);
                 return resolvedFont;
             }
             //-----
@@ -362,7 +362,7 @@ namespace PixelFarm.Drawing
             //cache to level2
             _resolvedTypefaceCache.Add(resolvedFont.FontKey, resolvedFont);
             //cache to level 1
-            PixelFarm.Drawing.Internal.RequestFontCacheAccess.SetResolvedFont1(font, resolvedFont);
+            RequestFont.SetResolvedFont1(font, resolvedFont);
 
             return resolvedFont;
 

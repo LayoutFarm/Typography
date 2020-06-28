@@ -116,7 +116,24 @@ namespace PixelFarm.Drawing
 
         //------------------ 
         //caching ...
-
+        public static void SetResolvedFont1(RequestFont reqFont, ResolvedFontBase resolvedFont)
+        {
+            reqFont._resolvedFont1 = resolvedFont;
+        }
+        public static void SetResolvedFont2(RequestFont reqFont, object resolvedFont)
+        {
+            reqFont._resolvedFont2 = resolvedFont;
+        }
+        public static T GetResolvedFont1<T>(RequestFont reqFont)
+           where T : ResolvedFontBase
+        {
+            return reqFont._resolvedFont1 as T;
+        }
+        public static T GetResolvedFont2<T>(RequestFont reqFont)
+           where T : class
+        {
+            return reqFont._resolvedFont2 as T;
+        }
         //preserve 2 field user cache their actual here
         internal ResolvedFontBase _resolvedFont1;
         internal object _resolvedFont2;
@@ -213,28 +230,5 @@ namespace PixelFarm.Drawing
         public string Name { get; }
     }
 
-    namespace Internal
-    {
-        public static class RequestFontCacheAccess
-        {
-            public static void SetResolvedFont1(RequestFont reqFont, ResolvedFontBase resolvedFont)
-            {
-                reqFont._resolvedFont1 = resolvedFont;
-            }
-            public static void SetResolvedFont2(RequestFont reqFont, object resolvedFont)
-            {
-                reqFont._resolvedFont2 = resolvedFont;
-            }
-            public static T GetResolvedFont1<T>(RequestFont reqFont)
-               where T : ResolvedFontBase
-            {
-                return reqFont._resolvedFont1 as T;
-            }
-            public static T GetResolvedFont2<T>(RequestFont reqFont)
-               where T : class
-            {
-                return reqFont._resolvedFont2 as T;
-            }
-        }
-    }
+
 }
