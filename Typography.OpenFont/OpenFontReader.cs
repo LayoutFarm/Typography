@@ -121,7 +121,7 @@ namespace Typography.OpenFont
         }
     }
 
-    public struct OpenFontReader
+    public class OpenFontReader
     {
 
         class FontCollectionHeader
