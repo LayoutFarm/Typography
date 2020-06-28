@@ -1,6 +1,6 @@
 ﻿namespace SampleWinForms
 {
-    partial class FormTestTrimableFeature
+    partial class FormTestTrimmableFeature
     {
         /// <summary>
         /// Required designer variable.
@@ -37,19 +37,19 @@
             this.cmdTestReloadGlyphs.Name = "cmdTestReloadGlyphs";
             this.cmdTestReloadGlyphs.Size = new System.Drawing.Size(133, 36);
             this.cmdTestReloadGlyphs.TabIndex = 80;
-            this.cmdTestReloadGlyphs.Text = "Test Trimable Features";
+            this.cmdTestReloadGlyphs.Text = "Test Trimmable Features";
             this.cmdTestReloadGlyphs.UseVisualStyleBackColor = true;
             this.cmdTestReloadGlyphs.Click += new System.EventHandler(this.cmdTestReloadGlyphs_Click);
             // 
-            // FormTestTrimableFeature
+            // FormTestTrimmableFeature
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 581);
             this.Controls.Add(this.cmdTestReloadGlyphs);
-            this.Name = "FormTestTrimableFeature";
-            this.Text = "FormTestTrimableFeature";
-            this.Load += new System.EventHandler(this.FormTestTrimableFeature_Load);
+            this.Name = "FormTestTrimmableFeature";
+            this.Text = "FormTestTrimmableFeature";
+            this.Load += new System.EventHandler(this.FormTestTrimmableFeature_Load);
             this.ResumeLayout(false);
 
         }

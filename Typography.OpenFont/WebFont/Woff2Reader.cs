@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using Typography.OpenFont;
 using Typography.OpenFont.IO;
 using Typography.OpenFont.Tables;
-using Typography.OpenFont.Trimable;
+using Typography.OpenFont.Trimmable;
 
 //see https://www.w3.org/TR/WOFF2/
 
