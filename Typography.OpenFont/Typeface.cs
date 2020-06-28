@@ -416,10 +416,10 @@ namespace Typography.OpenFont
         /// undate lang info
         /// </summary>
         /// <param name="metaTable"></param>
-        internal void UpdateLangs(Meta metaTable) => Languages.Update(OS2Table, metaTable, this.GSUBTable, this.GPOSTable);
+        internal void UpdateLangs(Meta metaTable) => Languages.Update(OS2Table, metaTable, CmapTable, this.GSUBTable, this.GPOSTable);
 
 
-      
+
     }
 
     public interface IGlyphPositions
@@ -1072,7 +1072,7 @@ namespace Typography.OpenFont
 
 
 
-   
+
 }
 
 

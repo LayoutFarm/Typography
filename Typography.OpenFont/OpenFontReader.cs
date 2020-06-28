@@ -414,10 +414,11 @@ namespace Typography.OpenFont
 
             GSUB gsub = rd.Read(new GSUB() { OnlyScriptList = true });
             GPOS gpos = rd.Read(new GPOS() { OnlyScriptList = true });
+            Cmap cmap = rd.Read(new Cmap());
             //gsub and gpos contains actual script_list that are in the typeface
 
             Languages langs = new Languages();
-            langs.Update(os2Table, metaTable, gsub, gpos);
+            langs.Update(os2Table, metaTable, cmap, gsub, gpos);
 
             return new PreviewFontInfo(
               nameEntry.FontName,
