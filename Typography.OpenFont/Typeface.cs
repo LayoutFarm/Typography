@@ -431,6 +431,11 @@ namespace Typography.OpenFont
                 _whitespaceWidth = this.GetAdvanceWidthFromGlyphIndex(whitespace_glyphIndex);
             }
         }
+
+#if DEBUG
+        public override string ToString() => Name;
+#endif
+
     }
 
     public interface IGlyphPositions

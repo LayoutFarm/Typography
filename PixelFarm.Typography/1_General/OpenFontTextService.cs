@@ -47,9 +47,17 @@ namespace PixelFarm.Drawing
         class EmptyResolvedFont : ResolvedFont
         {
             public EmptyResolvedFont() : base(null, 0, FontStyle.Regular, 0) { }
+#if DEBUG
+            public override string ToString() => "EMPTY_RESOLVED_FONT";
+#endif
         }
 
         internal static readonly ResolvedFont s_empty = new EmptyResolvedFont();
+#if DEBUG
+        public override string ToString() => Typeface?.Name;
+#endif
+
+
     }
     public class OpenFontTextService : ITextService
     {
