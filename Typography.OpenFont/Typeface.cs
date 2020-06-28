@@ -174,7 +174,7 @@ namespace Typography.OpenFont
 
         void UpdateCff1FontSetNamesCache()
         {
-            if (_cff1FontSet != null)
+            if (_cff1FontSet != null && _cachedGlyphDicByName == null)
             {
                 //create cache data
                 _cachedGlyphDicByName = new Dictionary<string, ushort>();
@@ -419,7 +419,7 @@ namespace Typography.OpenFont
         internal void UpdateLangs(Meta metaTable) => Languages.Update(OS2Table, metaTable, this.GSUBTable, this.GPOSTable);
 
 
-      
+
     }
 
     public interface IGlyphPositions
@@ -1072,7 +1072,7 @@ namespace Typography.OpenFont
 
 
 
-   
+
 }
 
 

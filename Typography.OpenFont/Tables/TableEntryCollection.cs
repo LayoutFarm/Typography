@@ -25,13 +25,6 @@ namespace Typography.OpenFont.Tables
                 i++;
             }
             return clones;
-        }
-
-        public bool CheckIfMatchedWith(TableHeader[] another)
-        {
-            return true;
-        }
+        } 
     }
-
-
 }

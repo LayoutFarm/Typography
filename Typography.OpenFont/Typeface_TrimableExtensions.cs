@@ -48,17 +48,24 @@ namespace Typography.OpenFont.Trimable
         /// only essential info for glyph layout
         /// </summary>
         EssentailLayoutInfo,
+        /// <summary>
+        /// restore again
+        /// </summary>
+        Restored,
     }
 
     public static class TypefaceExtensions
     {
         public static RestoreTicket TrimDown(this Typeface typeface) => typeface.TrimDownAndRemoveGlyphBuildingDetail();
-        public static TrimMode GetGlyphBuildingDetailMode(this Typeface typeface) => typeface._typefaceTrimMode;
-        public static bool IsTrimmed(this Typeface typeface) => typeface._typefaceTrimMode != TrimMode.No;
+        public static TrimMode GetTrimMode(this Typeface typeface) => typeface._typefaceTrimMode;
+        public static bool IsTrimmed(this Typeface typeface) => typeface._typefaceTrimMode == TrimMode.EssentailLayoutInfo;
 
         public static void RestoreUp(this Typeface typeface, RestoreTicket ticket, OpenFontReader openFontReader, Stream fontStream)
         {
-            openFontReader.Read(typeface, ticket, fontStream);
+            if (typeface.IsTrimmed())
+            {
+                openFontReader.Read(typeface, ticket, fontStream);
+            }
         }
         public static void RestoreUp(this Typeface typeface, RestoreTicket ticket, Stream fontStream)
         {
@@ -74,6 +81,7 @@ namespace Typography.OpenFont.Trimable
 
 namespace Typography.OpenFont
 {
+    using Typography.OpenFont.Tables;
 
     //-------------------------
     //This is our extension***,
@@ -87,12 +95,14 @@ namespace Typography.OpenFont
     {
         internal TrimMode _typefaceTrimMode;
 
+
         internal RestoreTicket TrimDownAndRemoveGlyphBuildingDetail()
         {
             switch (_typefaceTrimMode)
             {
                 default: throw new NotSupportedException();
                 case TrimMode.EssentailLayoutInfo: return null;//same mode
+                case TrimMode.Restored:
                 case TrimMode.No:
                     {
                         RestoreTicket ticket = new RestoreTicket();
@@ -162,6 +172,35 @@ namespace Typography.OpenFont
                         return ticket;
                     }
             }
+        }
+
+
+        internal bool CompareOriginalHeadersWithNewlyLoadOne(TableHeader[] others)
+        {
+            if (_tblHeaders != null && others != null &&
+                _tblHeaders.Length == others.Length)
+            {
+                for (int i = 0; i < _tblHeaders.Length; ++i)
+                {
+                    TableHeader a = _tblHeaders[i];
+                    TableHeader b = others[i];
+
+                    if (a.Tag != b.Tag ||
+                       a.Offset != b.Offset ||
+                       a.Length != b.Length ||
+                       a.CheckSum != b.CheckSum)
+                    {
+#if DEBUG
+                        System.Diagnostics.Debugger.Break();
+#endif
+
+                        return false;
+                    }
+                }
+                //pass all
+                return true;
+            }
+            return false;
         }
     }
 
