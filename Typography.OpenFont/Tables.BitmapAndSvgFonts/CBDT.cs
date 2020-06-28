@@ -29,43 +29,56 @@ namespace Typography.OpenFont.Tables
     //Some of the formats contain metric information plus image data, 
     //and other formats contain only the image data. Long word alignment is not required for these subtables;
     //byte alignment is sufficient.
+
     class CBDT : TableEntry, IDisposable
     {
         public const string _N = "CBDT";
         public override string Name => _N;
 
-        GlyphBitmapDataFmt17 _format17 = new GlyphBitmapDataFmt17();
-        GlyphBitmapDataFmt18 _format18 = new GlyphBitmapDataFmt18();
-        GlyphBitmapDataFmt19 _format19 = new GlyphBitmapDataFmt19();
+        readonly GlyphBitmapDataFmt17 _format17 = new GlyphBitmapDataFmt17();
+        readonly GlyphBitmapDataFmt18 _format18 = new GlyphBitmapDataFmt18();
+        readonly GlyphBitmapDataFmt19 _format19 = new GlyphBitmapDataFmt19();
 
 
         System.IO.MemoryStream _ms; //sub-stream contains image data
         Typography.OpenFont.IO.ByteOrderSwappingBinaryReader _binReader;
+
         public void Dispose()
         {
-            if (_binReader != null)
+            RemoveOldMemoryStreamAndReaders();
+        }
+
+        public void RemoveOldMemoryStreamAndReaders()
+        {
+            try
             {
-                ((System.IDisposable)_binReader).Dispose();
-                _binReader = null;
+                if (_binReader != null)
+                {
+                    ((System.IDisposable)_binReader).Dispose();
+                    _binReader = null;
+                }
+                if (_ms != null)
+                {
+                    _ms.Dispose();
+                    _ms = null;
+                }
             }
-            if (_ms != null)
+            catch (Exception ex)
             {
-                _ms.Dispose();
-                _ms = null;
+                //
             }
         }
         protected override void ReadContentFrom(BinaryReader reader)
         {
 
-            //we will read this later
+            //we copy data from the input mem stream
+            //and store inside this table for later use.
+            RemoveOldMemoryStreamAndReaders();
+
+            //-------------------
             byte[] data = reader.ReadBytes((int)this.Header.Length);//***
             _ms = new MemoryStream(data);
             _binReader = new IO.ByteOrderSwappingBinaryReader(_ms);
-
-            //ushort majorVersion = reader.ReadUInt16();
-            //ushort minorVersion = reader.ReadUInt16();
-            ////--------------
-            //this.Header.Length;
         }
         public void FillGlyphInfo(Glyph glyph)
         {

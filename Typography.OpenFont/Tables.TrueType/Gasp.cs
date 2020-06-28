@@ -11,7 +11,7 @@ namespace Typography.OpenFont.Tables
         public const string _N = "gasp";
         public override string Name => _N;
         //
-        //https://www.microsoft.com/typography/otspec/gasp.htm
+        //https://docs.microsoft.com/en-us/typography/opentype/spec/gasp
 
 
         // This table contains information which describes the preferred rasterization techniques 
@@ -36,15 +36,15 @@ namespace Typography.OpenFont.Tables
         protected override void ReadContentFrom(BinaryReader reader)
         {
 
-            //Type 	Name 	Description
-            //USHORT 	version 	Version number (set to 1)
-            //USHORT 	numRanges 	Number of records to follow
-            //GASPRANGE 	gaspRange[numRanges] 	Sorted by ppem
+            //Type 	        Name 	            Description
+            //USHORT 	    version 	        Version number (set to 1)
+            //USHORT 	    numRanges 	        Number of records to follow
+            //GASPRANGE     gaspRange[numRanges] 	Sorted by ppem
 
             //Each GASPRANGE record looks like this:
-            //Type 	Name 	Description
-            //USHORT 	rangeMaxPPEM 	Upper limit of range, in PPEM
-            //USHORT 	rangeGaspBehavior 	Flags describing desired rasterizer behavior.
+            //Type 	        Name 	            Description
+            //USHORT 	    rangeMaxPPEM 	    Upper limit of range, in PPEM
+            //USHORT 	    rangeGaspBehavior 	Flags describing desired rasterizer behavior.
             ushort version = reader.ReadUInt16();
             ushort numRanges = reader.ReadUInt16();
             _rangeRecords = new GaspRangeRecord[numRanges];

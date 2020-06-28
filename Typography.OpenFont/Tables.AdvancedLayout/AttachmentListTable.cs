@@ -4,7 +4,7 @@ using System.IO;
 
 namespace Typography.OpenFont.Tables
 {
-    //https://www.microsoft.com/typography/otspec/chapter2.htm
+    //https://docs.microsoft.com/en-us/typography/opentype/spec/chapter2
     //Attachment List Table
 
     //The Attachment List table (AttachList) may be used to cache attachment point coordinates along with glyph bitmaps.

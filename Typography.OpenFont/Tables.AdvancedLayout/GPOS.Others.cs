@@ -3,7 +3,7 @@ using System;
 using System.IO;
 using System.Text;
 
-//https://www.microsoft.com/typography/otspec/GPOS.htm
+//https://docs.microsoft.com/en-us/typography/opentype/spec/gpos
 
 namespace Typography.OpenFont.Tables
 {

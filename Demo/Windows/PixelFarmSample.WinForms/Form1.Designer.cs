@@ -41,6 +41,7 @@
             this.button2 = new System.Windows.Forms.Button();
             this.button3 = new System.Windows.Forms.Button();
             this.lstTextBaseline = new System.Windows.Forms.ListBox();
+            this.cmdTestReloadGlyphs = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // button1
@@ -160,11 +161,22 @@
             this.lstTextBaseline.Size = new System.Drawing.Size(120, 95);
             this.lstTextBaseline.TabIndex = 78;
             // 
+            // cmdTestReloadGlyphs
+            // 
+            this.cmdTestReloadGlyphs.Location = new System.Drawing.Point(1126, 260);
+            this.cmdTestReloadGlyphs.Name = "cmdTestReloadGlyphs";
+            this.cmdTestReloadGlyphs.Size = new System.Drawing.Size(133, 36);
+            this.cmdTestReloadGlyphs.TabIndex = 79;
+            this.cmdTestReloadGlyphs.Text = "Test Trimable Features ..";
+            this.cmdTestReloadGlyphs.UseVisualStyleBackColor = true;
+            this.cmdTestReloadGlyphs.Click += new System.EventHandler(this.cmdTestReloadGlyphs_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1393, 857);
+            this.Controls.Add(this.cmdTestReloadGlyphs);
             this.Controls.Add(this.lstTextBaseline);
             this.Controls.Add(this.button3);
             this.Controls.Add(this.button2);
@@ -200,6 +212,7 @@
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.Button button3;
         private System.Windows.Forms.ListBox lstTextBaseline;
+        private System.Windows.Forms.Button cmdTestReloadGlyphs;
     }
 }
 

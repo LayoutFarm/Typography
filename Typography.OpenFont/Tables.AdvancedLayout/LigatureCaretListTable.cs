@@ -4,7 +4,7 @@ using System.IO;
 
 namespace Typography.OpenFont.Tables
 {
-    //from https://www.microsoft.com/typography/otspec/gdef.htm
+    //from https://docs.microsoft.com/en-us/typography/opentype/spec/gdef
     //Ligature Caret List Table
     //The Ligature Caret List table (LigCaretList) defines caret positions for all the ligatures in a font. 
     //The table consists of an offset to a Coverage table that lists all the ligature glyphs (Coverage),

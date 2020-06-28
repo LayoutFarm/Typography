@@ -131,19 +131,14 @@ namespace Typography.OpenFont.Tables
 
             public readonly ushort lookupFlags;
             public readonly ushort markFilteringSet;
-            //--------------------------
-            LookupSubTable[] _subTables;
+
             public LookupTable(ushort lookupFlags, ushort markFilteringSet)
             {
                 this.lookupFlags = lookupFlags;
                 this.markFilteringSet = markFilteringSet;
             }
             //
-            public LookupSubTable[] SubTables
-            {
-                get => _subTables;
-                internal set => _subTables = value;
-            }
+            public LookupSubTable[] SubTables { get; internal set; }
 
             //
             public bool DoSubstitutionAt(IGlyphIndexList inputGlyphs, int pos, int len)

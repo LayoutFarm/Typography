@@ -41,6 +41,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FontAtlasBuilderHelper.cs" />
+    <Compile Include="FormTestTrimableFeature.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormTestTrimableFeature.Designer.cs">
+      <DependentUpon>FormTestTrimableFeature.cs</DependentUpon>
+    </Compile>
     <Compile Include="UIFontScriptOpt.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -79,6 +85,9 @@
       <DependentUpon>UIFontAtlasFileViewer.cs</DependentUpon>
     </Compile>
     <Compile Include="SimpleUtils.cs" />
+    <EmbeddedResource Include="FormTestTrimableFeature.resx">
+      <DependentUpon>FormTestTrimableFeature.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="UIFontAtlasFileViewer.resx">
       <DependentUpon>UIFontAtlasFileViewer.cs</DependentUpon>
     </EmbeddedResource>
@@ -108,12 +117,24 @@
       <Link>Test\latinmodern-math.otf</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="..\TestFonts\NotoColorEmoji.ttf">
+      <Link>Test\NotoColorEmoji.ttf</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="..\TestFonts\Sarabun-Regular.woff">
       <Link>Test\Sarabun-Regular.woff</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="..\TestFonts\Sarabun-Regular.woff2">
+      <Link>Test\Sarabun-Regular.woff2</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="..\TestFonts\SourceSansPro-Regular.ttf">
       <Link>Test\SourceSansPro-Regular.ttf</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\TestFonts\TwitterColorEmoji-SVGinOT.ttf">
+      <Link>Test\TwitterColorEmoji-SVGinOT.ttf</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Properties\Settings.settings">

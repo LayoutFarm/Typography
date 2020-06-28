@@ -7,7 +7,7 @@ namespace PixelFarm.Drawing
         public readonly int start;
         public readonly int len;
 
-        char[] _rawString;
+        readonly char[] _rawString;
 
         public TextBufferSpan(char[] rawCharBuffer)
         {
@@ -45,12 +45,10 @@ namespace PixelFarm.Drawing
 
     public interface ITextService
     {
-
+        ResolvedFontBase ResolveFont(RequestFont f);
         float MeasureWhitespace(RequestFont f);
         float MeasureBlankLineHeight(RequestFont f);
-        //
 
-        //
         Size MeasureString(in TextBufferSpan textBufferSpan, RequestFont font);
 
         void MeasureString(in TextBufferSpan textBufferSpan, RequestFont font, int maxWidth, out int charFit, out int charFitWidth);

@@ -1,6 +1,5 @@
 ﻿//MIT, 2018-present, WinterDev
-//https://www.microsoft.com/typography/otspec/math.htm
-
+//https://docs.microsoft.com/en-us/typography/opentype/spec/math
 
 using System.IO;
 
@@ -527,10 +526,7 @@ namespace Typography.OpenFont.MathGlyphs
             BottomRight = bottomRight;
             BottomLeft = bottomLeft;
         }
-
     }
-
-
 }
 
 namespace Typography.OpenFont.Tables
@@ -562,17 +558,18 @@ namespace Typography.OpenFont.Tables
         {
             return mathGlyphInfos[glyphIndex] ?? (mathGlyphInfos[glyphIndex] = new MathGlyphInfo(glyphIndex));
         }
-        public void LoadMathGlyph(Typeface typeface, MathTable mathTable)
+
+        public static void LoadMathGlyph(Typeface typeface, MathTable mathTable)
         {
             //expand math info to each glyph in typeface
 
             typeface._mathTable = mathTable;
-            Glyph[] allGlyphs = typeface.GetRawGlyphList();
 
-            //expand all information to the glyph 
-            int glyphCount = allGlyphs.Length;
+
+            //expand all information to the glyph  
+            int glyphCount = typeface.GlyphCount;
             MathGlyphInfo[] mathGlyphInfos = new MathGlyphInfo[glyphCount];
-            typeface._mathGlyphInfos = mathGlyphInfos;
+
 
             int index = 0;
             //-----------------
@@ -657,13 +654,7 @@ namespace Typography.OpenFont.Tables
                     }
                 }
             }
-
-            //-------
-            //fill to original glyph?
-            for (int n = 0; n < allGlyphs.Length; ++n)
-            {
-                allGlyphs[n].MathGlyphInfo = mathGlyphInfos[n];
-            }
+            typeface.LoadMathGlyphInfos(mathGlyphInfos);
         }
 
     }
@@ -1292,15 +1283,7 @@ namespace Typography.OpenFont.Tables
                     );
             }
         }
-
-
     }
-
-
-
-
-
-
 
     class MathItalicsCorrectonInfoTable
     {
@@ -1319,7 +1302,6 @@ namespace Typography.OpenFont.Tables
 
         public MathValueRecord[] ItalicCorrections;
         public CoverageTable CoverageTable;
-
 
     }
     class MathTopAccentAttachmentTable

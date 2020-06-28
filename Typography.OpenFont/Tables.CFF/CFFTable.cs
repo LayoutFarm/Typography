@@ -74,7 +74,7 @@ namespace Typography.OpenFont.Tables
         internal Cff1FontSet Cff1FontSet => _cff1FontSet;
         protected override void ReadContentFrom(BinaryReader reader)
         {
-            uint tableOffset = this.Header.Offset;
+            long startAt = reader.BaseStream.Position;
             //
             //
             //Table 8 Header Format
@@ -97,7 +97,7 @@ namespace Typography.OpenFont.Tables
                 case 1:
                     {
                         Cff1Parser cff1 = new Cff1Parser();
-                        cff1.ParseAfterHeader(tableOffset, reader);
+                        cff1.ParseAfterHeader(startAt, reader);
                         _cff1FontSet = cff1.ResultCff1FontSet;
                     }
                     break;

@@ -23,8 +23,8 @@ namespace DrawingGL.Text
         //
         // for tess
         // 
-        SimpleCurveFlattener _curveFlattener;
-        Tesselate.TessTool _tessTool;
+        readonly SimpleCurveFlattener _curveFlattener;
+        readonly Tesselate.TessTool _tessTool;
 
         Typeface _currentTypeface;
 
@@ -61,7 +61,7 @@ namespace DrawingGL.Text
 
         public override Typeface Typeface
         {
-            get { return _currentTypeface; }
+            get => _currentTypeface;
             set
             {
                 _currentTypeface = value;
@@ -81,7 +81,7 @@ namespace DrawingGL.Text
         /// </summary>
         public string FontFilename
         {
-            get { return _currentFontFile; }
+            get => _currentFontFile;
             set
             {
                 if (_currentFontFile != value)
@@ -167,10 +167,10 @@ namespace DrawingGL.Text
                 //
                 //1. check if we have this glyph in cache?
                 //if yes, not need to build it again 
-                ProcessedGlyph processGlyph;
-                float[] tessData = null;
 
-                if (!_glyphMeshCollection.TryGetCacheGlyph(glyphPlan.glyphIndex, out processGlyph))
+
+
+                if (!_glyphMeshCollection.TryGetCacheGlyph(glyphPlan.glyphIndex, out ProcessedGlyph processGlyph))
                 {
                     //if not found the  create a new one and register it
                     var writablePath = new WritablePath();
@@ -179,11 +179,10 @@ namespace DrawingGL.Text
                     _currentGlyphPathBuilder.ReadShapes(_pathTranslator);
 
                     //-------
-                    //do tess  
-                    int[] endContours;
-                    float[] flattenPoints = _curveFlattener.Flatten(writablePath._points, out endContours);
+                    //do tess   
+                    float[] flattenPoints = _curveFlattener.Flatten(writablePath._points, out int[] endContours);
 
-                    tessData = _tessTool.TessAsTriVertexArray(flattenPoints, endContours, out int vertexCount);
+                    float[] tessData = _tessTool.TessAsTriVertexArray(flattenPoints, endContours, out int vertexCount);
                     processGlyph = new ProcessedGlyph(tessData, (ushort)vertexCount);
 
                     _glyphMeshCollection.RegisterCachedGlyph(glyphPlan.glyphIndex, processGlyph);

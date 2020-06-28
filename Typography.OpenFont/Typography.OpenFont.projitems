@@ -38,7 +38,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Tables.AdvancedLayout\JustificationTable.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tables.AdvancedLayout\LigatureCaretListTable.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tables.AdvancedLayout\MathTable.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Tables.AdvancedLayout\ScriptLang.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tables.AdvancedLayout\ScriptList.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tables.AdvancedLayout\ScriptTable.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tables.AdvancedLayout\CPAL.cs" />
@@ -92,6 +91,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)TrueTypeInterperter\TrueTypeInterpreter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TrueTypeInterperter\InvalidFontException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Typeface.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Typeface_TrimableExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)WebFont\Woff2Reader.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)WebFont\WoffReader.cs" />
   </ItemGroup>

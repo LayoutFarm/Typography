@@ -41,7 +41,8 @@ using System.IO;
 //
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//https://www.microsoft.com/typography/otspec/GDEF.htm
+//https://docs.microsoft.com/en-us/typography/opentype/spec/gdef
+
 //GDEF — Glyph Definition Table
 
 //The Glyph Definition (GDEF) table contains six types of information in six independent tables:
