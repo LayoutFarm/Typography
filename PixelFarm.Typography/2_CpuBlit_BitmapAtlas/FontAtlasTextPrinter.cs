@@ -61,21 +61,17 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
 
         public AntialiasTechnique AntialiasTech { get; set; }
 
-
-        RequestFont _reqFont;
-        public void ChangeFont(RequestFont font)
+        public void ChangeFont(RequestFont reqFont)
         {
             //call to service             
-            _font = _textServices.ResolveFont(_reqFont = font); //resolve for 'actual' font
-
+            _font = _textServices.ResolveFont(reqFont); //resolve for 'actual' font
             _fontAtlas = _bmpFontMx.GetFontAtlas(_font, out _fontBmp);
-            FontSizeInPoints = font.SizeInPoints;
+            FontSizeInPoints = _font.SizeInPoints;
         }
 
         public void SetSvgBmpBuilderFunc(SvgBmpBuilderFunc svgBmpBuilderFunc) => _bmpFontMx.SetSvgBmpBuilderFunc(svgBmpBuilderFunc);
-
-        public RequestFont CurrentFont => _reqFont;
-        public ResolvedFontBase CurrentResolvedFont => _font;
+ 
+        public ResolvedFontBase CurrentFont => _font;
 
         public void ChangeFillColor(Color fontColor)
         {

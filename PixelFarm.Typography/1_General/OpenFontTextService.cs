@@ -14,14 +14,25 @@ namespace PixelFarm.Drawing
 {
     public class ResolvedFont : ResolvedFontBase
     {
-        public ResolvedFont(Typeface typeface, float sizeInPoints, FontStyle fontStyle, int fontKey)
-            : base(sizeInPoints, fontStyle, fontKey)
+        public ResolvedFont(Typeface typeface, float sizeInPoints, FontStyle fontStyle)
+             : base(typeface?.Name, sizeInPoints, fontStyle)
         {
             Typeface = typeface;
+            CalculateOtherValues();
+        }
+        public ResolvedFont(Typeface typeface, float sizeInPoints, FontStyle fontStyle, int fontKey)
+            : base(typeface?.Name, sizeInPoints, fontStyle, fontKey)
+        {
+            Typeface = typeface;
+            CalculateOtherValues();
 
+        }
+        void CalculateOtherValues()
+        {
+            Typeface typeface = this.Typeface;
             if (typeface != null)
             {
-                ScaleToPixel = typeface.CalculateScaleToPixelFromPointSize(sizeInPoints);//pxscale
+                ScaleToPixel = typeface.CalculateScaleToPixelFromPointSize(SizeInPoints);//pxscale
                 WhitespaceWidthF = typeface.GetWhitespaceWidth() * ScaleToPixel;
                 WhitespaceWidth = (int)Math.Round(WhitespaceWidthF);
 
@@ -29,7 +40,6 @@ namespace PixelFarm.Drawing
                 AscentInPixels = typeface.Ascender * ScaleToPixel;
                 DescentInPixels = typeface.Descender * ScaleToPixel;
                 LineGapInPx = typeface.LineGap * ScaleToPixel;
-                Name = typeface.Name;
             }
         }
         public Typeface Typeface { get; }

@@ -404,7 +404,7 @@ namespace PixelFarm.Drawing
             {
                 return glyphBmp;
             }
-             
+
 
             //TODO: use string builder from pool?
             var stbuilder = new System.Text.StringBuilder();
@@ -916,8 +916,9 @@ namespace PixelFarm.Drawing
                     seq.IsRightToLeft = spBreakInfo.RightToLeft;
 
                     FormattedGlyphPlanSeq formattedGlyphPlanSeq = _pool.GetFreeFmtGlyphPlanSeqs();
-                    formattedGlyphPlanSeq.seq = seq;
-                    formattedGlyphPlanSeq.Typeface = curTypeface;
+
+                    //TODO: other style?... (bold, italic)
+                    formattedGlyphPlanSeq.SetData(seq, new ResolvedFont(curTypeface, FontSizeInPoints, FontStyle.Regular));
 
                     _tmpGlyphPlanSeqs.Add(formattedGlyphPlanSeq);
 
@@ -933,7 +934,7 @@ namespace PixelFarm.Drawing
                     {
                         FormattedGlyphPlanSeq formattedGlyphPlanSeq = _tmpGlyphPlanSeqs[i];
 
-                        Typeface = formattedGlyphPlanSeq.Typeface;
+                        Typeface = formattedGlyphPlanSeq.ActualFont.Typeface;
 
                         DrawFromGlyphPlans(formattedGlyphPlanSeq.seq, xpos, y);
 
@@ -949,7 +950,7 @@ namespace PixelFarm.Drawing
                         FormattedGlyphPlanSeq formattedGlyphPlanSeq = _tmpGlyphPlanSeqs[i];
 
                         //change typeface                            
-                        Typeface = formattedGlyphPlanSeq.Typeface;
+                        Typeface = formattedGlyphPlanSeq.ActualFont.Typeface;
                         //update pxscale size                             
                         _currentFontSizePxScale = Typeface.CalculateScaleToPixelFromPointSize(FontSizeInPoints);
 
@@ -993,17 +994,23 @@ namespace PixelFarm.Drawing
     {
         static readonly GlyphPlanSequence s_EmptyGlypgPlanSeq = new GlyphPlanSequence();
 
-        public GlyphPlanSequence seq;
 
-        public Typeface Typeface;
 
-        public bool IsEmpty() => Typeface == null;
+        public GlyphPlanSequence seq { get; private set; } = GlyphPlanSequence.Empty;
+        public ResolvedFont ActualFont { get; private set; }
+        public void SetData(GlyphPlanSequence seq, ResolvedFont font)
+        {
+            this.seq = seq;
+            this.ActualFont = font;
+        }
+        public bool IsEmpty() => seq.IsEmpty();
         public void Reset()
         {
-
             seq = s_EmptyGlypgPlanSeq;
-            Typeface = null;
+            ActualFont = null;
         }
+
+
     }
 
     public interface IMultiLayerGlyphTranslator : IGlyphTranslator
