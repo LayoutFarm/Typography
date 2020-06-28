@@ -163,11 +163,11 @@
             // 
             // cmdTestReloadGlyphs
             // 
-            this.cmdTestReloadGlyphs.Location = new System.Drawing.Point(26, 795);
+            this.cmdTestReloadGlyphs.Location = new System.Drawing.Point(1126, 260);
             this.cmdTestReloadGlyphs.Name = "cmdTestReloadGlyphs";
-            this.cmdTestReloadGlyphs.Size = new System.Drawing.Size(121, 36);
+            this.cmdTestReloadGlyphs.Size = new System.Drawing.Size(133, 36);
             this.cmdTestReloadGlyphs.TabIndex = 79;
-            this.cmdTestReloadGlyphs.Text = "Test Reload Glyphs";
+            this.cmdTestReloadGlyphs.Text = "Test Trimable Features ..";
             this.cmdTestReloadGlyphs.UseVisualStyleBackColor = true;
             this.cmdTestReloadGlyphs.Click += new System.EventHandler(this.cmdTestReloadGlyphs_Click);
             // 

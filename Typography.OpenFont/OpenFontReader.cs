@@ -123,12 +123,12 @@ namespace Typography.OpenFont
 
     public class OpenFontReader
     {
-
+#if DEBUG
         public OpenFontReader()
         {
 
         }
-
+#endif
         class FontCollectionHeader
         {
             public ushort majorVersion;
@@ -438,9 +438,13 @@ namespace Typography.OpenFont
         bool ReadTableEntryCollectionOnRestoreMode(Typeface typeface, RestoreTicket ticket, TableEntryCollection tables, BinaryReader input)
         {
             //RESTORE MODE
-
             //check header matches
 
+            if (!typeface.IsTrimmed() ||
+                !typeface.CompareOriginalHeadersWithNewlyLoadOne(tables.CloneTableHeaders()))
+            {
+                return false;
+            }
 
 
             var rd = new EntriesReaderHelper(tables, input);
@@ -524,7 +528,7 @@ namespace Typography.OpenFont
                 typeface.UpdateAllCffGlyphBounds();
             }
 #endif
-
+            typeface._typefaceTrimMode = TrimMode.Restored;
             return true;
         }
         internal bool ReadTableEntryCollection(Typeface typeface, RestoreTicket ticket, TableEntryCollection tables, BinaryReader input)
