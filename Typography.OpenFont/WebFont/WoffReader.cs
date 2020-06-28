@@ -6,7 +6,7 @@ using System.IO;
 using Typography.OpenFont;
 using Typography.OpenFont.IO;
 using Typography.OpenFont.Tables;
-using Typography.OpenFont.Trimable;
+using Typography.OpenFont.Trimmable;
 
 namespace Typography.WebFont
 {

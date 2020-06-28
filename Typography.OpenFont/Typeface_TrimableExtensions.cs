@@ -3,7 +3,7 @@
 using System;
 using System.IO;
 
-namespace Typography.OpenFont.Trimable
+namespace Typography.OpenFont.Trimmable
 {
 
     //-------------------------
@@ -89,7 +89,7 @@ namespace Typography.OpenFont
     //-------------------------
     //user can reload a new clone of glyphs with fewer detail
     //or restore a new clone of glyphs with full detail 
-    using Typography.OpenFont.Trimable;
+    using Typography.OpenFont.Trimmable;
 
     partial class Typeface
     {

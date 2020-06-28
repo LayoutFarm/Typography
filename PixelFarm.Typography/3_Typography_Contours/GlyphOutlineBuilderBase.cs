@@ -2,7 +2,7 @@
 
 using System;
 using Typography.OpenFont;
-using Typography.OpenFont.Trimable;
+using Typography.OpenFont.Trimmable;
 
 namespace Typography.Contours
 {
@@ -61,7 +61,7 @@ namespace Typography.Contours
         public void BuildFromGlyphIndex(ushort glyphIndex, float sizeInPoints)
         {
             //------------
-            //Trimable feature note:
+            //Trimmable feature note:
             //in this mode, 
             //if _typeface is trimmed=> the glyph from _typeface has no building details
             //so can't build it.
@@ -89,7 +89,7 @@ namespace Typography.Contours
         public void BuildFromGlyph(Glyph glyph, float sizeInPoints)
         {
             //------------
-            //Trimable feature note:
+            //Trimmable feature note:
             //in this mode
             //we build from input glyphs 
             //please ensure that the glyph has full build instructions

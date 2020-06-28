@@ -41,11 +41,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FontAtlasBuilderHelper.cs" />
-    <Compile Include="FormTestTrimableFeature.cs">
+    <Compile Include="FormTestTrimmableFeature.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="FormTestTrimableFeature.Designer.cs">
-      <DependentUpon>FormTestTrimableFeature.cs</DependentUpon>
+    <Compile Include="FormTestTrimmableFeature.Designer.cs">
+      <DependentUpon>FormTestTrimmableFeature.cs</DependentUpon>
     </Compile>
     <Compile Include="UIFontScriptOpt.cs">
       <SubType>UserControl</SubType>
@@ -85,8 +85,8 @@
       <DependentUpon>UIFontAtlasFileViewer.cs</DependentUpon>
     </Compile>
     <Compile Include="SimpleUtils.cs" />
-    <EmbeddedResource Include="FormTestTrimableFeature.resx">
-      <DependentUpon>FormTestTrimableFeature.cs</DependentUpon>
+    <EmbeddedResource Include="FormTestTrimmableFeature.resx">
+      <DependentUpon>FormTestTrimmableFeature.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UIFontAtlasFileViewer.resx">
       <DependentUpon>UIFontAtlasFileViewer.cs</DependentUpon>
