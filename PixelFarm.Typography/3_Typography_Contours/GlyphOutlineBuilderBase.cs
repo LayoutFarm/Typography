@@ -60,6 +60,17 @@ namespace Typography.Contours
         /// <param name="sizeInPoints"></param>
         public void BuildFromGlyphIndex(ushort glyphIndex, float sizeInPoints)
         {
+            //------------
+            //Trimable feature note:
+            //in this mode, 
+            //if _typeface is trimmed=> the glyph from _typeface has no building details
+            //so can't build it.
+            //you have 2 choices:
+            //1. restore the typeface 
+            //2. use a glyph that has full build instructions => see void BuildFromGlyph(Glyph glyph, float sizeInPoints)
+            //------------
+
+
             if (!_typeface.IsTrimmed())
             {
                 BuildFromGlyph(_typeface.GetGlyph(glyphIndex), sizeInPoints);
@@ -77,7 +88,13 @@ namespace Typography.Contours
         /// <param name="sizeInPoints"></param>
         public void BuildFromGlyph(Glyph glyph, float sizeInPoints)
         {
-            //for TrueType font
+            //------------
+            //Trimable feature note:
+            //in this mode
+            //we build from input glyphs 
+            //please ensure that the glyph has full build instructions
+            //------------
+             
             _outputGlyphPoints = glyph.GlyphPoints;
             _outputContours = glyph.EndPoints;
 
@@ -86,7 +103,6 @@ namespace Typography.Contours
             if (glyph.IsCffGlyph)
             {
                 _cffGlyphData = glyph.GetCff1GlyphData();
-
             }
 
             //---------------
