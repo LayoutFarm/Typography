@@ -46,7 +46,7 @@ namespace SampleWinForms
             SetupWoffDecompressFunctions();
 
 
-            MemBitmapExtensions.DefaultMemBitmapIO = new PixelFarm.Drawing.WinGdi.GdiBitmapIO();
+            MemBitmapExt.DefaultMemBitmapIO = new PixelFarm.Drawing.WinGdi.GdiBitmapIO();
 
 
             lstTextBaseline.Items.AddRange(

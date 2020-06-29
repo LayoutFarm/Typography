@@ -343,7 +343,7 @@ namespace SampleWinForms
         private void button1_Click_1(object sender, EventArgs e)
         {
 
-            PixelFarm.CpuBlit.MemBitmapExtensions.DefaultMemBitmapIO = new PixelFarm.Drawing.WinGdi.GdiBitmapIO();
+            PixelFarm.CpuBlit.MemBitmapExt.DefaultMemBitmapIO = new PixelFarm.Drawing.WinGdi.GdiBitmapIO();
 
 
             var storageProvider = new LocalFileStorageProvider("", true);
