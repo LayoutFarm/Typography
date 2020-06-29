@@ -6,7 +6,7 @@ using System.IO;
 
 using Typography.OpenFont.IO;
 using Typography.OpenFont.Tables;
-using Typography.OpenFont.Trimable;
+using Typography.OpenFont.Trimmable;
 
 namespace Typography.OpenFont
 {
@@ -123,12 +123,7 @@ namespace Typography.OpenFont
 
     public class OpenFontReader
     {
-#if DEBUG
-        public OpenFontReader()
-        {
 
-        }
-#endif
         class FontCollectionHeader
         {
             public ushort majorVersion;

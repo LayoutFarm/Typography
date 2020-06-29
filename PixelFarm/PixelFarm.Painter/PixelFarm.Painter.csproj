@@ -65,6 +65,9 @@
     <Compile Include="..\BackEnd.BurningMineCurve\curveutils\VectorHelper.cs">
       <Link>0_REF_Vectors\0_REF_BurningMineCurves\VectorHelper.cs</Link>
     </Compile>
+    <Compile Include="..\PixelFarm.CpuBlit\03_Rasterization\AggMathRound.cs">
+      <Link>Drawing\AggMathRound.cs</Link>
+    </Compile>
     <Compile Include="..\pixelfarm.vectors\1_vectormaths\AggMath.cs">
       <Link>0_REF_Vectors\1_VectorMaths\AggMath.cs</Link>
     </Compile>
@@ -156,6 +159,8 @@
       <Link>0_REF_Vectors\5_Clipper\ClipLiangBarsky.cs</Link>
     </Compile>
     <Compile Include="0_Base\ForNet20.cs" />
+    <Compile Include="CpuBlit\IBitmapSrc.cs" />
+    <Compile Include="CpuBlit\MemBitmapExt.cs" />
     <Compile Include="CpuBlit\TempMemPtr.cs" />
     <Compile Include="Drawing\ClipingTechnique.cs" />
     <Compile Include="TempContext.cs" />

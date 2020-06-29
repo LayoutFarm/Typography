@@ -319,72 +319,63 @@ namespace PixelFarm.CpuBlit.Imaging
 
         class CircularBlurStack
         {
-            int currentHeadIndex;
-            int currentTailIndex;
-            int size;
-            BlurStack[] blurValues;
+            int _currentHeadIndex;
+            int _currentTailIndex;
+            int _size;
+            BlurStack[] _blurValues;
             public CircularBlurStack(int size)
             {
-                this.size = size;
-                this.blurValues = new BlurStack[size];
-                this.currentHeadIndex = 0;
-                this.currentTailIndex = size - 1;
+                _size = size;
+                _blurValues = new BlurStack[size];
+                _currentHeadIndex = 0;
+                _currentTailIndex = size - 1;
                 for (int i = size - 1; i >= 0; --i)
                 {
-                    blurValues[i] = new BlurStack();
+                    _blurValues[i] = new BlurStack();
                 }
             }
             public void Prepare(int count, int r, int g, int b, int a)
             {
-                this.currentHeadIndex = 0;
-                this.currentTailIndex = size - 1;
+                _currentHeadIndex = 0;
+                _currentTailIndex = _size - 1;
                 for (int i = 0; i < count; ++i)
                 {
-                    blurValues[i] = new BlurStack((byte)r, (byte)g, (byte)b, (byte)a);
+                    _blurValues[i] = new BlurStack((byte)r, (byte)g, (byte)b, (byte)a);
                     this.Next();
                 }
             }
             public void ResetHeadTailPosition()
             {
-                this.currentHeadIndex = 0;
-                this.currentTailIndex = size - 1;
+                _currentHeadIndex = 0;
+                _currentTailIndex = _size - 1;
             }
             public void Next()
             {
                 //--------------------------
-                if (currentHeadIndex + 1 < size)
+                if (_currentHeadIndex + 1 < _size)
                 {
-                    currentHeadIndex++;
+                    _currentHeadIndex++;
                 }
                 else
                 {
-                    currentHeadIndex = 0;
+                    _currentHeadIndex = 0;
                 }
                 //--------------------------
 
-                if (currentTailIndex + 1 < size)
+                if (_currentTailIndex + 1 < _size)
                 {
-                    currentTailIndex++;
+                    _currentTailIndex++;
                 }
                 else
                 {
-                    currentTailIndex = 0;
+                    _currentTailIndex = 0;
                 }
             }
-            public BlurStack CurrentHeadColor
-            {
-                get
-                {
-                    return this.blurValues[this.currentHeadIndex];
-                }
-            }
-            public BlurStack CurrentTailColor
-            {
-                get
-                {
-                    return this.blurValues[this.currentTailIndex];
-                }
-            }
+
+            public BlurStack CurrentHeadColor => _blurValues[_currentHeadIndex];
+
+            public BlurStack CurrentTailColor => _blurValues[_currentTailIndex];
+
         }
 
         void StackBlurRGBA32(BitmapBlenderBase img, int radius, int ry)

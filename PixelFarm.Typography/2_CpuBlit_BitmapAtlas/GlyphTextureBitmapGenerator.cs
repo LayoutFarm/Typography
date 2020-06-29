@@ -57,7 +57,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                 if (detail.AllGlyphs)
                 {
 #if DEBUG
-                               
+
 #endif
 
                     int count = typeface.GlyphCount;
@@ -225,7 +225,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                     Glyph glyph = typeface.GetGlyph(glyphIndex);
                     typeface.ReadBitmapContent(glyph, ms);
 
-                    using (MemBitmap memBitmap = MemBitmap.LoadBitmap(ms))
+                    using (MemBitmap memBitmap = MemBitmapExt.LoadBitmap(ms))
                     {
                         //bitmap that are load may be larger than we need
                         //so we need to scale it to specfic size
@@ -253,7 +253,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
         {
 
             //TODO: use string builder from pool?  
-           
+
             var stbuilder = new System.Text.StringBuilder();
             typeface.ReadSvgContent(glyphIndex, stbuilder);
 
@@ -439,7 +439,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                                     glyphImage.TextureYOffset = (short)glyphBmp.ImageStartY;
 
                                     //
-                                    glyphImage.SetImageBuffer(MemBitmapExtensions.CopyImgBuffer(glyphBmp.Bitmap, w, h, true), false);
+                                    glyphImage.SetImageBuffer(MemBitmapExt.CopyImgBuffer(glyphBmp.Bitmap, w, h, true), false);
 
                                     glyphImage.UniqueInt16Name = gindex;
                                     _onEachGlyphDel?.Invoke(glyphImage);
@@ -478,7 +478,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                                 glyphImage.TextureYOffset = (short)glyphBmp.ImageStartY;
 
                                 //
-                                glyphImage.SetImageBuffer(MemBitmapExtensions.CopyImgBuffer(glyphBmp.Bitmap, w, h, true), false);
+                                glyphImage.SetImageBuffer(MemBitmapExt.CopyImgBuffer(glyphBmp.Bitmap, w, h, true), false);
 
                                 glyphImage.UniqueInt16Name = gindex;
                                 _onEachGlyphDel?.Invoke(glyphImage);
@@ -515,7 +515,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                                 glyphImage.TextureYOffset = (short)glyphBmp.ImageStartY;
 
                                 //
-                                glyphImage.SetImageBuffer(MemBitmapExtensions.CopyImgBuffer(glyphBmp.Bitmap, w, h, true), false);
+                                glyphImage.SetImageBuffer(MemBitmapExt.CopyImgBuffer(glyphBmp.Bitmap, w, h, true), false);
 
                                 glyphImage.UniqueInt16Name = gindex;
                                 _onEachGlyphDel?.Invoke(glyphImage);

@@ -99,7 +99,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                     atlasInfo.ImgUrlDict = fontAtlas.ImgUrlDict;
 
                     using (Stream fontImgStream = PixelFarm.Platforms.StorageService.Provider.ReadDataStream(atlasInfo.imgFile))
-                    using (MemBitmap atlasBmp = MemBitmap.LoadBitmap(fontImgStream))
+                    using (MemBitmap atlasBmp = MemBitmapExt.LoadBitmap(fontImgStream))
                     {
                         painter.DrawImage(atlasBmp, 0, top);
                         top += atlasBmp.Height + interAtlasSpace;
