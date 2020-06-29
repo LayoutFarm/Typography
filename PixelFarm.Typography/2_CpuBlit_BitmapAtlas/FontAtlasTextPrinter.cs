@@ -70,7 +70,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
         }
 
         public void SetSvgBmpBuilderFunc(SvgBmpBuilderFunc svgBmpBuilderFunc) => _bmpFontMx.SetSvgBmpBuilderFunc(svgBmpBuilderFunc);
- 
+
         public ResolvedFontBase CurrentFont => _font;
 
         public void ChangeFillColor(Color fontColor)
@@ -109,6 +109,8 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                 OnFontSizeChanged();
             }
         }
+
+        int IAggTextPrinter.CurrentLineSpaceHeight => (int)FontLineSpacingPx;
 
         void SetupMaskPixelBlender(int width, int height)
         {

@@ -90,7 +90,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                     {
                         List<SimpleBitmapAtlas> atlasList = atlasBuilder.LoadAtlasInfo(fontAtlasTextureInfo);
                         SimpleBitmapAtlas foundAtlas = atlasList[0];
-                        foundAtlas.SetMainBitmap(MemBitmap.LoadBitmap(fontImgStream), true);
+                        foundAtlas.SetMainBitmap(MemBitmapExt.LoadBitmap(fontImgStream), true);
                         _createdAtlases.Add(atlasName, foundAtlas);
                     }
                     catch (Exception ex)
@@ -134,7 +134,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                         {
                             List<SimpleBitmapAtlas> atlasList = atlasBuilder.LoadAtlasInfo(fontAtlasTextureInfo);
                             foundAtlas = atlasList[0];
-                            foundAtlas.SetMainBitmap(MemBitmap.LoadBitmap(fontImgStream), true);
+                            foundAtlas.SetMainBitmap(MemBitmapExt.LoadBitmap(fontImgStream), true);
                             _createdAtlases.Add(atlasName, foundAtlas);
                         }
                         catch (Exception ex)
@@ -154,7 +154,8 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                         {
                             List<SimpleBitmapAtlas> atlasList = atlasBuilder.LoadAtlasInfo(fontAtlasTextureInfo);
                             foundAtlas = atlasList[0];
-                            foundAtlas.SetMainBitmap(MemBitmap.LoadBitmap(fontImgStream), true);
+                            
+                            foundAtlas.SetMainBitmap(MemBitmapExt.LoadBitmap(fontImgStream), true);
                             _createdAtlases.Add(atlasName, foundAtlas);
                         }
                         catch (Exception ex)

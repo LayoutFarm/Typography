@@ -86,6 +86,9 @@
     <Compile Include="..\BackEnd.Tesselate\Tesselator.cs">
       <Link>0_REF_Tesselate\Tesselator.cs</Link>
     </Compile>
+    <Compile Include="..\PixelFarm.CpuBlit\03_Rasterization\AggMathRound.cs">
+      <Link>0_REF_CpuBlit\03_Rasterization\AggMathRound.cs</Link>
+    </Compile>
     <Compile Include="..\PixelFarm.CpuBlit\04_FragmentProcessing_Gradient\GouraudVerticeBuilder.cs">
       <Link>0_REF_CpuBlit\04_FragmentProcessing_Gradient\GouraudVerticeBuilder.cs</Link>
     </Compile>
@@ -227,6 +230,9 @@
     <Compile Include="..\PixelFarm.DrawingCore\ExtensionAttribute.cs">
       <Link>0_REF_DrawingCore\ExtensionAttribute.cs</Link>
     </Compile>
+    <Compile Include="..\PixelFarm.DrawingCore\FillingRule.cs">
+      <Link>0_REF_DrawingCore\FillingRule.cs</Link>
+    </Compile>
     <Compile Include="..\PixelFarm.DrawingCore\MemMx.cs">
       <Link>0_REF_DrawingCore\MemMx.cs</Link>
     </Compile>
@@ -241,9 +247,6 @@
     </Compile>
     <Compile Include="..\PixelFarm.DrawingCore\RenderVx.cs">
       <Link>0_REF_DrawingCore\RenderVx.cs</Link>
-    </Compile>
-    <Compile Include="..\PixelFarm.DrawingCore\VertexCommandAndOrientation.cs">
-      <Link>0_REF_DrawingCore\VertexCommandAndOrientation.cs</Link>
     </Compile>
     <Compile Include="..\PixelFarm.DrawingCore\VertexStore.cs">
       <Link>0_REF_DrawingCore\VertexStore.cs</Link>
@@ -302,8 +305,14 @@
     <Compile Include="..\PixelFarm.Painter\CpuBlit\ColorRGBAf.cs">
       <Link>0_REF_Painter\CpuBlit\ColorRGBAf.cs</Link>
     </Compile>
+    <Compile Include="..\PixelFarm.Painter\CpuBlit\IBitmapSrc.cs">
+      <Link>0_REF_Painter\CpuBlit\IBitmapSrc.cs</Link>
+    </Compile>
     <Compile Include="..\PixelFarm.Painter\CpuBlit\MemBitmap.cs">
       <Link>0_REF_Painter\CpuBlit\MemBitmap.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Painter\CpuBlit\MemBitmapExt.cs">
+      <Link>0_REF_Painter\CpuBlit\MemBitmapExt.cs</Link>
     </Compile>
     <Compile Include="..\PixelFarm.Painter\CpuBlit\PathWriter.cs">
       <Link>0_REF_Painter\CpuBlit\PathWriter.cs</Link>
@@ -334,6 +343,9 @@
     </Compile>
     <Compile Include="..\PixelFarm.PrimitiveDrawing\AffineMat.cs">
       <Link>0_REF_DrawingCore\1_PrimitiveDrawing\AffineMat.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.PrimitiveDrawing\BitmapBufferFormat.cs">
+      <Link>0_REF_DrawingCore\1_PrimitiveDrawing\BitmapBufferFormat.cs</Link>
     </Compile>
     <Compile Include="..\PixelFarm.PrimitiveDrawing\Color.cs">
       <Link>0_REF_DrawingCore\1_PrimitiveDrawing\Color.cs</Link>

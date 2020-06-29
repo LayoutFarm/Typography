@@ -48,9 +48,12 @@ namespace PixelFarm.Drawing
         ResolvedFontBase ResolveFont(RequestFont f);
         float MeasureWhitespace(RequestFont f);
         float MeasureBlankLineHeight(RequestFont f);
+        //
 
+
+        //
+        Size MeasureString(in TextBufferSpan textBufferSpan, ResolvedFontBase font);
         Size MeasureString(in TextBufferSpan textBufferSpan, RequestFont font);
-
         void MeasureString(in TextBufferSpan textBufferSpan, RequestFont font, int maxWidth, out int charFit, out int charFitWidth);
 
     }

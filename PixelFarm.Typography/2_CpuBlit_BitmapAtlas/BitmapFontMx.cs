@@ -343,14 +343,14 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
         
         static PixelFarm.CpuBlit.MemBitmap ReadGlyphImages(System.IO.Stream stream)
         {
-            return PixelFarm.CpuBlit.MemBitmap.LoadBitmap(stream);
+            return PixelFarm.CpuBlit.MemBitmapExt.LoadBitmap(stream);
         }
         static void SaveImgBufferToFile(BitmapAtlasItemSource glyphImg, string filename)
         {
             using (PixelFarm.CpuBlit.MemBitmap memBmp = PixelFarm.CpuBlit.MemBitmap.CreateFromCopy(
                    glyphImg.Width, glyphImg.Height, glyphImg.GetImageBuffer(), false))
             {
-                PixelFarm.CpuBlit.MemBitmapExtensions.SaveImage(memBmp, filename, PixelFarm.CpuBlit.MemBitmapIO.OutputImageFormat.Png);
+                PixelFarm.CpuBlit.MemBitmapExt.SaveImage(memBmp, filename, PixelFarm.CpuBlit.MemBitmapIO.OutputImageFormat.Png);
             }
         }
 #if DEBUG

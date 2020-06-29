@@ -18,6 +18,7 @@
 //          http://www.antigrain.com
 //----------------------------------------------------------------------------
 
+using PixelFarm.CpuBlit;
 using System;
 namespace PixelFarm.Drawing
 {
@@ -40,38 +41,39 @@ namespace PixelFarm.Drawing
 #endif
         public static Color Make(double r_, double g_, double b_, double a_)
         {
+            
             return new Color(
-               ((byte)CpuBlit.AggMath.uround(a_ * (double)BASE_MASK)),
-               ((byte)CpuBlit.AggMath.uround(r_ * (double)BASE_MASK)),
-               ((byte)CpuBlit.AggMath.uround(g_ * (double)BASE_MASK)),
-               ((byte)CpuBlit.AggMath.uround(b_ * (double)BASE_MASK))
+               ((byte)AggMathRound.uround(a_ * (double)BASE_MASK)),
+               ((byte)AggMathRound.uround(r_ * (double)BASE_MASK)),
+               ((byte)AggMathRound.uround(g_ * (double)BASE_MASK)),
+               ((byte)AggMathRound.uround(b_ * (double)BASE_MASK))
                );
         }
         public static Color Make(double r_, double g_, double b_)
         {
             return new Color(
-               ((byte)CpuBlit.AggMath.uround(BASE_MASK)),
-               ((byte)CpuBlit.AggMath.uround(r_ * BASE_MASK)),
-               ((byte)CpuBlit.AggMath.uround(g_ * BASE_MASK)),
-               ((byte)CpuBlit.AggMath.uround(b_ * BASE_MASK)));
+               ((byte)AggMathRound.uround(BASE_MASK)),
+               ((byte)AggMathRound.uround(r_ * BASE_MASK)),
+               ((byte)AggMathRound.uround(g_ * BASE_MASK)),
+               ((byte)AggMathRound.uround(b_ * BASE_MASK)));
         }
         //------------------------------------------
         public static Color Make(float r_, float g_, float b_)
         {
             return new Color(
-               ((byte)CpuBlit.AggMath.uround_f(BASE_MASK)),
-               ((byte)CpuBlit.AggMath.uround_f(r_ * BASE_MASK)),
-               ((byte)CpuBlit.AggMath.uround_f(g_ * BASE_MASK)),
-               ((byte)CpuBlit.AggMath.uround_f(b_ * BASE_MASK))
+               ((byte)AggMathRound.uround_f(BASE_MASK)),
+               ((byte)AggMathRound.uround_f(r_ * BASE_MASK)),
+               ((byte)AggMathRound.uround_f(g_ * BASE_MASK)),
+               ((byte)AggMathRound.uround_f(b_ * BASE_MASK))
               );
         }
         public static Color Make(float r_, float g_, float b_, float a_)
         {
             return new Color(
-               ((byte)CpuBlit.AggMath.uround_f(a_ * BASE_MASK)),
-               ((byte)CpuBlit.AggMath.uround_f(r_ * BASE_MASK)),
-               ((byte)CpuBlit.AggMath.uround_f(g_ * BASE_MASK)),
-               ((byte)CpuBlit.AggMath.uround_f(b_ * BASE_MASK))
+               ((byte)AggMathRound.uround_f(a_ * BASE_MASK)),
+               ((byte)AggMathRound.uround_f(r_ * BASE_MASK)),
+               ((byte)AggMathRound.uround_f(g_ * BASE_MASK)),
+               ((byte)AggMathRound.uround_f(b_ * BASE_MASK))
                );
         }
         public static Color Blend(this Color a, Color other, float weight)

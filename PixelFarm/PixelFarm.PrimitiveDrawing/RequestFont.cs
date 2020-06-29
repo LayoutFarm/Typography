@@ -116,6 +116,11 @@ namespace PixelFarm.Drawing
 
         //------------------ 
         //caching ...
+
+        //preserve 2 field user cache their actual here
+        internal ResolvedFontBase _resolvedFont1;
+        internal object _resolvedFont2;
+
         public static void SetResolvedFont1(RequestFont reqFont, ResolvedFontBase resolvedFont)
         {
             reqFont._resolvedFont1 = resolvedFont;
@@ -134,10 +139,7 @@ namespace PixelFarm.Drawing
         {
             return reqFont._resolvedFont2 as T;
         }
-        //preserve 2 field user cache their actual here
-        internal ResolvedFontBase _resolvedFont1;
-        internal object _resolvedFont2;
-
+       
 #if DEBUG
         public override string ToString()
         {
@@ -230,5 +232,5 @@ namespace PixelFarm.Drawing
         public string Name { get; }
     }
 
-
+ 
 }

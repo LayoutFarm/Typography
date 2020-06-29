@@ -548,7 +548,7 @@ namespace PixelFarm.Drawing
                     Glyph glyph = _currentTypeface.GetGlyph(glyphIndex);
                     _currentTypeface.ReadBitmapContent(glyph, ms);
 
-                    using (MemBitmap memBitmap = MemBitmap.LoadBitmap(ms))
+                    using (MemBitmap memBitmap = MemBitmapExt.LoadBitmap(ms))
                     {
                         //bitmap that are load may be larger than we need
                         //so we need to scale it to specfic size
