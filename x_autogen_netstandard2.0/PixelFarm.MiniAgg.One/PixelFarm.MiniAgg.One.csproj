@@ -76,6 +76,7 @@
     <Compile Include="..\..\PixelFarm\PixelFarm.CpuBlit\03_rasterization\4.2_CellAARasterizer.cs" Link="PixelFarm\PixelFarm.CpuBlit\03_rasterization\4.2_CellAARasterizer.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.CpuBlit\03_rasterization\4.3_VectorClipper.cs" Link="PixelFarm\PixelFarm.CpuBlit\03_rasterization\4.3_VectorClipper.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.CpuBlit\03_rasterization\5_DestBitmapRasterizer.cs" Link="PixelFarm\PixelFarm.CpuBlit\03_rasterization\5_DestBitmapRasterizer.cs" />
+    <Compile Include="..\..\PixelFarm\PixelFarm.CpuBlit\03_Rasterization\AggMathRound.cs" Link="PixelFarm\PixelFarm.CpuBlit\03_Rasterization\AggMathRound.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.CpuBlit\03_rasterization\SubPixConst.cs" Link="PixelFarm\PixelFarm.CpuBlit\03_rasterization\SubPixConst.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.CpuBlit\03_rasterization_lines\1.1_LinesAA.cs" Link="PixelFarm\PixelFarm.CpuBlit\03_rasterization_lines\1.1_LinesAA.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.CpuBlit\03_rasterization_lines\1.2_PatternFilter.cs" Link="PixelFarm\PixelFarm.CpuBlit\03_rasterization_lines\1.2_PatternFilter.cs" />
@@ -115,12 +116,12 @@
     <Compile Include="..\..\PixelFarm\PixelFarm.DrawingCore\DashStyle.cs" Link="PixelFarm\PixelFarm.DrawingCore\DashStyle.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.DrawingCore\DrawBoard.cs" Link="PixelFarm\PixelFarm.DrawingCore\DrawBoard.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.DrawingCore\ExtensionAttribute.cs" Link="PixelFarm\PixelFarm.DrawingCore\ExtensionAttribute.cs" />
+    <Compile Include="..\..\PixelFarm\PixelFarm.DrawingCore\FillingRule.cs" Link="PixelFarm\PixelFarm.DrawingCore\FillingRule.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.DrawingCore\MemMx.cs" Link="PixelFarm\PixelFarm.DrawingCore\MemMx.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.DrawingCore\NativeMemMx.cs" Link="PixelFarm\PixelFarm.DrawingCore\NativeMemMx.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.DrawingCore\Painter.cs" Link="PixelFarm\PixelFarm.DrawingCore\Painter.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.DrawingCore\Region.cs" Link="PixelFarm\PixelFarm.DrawingCore\Region.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.DrawingCore\RenderVx.cs" Link="PixelFarm\PixelFarm.DrawingCore\RenderVx.cs" />
-    <Compile Include="..\..\PixelFarm\PixelFarm.DrawingCore\VertexCommandAndOrientation.cs" Link="PixelFarm\PixelFarm.DrawingCore\VertexCommandAndOrientation.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.DrawingCore\VertexStore.cs" Link="PixelFarm\PixelFarm.DrawingCore\VertexStore.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.Painter\0_Base\ForNet20.cs" Link="PixelFarm\PixelFarm.Painter\0_Base\ForNet20.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.Painter\CpuBlit.VertexProcessing\BoundingRect.cs" Link="PixelFarm\PixelFarm.Painter\CpuBlit.VertexProcessing\BoundingRect.cs" />
@@ -140,7 +141,9 @@
     <Compile Include="..\..\PixelFarm\PixelFarm.Painter\CpuBlit.VertexProcessing\VertexStoreTransformExtensions.cs" Link="PixelFarm\PixelFarm.Painter\CpuBlit.VertexProcessing\VertexStoreTransformExtensions.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.Painter\CpuBlit.VertexProcessing\VxsClipping.cs" Link="PixelFarm\PixelFarm.Painter\CpuBlit.VertexProcessing\VxsClipping.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.Painter\CpuBlit\ColorRGBAf.cs" Link="PixelFarm\PixelFarm.Painter\CpuBlit\ColorRGBAf.cs" />
+    <Compile Include="..\..\PixelFarm\PixelFarm.Painter\CpuBlit\IBitmapSrc.cs" Link="PixelFarm\PixelFarm.Painter\CpuBlit\IBitmapSrc.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.Painter\CpuBlit\MemBitmap.cs" Link="PixelFarm\PixelFarm.Painter\CpuBlit\MemBitmap.cs" />
+    <Compile Include="..\..\PixelFarm\PixelFarm.Painter\CpuBlit\MemBitmapExt.cs" Link="PixelFarm\PixelFarm.Painter\CpuBlit\MemBitmapExt.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.Painter\CpuBlit\PathWriter.cs" Link="PixelFarm\PixelFarm.Painter\CpuBlit\PathWriter.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.Painter\CpuBlit\TempMemPtr.cs" Link="PixelFarm\PixelFarm.Painter\CpuBlit\TempMemPtr.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.Painter\Drawing.Internal\CO.cs" Link="PixelFarm\PixelFarm.Painter\Drawing.Internal\CO.cs" />
@@ -151,6 +154,7 @@
     <Compile Include="..\..\PixelFarm\PixelFarm.Painter\Drawing\TextBaseline.cs" Link="PixelFarm\PixelFarm.Painter\Drawing\TextBaseline.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.Painter\TempContext.cs" Link="PixelFarm\PixelFarm.Painter\TempContext.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.PrimitiveDrawing\AffineMat.cs" Link="PixelFarm\PixelFarm.PrimitiveDrawing\AffineMat.cs" />
+    <Compile Include="..\..\PixelFarm\PixelFarm.PrimitiveDrawing\BitmapBufferFormat.cs" Link="PixelFarm\PixelFarm.PrimitiveDrawing\BitmapBufferFormat.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.PrimitiveDrawing\Color.cs" Link="PixelFarm\PixelFarm.PrimitiveDrawing\Color.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.PrimitiveDrawing\CRC32Calculator.cs" Link="PixelFarm\PixelFarm.PrimitiveDrawing\CRC32Calculator.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.PrimitiveDrawing\Image.cs" Link="PixelFarm\PixelFarm.PrimitiveDrawing\Image.cs" />

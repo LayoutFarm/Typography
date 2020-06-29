@@ -19,11 +19,7 @@
 using PixelFarm.CpuBlit;
 namespace PixelFarm.Drawing
 {
-    public enum FillingRule
-    {
-        NonZero,//default
-        EvenOdd
-    }
+   
 
     public enum TargetBuffer
     {

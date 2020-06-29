@@ -36,6 +36,15 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="03_Rasterization\0_ScanlineSpan.cs" />
+    <Compile Include="03_Rasterization\1_Scanline.cs" />
+    <Compile Include="03_Rasterization\2_ScanlinePacked8.cs" />
+    <Compile Include="03_Rasterization\3_ScanlineUnpacked8.cs" />
+    <Compile Include="03_Rasterization\4.1_ScanlineRasterizer.cs" />
+    <Compile Include="03_Rasterization\4.2_CellAARasterizer.cs" />
+    <Compile Include="03_Rasterization\4.3_VectorClipper.cs" />
+    <Compile Include="03_Rasterization\5_DestBitmapRasterizer.cs" />
+    <Compile Include="03_Rasterization\AggMathRound.cs" />
     <Compile Include="05_PixelProcessing\BitmapBlenderBase.cs" />
     <Compile Include="04_FragmentProcessing_Gradient\GouraudVerticeBuilder.cs" />
     <Compile Include="04_FragmentProcessing_Gradient\RGBAGouraudSpanGen.cs" />
@@ -71,8 +80,6 @@
     <Compile Include="08_ImageResampling\ImageFreeTransform.cs" />
     <Compile Include="08_ImageResampling\ImageInterpolationQuality.cs" />
     <Compile Include="08_ImageResampling\ImageTransform.cs" />
-    <Compile Include="03_Rasterization\0_ScanlineSpan.cs" />
-    <Compile Include="03_Rasterization\4.2_CellAARasterizer.cs" />
     <Compile Include="08_ImageResampling\IImageFilter.cs" />
     <Content Include="x_backup\FilterImageSpanGenerator.txt" />
     <Content Include="x_backup\2_ImgSpanGenRGB.txt" />
@@ -81,13 +88,7 @@
     <Compile Include="04_FragmentProcessing\GammaLookUpTable.cs" />
     <Compile Include="05_PixelProcessing\IBitmapBlender.cs" />
     <Compile Include="05_PixelProcessing\PixelBlender32.cs" />
-    <Compile Include="03_Rasterization\1_Scanline.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="03_Rasterization\2_ScanlinePacked8.cs" />
-    <Compile Include="03_Rasterization\3_ScanlineUnpacked8.cs" />
-    <Compile Include="03_Rasterization\4.1_ScanlineRasterizer.cs" />
-    <Compile Include="03_Rasterization\5_DestBitmapRasterizer.cs" />
-    <Compile Include="03_Rasterization\4.3_VectorClipper.cs" />
     <Content Include="x_backup\PixelBlenderGray.txt" />
     <Content Include="x_backup\PixelBlenderRGB.txt" />
     <Content Include="x_backup\ScanlineRasToDestBitmapRendererExtension.txt" />

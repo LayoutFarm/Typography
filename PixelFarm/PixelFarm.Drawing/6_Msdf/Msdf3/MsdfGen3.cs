@@ -454,7 +454,7 @@ namespace Msdfgen
                     //and check it from external program
                     //but we generate msdf bitmap from msdf_shape_lut.png 
                     bmpLut.SaveImage(dbug_msdf_shape_lutName);
-                    var bmp5 = MemBitmap.LoadBitmap(dbug_msdf_shape_lutName);
+                    var bmp5 = MemBitmapExt.LoadBitmap(dbug_msdf_shape_lutName);
                     int[] lutBuffer5 = bmp5.CopyImgBuffer(bmpLut.Width, bmpLut.Height);
                     if (bmpLut.Width == 338 && bmpLut.Height == 477)
                     {

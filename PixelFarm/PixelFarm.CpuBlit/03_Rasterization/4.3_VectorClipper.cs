@@ -242,7 +242,7 @@ namespace PixelFarm.CpuBlit.Rasterization
 
             static int MulDiv(int a, int b, int c)
             {
-                return AggMath.iround_f((float)a * (float)b / (float)c);
+                return AggMathRound.iround_f((float)a * (float)b / (float)c);
             }
         }
     }

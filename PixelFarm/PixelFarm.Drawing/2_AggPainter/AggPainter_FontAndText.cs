@@ -15,12 +15,13 @@ namespace PixelFarm.CpuBlit
         /// <param name="top"></param>
         void DrawString(AggRenderVxFormattedString renderVx, double left, double top);
         void PrepareStringForRenderVx(AggRenderVxFormattedString renderVx, char[] text, int startAt, int len);
+        int CurrentLineSpaceHeight { get; }
     }
 
     partial class AggPainter
     {
         //font
-        ResolvedFontBase _resolvedFont;
+
         RequestFont _currentFont;
         IAggTextPrinter _textPrinter;
 
@@ -30,52 +31,29 @@ namespace PixelFarm.CpuBlit
             set
             {
                 _textPrinter = value;
-                if (_textPrinter != null)
+                if (_currentFont != null)
                 {
-                    _textPrinter.ChangeFont(_currentFont);
+                    _textPrinter?.ChangeFont(_currentFont);
                 }
             }
         }
 
-        public ResolvedFontBase CurrentResolvedFont
-        {
-            get
-            {
-                if (_resolvedFont == null)
-                {
 
-                }
-                return _resolvedFont;
-            }
-            set
-            {
-                _resolvedFont = value;
-            }
-        }
         public override RequestFont CurrentFont
         {
             get => _currentFont;
             set
             {
                 _currentFont = value;
-                if (value != null)
-                {
-                    //resolve 
-                }
-                else
-                {
-                   // _resolvedFont = null;
-                }
-
-                //this request font must resolve to actual font
-                //within canvas *** 
-                //TODO: review drawing string  with agg here 
+                //                
                 if (_textPrinter != null && value != null)
                 {
                     _textPrinter.ChangeFont(value);
                 }
             }
         }
+
+        public int CurrentLineSpaceHeight => (_textPrinter != null) ? _textPrinter.CurrentLineSpaceHeight : 0;
 
         public override void DrawString(
            string text,

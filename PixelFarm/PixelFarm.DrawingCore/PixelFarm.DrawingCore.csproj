@@ -42,11 +42,11 @@
     <Compile Include="Brushes_Pens.cs" />
     <Compile Include="CombineMode.cs" />
     <Compile Include="DashStyle.cs" />
+    <Compile Include="FillingRule.cs" />
     <Compile Include="MemMx.cs" />
     <Compile Include="NativeMemMx.cs" />
     <Compile Include="Region.cs" />
     <Compile Include="RenderVx.cs" />
-    <Compile Include="VertexCommandAndOrientation.cs" />
     <Compile Include="VertexStore.cs" />
     <Compile Include="ExtensionAttribute.cs" />
     <Compile Include="Painter.cs" />

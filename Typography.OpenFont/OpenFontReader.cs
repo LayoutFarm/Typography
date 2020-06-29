@@ -123,12 +123,7 @@ namespace Typography.OpenFont
 
     public class OpenFontReader
     {
-#if DEBUG
-        public OpenFontReader()
-        {
 
-        }
-#endif
         class FontCollectionHeader
         {
             public ushort majorVersion;
