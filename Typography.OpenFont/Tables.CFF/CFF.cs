@@ -1230,7 +1230,7 @@ namespace Typography.OpenFont.CFF
             }
         }
 
-        struct FDRange3
+        readonly struct FDRange3
         {
             public readonly ushort first;
             public readonly byte fd;
@@ -1934,7 +1934,7 @@ namespace Typography.OpenFont.CFF
         }
 
 
-        struct CffIndexOffset
+        readonly struct CffIndexOffset
         {
             /// <summary>
             /// start offset
@@ -2014,7 +2014,7 @@ namespace Typography.OpenFont.CFF
     }
 
 
-    struct CffOperand
+    readonly struct CffOperand
     {
         public readonly OperandKind _kind;
         public readonly double _realNumValue;

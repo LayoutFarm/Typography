@@ -376,9 +376,9 @@ namespace Typography.OpenFont.Tables
                     }
                 }
             }
-            struct SequenceTable
+            readonly struct SequenceTable
             {
-                public ushort[] substituteGlyphs;
+                public readonly ushort[] substituteGlyphs;
                 public SequenceTable(ushort[] substituteGlyphs)
                 {
                     this.substituteGlyphs = substituteGlyphs;
@@ -636,7 +636,7 @@ namespace Typography.OpenFont.Tables
                 }
 
             }
-            struct LigatureTable
+            readonly struct LigatureTable
             {
                 //uint16 	LigGlyph 	GlyphID of ligature to substitute
                 //uint16 	CompCount 	Number of components in the ligature
@@ -644,20 +644,25 @@ namespace Typography.OpenFont.Tables
                 /// <summary>
                 /// output glyph
                 /// </summary>
-                public ushort GlyphId { get; set; }
+                public readonly ushort GlyphId;
                 /// <summary>
                 /// ligature component start with second ordered glyph
                 /// </summary>
-                public ushort[] ComponentGlyphs { get; set; }
+                public readonly ushort[] ComponentGlyphs;
+
+                public LigatureTable(ushort glyphId, ushort[] componentGlyphs)
+                {
+                    GlyphId = glyphId;
+                    ComponentGlyphs = componentGlyphs;
+                }
                 public static LigatureTable CreateFrom(BinaryReader reader, long beginAt)
                 {
                     reader.BaseStream.Seek(beginAt, SeekOrigin.Begin);
-                    // 
-                    LigatureTable ligTable = new LigatureTable();
-                    ligTable.GlyphId = reader.ReadUInt16();
+
+                    //
+                    ushort glyphIndex = reader.ReadUInt16();
                     ushort compCount = reader.ReadUInt16();
-                    ligTable.ComponentGlyphs = Utils.ReadUInt16Array(reader, compCount - 1);
-                    return ligTable;
+                    return new LigatureTable(glyphIndex, Utils.ReadUInt16Array(reader, compCount - 1));
                 }
 #if DEBUG
                 public override string ToString()
@@ -1165,7 +1170,7 @@ namespace Typography.OpenFont.Tables
 
             //    Note: This example assumes that the LookupList specifies the ligature substitution lookup before the single substitution lookup.
 
-            struct SubstLookupRecord
+            readonly struct SubstLookupRecord
             {
                 public readonly ushort sequenceIndex;
                 public readonly ushort lookupListIndex;

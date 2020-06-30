@@ -387,7 +387,7 @@ namespace Typography.OpenFont.Tables
             }
         }
 
-        public struct AxisValueRecord
+        public readonly struct AxisValueRecord
         {
             //The axisValues array uses AxisValue records, which have the following format.
             //AxisValue record:

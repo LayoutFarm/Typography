@@ -8,25 +8,25 @@ namespace DrawingGL
     /// Represents a cubic bezier curve with two anchor and two control points.
     /// </summary>
     //[Serializable]
-    struct BezierCurveCubic
+    readonly struct BezierCurveCubic
     {
 
         /// <summary>
         /// Start anchor point.
         /// </summary>
-        public Vector2 StartAnchor;
+        public readonly Vector2 StartAnchor;
         /// <summary>
         /// End anchor point.
         /// </summary>
-        public Vector2 EndAnchor;
+        public readonly Vector2 EndAnchor;
         /// <summary>
         /// First control point, controls the direction of the curve start.
         /// </summary>
-        public Vector2 FirstControlPoint;
+        public readonly Vector2 FirstControlPoint;
         /// <summary>
         /// Second control point, controls the direction of the curve end.
         /// </summary>
-        public Vector2 SecondControlPoint;
+        public readonly Vector2 SecondControlPoint;
 
 
 

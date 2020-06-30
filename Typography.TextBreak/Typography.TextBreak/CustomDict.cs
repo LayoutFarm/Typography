@@ -130,7 +130,7 @@ namespace Typography.TextBreak
 
 
 
-    struct WordSpan
+    readonly struct WordSpan
     {
         public readonly int startAt;
         public readonly byte len;

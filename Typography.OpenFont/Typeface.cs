@@ -865,7 +865,7 @@ namespace Typography.OpenFont
     }
 
 
-    public struct GlyphNameMap
+    public readonly struct GlyphNameMap
     {
         public readonly ushort glyphIndex;
         public readonly string glyphName;

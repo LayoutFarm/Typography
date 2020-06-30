@@ -11,7 +11,7 @@ namespace Typography.TextLayout
     /// <summary>
     /// unscaled glyph-plan
     /// </summary>
-    public struct UnscaledGlyphPlan
+    public readonly struct UnscaledGlyphPlan
     {
         public readonly ushort input_cp_offset;
         public readonly ushort glyphIndex;
@@ -23,15 +23,15 @@ namespace Typography.TextLayout
             this.OffsetY = offsetY;
             this.AdvanceX = advanceW;
         }
-        public short AdvanceX { get; private set; }
+        public readonly short AdvanceX;
         /// <summary>
         /// x offset from current position
         /// </summary>
-        public short OffsetX { get; private set; }
+        public readonly short OffsetX;
         /// <summary>
         /// y offset from current position
         /// </summary>
-        public short OffsetY { get; private set; }
+        public readonly short OffsetY;
 
         public bool AdvanceMoveForward => this.AdvanceX > 0;
 
@@ -181,7 +181,7 @@ namespace Typography.TextLayout
         }
 
     }
-    struct GlyphLayoutPlanKey
+    readonly struct GlyphLayoutPlanKey
     {
         public readonly Typeface t;
         public readonly int scriptInternameName;
@@ -191,7 +191,7 @@ namespace Typography.TextLayout
             this.scriptInternameName = scriptInternameName;
         }
     }
-    struct GlyphLayoutPlanContext
+    readonly struct GlyphLayoutPlanContext
     {
         public readonly GlyphSubstitution _glyphSub;
         public readonly GlyphSetPosition _glyphPos;
@@ -203,7 +203,7 @@ namespace Typography.TextLayout
     }
 
 #if DEBUG
-    struct dbugCodePointFromUserChar
+    readonly struct dbugCodePointFromUserChar
     {
         /// <summary>
         /// input codepoint

@@ -77,7 +77,7 @@ namespace Typography.OpenFont.Tables
                 npairs--;
             }
         }
-        struct KerningPair
+        readonly struct KerningPair
         {
             /// <summary>
             /// left glyph index
@@ -104,7 +104,7 @@ namespace Typography.OpenFont.Tables
             }
 #endif
         }
-        struct KernCoverage
+        readonly struct KernCoverage
         {
             //horizontal 	0 	1 	1 if table has horizontal data, 0 if vertical.
             //minimum 	1 	1 	If this bit is set to 1, the table has minimum values. If set to 0, the table has kerning values.

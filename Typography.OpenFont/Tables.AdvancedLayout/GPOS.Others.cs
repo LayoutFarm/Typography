@@ -72,7 +72,7 @@ namespace Typography.OpenFont.Tables
         }
 
 
-        struct PairSet
+        readonly struct PairSet
         {
             public readonly ushort secondGlyph;//GlyphID of second glyph in the pair-first glyph is listed in the Coverage table
             public readonly ValueRecord value1;//Positioning data for the first glyph in the pair
@@ -447,7 +447,7 @@ namespace Typography.OpenFont.Tables
             }
         }
 
-        struct MarkRecord
+        readonly struct MarkRecord
         {
             /// <summary>
             /// Class defined for this mark,. A mark class is identified by a specific integer, called a class value
@@ -584,7 +584,7 @@ namespace Typography.OpenFont.Tables
 #endif
         }
 
-        struct BaseRecord
+        readonly struct BaseRecord
         {
             //BaseRecord
             //Value 	Type 	Description
@@ -691,7 +691,7 @@ namespace Typography.OpenFont.Tables
             }
             public ComponentRecord GetComponentRecord(int index) => _records[index];
         }
-        struct ComponentRecord
+        readonly struct ComponentRecord
         {
             //ComponentRecord
             //Value         Type                          Description
@@ -705,10 +705,8 @@ namespace Typography.OpenFont.Tables
 
         }
 
-        //------
-
-
-        struct PosLookupRecord
+        //------ 
+        readonly struct PosLookupRecord
         {
 
 
@@ -877,10 +875,10 @@ namespace Typography.OpenFont.Tables
                 ushort posCount = reader.ReadUInt16();
                 if (glyphCount > 1)
                 {
-                    posClassRule._inputGlyphIds = Utils.ReadUInt16Array(reader, glyphCount - 1); 
+                    posClassRule._inputGlyphIds = Utils.ReadUInt16Array(reader, glyphCount - 1);
 
                 }
-              
+
                 posClassRule._posLookupRecords = CreateMultiplePosLookupRecords(reader, posCount);
                 return posClassRule;
             }

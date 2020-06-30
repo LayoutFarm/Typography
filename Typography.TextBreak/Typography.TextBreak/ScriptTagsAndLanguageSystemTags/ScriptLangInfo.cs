@@ -20,10 +20,31 @@ namespace Typography.OpenFont
             shortname = TagUtils.TagToString(tagDef.Tag);
             this.unicodeLangs = unicodeLangs;
         }
+#if DEBUG
+
         public override string ToString()
         {
-
             return this.fullname;
+        }
+#endif
+    }
+
+    //unicode range 
+    public readonly struct UnicodeRangeInfo
+    {
+        public readonly int BitNo;
+        public readonly int StartAt;
+        public readonly int EndAt;
+        public UnicodeRangeInfo(int bitNo, int startAt, int endAt)
+        {
+            BitNo = bitNo;
+            StartAt = startAt;
+            EndAt = endAt;
+        }
+
+        public bool IsInRange(int value)
+        {
+            return (value >= StartAt) && (value <= EndAt);
         }
     }
 
@@ -978,7 +999,7 @@ Zanabazar_Square__Zanabazarin_Dörböljin_Useg__Xewtee_Dörböljin_Bicig__Horizo
 
         readonly static Dictionary<string, UnicodeLangRange[]> s_registeredScriptTagsToUnicodeLangRanges = new Dictionary<string, UnicodeLangRange[]>();
 
-        struct UnicodeRangeMapWithScriptLang
+        readonly struct UnicodeRangeMapWithScriptLang
         {
             public readonly ScriptLangInfo scLang;
             public readonly UnicodeLangRange unicodeLangRange;

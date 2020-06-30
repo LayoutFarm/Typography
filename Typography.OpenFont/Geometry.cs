@@ -17,8 +17,7 @@ namespace Typography.OpenFont
         internal bool onCurve;
 
         public GlyphPointF(float x, float y, bool onCurve)
-        {          
-             
+        {
             P = new Vector2(x, y);
             this.onCurve = onCurve;
         }

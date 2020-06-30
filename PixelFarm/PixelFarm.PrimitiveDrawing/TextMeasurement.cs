@@ -2,7 +2,7 @@
 
 namespace PixelFarm.Drawing
 {
-    public struct TextBufferSpan
+    public readonly struct TextBufferSpan
     {
         public readonly int start;
         public readonly int len;

@@ -67,7 +67,7 @@ namespace Typography.OpenFont.Tables
             GASP_SYMMETRIC_SMOOTHING = 0x0008,
             GASP_SYMMETRIC_SMOOTHING_GASP_SYMMETRIC_GRIDFIT = 0x000C
         }
-        struct GaspRangeRecord
+        readonly struct GaspRangeRecord
         {
             public readonly ushort rangeMaxPPEM;
             public readonly GaspRangeBehavior rangeGaspBehavior;
