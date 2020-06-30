@@ -31,7 +31,7 @@ namespace Typography.TextLayout
         /// </summary>
         public readonly float OffsetY;
 
-        public readonly bool AdvanceMoveForward => this.AdvanceX > 0;
+        public bool AdvanceMoveForward => this.AdvanceX > 0;
 
 #if DEBUG
         public override string ToString()
