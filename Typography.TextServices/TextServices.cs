@@ -50,6 +50,9 @@ namespace Typography.TextServices
 
         Typeface _latestTypeface;
         float _latestFontSizeInPts;
+        public Typeface CurrentTypeface => _latestTypeface;
+        public float CurrentFontSizeInPts => _latestFontSizeInPts;
+
         public void SetCurrentFont(Typeface typeface, float fontSizeInPts)
         {
             if (_latestTypeface == typeface && fontSizeInPts == _latestFontSizeInPts)
@@ -134,8 +137,7 @@ namespace Typography.TextServices
             charFit = measureStringBox.StopAt;
             charFitWidth = (int)Math.Ceiling(measureStringBox.width);
         }
-
-
+     
 
         readonly struct TextShapingContextKey
         {

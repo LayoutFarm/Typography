@@ -71,7 +71,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
 
         public void SetSvgBmpBuilderFunc(SvgBmpBuilderFunc svgBmpBuilderFunc) => _bmpFontMx.SetSvgBmpBuilderFunc(svgBmpBuilderFunc);
 
-        public ResolvedFontBase CurrentFont => _font;
+        public ResolvedFont CurrentFont => _font;
 
         public void ChangeFillColor(Color fontColor)
         {

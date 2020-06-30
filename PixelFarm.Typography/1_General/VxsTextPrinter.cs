@@ -121,92 +121,7 @@ namespace PixelFarm.Drawing
 
     public delegate void SvgBmpBuilderFunc(SvgBmpBuilderReq req);
 
-    public interface ILineSegmentList
-    {
-        int Count { get; }
-        ILineSegment this[int index] { get; }
-    }
-    public interface ILineSegment
-    {
-        int StartAt { get; }
-        ushort Length { get; }
-    }
-
-
-    //---------
-    public struct TextPrinterLineSegment : ILineSegment
-    {
-        public TextPrinterLineSegment(int startAt, int len, WordKind wordKind, SpanBreakInfo breakInfo)
-        {
-            StartAt = startAt;
-            Length = (ushort)len; //***
-            WordKind = wordKind;
-            BreakInfo = breakInfo;
-        }
-        public int StartAt { get; }
-        public ushort Length { get; }
-        public WordKind WordKind { get; }
-        public SpanBreakInfo BreakInfo { get; }
-#if DEBUG
-        public override string ToString()
-        {
-            return StartAt + ":" + Length + (BreakInfo.RightToLeft ? "(rtl)" : "");
-        }
-#endif
-    }
-
-    public class TextPrinterLineSegmentList<T> : ILineSegmentList
-        where T : ILineSegment
-    {
-        readonly List<T> _segments = new List<T>();
-        public TextPrinterLineSegmentList()
-        {
-        }
-        public void AddLineSegment(T lineSegment)
-        {
-            _segments.Add(lineSegment);
-        }
-        public void Clear()
-        {
-            _segments.Clear();
-        }
-
-        public T GetLineSegment(int index) => _segments[index];
-        //
-        public ILineSegment this[int index] => _segments[index];
-        //
-        public int Count => _segments.Count;
-        //
-        public ILineSegment GetSegment(int index) => _segments[index];
-        //
-#if DEBUG
-        public int dbugStartAt;
-        public int dbugLen;
-#endif
-        public void Dispose()
-        {
-        }
-    }
-
-
-    public class TextPrinterWordVisitor : WordVisitor
-    {
-        TextPrinterLineSegmentList<TextPrinterLineSegment> _lineSegs;
-        public void SetLineSegmentList(TextPrinterLineSegmentList<TextPrinterLineSegment> lineSegs)
-        {
-            _lineSegs = lineSegs;
-        }
-        protected override void OnBreak()
-        {
-            _lineSegs.AddLineSegment(new TextPrinterLineSegment(
-                this.LatestSpanStartAt,
-                this.LatestSpanLen,
-                this.LatestWordKind,
-                this.SpanBreakInfo));
-        }
-    }
-
-
+   
 
     public class VxsTextPrinter : TextPrinterBase, ITextPrinter
     {
@@ -223,8 +138,6 @@ namespace PixelFarm.Drawing
 
         public VxsTextPrinter(Painter painter, OpenFontTextService textService)
         {
-
-            //
             _painter = painter;
             _glyphMeshStore = new GlyphMeshStore();
             _glyphMeshStore.FlipGlyphUpward = true;
@@ -247,14 +160,19 @@ namespace PixelFarm.Drawing
 
         public AntialiasTechnique AntialiasTechnique { get; set; }
 
-        public void ChangeFont(RequestFont font)
+
+        public void ChangeFont(RequestFont reqFont)
         {
-            //1.  resolve actual font file             
-            ResolvedFont resolvedFont = _textServices.ResolveFont(font);
+            //we can resolve request font first 
+            //if not found then ask the service***
+
+
+            ResolvedFont resolvedFont = _textServices.ResolveFont(reqFont);
             if (resolvedFont != null)
             {
                 this.Typeface = resolvedFont.Typeface;
-                this.FontSizeInPoints = resolvedFont.SizeInPoints;
+                //
+                this.FontSizeInPoints = reqFont.SizeInPoints;
             }
             else
             {
@@ -801,7 +719,7 @@ namespace PixelFarm.Drawing
 
 
         TextPrinterWordVisitor _textPrinterWordVisitor = new TextPrinterWordVisitor();
-        TextPrinterLineSegmentList<TextPrinterLineSegment> _textPrinterLineSegmentList = new TextPrinterLineSegmentList<TextPrinterLineSegment>();
+        TextPrinterLineSegmentList<TextPrinterLineSegment> _lineSegs = new TextPrinterLineSegmentList<TextPrinterLineSegment>();
 
         void InnerDrawString(char[] textBuffer, int startAt, int len, float x, float y)
         {
@@ -832,13 +750,13 @@ namespace PixelFarm.Drawing
                 //a single string may be broken into many glyph-plan-seq
                 //set segmentlist
 
-                _textPrinterLineSegmentList.Clear();//clear before reuse
-                _textPrinterWordVisitor.SetLineSegmentList(_textPrinterLineSegmentList);
+                _lineSegs.Clear();//clear before reuse
+                _textPrinterWordVisitor.SetLineSegmentList(_lineSegs);
                 _textServices.BreakToLineSegments(buffSpan, _textPrinterWordVisitor);//***
                 _textPrinterWordVisitor.SetLineSegmentList(null);
 
 
-                int count = _textPrinterLineSegmentList.Count;
+
 
                 ClearTempFormattedGlyphPlanSeq();
 
@@ -847,11 +765,11 @@ namespace PixelFarm.Drawing
                 Typeface defaultTypeface = _currentTypeface;
                 Typeface curTypeface = defaultTypeface;
 
+                int count = _lineSegs.Count;
                 for (int i = 0; i < count; ++i)
                 {
                     //
-                    TextPrinterLineSegment line_seg = _textPrinterLineSegmentList.GetLineSegment(i);
-
+                    TextPrinterLineSegment line_seg = _lineSegs.GetLineSegment(i);
                     SpanBreakInfo spBreakInfo = line_seg.BreakInfo;
                     if (spBreakInfo.RightToLeft)
                     {
@@ -865,26 +783,21 @@ namespace PixelFarm.Drawing
                     //so we need to ensure that we get a proper typeface,
                     //if not => alternative typeface
 
-                    ushort glyphIndex = 0;
+                    ushort sample_glyphIndex = 0;
                     char sample_char = textBuffer[line_seg.StartAt];
                     int codepoint = sample_char;
 
-                    bool contains_surrogate_pair = false;
-
                     if (line_seg.Length > 1 && line_seg.WordKind == WordKind.SurrogatePair)
                     {
-                        contains_surrogate_pair = true;//***
-                        //bind 2 char to utf32=> codepoint
-                        //and get glyphIndex from current typeface
-                        glyphIndex = curTypeface.GetGlyphIndex(char.ConvertToUtf32(sample_char, textBuffer[line_seg.StartAt + 1]));
+                        sample_glyphIndex = curTypeface.GetGlyphIndex(char.ConvertToUtf32(sample_char, textBuffer[line_seg.StartAt + 1]));
                     }
                     else
                     {
-                        glyphIndex = curTypeface.GetGlyphIndex(codepoint);
+                        sample_glyphIndex = curTypeface.GetGlyphIndex(codepoint);
                     }
 
 
-                    if (glyphIndex == 0)
+                    if (sample_glyphIndex == 0)
                     {
                         //not found then => find other typeface                    
                         //we need more information about line seg layout
@@ -912,14 +825,16 @@ namespace PixelFarm.Drawing
 
 
                     _textServices.CurrentScriptLang = new ScriptLang(spBreakInfo.ScriptTag, spBreakInfo.LangTag);
+                    //layout glyphs in each context
                     GlyphPlanSequence seq = _textServices.CreateGlyphPlanSeq(buff, curTypeface, FontSizeInPoints);
                     seq.IsRightToLeft = spBreakInfo.RightToLeft;
 
+                    //create an object that hold more information about GlyphPlanSequence
+
                     FormattedGlyphPlanSeq formattedGlyphPlanSeq = _pool.GetFreeFmtGlyphPlanSeqs();
 
-                    //TODO: other style?... (bold, italic)
-                    formattedGlyphPlanSeq.SetData(seq, new ResolvedFont(curTypeface, FontSizeInPoints, FontStyle.Regular));
-
+                    //TODO: other style?... (bold, italic)                     
+                    formattedGlyphPlanSeq.SetData(seq, curTypeface, FontSizeInPoints, FontStyle.Regular);
                     _tmpGlyphPlanSeqs.Add(formattedGlyphPlanSeq);
 
                     curTypeface = defaultTypeface;//switch back to default
@@ -934,9 +849,9 @@ namespace PixelFarm.Drawing
                     {
                         FormattedGlyphPlanSeq formattedGlyphPlanSeq = _tmpGlyphPlanSeqs[i];
 
-                        Typeface = formattedGlyphPlanSeq.ActualFont.Typeface;
+                        Typeface = formattedGlyphPlanSeq.Typeface;
 
-                        DrawFromGlyphPlans(formattedGlyphPlanSeq.seq, xpos, y);
+                        DrawFromGlyphPlans(formattedGlyphPlanSeq.Seq, xpos, y);
 
 
                         //xpos += (glyphPlanSeq.CalculateWidth() * _currentFontSizePxScale);
@@ -950,19 +865,19 @@ namespace PixelFarm.Drawing
                         FormattedGlyphPlanSeq formattedGlyphPlanSeq = _tmpGlyphPlanSeqs[i];
 
                         //change typeface                            
-                        Typeface = formattedGlyphPlanSeq.ActualFont.Typeface;
+                        Typeface = formattedGlyphPlanSeq.Typeface;
                         //update pxscale size                             
                         _currentFontSizePxScale = Typeface.CalculateScaleToPixelFromPointSize(FontSizeInPoints);
 
-                        DrawFromGlyphPlans(formattedGlyphPlanSeq.seq, xpos, y);
+                        DrawFromGlyphPlans(formattedGlyphPlanSeq.Seq, xpos, y);
                         xpos += LatestAccumulateWidth;
 
                     }
                 }
-
-                Typeface = defaultTypeface;
                 ClearTempFormattedGlyphPlanSeq();
 
+                //restore prev typeface & settings
+                Typeface = defaultTypeface;
             }
         }
 
@@ -990,24 +905,43 @@ namespace PixelFarm.Drawing
             _pool.Enqueue(seq);
         }
     }
+
     public class FormattedGlyphPlanSeq
     {
         static readonly GlyphPlanSequence s_EmptyGlypgPlanSeq = new GlyphPlanSequence();
 
+        public GlyphPlanSequence Seq { get; private set; } = GlyphPlanSequence.Empty;
 
 
-        public GlyphPlanSequence seq { get; private set; } = GlyphPlanSequence.Empty;
-        public ResolvedFont ActualFont { get; private set; }
-        public void SetData(GlyphPlanSequence seq, ResolvedFont font)
+        public Typeface Typeface { get; private set; }
+        public float SizeInPoints { get; private set; }
+        public FontStyle FontStyle { get; private set; }
+
+        /// <summary>
+        /// whitespace count at the end of this seq
+        /// </summary>
+        public ushort PostfixWhitespaceCount { get; set; }
+        /// <summary>
+        /// whitespace count at the begin of this seq
+        /// </summary>
+        public ushort PrefixWhitespaceCount { get; set; }
+
+        public bool ColorGlyphOnTransparentBG { get; set; }
+
+        public void SetData(GlyphPlanSequence seq, Typeface typeface, float sizeInPoints, FontStyle style)
         {
-            this.seq = seq;
-            this.ActualFont = font;
+            this.Seq = seq;
+            this.Typeface = typeface;
+            this.SizeInPoints = sizeInPoints;
+            this.FontStyle = style;
         }
-        public bool IsEmpty() => seq.IsEmpty();
+        public bool IsEmpty() => Seq.IsEmpty();
         public void Reset()
         {
-            seq = s_EmptyGlypgPlanSeq;
-            ActualFont = null;
+            Seq = s_EmptyGlypgPlanSeq;
+            Typeface = null;
+            FontStyle = FontStyle.Regular;
+            SizeInPoints = 0;
         }
 
 
