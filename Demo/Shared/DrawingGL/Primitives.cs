@@ -1,10 +1,10 @@
 ﻿//MIT, 2017, Zou Wei(github/zwcloud), WinterDev
 namespace DrawingGL
 {
-    struct Size
+    readonly struct Size
     {
-        float _width;
-        float _height;
+        readonly float _width;
+        readonly float _height;
 
         public Size(float width, float height)
         {

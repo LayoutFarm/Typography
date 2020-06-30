@@ -314,7 +314,7 @@ namespace Typography.OpenFont.Tables
                     }
                 }
             }
-            struct Lk2Class1Record
+            readonly struct Lk2Class1Record
             {
                 // a Class1Record enumerates all pairs that contain a particular class as a first component.
                 //The Class1Record array stores all Class1Records according to class value.

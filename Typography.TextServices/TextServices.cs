@@ -127,7 +127,7 @@ namespace Typography.TextServices
 
 
 
-        struct TextShapingContextKey
+        readonly struct TextShapingContextKey
         {
 
             readonly Typeface _typeface;

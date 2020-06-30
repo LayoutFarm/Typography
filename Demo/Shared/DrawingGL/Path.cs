@@ -10,7 +10,7 @@ namespace DrawingGL
         CurveControl,
         CloseFigure,
     }
-    struct PathPoint
+    readonly struct PathPoint
     {
         public readonly float x;
         public readonly float y;
@@ -109,13 +109,13 @@ namespace DrawingGL
         //-------------------- 
     }
 
-    public struct GlyphRun
+    public readonly struct GlyphRun
     {
         //glyph run contains...
         //1.
-        Typography.TextLayout.UnscaledGlyphPlan _glyphPlan; //10 bytes        
-        public float[] _tessData; //4
-        public ushort _vertextCount;
+        readonly Typography.TextLayout.UnscaledGlyphPlan _glyphPlan; //10 bytes        
+        public readonly float[] _tessData; //4
+        public readonly ushort _vertextCount;
         internal GlyphRun(Typography.TextLayout.UnscaledGlyphPlan glyphPlan, float[] tessData, ushort vertextCount)
         {
             _glyphPlan = glyphPlan;

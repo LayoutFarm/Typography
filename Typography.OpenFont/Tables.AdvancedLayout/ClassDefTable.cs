@@ -134,7 +134,7 @@ namespace Typography.OpenFont.Tables
             }
             return classDefTable;
         }
-        internal struct ClassRangeRecord
+        internal readonly struct ClassRangeRecord
         {
             //---------------------------------------
             //

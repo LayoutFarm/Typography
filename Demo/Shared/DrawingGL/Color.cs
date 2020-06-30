@@ -3,7 +3,7 @@
 
 namespace DrawingGL
 {
-    public struct Color
+    public readonly struct Color
     {
         public readonly byte R;
         public readonly byte G;

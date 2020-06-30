@@ -17,7 +17,7 @@ namespace Typography.TextLayout
         /// <summary>
         /// map from glyph index to original user char
         /// </summary>
-        struct GlyphIndexToUserCodePoint
+        readonly struct GlyphIndexToUserCodePoint
         {
             /// <summary>
             /// offset from start layout char
@@ -25,7 +25,7 @@ namespace Typography.TextLayout
             public readonly ushort o_codepoint_charOffset;
             public readonly ushort len;
 #if DEBUG
-            public ushort dbug_glyphIndex;
+            public readonly short dbug_glyphIndex;
 #endif
             public GlyphIndexToUserCodePoint(ushort o_user_charOffset, ushort len)
             {
@@ -65,7 +65,7 @@ namespace Typography.TextLayout
 
             var glyphIndexToCharMap = new GlyphIndexToUserCodePoint(_originalCodePointOffset, 1);
 #if DEBUG
-            glyphIndexToCharMap.dbug_glyphIndex = glyphIndex;
+            //glyphIndexToCharMap.dbug_glyphIndex = glyphIndex;
 #endif
             _mapGlyphIndexToUserCodePoint.Add(glyphIndexToCharMap);
             _originalCodePointOffset++;
@@ -128,7 +128,7 @@ namespace Typography.TextLayout
             //TODO: check if removeLen > ushort.Max
             GlyphIndexToUserCodePoint newMap = new GlyphIndexToUserCodePoint(firstRemove.o_codepoint_charOffset, (ushort)removeLen);
 #if DEBUG
-            newMap.dbug_glyphIndex = newGlyphIndex;
+            //newMap.dbug_glyphIndex = newGlyphIndex;
 #endif
 
             //------------------------------------------------ 
@@ -153,7 +153,7 @@ namespace Typography.TextLayout
             {
                 var newglyph = new GlyphIndexToUserCodePoint(cur.o_codepoint_charOffset, 1);
 #if DEBUG
-                newglyph.dbug_glyphIndex = newGlyphIndices[i];
+                //newglyph.dbug_glyphIndex = newGlyphIndices[i];
 #endif
                 //may point to the same user char                 
                 _mapGlyphIndexToUserCodePoint.Insert(index, newglyph);

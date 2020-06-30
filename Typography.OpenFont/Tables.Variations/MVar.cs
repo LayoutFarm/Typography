@@ -113,7 +113,7 @@ namespace Typography.OpenFont.Tables
 
         }
 
-        public struct ValueRecord
+        public readonly struct ValueRecord
         {
             //ValueRecord:
             //Type      Name                Description
@@ -126,9 +126,9 @@ namespace Typography.OpenFont.Tables
             //For example, if a value record has a value tag of 'hasc',
             //this corresponds to the OS/2.sTypoAscender field. Details on the tags used within the MVAR table are provided below.
 
-            public uint tag;
-            public ushort deltaSetOuterIndex;
-            public ushort deltaSetInnerIndex;
+            public readonly uint tag;
+            public readonly ushort deltaSetOuterIndex;
+            public readonly ushort deltaSetInnerIndex;
             public ValueRecord(uint tag, ushort deltaSetOuterIndex, ushort deltaSetInnerIndex)
             {
                 this.tag = tag;

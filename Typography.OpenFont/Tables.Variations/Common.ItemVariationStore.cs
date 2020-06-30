@@ -67,7 +67,7 @@ namespace Typography.OpenFont.Tables
             }
         }
     }
-    struct RegionAxisCoordinate
+    readonly struct RegionAxisCoordinate
     {
         //RegionAxisCoordinates record:
         //Type        Name          Description

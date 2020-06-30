@@ -1806,28 +1806,28 @@ namespace Typography.OpenFont
 
         struct InstructionStream
         {
-            byte[] instructions;
-            int ip;
+            readonly byte[] _instructions;
+            int _ip;
 
-            public bool IsValid => instructions != null;
-            public bool Done => ip >= instructions.Length;
+            public bool IsValid => _instructions != null;
+            public bool Done => _ip >= _instructions.Length;
 
             public InstructionStream(byte[] instructions)
             {
-                this.instructions = instructions;
-                ip = 0;
+                _instructions = instructions;
+                _ip = 0;
             }
 
             public int NextByte()
             {
                 if (Done)
                     throw new InvalidTrueTypeFontException();
-                return instructions[ip++];
+                return _instructions[_ip++];
             }
 
             public OpCode NextOpCode() => (OpCode)NextByte();
             public int NextWord() => (short)(ushort)(NextByte() << 8 | NextByte());
-            public void Jump(int offset) { ip += offset; }
+            public void Jump(int offset) { _ip += offset; }
         }
 
         struct GraphicsState
@@ -1878,19 +1878,19 @@ namespace Typography.OpenFont
                 _s = new int[maxStack];
             }
 
-            public int Peek() => Peek(0); 
-            public bool PopBool() => Pop() != 0; 
-            public float PopFloat()=> F26Dot6ToFloat(Pop()); 
-            public void Push(bool value) => Push(value ? 1 : 0); 
-            public void Push(float value) => Push(FloatToF26Dot6(value)); 
+            public int Peek() => Peek(0);
+            public bool PopBool() => Pop() != 0;
+            public float PopFloat() => F26Dot6ToFloat(Pop());
+            public void Push(bool value) => Push(value ? 1 : 0);
+            public void Push(float value) => Push(FloatToF26Dot6(value));
 
-            public void Clear() => _count = 0; 
-            public void Depth() => Push(_count); 
-            public void Duplicate() =>Push(Peek()); 
-            public void Copy() => Copy(Pop() - 1); 
-            public void Copy(int index) => Push(Peek(index)); 
-            public void Move() => Move(Pop() - 1); 
-            public void Roll() => Move(2); 
+            public void Clear() => _count = 0;
+            public void Depth() => Push(_count);
+            public void Duplicate() => Push(Peek());
+            public void Copy() => Copy(Pop() - 1);
+            public void Copy(int index) => Push(Peek(index));
+            public void Move() => Move(Pop() - 1);
+            public void Roll() => Move(2);
 
             public void Move(int index)
             {
@@ -1932,12 +1932,12 @@ namespace Typography.OpenFont
             }
         }
 
-        struct Zone
+        readonly struct Zone
         {
-            public GlyphPointF[] Current;
-            public GlyphPointF[] Original;
-            public TouchState[] TouchState;
-            public bool IsTwilight;
+            public readonly GlyphPointF[] Current;
+            public readonly GlyphPointF[] Original;
+            public readonly TouchState[] TouchState;
+            public readonly bool IsTwilight;
 
             public Zone(GlyphPointF[] points, bool isTwilight)
             {
@@ -1947,8 +1947,8 @@ namespace Typography.OpenFont
                 TouchState = new TouchState[points.Length];
             }
 
-            public Vector2 GetCurrent(int index) { return Current[index].P; }
-            public Vector2 GetOriginal(int index) { return Original[index].P; }
+            public Vector2 GetCurrent(int index) => Current[index].P;
+            public Vector2 GetOriginal(int index) => Original[index].P;
         }
 
         enum RoundMode

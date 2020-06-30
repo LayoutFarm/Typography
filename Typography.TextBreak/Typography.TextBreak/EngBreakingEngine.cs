@@ -40,11 +40,18 @@ namespace Typography.TextBreak
         public SurrogatePairBreakingOption SurrogatePairBreakingOption { get; set; } = SurrogatePairBreakingOption.ConsecutiveSurrogatePairsAndJoiner;
 
         public CustomAbbrvDic EngCustomAbbrvDic { get; set; }
+
         struct BreakBounds
         {
             public int startIndex;
             public int length;
             public WordKind kind;
+            public BreakBounds(int startIndex, int length, WordKind kind)
+            {
+                this.startIndex = startIndex;
+                this.length = length;
+                this.kind = kind;
+            }
         }
 
         static readonly SpanBreakInfo s_latin = new SpanBreakInfo(false, ScriptTagDefs.Latin.Tag);
@@ -187,10 +194,10 @@ namespace Typography.TextBreak
             bb.startIndex = start;
 
             bool enableUnicodeRangeBreaker = EnableUnicodeRangeBreaker;
-            bool breakPeroidInTextSpan = BreakPeroidInTextSpan; 
+            bool breakPeroidInTextSpan = BreakPeroidInTextSpan;
 
             visitor.SpanBreakInfo = s_latin;
-             
+
             for (int i = start; i < endBefore; ++i)
             {
                 char c = input[i];

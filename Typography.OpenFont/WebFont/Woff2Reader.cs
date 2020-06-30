@@ -919,7 +919,7 @@ namespace Typography.WebFont
             return finalGlyph ?? emptyGlyph;
         }
 
-        struct TripleEncodingRecord
+        readonly struct TripleEncodingRecord
         {
             public readonly byte ByteCount;
             public readonly byte XBits;
@@ -942,15 +942,15 @@ namespace Typography.WebFont
                 DeltaY = deltaY;
                 Xsign = xsign;
                 Ysign = ysign;
-#if DEBUG
-                debugIndex = -1;
-#endif
+                //#if DEBUG
+                //                debugIndex = -1;
+                //#endif
             }
 #if DEBUG
-            public int debugIndex;
+            //public int debugIndex;
             public override string ToString()
             {
-                return debugIndex + " " + ByteCount + " " + XBits + " " + YBits + " " + DeltaX + " " + DeltaY + " " + Xsign + " " + Ysign;
+                return ByteCount + " " + XBits + " " + YBits + " " + DeltaX + " " + DeltaY + " " + Xsign + " " + Ysign;
             }
 #endif
             /// <summary>
@@ -1247,7 +1247,7 @@ namespace Typography.WebFont
             {
                 var rec = new TripleEncodingRecord(byteCount, xbits, ybits, deltaX, deltaY, xsign, ysign);
 #if DEBUG
-                rec.debugIndex = _records.Count;
+                //rec.debugIndex = _records.Count;
 #endif
                 _records.Add(rec);
             }
