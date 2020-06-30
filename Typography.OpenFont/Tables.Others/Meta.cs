@@ -212,7 +212,7 @@ namespace Typography.OpenFont.Tables
             }
             return tags;
         }
-        struct DataMapRecord
+        readonly struct DataMapRecord
         {
             public readonly uint tag;
             public readonly uint dataOffset;

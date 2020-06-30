@@ -11,14 +11,14 @@
 
 using System;
 using System.Collections.Generic;
- 
+
 
 namespace Tesselate
 {
-    public struct TessVertex2d
+    public readonly struct TessVertex2d
     {
-        public double x;
-        public double y;
+        public readonly double x;
+        public readonly double y;
         public TessVertex2d(double x, double y)
         {
             this.x = x;
@@ -675,19 +675,14 @@ namespace Tesselate
 
         void CacheVertex(double x, double y, double z, int data)
         {
-            TessVertex2d v = new TessVertex2d();
-            v.x = x;
-            v.y = y;
-            _simpleVertexCache[_cacheCount] = v;
+
+            _simpleVertexCache[_cacheCount] = new TessVertex2d(x, y);
             _indexCached[_cacheCount] = data;
             ++_cacheCount;
         }
         void CacheVertex(double x, double y, int data)
-        {
-            TessVertex2d v = new TessVertex2d();
-            v.x = x;
-            v.y = y;
-            _simpleVertexCache[_cacheCount] = v;
+        {             
+            _simpleVertexCache[_cacheCount] = new TessVertex2d(x, y);
             _indexCached[_cacheCount] = data;
             ++_cacheCount;
         }

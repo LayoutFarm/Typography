@@ -68,7 +68,7 @@ namespace Typography.OpenFont.Tables
             }
             return featureList;
         }
-        struct FeatureRecord
+        readonly struct FeatureRecord
         {
             public readonly uint featureTag;//4-byte ScriptTag identifier
             public readonly ushort offset; //Script Offset to Script table-from beginning of ScriptList

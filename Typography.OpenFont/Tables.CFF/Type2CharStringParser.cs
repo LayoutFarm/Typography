@@ -17,7 +17,7 @@ namespace Typography.OpenFont.CFF
     //must be used in a CFF (Compact Font Format) or OpenType font 
     //file to create a complete font program
 
-    struct Type2Instruction
+    readonly struct Type2Instruction
     {
         public readonly int Value;
         public readonly byte Op;
@@ -64,7 +64,7 @@ namespace Typography.OpenFont.CFF
         internal bool IsLoadInt => (OperatorName)Op == OperatorName.LoadInt;
 
 #if DEBUG
-        bool _dbug_OnlyOp;
+        readonly bool _dbug_OnlyOp;
 
         [System.ThreadStatic]
         static System.Text.StringBuilder s_dbugSb;

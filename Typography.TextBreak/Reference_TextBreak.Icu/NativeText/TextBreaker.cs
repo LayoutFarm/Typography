@@ -39,7 +39,7 @@ namespace Typography.TextBreak.ICU
         /// </summary>
         public void Cancel() { IsCanceled = true; }
     }
-    public struct SplitBound
+    public readonly struct SplitBound
     {
         public readonly int startIndex;
         public readonly int length;

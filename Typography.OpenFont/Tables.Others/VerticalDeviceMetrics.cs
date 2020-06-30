@@ -53,7 +53,7 @@ namespace Typography.OpenFont.Tables
             //actual vdmx group
             //TODO: implement this
         }
-        struct Ratio
+        readonly struct Ratio
         {
             public readonly byte charset;
             public readonly byte xRatio;

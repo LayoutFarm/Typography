@@ -39,7 +39,7 @@ namespace Typography.OpenFont
         }
     }
     //unicode range 
-    public struct UnicodeRangeInfo
+    public readonly struct UnicodeRangeInfo
     {
         public readonly int BitNo;
         public readonly int StartAt;
@@ -787,8 +787,8 @@ namespace Typography.OpenFont
         public string Name { get; }
         public ScriptTagDef(string tag, string name)
         {
- 
-            StringTag = tag; 
+
+            StringTag = tag;
             Tag = TagUtils.StringToTag(tag);
             Name = name;
         }
@@ -1015,7 +1015,7 @@ Zanabazar_Square__Zanabazarin_Dörböljin_Useg__Xewtee_Dörböljin_Bicig__Horizo
 
         readonly static Dictionary<string, UnicodeLangBits[]> s_registeredScriptTagsToUnicodeLangBits = new Dictionary<string, UnicodeLangBits[]>();
 
-        struct UnicodeRangeMapWithScriptLang
+        readonly struct UnicodeRangeMapWithScriptLang
         {
             public readonly ScriptLangInfo scLang;
             public readonly UnicodeLangBits unicodeRangeBits;
@@ -1107,7 +1107,7 @@ Zanabazar_Square__Zanabazarin_Dörböljin_Useg__Xewtee_Dörböljin_Bicig__Horizo
         {
             s_registerScriptFromFullNames.TryGetValue(languageName, out ScriptLangInfo found);
             return found;
-        } 
+        }
 
     }
 
@@ -1141,8 +1141,8 @@ Zanabazar_Square__Zanabazarin_Dörböljin_Useg__Xewtee_Dörböljin_Bicig__Horizo
 
         static ScriptLangInfo s_hangul_jumo = new ScriptLangInfo(ScriptTagDefs.Hangul, UnicodeLangBits.Hangul_Jamo);
 
-        static ScriptLangInfo s_hani = new ScriptLangInfo(ScriptTagDefs.CJK_Ideographic, 
-            
+        static ScriptLangInfo s_hani = new ScriptLangInfo(ScriptTagDefs.CJK_Ideographic,
+
                 UnicodeLangBits.CJK_Compatibility,
                 UnicodeLangBits.CJK_Compatibility_Forms,
                 UnicodeLangBits.CJK_Compatibility_Ideographs,
@@ -1154,7 +1154,7 @@ Zanabazar_Square__Zanabazarin_Dörböljin_Useg__Xewtee_Dörböljin_Bicig__Horizo
                 UnicodeLangBits.CJK_Unified_Ideographs,
                 UnicodeLangBits.CJK_Unified_Ideographs_Extension_A,
                 UnicodeLangBits.CJK_Unified_Ideographs_Extension_B
-             
+
         );
 
         //CJK_Symbols_And_Punctuation = (48L << 32) | (0x3000 << 16) | 0x303F,   

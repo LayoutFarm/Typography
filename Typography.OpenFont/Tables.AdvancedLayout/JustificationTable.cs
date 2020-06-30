@@ -66,7 +66,7 @@ namespace Typography.OpenFont.Tables
                 _jsftScriptTables[i] = jstfScriptTable;
             }
         }
-        struct JstfScriptRecord
+        readonly struct JstfScriptRecord
         {
             public readonly string jstfScriptTag;
             public readonly ushort jstfScriptOffset;

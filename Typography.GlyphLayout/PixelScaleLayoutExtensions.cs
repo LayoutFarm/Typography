@@ -9,7 +9,7 @@ namespace Typography.TextLayout
     /// scaled glyph plan to specfic font size.
     /// offsetX,offsetY,advanceX are adjusted to fit with specific font size    
     /// </summary>
-    public struct PxScaledGlyphPlan
+    public readonly struct PxScaledGlyphPlan
     {
         public readonly ushort input_cp_offset;
         public readonly ushort glyphIndex;
@@ -21,17 +21,17 @@ namespace Typography.TextLayout
             this.OffsetY = offsetY;
             this.AdvanceX = advanceW;
         }
-        public float AdvanceX { get; private set; }
+        public readonly float AdvanceX;
         /// <summary>
         /// x offset from current position
         /// </summary>
-        public float OffsetX { get; private set; }
+        public readonly float OffsetX;
         /// <summary>
         /// y offset from current position
         /// </summary>
-        public float OffsetY { get; private set; }
+        public readonly float OffsetY;
 
-        public bool AdvanceMoveForward => this.AdvanceX > 0;
+        public readonly bool AdvanceMoveForward => this.AdvanceX > 0;
 
 #if DEBUG
         public override string ToString()

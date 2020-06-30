@@ -7,7 +7,7 @@ using System.IO;
 namespace Typography.OpenFont.MathGlyphs
 {
 
-    public struct MathValueRecord
+    public readonly struct MathValueRecord
     {
         //MathValueRecord
         //Type      Name            Description
@@ -400,7 +400,7 @@ namespace Typography.OpenFont.MathGlyphs
     }
 
 
-    public struct GlyphPartRecord
+    public readonly struct GlyphPartRecord
     {
         //Thus, a GlyphPartRecord consists of the following fields: 
         //1) Glyph ID for the part.
@@ -466,14 +466,14 @@ namespace Typography.OpenFont.MathGlyphs
     }
 
 
-    public struct MathGlyphVariantRecord
+    public readonly struct MathGlyphVariantRecord
     {
         //    MathGlyphVariantRecord Table
         //Type      Name                Description
         //uint16    VariantGlyph        Glyph ID for the variant.
         //uint16    AdvanceMeasurement  Advance width/height, in design units, of the variant, in the direction of requested glyph extension.
-        public ushort VariantGlyph;
-        public ushort AdvanceMeasurement;
+        public readonly ushort VariantGlyph;
+        public readonly ushort AdvanceMeasurement;
         public MathGlyphVariantRecord(ushort variantGlyph, ushort advanceMeasurement)
         {
             this.VariantGlyph = variantGlyph;
@@ -509,7 +509,8 @@ namespace Typography.OpenFont.MathGlyphs
         }
 #endif
     }
-    struct MathKernInfoRecord
+
+    readonly struct MathKernInfoRecord
     {
         //resolved value
         public readonly MathKern TopRight;
@@ -554,7 +555,7 @@ namespace Typography.OpenFont.Tables
         }
     }
 
-    struct MathGlyphLoader
+    readonly struct MathGlyphLoader
     {
 
         static MathGlyphInfo GetMathGlyphOrCreateNew(MathGlyphInfo[] mathGlyphInfos, ushort glyphIndex)
@@ -567,12 +568,12 @@ namespace Typography.OpenFont.Tables
             //expand math info to each glyph in typeface
 
             typeface._mathTable = mathTable;
-            
+
 
             //expand all information to the glyph  
             int glyphCount = typeface.GlyphCount;
             MathGlyphInfo[] mathGlyphInfos = new MathGlyphInfo[glyphCount];
-           
+
 
             int index = 0;
             //-----------------
@@ -656,8 +657,8 @@ namespace Typography.OpenFont.Tables
                         index++;
                     }
                 }
-            }           
-            typeface.LoadMathGlyphInfos(mathGlyphInfos);           
+            }
+            typeface.LoadMathGlyphInfos(mathGlyphInfos);
         }
 
     }

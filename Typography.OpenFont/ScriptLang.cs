@@ -6,7 +6,7 @@ namespace Typography.OpenFont
     /// <summary>
     /// script tag and lang_feature tag request for GSUB, GPOS
     /// </summary>
-    public struct ScriptLang
+    public readonly struct ScriptLang
     {
         /// <summary>
         /// script tag

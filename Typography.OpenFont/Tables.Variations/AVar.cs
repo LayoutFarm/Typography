@@ -82,7 +82,7 @@ namespace Typography.OpenFont.Tables
                 }
             }
         }
-        public struct AxisValueMap
+        public readonly struct AxisValueMap
         {
             //AxisValueMap record:
             //Type        Name            Description
@@ -109,8 +109,8 @@ namespace Typography.OpenFont.Tables
             //This requirement ensures that there are no retrograde behaviors as the user-scale value range is traversed.
             //If a toCoordinate value of a record is less than that of the previous record, then the given record may be ignored.
 
-            public float fromCoordinate;
-            public float toCoordinate;
+            public readonly float fromCoordinate;
+            public readonly float toCoordinate;
             public AxisValueMap(float fromCoordinate, float toCoordinate)
             {
                 this.fromCoordinate = fromCoordinate;

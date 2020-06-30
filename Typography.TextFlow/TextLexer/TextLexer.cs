@@ -168,11 +168,11 @@ namespace Typography.TextBreak
     }
 
 
-    public struct LexWordSpan
+    public readonly struct LexWordSpan
     {
-        public int start;
-        public ushort len; //span should not too long more than ushort.Max
-        public WordSpanKind kind;
+        public readonly int start;
+        public readonly ushort len; //span should not too long more than ushort.Max
+        public readonly WordSpanKind kind;
         public LexWordSpan(int start, ushort len, WordSpanKind kind)
         {
             this.start = start;

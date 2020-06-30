@@ -262,7 +262,7 @@ namespace Typography.OpenFont.Tables
             }
             return baseScripts;
         }
-        struct BaseScriptRecord
+        readonly struct BaseScriptRecord
         {
             public readonly string baseScriptTag;
             public readonly ushort baseScriptOffset;
@@ -272,7 +272,7 @@ namespace Typography.OpenFont.Tables
                 this.baseScriptOffset = offset;
             }
         }
-        public struct BaseLangSysRecord
+        public readonly struct BaseLangSysRecord
         {
             public readonly string baseScriptTag;
             public readonly ushort baseScriptOffset;
@@ -381,13 +381,13 @@ namespace Typography.OpenFont.Tables
             BaseCoord[] baseCoords = new BaseCoord[baseCoordCount];
             for (int i = 0; i < baseCoordCount; ++i)
             {
-                reader.BaseStream.Position = baseValueTableStartAt + baseCoords_Offset[i];
-                baseCoords[i] = ReadBaseCoordTable(reader);
+                baseCoords[i] = ReadBaseCoordTable(reader, baseValueTableStartAt + baseCoords_Offset[i]);
             }
 
             return new BaseValues(defaultBaselineIndex, baseCoords);
         }
-        public struct BaseValues
+
+        public readonly struct BaseValues
         {
             public readonly ushort defaultBaseLineIndex;
             public readonly BaseCoord[] baseCoords;
@@ -400,7 +400,7 @@ namespace Typography.OpenFont.Tables
         }
 
 
-        public struct BaseCoord
+        public readonly struct BaseCoord
         {
             public readonly ushort baseCoordFormat;
             /// <summary>
@@ -431,8 +431,9 @@ namespace Typography.OpenFont.Tables
             }
 #endif
         }
-        static BaseCoord ReadBaseCoordTable(BinaryReader reader)
+        static BaseCoord ReadBaseCoordTable(BinaryReader reader, long pos)
         {
+            reader.BaseStream.Position = pos;
             //BaseCoord Tables
             //Within the BASE table, a BaseCoord table defines baseline and min/max extent values.
             //Each BaseCoord table defines one X or Y value:
@@ -576,13 +577,11 @@ namespace Typography.OpenFont.Tables
             //----------
             if (minCoordOffset > 0)
             {
-                reader.BaseStream.Position = startMinMaxTableAt + minCoordOffset;
-                minMax.minCoord = ReadBaseCoordTable(reader);
+                minMax.minCoord = ReadBaseCoordTable(reader, startMinMaxTableAt + minCoordOffset);
             }
             if (maxCoordOffset > 0)
             {
-                reader.BaseStream.Position = startMinMaxTableAt + maxCoordOffset;
-                minMax.maxCoord = ReadBaseCoordTable(reader);
+                minMax.maxCoord = ReadBaseCoordTable(reader, startMinMaxTableAt + maxCoordOffset);
             }
 
             if (minMaxFeatureOffsets != null)
@@ -592,20 +591,14 @@ namespace Typography.OpenFont.Tables
                 {
                     FeatureMinMaxOffset featureMinMaxOffset = minMaxFeatureOffsets[i];
 
-                    var featureMinMax = new FeatureMinMax();
-                    //tag
-                    featureMinMax.featureTableTag = featureMinMaxOffset.featureTableTag;
-                    //min
-                    reader.BaseStream.Position = startMinMaxTableAt + featureMinMaxOffset.minCoord;//min
-                    featureMinMax.minCoord = ReadBaseCoordTable(reader);
-                    //max
-                    reader.BaseStream.Position = startMinMaxTableAt + featureMinMaxOffset.maxCoord;//max
-                    featureMinMax.maxCoord = ReadBaseCoordTable(reader);
-
-                    featureMinMaxRecords[i] = featureMinMax;
+                    featureMinMaxRecords[i] = new FeatureMinMax(
+                        featureMinMaxOffset.featureTableTag, //tag
+                        ReadBaseCoordTable(reader, startMinMaxTableAt + featureMinMaxOffset.minCoord), //min
+                        ReadBaseCoordTable(reader, startMinMaxTableAt + featureMinMaxOffset.maxCoord)); //max
                 }
                 minMax.featureMinMaxRecords = featureMinMaxRecords;
             }
+
             return minMax;
         }
 
@@ -615,13 +608,19 @@ namespace Typography.OpenFont.Tables
             public BaseCoord maxCoord;
             public FeatureMinMax[] featureMinMaxRecords;
         }
-        public struct FeatureMinMax
+        public readonly struct FeatureMinMax
         {
-            public string featureTableTag;
-            public BaseCoord minCoord;
-            public BaseCoord maxCoord;
+            public readonly string featureTableTag;
+            public readonly BaseCoord minCoord;
+            public readonly BaseCoord maxCoord;
+            public FeatureMinMax(string tag, BaseCoord minCoord, BaseCoord maxCoord)
+            {
+                featureTableTag = tag;
+                this.minCoord = minCoord;
+                this.maxCoord = maxCoord;
+            }
         }
-        struct FeatureMinMaxOffset
+        readonly struct FeatureMinMaxOffset
         {
             public readonly string featureTableTag;
             public readonly ushort minCoord;

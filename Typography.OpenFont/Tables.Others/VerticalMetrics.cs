@@ -77,7 +77,7 @@ namespace Typography.OpenFont.Tables
             }
         }
 
-        public struct AdvanceHeightAndTopSideBearing
+        public readonly struct AdvanceHeightAndTopSideBearing
         {
             public readonly ushort advanceHeight;
             public readonly short topSideBearing;
