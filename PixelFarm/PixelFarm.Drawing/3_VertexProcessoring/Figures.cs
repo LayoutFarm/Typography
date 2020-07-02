@@ -820,7 +820,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
     }
 
 
-    public struct FigureContainer
+    public readonly struct FigureContainer
     {
         public readonly Figure _figure;
         public readonly MultiFigures _multiFig;

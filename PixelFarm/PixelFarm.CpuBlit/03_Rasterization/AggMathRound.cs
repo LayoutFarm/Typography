@@ -1,4 +1,5 @@
 ﻿//BSD, 2014-present, WinterDev
+
 //----------------------------------------------------------------------------
 // Anti-Grain Geometry - Version 2.4
 // Copyright (C) 2002-2005 Maxim Shemanarev (http://www.antigrain.com)
@@ -17,45 +18,31 @@
 //          mcseemagg@yahoo.com
 //          http://www.antigrain.com
 //----------------------------------------------------------------------------
+// Bessel function (besj) was adapted for use in AGG library by Andy Wilk 
+// Contact: castor.vulgaris@gmail.com
+//----------------------------------------------------------------------------
 
 using System;
 namespace PixelFarm.CpuBlit
 {
-
-    public struct TempMemPtr : IDisposable
+    static class AggMathRound
     {
-        readonly int _lenInBytes; //in bytes         
-        readonly bool _isOwner;
-        IntPtr _nativeBuffer;
+        public static int uround(double v) => (int)(uint)(v + 0.5);
+        public static int uround_f(float v) => (int)(uint)(v + 0.5);
 
-        public TempMemPtr(IntPtr nativeBuffer32, int lenInBytes, bool isOwner = false)
+        public static int iround(double v)
         {
-            _lenInBytes = lenInBytes;
-            _nativeBuffer = nativeBuffer32;
-            _isOwner = isOwner;
-        }
-        //
-        public int LengthInBytes => _lenInBytes;
-        //
-        public IntPtr Ptr => _nativeBuffer;
-        //
-        public void Dispose()
-        {
-            if (_isOwner && _nativeBuffer != IntPtr.Zero)
+            unchecked
             {
-                //destroy in
-                System.Runtime.InteropServices.Marshal.FreeHGlobal(_nativeBuffer);
-                _nativeBuffer = IntPtr.Zero;
+                return (int)((v < 0.0) ? v - 0.5 : v + 0.5);
             }
         }
-        public unsafe static TempMemPtr FromBmp(IBitmapSrc actualBmp, out int* headPtr)
+        public static int iround_f(float v)
         {
-            TempMemPtr ptr = actualBmp.GetBufferPtr();
-            headPtr = (int*)ptr.Ptr;
-            return ptr;
+            unchecked
+            {
+                return (int)((v < 0.0) ? v - 0.5 : v + 0.5);
+            }
         }
-
-
-       
     }
 }

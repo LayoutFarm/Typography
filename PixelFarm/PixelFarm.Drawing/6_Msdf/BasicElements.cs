@@ -6,7 +6,7 @@ using System.Collections.Generic;
 namespace Msdfgen
 {
 
-    public struct Vector2
+    public readonly struct Vector2
     {
         public readonly double x;
         public readonly double y;
@@ -221,7 +221,7 @@ namespace Msdfgen
                   ));
         }
 
-        
+
         public void findBounds(ref double left, ref double bottom, ref double right, ref double top)
         {
             if (!_hasCalculatedBounds)
@@ -301,7 +301,7 @@ namespace Msdfgen
 
     }
 
-    public struct FloatRGB
+    public readonly struct FloatRGB
     {
         //eg. Vector3f
 
@@ -319,7 +319,7 @@ namespace Msdfgen
         }
 #endif
     }
-    public struct Pair<T, U>
+    public readonly struct Pair<T, U>
     {
         public readonly T first;
         public readonly U second;

@@ -51,7 +51,7 @@ namespace PaintLab.Svg
         }
     }
 
-    public struct VgHitInfo
+    public readonly struct VgHitInfo
     {
         public readonly VgVisualElement hitElem;
         public readonly float x;

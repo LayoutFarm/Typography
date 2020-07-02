@@ -17,35 +17,29 @@
 //          mcseemagg@yahoo.com
 //          http://www.antigrain.com
 //----------------------------------------------------------------------------
-//
-// Affine transformation classes.
-//
-//----------------------------------------------------------------------------
-//#ifndef AGG_TRANS_AFFINE_INCLUDED
-//#define AGG_TRANS_AFFINE_INCLUDED
 
-//#include <math.h>
-//#include "agg_basics.h"
-
-
-namespace PixelFarm.CpuBlit.VertexProcessing
+using System;
+using PixelFarm.Drawing;
+using PixelFarm.CpuBlit.VertexProcessing;
+namespace PixelFarm.CpuBlit
 {
-    public interface ICoordTransformer
+    public interface IBitmapSrc
     {
-        void Transform(ref double x, ref double y);
-        ICoordTransformer MultiplyWith(ICoordTransformer another);
-        ICoordTransformer CreateInvert();
-        CoordTransformerKind Kind { get; }
-        bool IsIdentity { get; }
-    }
-    public enum CoordTransformerKind
-    {
-        Unknown,
-        Affine3x2,
-        Perspective,
-        Bilinear,
-        TransformChain,
-    }
+        int BitDepth { get; }
+        int Width { get; }
+        int Stride { get; }
+        int Height { get; }
 
+        Q1Rect GetBounds();
+
+        int GetBufferOffsetXY32(int x, int y);
+
+        TempMemPtr GetBufferPtr();
+
+
+        int BytesBetweenPixelsInclusive { get; }
+        void WriteBuffer(int[] newBuffer);
+        Color GetPixel(int x, int y);
+    }
 
 }

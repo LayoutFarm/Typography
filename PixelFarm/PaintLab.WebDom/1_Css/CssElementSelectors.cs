@@ -134,7 +134,7 @@ namespace LayoutFarm.WebDom
 
         public CssElementSelector LeftSelector
         {
-            get { return _left; }
+            get => _left;
             set
             {
                 _left = value;
@@ -146,7 +146,7 @@ namespace LayoutFarm.WebDom
         }
         public CssElementSelector RightSelector
         {
-            get { return _right; }
+            get => _right;
             set
             {
                 _right = value;

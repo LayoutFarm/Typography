@@ -15,11 +15,13 @@ namespace PixelFarm.CpuBlit
         /// <param name="top"></param>
         void DrawString(AggRenderVxFormattedString renderVx, double left, double top);
         void PrepareStringForRenderVx(AggRenderVxFormattedString renderVx, char[] text, int startAt, int len);
+        int CurrentLineSpaceHeight { get; }
     }
 
     partial class AggPainter
     {
         //font
+
         RequestFont _currentFont;
         IAggTextPrinter _textPrinter;
 
@@ -29,12 +31,13 @@ namespace PixelFarm.CpuBlit
             set
             {
                 _textPrinter = value;
-                if (_textPrinter != null)
+                if (_currentFont != null)
                 {
-                    _textPrinter.ChangeFont(_currentFont);
+                    _textPrinter?.ChangeFont(_currentFont);
                 }
             }
         }
+
 
         public override RequestFont CurrentFont
         {
@@ -42,15 +45,15 @@ namespace PixelFarm.CpuBlit
             set
             {
                 _currentFont = value;
-                //this request font must resolve to actual font
-                //within canvas *** 
-                //TODO: review drawing string  with agg here 
+                //                
                 if (_textPrinter != null && value != null)
                 {
                     _textPrinter.ChangeFont(value);
                 }
             }
         }
+
+        public int CurrentLineSpaceHeight => (_textPrinter != null) ? _textPrinter.CurrentLineSpaceHeight : 0;
 
         public override void DrawString(
            string text,

@@ -22,7 +22,7 @@ using System;
 using PixelFarm.CpuBlit.FragmentProcessing;
 namespace PixelFarm.CpuBlit.PixelProcessing
 {
-    public struct GammaNone : IGammaFunction
+    public readonly struct GammaNone : IGammaFunction
     {
         public float GetGamma(float x) => x;
     }

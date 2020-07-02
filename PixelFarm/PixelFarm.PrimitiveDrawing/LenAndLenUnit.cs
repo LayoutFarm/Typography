@@ -17,7 +17,7 @@ namespace PixelFarm.Drawing
         Picas, //pc 
     }
 
-    public struct Len
+    public readonly struct Len
     {
         public readonly float Number;
         public readonly LenUnit Unit;
@@ -67,8 +67,14 @@ namespace PixelFarm.Drawing
 
     public static class LenExtensions
     {
-        const int POINTS_PER_INCH = 72; //default value
+
+        //------------------
+        //TODO: review here again***
+        //if the system does not use 96 dpi or 72 ppi
+        //------------------
+        const int POINTS_PER_INCH = 72; //default value 
         static int s_PIXELS_PER_INCH = 96; //default value        
+
         public static float ToPixels(this Len len)
         {
             switch (len.Unit)
@@ -140,5 +146,5 @@ namespace PixelFarm.Drawing
 
 
 
-   
+
 }

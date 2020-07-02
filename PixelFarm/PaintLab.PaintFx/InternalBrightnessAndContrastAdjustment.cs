@@ -39,7 +39,7 @@ namespace PixelFarm.CpuBlit
         /// </summary>
         public int Brightness
         {
-            get { return _brightness; }
+            get => _brightness;
             set
             {
                 Clamp(-100, 100, ref value);
@@ -56,7 +56,7 @@ namespace PixelFarm.CpuBlit
         /// </summary>
         public int Contrast
         {
-            get { return _contrast; }
+            get => _contrast;
             set
             {
                 Clamp(-100, 100, ref value);

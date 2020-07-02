@@ -91,10 +91,7 @@ namespace PixelFarm.Contours
             //find min of 3
             unsafe
             {
-                double* doubleArr = stackalloc double[3];
-                doubleArr[0] = v0;
-                doubleArr[1] = v1;
-                doubleArr[2] = v2;
+                double* doubleArr = stackalloc double[] { v0, v1, v2 };
 
                 double min = double.MaxValue;
                 int foundAt = 0;
@@ -624,10 +621,7 @@ namespace PixelFarm.Contours
         {
             unsafe
             {
-                double* tmpArr = stackalloc double[3];
-                tmpArr[0] = d0;
-                tmpArr[1] = d1;
-                tmpArr[2] = d2;
+                double* tmpArr = stackalloc double[] { d0, d1, d2 };                
 
                 int minAt = -1;
                 double currentMin = double.MaxValue;

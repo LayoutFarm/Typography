@@ -12,6 +12,7 @@
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
+	 <LangVersion>8.0</LangVersion> 
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -35,6 +36,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AffineMat.cs" />
+    <Compile Include="BitmapBufferFormat.cs" />
     <Compile Include="Color.cs" />
     <Compile Include="CRC32Calculator.cs" />
     <Compile Include="ExtensionAttribute.cs" />
@@ -42,7 +44,6 @@
     <Compile Include="ImageBinder.cs" />
     <Compile Include="LenAndLenUnit.cs" />
     <Compile Include="RequestFont.cs" />
-    <Compile Include="TextMeasurement.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\PixelFarm.PrimitiveGeo\PixelFarm.PrimitiveGeo.csproj">

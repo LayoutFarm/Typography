@@ -79,7 +79,7 @@ namespace PixelFarm.CpuBlit.Rasterization
         {
             for (int i = ScanlineRasterizer.AA_SCALE - 1; i >= 0; --i)
             {
-                _gammaLut[i] = AggMath.uround(
+                _gammaLut[i] = AggMathRound.uround(
                     gamma_function.GetGamma((float)(i) / ScanlineRasterizer.AA_MASK) * ScanlineRasterizer.AA_MASK);
             }
         }
@@ -194,7 +194,7 @@ namespace PixelFarm.CpuBlit.Rasterization
         }
         //---------------------------------
         //from vector clipper
-        static int upscale(double v) => AggMath.iround(v * poly_subpix.SCALE);
+        static int upscale(double v) => AggMathRound.iround(v * poly_subpix.SCALE);
         static int upscale(int v) => v << poly_subpix.SHIFT;
         //
         ////from vector clipper
@@ -217,7 +217,7 @@ namespace PixelFarm.CpuBlit.Rasterization
                 //
                 for (int i = AA_SCALE - 1; i >= 0; --i)
                 {
-                    _gammaLut[i] = AggMath.uround(
+                    _gammaLut[i] = AggMathRound.uround(
                         gamma_function.GetGamma((float)(i) / AA_MASK) * AA_MASK);
                 }
             }

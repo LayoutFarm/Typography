@@ -20,7 +20,44 @@
 
 
 namespace PixelFarm.Drawing
-{
+{ /// <summary>
+  /// vertex command and flags
+  /// </summary>
+    public enum VertexCmd : byte
+    {
+        //---------------------------------
+        //the order of these fields are significant!
+        //---------------------------------
+        //first lower 4 bits compact flags
+        /// <summary>
+        /// no more command
+        /// </summary>
+        NoMore = 0x00,
+        //----------------------- 
+        /// <summary>
+        /// close current polygon
+        /// </summary>
+        Close = 0x02,
+        //----------------------- 
+        //start from move to 
+        MoveTo = 0x04,
+        LineTo = 0x05,
+        /// <summary>
+        /// control point for curve3
+        /// </summary>
+        C3 = 0x06, // 
+        /// <summary>
+        /// control point for curve4
+        /// </summary>
+        C4 = 0x07,
+    }
+    public enum EndVertexOrientation
+    {
+        Unknown, //0
+        CCW,//1
+        CW//2
+    }
+
     public sealed class VertexStore
     {
 
@@ -161,18 +198,8 @@ namespace PixelFarm.Drawing
         }
 
         public bool _dbugIsChanged;
-        public static bool dbugCheckNANs(double x, double y)
-        {
-            if (double.IsNaN(x))
-            {
-                return true;
-            }
-            else if (double.IsNaN(y))
-            {
-                return true;
-            }
-            return false;
-        }
+
+        public static bool dbugCheckNANs(double x, double y) => double.IsNaN(x) || double.IsNaN(y);
 #endif
         void AllocIfRequired(int indexToAdd)
         {
@@ -308,7 +335,7 @@ namespace PixelFarm.Drawing
                   0,//src index
                   _coord_xy,//dst
                   _vertices_count << 1,//*2 //
-                  another._vertices_count << 1); 
+                  another._vertices_count << 1);
 
                 //B.2 
                 System.Array.Copy(

@@ -3,15 +3,7 @@
 using System;
 namespace PixelFarm.Drawing
 {
-    public delegate void LoadImageFunc(ImageBinder binder);
-    public enum BitmapBufferFormat
-    {
-        BGRA, //eg. System.Drawing.Bitmap
-        BGR, //eg. Native Windows GDI surface
-        RGBA, //eg. OpenGL 
-
-        RGBO, //my extension, 32 bits RGB ignore Alpha, assume its value= 1
-    }
+    public delegate void LoadImageFunc(ImageBinder binder); 
 
     public class ImageBinder : Image
     {

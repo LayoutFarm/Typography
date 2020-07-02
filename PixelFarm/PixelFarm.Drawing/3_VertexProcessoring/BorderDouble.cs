@@ -80,9 +80,9 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             return false;
         }
 
-        public double Width => Left + Right; 
+        public double Width => Left + Right;
         // This function assumes the rect is normalized
-        public double Height => Bottom + Top; 
+        public double Height => Bottom + Top;
 
         public override string ToString()
         {

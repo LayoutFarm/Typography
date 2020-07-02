@@ -43,6 +43,7 @@ namespace PixelFarm.CpuBlit
         const int BASE_SHIFT = 8;
         const int BASE_SCALE = (int)(1 << BASE_SHIFT);
         const int BASE_MASK = BASE_SCALE - 1;
+
         public float red;
         public float green;
         public float blue;
