@@ -25,8 +25,15 @@ namespace MathLayout
             {
                 _glyphMeshStore.SetFont(typeface, sizeInPoint);//20= font size
                 _glyphMeshStore.FlipGlyphUpward = true;
-
+                if (glyphBox.IsItalic)
+                {
+                    _glyphMeshStore.SimulateOblique = glyphBox.IsItalic;
+                }
                 vxsGlyphBox.GlyphVxs = _glyphMeshStore.GetGlyphMesh(glyphBox.GlyphIndex);
+                if (_glyphMeshStore.SimulateOblique)
+                {
+                    _glyphMeshStore.SimulateOblique = false;
+                }
             }
         }
         protected override void CreateCustomNotation(EncloseNotation notation,
