@@ -131,9 +131,22 @@ namespace Typography.TextBreak
                             BreakingEngine anotherEngine = SelectEngine(_visitor.Char);
                             if (anotherEngine == currentEngine)
                             {
+#if DEBUG
+                                //some time with error char[] buffer
+                                //we may found high surrogate but not followed by low-surrogate
+                                //or low without high etc
+                                //we should handle this!
+                                if (char.IsLowSurrogate(_visitor.Char))
+                                {
+
+                                }
+#endif
+
                                 if (ThrowIfCharOutOfRange) throw new NotSupportedException($"A proper breaking engine for character '{_visitor.Char}' was not found.");
                                 startAt = _visitor.CurrentIndex + 1;
                                 _visitor.SetCurrentIndex(startAt);
+
+
                                 _visitor.AddWordBreakAtCurrentIndex(WordKind.Unknown);
                             }
                             else

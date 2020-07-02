@@ -99,8 +99,15 @@ namespace TextBreakerTest
             });
 
         }
-        private void cmdManaged_Click(object sender, EventArgs e)
+
+        void InitNewCustomTextBreakerAndBreakWords(char[] inputBuffer)
         {
+            //---------------------------
+            //we don't have to create a new text breaker everytime.
+            //we can reuse it.***
+
+            //this is just a demonstration.
+            //---------------------------
 
             //some lang eg. Thai, Lao, need dictionary breaking
             //we use dic data from icu-project
@@ -117,22 +124,73 @@ namespace TextBreakerTest
             breaker1.BreakNumberAfterText = true;
 
 
-            char[] test = this.textBox1.Text.ToCharArray();
+
             this.listBox1.Items.Clear();
             breaker1.SetNewBreakHandler(vis =>
             {
                 BreakSpan span = vis.GetBreakSpan();
-                string s = new string(test, span.startAt, span.len);
+                string s = new string(inputBuffer, span.startAt, span.len);
                 this.listBox1.Items.Add(span.startAt + " " + s);
 
             });
-            breaker1.BreakWords(test, 0, test.Length);
+
+            breaker1.BreakWords(inputBuffer, 0, inputBuffer.Length);
 
             //foreach (BreakSpan span in breaker1.GetBreakSpanIter())
             //{
             //   
             //    this.listBox1.Items.Add(span.startAt + " " + s);
             //}
+        }
+        private void cmdManaged_Click(object sender, EventArgs e)
+        {
+            InitNewCustomTextBreakerAndBreakWords(this.textBox1.Text.ToCharArray());
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            //test some surrogate pair error
+
+            string w = "👩🏾";
+            char[] buffer = w.ToCharArray();
+
+
+            //test with just part of the surrogate
+            {
+                //test 3: last-pair, high without low
+                //create string buffer the has high surrogate that is not followed by a low surrogate
+                char[] buff1 = new char[buffer.Length];
+                Array.Copy(buffer, 0, buff1, 0, buffer.Length - 1);
+                buff1[buff1.Length - 1] = 'a';
+
+                string output1 = new string(buff1);
+                //test break the err surrogate pair
+                InitNewCustomTextBreakerAndBreakWords(buff1);
+
+            }
+
+            {
+                //test 2: last-pair, high without low
+                //create string buffer the has high surrogate that is not followed by a low surrogate
+                char[] buff1 = new char[buffer.Length - 1];
+                Array.Copy(buffer, 0, buff1, 0, buffer.Length - 1);
+                string output1 = new string(buff1);
+                //test break the err surrogate pair
+                InitNewCustomTextBreakerAndBreakWords(buff1);
+
+            }
+
+
+            {
+                //test 1: 1st pair, low without high 
+                //create string buffer the has low surrogate that is not precedede by a high surrogate
+                char[] buff1 = new char[buffer.Length - 1];
+                Array.Copy(buffer, 1, buff1, 0, buffer.Length - 1);
+                string output1 = new string(buff1);
+                //test break the err surrogate pair
+                InitNewCustomTextBreakerAndBreakWords(buff1);
+            }
+
         }
         static bool StringStartsWithChars(string srcString, string value)
         {
@@ -411,6 +469,8 @@ namespace TextBreakerTest
             BeforeHalf,
             AfterSubscript
         }
+
+
     }
 }
 
