@@ -3,7 +3,7 @@
 
 namespace Msdfgen
 {
-    public struct SignedDistance
+    public readonly struct SignedDistance
     {
         public readonly double distance;
         public readonly double dot;

@@ -17,7 +17,7 @@ namespace Msdfgen
         AreaInsideCoverage100,
 
     }
-    public struct EdgeStructure
+    public readonly struct EdgeStructure
     {
         readonly EdgeSegment _edgeSegment;
         readonly EdgeSegment[] _edgeSegments;

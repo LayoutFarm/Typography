@@ -61,9 +61,9 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
     }
 
     // based on the "MAXRECTS" method developed by Jukka Jylänki: http://clb.demon.fi/files/RectangleBinPack.pdf
-    public struct BinPacker
+    public readonly struct BinPacker
     {
-        ResizableArray<BinPackRect> freeList;
+        readonly ResizableArray<BinPackRect> freeList;
 
         public BinPacker(int width, int height)
         {

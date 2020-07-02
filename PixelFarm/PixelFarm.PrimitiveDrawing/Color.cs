@@ -65,7 +65,7 @@ namespace PixelFarm.Drawing
 {
 
     [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
-    public struct Color
+    public readonly struct Color
     {
         readonly byte _r;
         readonly byte _g;

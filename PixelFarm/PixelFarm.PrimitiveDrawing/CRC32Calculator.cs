@@ -32,7 +32,7 @@
 namespace PixelFarm.Drawing
 {
 
-    public struct TinyCRC32Calculator
+    public readonly struct TinyCRC32Calculator
     {
 
         /// <summary>
@@ -101,7 +101,7 @@ namespace PixelFarm.Drawing
 
 
 #if DEBUG
-        Int64 dbugTotalBytesRead;
+        //Int64 dbugTotalBytesRead;
 #endif
 
         static readonly UInt32[] s_crc32Table;

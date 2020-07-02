@@ -5,7 +5,7 @@ namespace PixelFarm.Contours
     /// <summary>
     /// a link (line) that connects between centroid of 2 GlyphTriangle(p => q)
     /// </summary>
-    public struct CentroidPair
+    public readonly struct CentroidPair
     {
         //this is a temporary object.
         //we crate glyph

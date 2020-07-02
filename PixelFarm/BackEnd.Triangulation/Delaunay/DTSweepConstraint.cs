@@ -33,7 +33,7 @@
 
 namespace Poly2Tri
 {
-    public struct DTSweepConstraint
+    public readonly struct DTSweepConstraint
     {
         public readonly TriangulationPoint P;
         public readonly TriangulationPoint Q;

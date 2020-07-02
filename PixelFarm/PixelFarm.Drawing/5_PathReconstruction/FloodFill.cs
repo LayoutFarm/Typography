@@ -62,7 +62,7 @@ namespace PixelFarm.PathReconstruction
     /// <summary>
     /// horizontal (scanline) span
     /// </summary>
-    public struct HSpan
+    public readonly struct HSpan
     {
         public readonly int startX;
 
