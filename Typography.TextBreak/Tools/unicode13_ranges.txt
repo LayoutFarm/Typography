@@ -1,8 +1,28 @@
 ﻿name,start_unicode,end_unicode
-Basic Latin,0000,007F
-Letters of Basic Latin,0041,007A
-Latin-1 Supplement,0080,00FF
-Letters of the Latin-1 Supplement,00C0,00FF
+# C0 Controls and Basic Latin, (from https://www.unicode.org/charts/PDF/U0000.pdf)
+#---------
+C0 controls,0000, 001F
+ASCII punctuation and symbols 1, 0020, 002F
+ASCII digits, 0030, 0039
+ASCII punctuation and symbols 2, 003A, 0040
+Uppercase Latin alphabet, 0041, 005A
+ASCII punctuation and symbols 3,005B,0060
+Lowercase Latin alphabet, 0061, 007A
+ASCII punctuation and symbols 4,007B, 007E
+Control character 2, 007F,007F
+#---------
+#C1 Controls and Latin-1 Supplement, (https://www.unicode.org/charts/PDF/U0080.pdf)
+#---------
+C1 controls, 0080, 009F
+Latin-1 punctuation and symbols, 00A0,00BB
+Vulgar fractions, 00BC, 00BE
+Punctuation 5,00BF,00BF 
+Letters of the Latin-1 Supplement part1,00C0,00D6
+Mathematical operator multiplication,00D7,00D7
+Letters of the Latin-1 Supplement part2, 00D8,00F6
+Mathematical operator division, 00F7,00F7
+Letters of Latin-1 Supplement part3,00F8, 00FF
+#
 Latin Extended-A,0100,017F
 Latin Extended-B,0180,024F
 IPA Extensions,0250,02AF
@@ -72,7 +92,7 @@ Combining Diacritical Marks Supplement,1DC0,1DFF
 Latin Extended Additional,1E00,1EFF
 Greek Extended,1F00,1FFF
 General Punctuation,2000,206F
-Deprecated Format Characters,206A,206F
+#Deprecated Format Characters,206A,206F(this is inside=> General Punctuation,2000,206F)
 Superscripts and Subscripts,2070,209F
 Currency Symbols,20A0,20CF
 Combining Diacritical Marks for Symbols,20D0,20FF
@@ -150,7 +170,7 @@ Meetei Mayek,ABC0,ABFF
 Hangul Syllables,AC00,D7A3
 Hangul Jamo Extended-B,D7B0,D7FF
 High Surrogates,D800,DBFF
-High Private Use Surrogates,DB80,DBFF
+#High Private Use Surrogates,DB80,DBFF (this is inside High Surrogates,D800,DBFF)
 Low Surrogates,DC00,DFFF
 Private Use Area,E000,F8FF
 CJK Compatibility Ideographs,F900,FAFF

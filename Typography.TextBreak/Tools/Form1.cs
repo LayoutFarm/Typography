@@ -4,7 +4,7 @@ using System.Windows.Forms;
 using System.Text;
 using System.IO;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
+using Tools.UnicodeLangTool;
 
 namespace Tools
 {
@@ -96,6 +96,7 @@ namespace Tools
         Dictionary<string, UnicodeRangeInfo> _unicode13Dic;
         private void button2_Click(object sender, EventArgs e)
         {
+            //ucd.all.flat.xml
             LoadUnicode13Ranges();
         }
         void LoadUnicode13Ranges()
@@ -109,28 +110,77 @@ namespace Tools
             _unicode13Dic = new Dictionary<string, UnicodeRangeInfo>();
             for (int i = 1; i < allLines.Length; ++i)
             {
-                string[] fields = allLines[i].Split(',');
+                string line = allLines[i].Trim();
+
+                if (line.Length == 0 || line.StartsWith("#")) { continue; }//skip blank line or comment line
+                                                                           //
+
+                string[] fields = line.Split(',');
                 if (fields.Length != 3)
                 {
                     throw new NotSupportedException();
                 }
-
-
-                var rangeInfo = new UnicodeRangeInfo { LangName = fields[0].Trim(), StartCodePoint = fields[1].Trim(), EndCodePoint = fields[2].Trim() };
-
+                var rangeInfo = new UnicodeRangeInfo
+                {
+                    LangName = fields[0].Trim(),
+                    StartCodePoint = int.Parse(fields[1].Trim(), System.Globalization.NumberStyles.HexNumber),
+                    EndCodePoint = int.Parse(fields[2].Trim(), System.Globalization.NumberStyles.HexNumber)
+                };
                 _unicode13Ranges.Add(rangeInfo);
-
                 _unicode13Dic.Add(rangeInfo.LangName, rangeInfo);
             }
 
+            //----------------------
+            //from https://www.unicode.org/faq/blocks_ranges.html
+            //Q: Can blocks overlap?
+            //A: No.Every Unicode block is discrete, and cannot overlap with any other block.
+            //Also, every assigned character in the Unicode Standard has to be in a block(and only one block, of course).            
+            //This ensures that when code charts are printed, no characters are omitted simply because they aren't in a block
+            //----------------------
 
+            //***ensure no overlap unicode range***
+            int count = _unicode13Ranges.Count;
+            for (int i = 0; i < count; ++i)
+            {
+                if (!CheckIfNotOverlap(_unicode13Ranges[i], _unicode13Ranges, i))
+                {
+                    //found overlap!                     
+                    throw new NotSupportedException("unicode overlap found!");
+                }
+            }
+
+
+        }
+        static bool CheckIfNotOverlap(UnicodeRangeInfo test, List<UnicodeRangeInfo> others, int exceptIndex)
+        {
+            int count = others.Count;
+
+            for (int i = 0; i < count; ++i)
+            {
+                if (i == exceptIndex)
+                {
+                    continue;
+                }
+
+                UnicodeRangeInfo rng = others[i];
+                int b_begin = rng.StartCodePoint;
+                int b_end = rng.EndCodePoint;
+
+                if ((test.StartCodePoint >= b_begin && test.StartCodePoint <= b_end) ||
+                     (test.EndCodePoint >= b_begin && test.EndCodePoint <= b_begin))
+                {
+                    //overlap found
+                    return false;
+                }
+            }
+            return true;
         }
         class UnicodeRangeInfo
         {
             public int BitPlane { get; set; }
             public string LangName { get; set; }
-            public string StartCodePoint { get; set; }
-            public string EndCodePoint { get; set; }
+            public int StartCodePoint { get; set; }
+            public int EndCodePoint { get; set; }
             public override string ToString()
             {
                 if (BitPlane == null)
@@ -173,8 +223,8 @@ namespace Tools
                 {
                     BitPlane = int.Parse(fields[0].Trim()),
                     LangName = fields[1].Trim(),
-                    StartCodePoint = codePointRanges[0],
-                    EndCodePoint = codePointRanges[1]
+                    StartCodePoint = int.Parse(codePointRanges[0], System.Globalization.NumberStyles.HexNumber),
+                    EndCodePoint = int.Parse(codePointRanges[1], System.Globalization.NumberStyles.HexNumber)
                 });
             }
 
@@ -822,6 +872,12 @@ namespace Tools
                     dic1[langSub.SubLang] = langSub;
                 }
             }
+        }
+
+        private void button9_Click(object sender, EventArgs e)
+        {
+            UnicodeDataTxtParser unicodeTxtParser = new UnicodeDataTxtParser();
+            unicodeTxtParser.Parse("icu_data/data/unidata/UnicodeData.txt");
 
         }
     }

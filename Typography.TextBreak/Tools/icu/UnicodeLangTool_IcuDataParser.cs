@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace Tools
+namespace Tools.UnicodeLangTool
 {
     public class IcuDataTree
     {
