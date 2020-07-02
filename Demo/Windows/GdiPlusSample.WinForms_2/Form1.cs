@@ -190,9 +190,8 @@ namespace SampleWinForms
             g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
             g.Clear(Color.White);
 
-            Typography.OpenFont.Typeface typeface = _currentTextPrinter.Typeface;
-            Typography.OpenFont.TypefaceExtension2.UpdateAllCffGlyphBounds(typeface);
-
+            Typeface typeface = _currentTextPrinter.Typeface;
+            typeface.UpdateAllCffGlyphBounds();
 
             float pxscale = typeface.CalculateScaleToPixelFromPointSize(_currentTextPrinter.FontSizeInPoints);
             int lineSpacing = (int)System.Math.Ceiling((double)typeface.CalculateLineSpacing(LineSpacingChoice.TypoMetric) * pxscale);
