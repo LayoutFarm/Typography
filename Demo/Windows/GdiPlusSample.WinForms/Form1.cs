@@ -195,7 +195,7 @@ namespace SampleWinForms
             g.Clear(Color.White);
 
             Typography.OpenFont.Typeface typeface = _currentTextPrinter.Typeface;
-            Typography.OpenFont.TypefaceExtension2.UpdateAllCffGlyphBounds(typeface);
+            Typography.OpenFont.Extensions.TypefaceExtensions.UpdateAllCffGlyphBounds(typeface);
 
 
             float pxscale = typeface.CalculateScaleToPixelFromPointSize(_currentTextPrinter.FontSizeInPoints);

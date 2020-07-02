@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 
 using Typography.OpenFont;
+using Typography.OpenFont.Extensions;
 using Typography.OpenFont.MathGlyphs;
 using LayoutFarm.MathLayout;
 
