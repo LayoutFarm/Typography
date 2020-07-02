@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using PixelFarm.Drawing;
 using PixelFarm.Platforms;
 using Typography.OpenFont;
+using Typography.OpenFont.Extensions;
 
 namespace PixelFarm.CpuBlit.BitmapAtlas
 {
@@ -62,7 +63,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             s_default = defaultDetails;
         }
 
-        public static GlyphTextureBuildDetail[] TryGetGlyphTextureBuildDetail(in ResolvedFont2 font, bool forAnySize = true, bool forAnyStyle = true)
+        public static GlyphTextureBuildDetail[] TryGetGlyphTextureBuildDetail(ResolvedFont font, bool forAnySize = true, bool forAnyStyle = true)
         {
 
             if (s_registerDetails == null)
@@ -168,15 +169,15 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             }
 
 
-            return InternalGetFontAtlas(new ResolvedFont2(_textServices.ResolveFont(font)), out outputBitmap);
+            return InternalGetFontAtlas(_textServices.ResolveFont(font), out outputBitmap);
         }
-        public SimpleBitmapAtlas GetFontAtlas(ResolvedFont font, out B outputBitmap) => GetFontAtlas(new ResolvedFont2(font), out outputBitmap);
+
         /// <summary>
         /// get from cache or create a new one
         /// </summary>
         /// <param name="reqFont"></param>
         /// <returns></returns>
-        public SimpleBitmapAtlas GetFontAtlas(in ResolvedFont2 font, out B outputBitmap)
+        public SimpleBitmapAtlas GetFontAtlas(ResolvedFont font, out B outputBitmap)
         {
 
 #if DEBUG
@@ -201,7 +202,8 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
 
             return InternalGetFontAtlas(font, out outputBitmap);
         }
-        SimpleBitmapAtlas InternalGetFontAtlas(in ResolvedFont2 font, out B outputBitmap)
+
+        SimpleBitmapAtlas InternalGetFontAtlas(ResolvedFont font, out B outputBitmap)
         {
             //--------------------------------
             //check from pre-built cache (if availiable)     

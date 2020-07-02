@@ -5,6 +5,7 @@ using PixelFarm.CpuBlit.BitmapAtlas;
 
 using Typography.Contours;
 using Typography.OpenFont;
+using Typography.OpenFont.Extensions;
 using Typography.OpenFont.Tables;
 using Typography.TextLayout;
 using Typography.TextBreak;
@@ -121,7 +122,7 @@ namespace PixelFarm.Drawing
 
     public delegate void SvgBmpBuilderFunc(SvgBmpBuilderReq req);
 
-   
+
 
     public class VxsTextPrinter : TextPrinterBase, ITextPrinter
     {
@@ -718,8 +719,9 @@ namespace PixelFarm.Drawing
         }
 
 
-        TextPrinterWordVisitor _textPrinterWordVisitor = new TextPrinterWordVisitor();
-        TextPrinterLineSegmentList<TextPrinterLineSegment> _lineSegs = new TextPrinterLineSegmentList<TextPrinterLineSegment>();
+        readonly TextPrinterWordVisitor _textPrinterWordVisitor = new TextPrinterWordVisitor();
+        readonly TextPrinterLineSegmentList<TextPrinterLineSegment> _lineSegs = new TextPrinterLineSegmentList<TextPrinterLineSegment>();
+        readonly Dictionary<int, ResolvedFont> _localResolvedFonts = new Dictionary<int, ResolvedFont>();
 
         void InnerDrawString(char[] textBuffer, int startAt, int len, float x, float y)
         {
@@ -754,9 +756,6 @@ namespace PixelFarm.Drawing
                 _textPrinterWordVisitor.SetLineSegmentList(_lineSegs);
                 _textServices.BreakToLineSegments(buffSpan, _textPrinterWordVisitor);//***
                 _textPrinterWordVisitor.SetLineSegmentList(null);
-
-
-
 
                 ClearTempFormattedGlyphPlanSeq();
 
@@ -833,8 +832,15 @@ namespace PixelFarm.Drawing
 
                     FormattedGlyphPlanSeq formattedGlyphPlanSeq = _pool.GetFreeFmtGlyphPlanSeqs();
 
-                    //TODO: other style?... (bold, italic)                     
-                    formattedGlyphPlanSeq.SetData(seq, curTypeface, FontSizeInPoints, FontStyle.Regular);
+                    //TODO: other style?... (bold, italic)  
+
+                    int fontkey = RequestFont.CalculateFontKey(curTypeface.Name, FontSizeInPoints, FontStyle.Regular);
+                    if (!_localResolvedFonts.TryGetValue(fontkey, out ResolvedFont foundResolvedFont))
+                    {
+                        foundResolvedFont = new ResolvedFont(curTypeface, FontSizeInPoints, FontStyle.Regular, fontkey);
+                    }
+
+                    formattedGlyphPlanSeq.SetData(seq, foundResolvedFont);
                     _tmpGlyphPlanSeqs.Add(formattedGlyphPlanSeq);
 
                     curTypeface = defaultTypeface;//switch back to default
@@ -849,10 +855,9 @@ namespace PixelFarm.Drawing
                     {
                         FormattedGlyphPlanSeq formattedGlyphPlanSeq = _tmpGlyphPlanSeqs[i];
 
-                        Typeface = formattedGlyphPlanSeq.Typeface;
+                        Typeface = formattedGlyphPlanSeq.ResolvedFont.Typeface;
 
                         DrawFromGlyphPlans(formattedGlyphPlanSeq.Seq, xpos, y);
-
 
                         //xpos += (glyphPlanSeq.CalculateWidth() * _currentFontSizePxScale);
                         xpos += LatestAccumulateWidth;
@@ -865,7 +870,7 @@ namespace PixelFarm.Drawing
                         FormattedGlyphPlanSeq formattedGlyphPlanSeq = _tmpGlyphPlanSeqs[i];
 
                         //change typeface                            
-                        Typeface = formattedGlyphPlanSeq.Typeface;
+                        Typeface = formattedGlyphPlanSeq.ResolvedFont.Typeface;
                         //update pxscale size                             
                         _currentFontSizePxScale = Typeface.CalculateScaleToPixelFromPointSize(FontSizeInPoints);
 
@@ -912,10 +917,7 @@ namespace PixelFarm.Drawing
 
         public GlyphPlanSequence Seq { get; private set; } = GlyphPlanSequence.Empty;
 
-
-        public Typeface Typeface { get; private set; }
-        public float SizeInPoints { get; private set; }
-        public FontStyle FontStyle { get; private set; }
+        public ResolvedFont ResolvedFont { get; private set; }
 
         /// <summary>
         /// whitespace count at the end of this seq
@@ -928,20 +930,16 @@ namespace PixelFarm.Drawing
 
         public bool ColorGlyphOnTransparentBG { get; set; }
 
-        public void SetData(GlyphPlanSequence seq, Typeface typeface, float sizeInPoints, FontStyle style)
+        public void SetData(GlyphPlanSequence seq, ResolvedFont resolvedFont)
         {
-            this.Seq = seq;
-            this.Typeface = typeface;
-            this.SizeInPoints = sizeInPoints;
-            this.FontStyle = style;
+            Seq = seq;
+            ResolvedFont = resolvedFont;
         }
         public bool IsEmpty() => Seq.IsEmpty();
         public void Reset()
         {
             Seq = s_EmptyGlypgPlanSeq;
-            Typeface = null;
-            FontStyle = FontStyle.Regular;
-            SizeInPoints = 0;
+            ResolvedFont = null;
         }
 
 

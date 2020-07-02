@@ -302,7 +302,7 @@ namespace PixelFarm.Drawing
             if (otherChoice != null)
             {
                 //this come from other choice
-                resolvedFont = new ResolvedFont(typeface, otherChoice.SizeInPoints, otherChoice.Style, otherChoice.FontKey);
+                resolvedFont = new ResolvedFont(typeface, otherChoice.SizeInPoints, otherChoice.Style, otherChoice.GetFontKey());
             }
             else
             {

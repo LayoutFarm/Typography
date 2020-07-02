@@ -18,19 +18,23 @@ namespace PixelFarm.Drawing
 
 
     //---------
-    public struct TextPrinterLineSegment : ILineSegment
+    public readonly struct TextPrinterLineSegment : ILineSegment
     {
         public TextPrinterLineSegment(int startAt, int len, WordKind wordKind, SpanBreakInfo breakInfo)
         {
-            StartAt = startAt;
-            Length = (ushort)len; //***
+            _startAt = startAt;
+            _len = (ushort)len; //***
             WordKind = wordKind;
             BreakInfo = breakInfo;
         }
-        public int StartAt { get; }
-        public ushort Length { get; }
-        public WordKind WordKind { get; }
-        public SpanBreakInfo BreakInfo { get; }
+
+        readonly int _startAt;
+        readonly ushort _len;
+
+        public readonly int StartAt => _startAt;
+        public readonly ushort Length => _len;
+        public readonly WordKind WordKind;
+        public readonly SpanBreakInfo BreakInfo;
 #if DEBUG
         public override string ToString()
         {

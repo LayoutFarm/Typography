@@ -1,36 +1,11 @@
 ﻿//Apache2, 2014-present, WinterDev
 using System;
-using System.Collections.Generic;
-
 using Typography.OpenFont;
 using Typography.OpenFont.Extensions;
- 
+
+
 namespace PixelFarm.Drawing
 {
-    public struct ResolvedFont2
-    {
-        public Typeface Typeface { get; }
-        public float SizeInPoints { get; }
-        public FontStyle Style { get; }
-        public int FontKey { get; }
-        public string Name => Typeface.Name;
-
-        public ResolvedFont2(Typeface typeface, float sizeInPoints, FontStyle style, int fontKey)
-        {
-            Typeface = typeface;
-            SizeInPoints = sizeInPoints;
-            FontKey = fontKey;
-            Style = style;
-        }
-
-        public ResolvedFont2(ResolvedFont resolvedFont)
-        {
-            Typeface = resolvedFont.Typeface;
-            SizeInPoints = resolvedFont.SizeInPoints;
-            FontKey = resolvedFont.FontKey;
-            Style = resolvedFont.FontStyle;
-        }
-    }
 
     public class ResolvedFont
     {
@@ -47,8 +22,8 @@ namespace PixelFarm.Drawing
             FontStyle = fontStyle;
             FontKey = fontKey;
             Typeface = typeface;
-        }
 
+        }
         public Typeface Typeface { get; }
 
         public float WhitespaceWidthF
