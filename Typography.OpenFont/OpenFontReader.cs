@@ -4,6 +4,7 @@
 using System;
 using System.IO;
 
+using Typography.OpenFont.Extensions;
 using Typography.OpenFont.IO;
 using Typography.OpenFont.Tables;
 using Typography.OpenFont.Trimmable;
@@ -123,12 +124,7 @@ namespace Typography.OpenFont
 
     public class OpenFontReader
     {
-#if DEBUG
-        public OpenFontReader()
-        {
 
-        }
-#endif
         class FontCollectionHeader
         {
             public ushort majorVersion;
@@ -171,42 +167,40 @@ namespace Typography.OpenFont
         public PreviewFontInfo ReadPreview(Stream stream)
         {
             //var little = BitConverter.IsLittleEndian;
-            using (var input = new ByteOrderSwappingBinaryReader(stream))
-            {
-                ushort majorVersion = input.ReadUInt16();
-                ushort minorVersion = input.ReadUInt16();
+            using var input = new ByteOrderSwappingBinaryReader(stream);
+            ushort majorVersion = input.ReadUInt16();
+            ushort minorVersion = input.ReadUInt16();
 
-                if (KnownFontFiles.IsTtcf(majorVersion, minorVersion))
+            if (KnownFontFiles.IsTtcf(majorVersion, minorVersion))
+            {
+                //this font stream is 'The Font Collection'
+                FontCollectionHeader ttcHeader = ReadTTCHeader(input);
+                PreviewFontInfo[] members = new PreviewFontInfo[ttcHeader.numFonts];
+                for (uint i = 0; i < ttcHeader.numFonts; ++i)
                 {
-                    //this font stream is 'The Font Collection'
-                    FontCollectionHeader ttcHeader = ReadTTCHeader(input);
-                    PreviewFontInfo[] members = new PreviewFontInfo[ttcHeader.numFonts];
-                    for (uint i = 0; i < ttcHeader.numFonts; ++i)
-                    {
-                        input.BaseStream.Seek(ttcHeader.offsetTables[i], SeekOrigin.Begin);
-                        PreviewFontInfo member = members[i] = ReadActualFontPreview(input, false);
-                        member.ActualStreamOffset = ttcHeader.offsetTables[i];
-                    }
-                    return new PreviewFontInfo(BuildTtcfName(members), members);
+                    input.BaseStream.Seek(ttcHeader.offsetTables[i], SeekOrigin.Begin);
+                    PreviewFontInfo member = members[i] = ReadActualFontPreview(input, false);
+                    member.ActualStreamOffset = ttcHeader.offsetTables[i];
                 }
-                else if (KnownFontFiles.IsWoff(majorVersion, minorVersion))
-                {
-                    //check if we enable woff or not
-                    WebFont.WoffReader woffReader = new WebFont.WoffReader();
-                    input.BaseStream.Position = 0;
-                    return woffReader.ReadPreview(input);
-                }
-                else if (KnownFontFiles.IsWoff2(majorVersion, minorVersion))
-                {
-                    //check if we enable woff2 or not
-                    WebFont.Woff2Reader woffReader = new WebFont.Woff2Reader();
-                    input.BaseStream.Position = 0;
-                    return woffReader.ReadPreview(input);
-                }
-                else
-                {
-                    return ReadActualFontPreview(input, true);//skip version data (majorVersion, minorVersion)
-                }
+                return new PreviewFontInfo(BuildTtcfName(members), members);
+            }
+            else if (KnownFontFiles.IsWoff(majorVersion, minorVersion))
+            {
+                //check if we enable woff or not
+                WebFont.WoffReader woffReader = new WebFont.WoffReader();
+                input.BaseStream.Position = 0;
+                return woffReader.ReadPreview(input);
+            }
+            else if (KnownFontFiles.IsWoff2(majorVersion, minorVersion))
+            {
+                //check if we enable woff2 or not
+                WebFont.Woff2Reader woffReader = new WebFont.Woff2Reader();
+                input.BaseStream.Position = 0;
+                return woffReader.ReadPreview(input);
+            }
+            else
+            {
+                return ReadActualFontPreview(input, true);//skip version data (majorVersion, minorVersion)
             }
         }
         FontCollectionHeader ReadTTCHeader(ByteOrderSwappingBinaryReader input)
@@ -414,10 +408,11 @@ namespace Typography.OpenFont
 
             GSUB gsub = rd.Read(new GSUB() { OnlyScriptList = true });
             GPOS gpos = rd.Read(new GPOS() { OnlyScriptList = true });
+            Cmap cmap = rd.Read(new Cmap());
             //gsub and gpos contains actual script_list that are in the typeface
 
             Languages langs = new Languages();
-            langs.Update(os2Table, metaTable, gsub, gpos);
+            langs.Update(os2Table, metaTable, cmap, gsub, gpos);
 
             return new PreviewFontInfo(
               nameEntry.FontName,
@@ -685,9 +680,8 @@ namespace Typography.OpenFont
                 typeface.UpdateAllCffGlyphBounds();
             }
 #endif
-
-
             typeface.UpdateLangs(meta);
+            typeface.UpdateFrequentlyUsedValues();
             return true;
         }
 
@@ -699,9 +693,6 @@ namespace Typography.OpenFont
                 input.ReadUInt32(),
                 input.ReadUInt32());
         }
-
-
-
     }
 
 }

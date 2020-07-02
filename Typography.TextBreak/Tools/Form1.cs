@@ -127,7 +127,7 @@ namespace Tools
         }
         class UnicodeRangeInfo
         {
-            public string BitPlane { get; set; }
+            public int BitPlane { get; set; }
             public string LangName { get; set; }
             public string StartCodePoint { get; set; }
             public string EndCodePoint { get; set; }
@@ -149,6 +149,11 @@ namespace Tools
         private void button3_Click(object sender, EventArgs e)
         {
 
+
+            //    public static readonly UnicodeLangRange
+            //        Basic_Latin = _(0, 0x007F, nameof(Basic_Latin)),
+
+
             //https://docs.microsoft.com/en-us/typography/opentype/spec/os2#ulunicoderange1-bits-031ulunicoderange2-bits-3263ulunicoderange3-bits-6495ulunicoderange4-bits-96127
 
             string[] allLines = File.ReadAllLines("opentype_unicode5.1_ranges.txt");
@@ -166,12 +171,44 @@ namespace Tools
                 string[] codePointRanges = ParseCodePointRanges(fields[2].Trim());
                 _unicode5_1Ranges.Add(new UnicodeRangeInfo
                 {
-                    BitPlane = fields[0].Trim(),
+                    BitPlane = int.Parse(fields[0].Trim()),
                     LangName = fields[1].Trim(),
                     StartCodePoint = codePointRanges[0],
                     EndCodePoint = codePointRanges[1]
                 });
             }
+
+            Dictionary<int, List<UnicodeRangeInfo>> bitpos_group_dic = new Dictionary<int, List<UnicodeRangeInfo>>();
+
+            foreach (UnicodeRangeInfo range_info in _unicode5_1Ranges)
+            {
+                if (!bitpos_group_dic.TryGetValue(range_info.BitPlane, out List<UnicodeRangeInfo> list))
+                {
+                    list = new List<UnicodeRangeInfo>();
+                    bitpos_group_dic.Add(range_info.BitPlane, list);
+                }
+                list.Add(range_info);
+            }
+
+            {
+                StringBuilder sb = new StringBuilder();
+                int index = 0;
+                foreach (List<UnicodeRangeInfo> bitpos_group in bitpos_group_dic.Values)
+                {
+                    sb.Append("_2(" + index);
+                    foreach (UnicodeRangeInfo rangeInfo in bitpos_group)
+                    {
+                        string field_name = GetProperFieldName(rangeInfo.LangName);
+                        sb.Append(",");
+                        sb.Append(field_name);
+                    }
+                    sb.AppendLine("),");
+
+                    index++;
+                }
+                File.WriteAllText("bitpos_group_dic.gen.txt", sb.ToString());
+            }
+
 
             //generate unicode langs bits
             //generate cs code for this
@@ -181,7 +218,7 @@ namespace Tools
                 {
                     string field_name = GetProperFieldName(unicodeRangeInfo.LangName);
 
-                    sb.AppendLine(field_name + "= (" + unicodeRangeInfo.BitPlane + "L<<32) | (0x" + unicodeRangeInfo.StartCodePoint + " << 16)|0x" + unicodeRangeInfo.EndCodePoint + ",");
+                    sb.AppendLine(field_name + "= _(0x" + unicodeRangeInfo.StartCodePoint + ",0x" + unicodeRangeInfo.EndCodePoint + ",nameof(" + field_name + ")),");
                 }
                 File.WriteAllText("unicode5.1.gen.txt", sb.ToString());
             }
@@ -191,7 +228,7 @@ namespace Tools
                 foreach (UnicodeRangeInfo unicodeRangeInfo in _unicode5_1Ranges)
                 {
                     string field_name = GetProperFieldName(unicodeRangeInfo.LangName);
-                    sb.AppendLine("UnicodeLangBits." + field_name + ", ");
+                    sb.AppendLine(field_name + ", ");
                 }
                 File.WriteAllText("unicode5.1.enum.gen.txt", sb.ToString());
             }
