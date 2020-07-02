@@ -196,6 +196,14 @@ namespace Typography.FontManagement
 
             PostScriptName = previewFontInfo.PostScriptName;
             UniqueFontIden = previewFontInfo.UniqueFontIden;
+
+#if DEBUG
+            if (string.IsNullOrEmpty(UniqueFontIden))
+            {
+
+            }
+#endif
+
             Languages = previewFontInfo.Languages;
             TypefaceStyle = style;
 
