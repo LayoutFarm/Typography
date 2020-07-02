@@ -13,23 +13,19 @@ using Typography.TextBreak;
 namespace PixelFarm.Drawing
 {
 
-
-
-
-    public class OpenFontTextService : ITextService
+    public partial class OpenFontTextService : ITextService
     {
         /// <summary>
         /// instance of Typography lib's text service
         /// </summary>
-        TextServices _txtServices;
-        Dictionary<int, Typeface> _resolvedTypefaceCache = new Dictionary<int, Typeface>(); //similar to TypefaceStore
-        readonly int _system_id;
+        readonly TextServices _txtServices;
+        readonly Dictionary<int, ResolvedFont> _resolvedTypefaceCache = new Dictionary<int, ResolvedFont>(); //similar to TypefaceStore
+
         //
         public static ScriptLang DefaultScriptLang { get; set; }
 
         public OpenFontTextService()
         {
-            _system_id = PixelFarm.Drawing.Internal.RequestFontCacheAccess.GetNewCacheSystemId();
 
             //set up typography text service
             _txtServices = new TextServices();
@@ -111,32 +107,19 @@ namespace PixelFarm.Drawing
             return false;
         }
 
-
-        public PixelFarm.Drawing.SvgBmpBuilderFunc SvgBmpBuilder { get; set; }
-
-        public bool TryGetAlternativeTypefaceFromChar(char c, AlternativeTypefaceSelector selector, out Typeface found)
+        /// <summary>
+        /// get alternative typeface from a given unicode codepoint
+        /// </summary>
+        /// <param name="codepoint"></param>
+        /// <param name="selector"></param>
+        /// <param name="found"></param>
+        /// <returns></returns>
+        public bool TryGetAlternativeTypefaceFromCodepoint(int codepoint, AlternativeTypefaceSelector selector, out Typeface found)
         {
-            //find a typeface that supported input char c
-            if (_txtServices.InstalledFontCollection.TryGetAlternativeTypefaceFromChar(c,
-                out ScriptLangInfo scriptLangInfo,
-                out List<InstalledTypeface> installedTypefaceList))
+            if (_txtServices.InstalledFontCollection.TryGetAlternativeTypefaceFromCodepoint(codepoint, selector, out InstalledTypeface foundInstalledTypeface))
             {
-                //select a prefer font
-                if (selector != null)
-                {
-                    InstalledTypeface selected = selector.Select(installedTypefaceList, scriptLangInfo, c);
-                    if (selected != null)
-                    {
-                        found = _txtServices.GetTypeface(selected.FontName, TypefaceStyle.Regular);
-                        return true;
-                    }
-                }
-                else
-                {
-                    InstalledTypeface selected = installedTypefaceList[0];//default
-                    found = _txtServices.GetTypeface(selected.FontName, TypefaceStyle.Regular);
-                    return true;
-                }
+                found = _txtServices.GetTypeface(foundInstalledTypeface.FontName, TypefaceStyle.Regular);
+                return true;
             }
             found = null;
             return false;
@@ -148,9 +131,9 @@ namespace PixelFarm.Drawing
             set => _txtServices.CurrentScriptLang = value;
         }
 
+        readonly TextPrinterWordVisitor _wordVisitor = new TextPrinterWordVisitor();
+        readonly TextPrinterLineSegmentList<TextPrinterLineSegment> _lineSegmentList = new TextPrinterLineSegmentList<TextPrinterLineSegment>();
 
-        readonly MyWordVisitor _wordVisitor = new MyWordVisitor(); //for internal use only
-        readonly MyLineSegmentList _lineSegmentList = new MyLineSegmentList();
         public void CalculateUserCharGlyphAdvancePos(in TextBufferSpan textBufferSpan, RequestFont font, ref TextSpanMeasureResult measureResult)
         {
 
@@ -180,9 +163,9 @@ namespace PixelFarm.Drawing
             //from font
             //resolve for typeface
             //  
-            Typeface typeface = ResolveTypeface(font);
+            Typeface typeface = ResolveFont(font).Typeface;
             _txtServices.SetCurrentFont(typeface, font.SizeInPoints);
-           
+
             float scale = typeface.CalculateScaleToPixelFromPointSize(font.SizeInPoints);
 
             int j = lineSegs.Count;
@@ -259,64 +242,88 @@ namespace PixelFarm.Drawing
             _reusableTextBuffer.SetRawCharBuffer(null);
         }
 
-        public float CalculateScaleToPixelsFromPoint(RequestFont font)
+        public float CalculateScaleToPixelsFromPoint(RequestFont font) => (ResolveFont(font) is ResolvedFont resolvedFont) ? resolvedFont.GetScaleToPixelFromPointInSize() : 0;
+
+        public ResolvedFont ResolveFont(RequestFont font)
         {
-            return ResolveTypeface(font).CalculateScaleToPixelFromPointSize(font.SizeInPoints);
-        }
-        public Typeface ResolveTypeface(RequestFont font)
-        {
-            //from user's request font
-            //resolve to actual Typeface
-            //get data from... 
             //cache level-1 (attached inside the request font)
-            Typeface typeface = PixelFarm.Drawing.Internal.RequestFontCacheAccess.GetActualFont<Typeface>(font, _system_id);
-            if (typeface != null) return typeface;
-            //
-            //cache level-2 (stored in this Ifonts)
-            if (!_resolvedTypefaceCache.TryGetValue(font.FontKey, out typeface))
+            ResolvedFont resolvedFont = RequestFont.GetResolvedFont1<ResolvedFont>(font);
+            if (resolvedFont != null) return resolvedFont;
+
+            //cache level-2 (stored in this openfont service)
+            if (_resolvedTypefaceCache.TryGetValue(font.FontKey, out resolvedFont))
             {
-                //not found ask the typeface store to load that font
-                //....
-                typeface = _txtServices.GetTypeface(font.Name, PixelFarm.Drawing.FontStyleExtensions.ConvToInstalledFontStyle(font.Style));
+                if (resolvedFont.Typeface == null)
+                {
+                    //this is 'not found' resovled font
+                    //so don't return it
+                    return null;
+                }
+                //----
+                //cache to level-1
+                RequestFont.SetResolvedFont1(font, resolvedFont);
+                return resolvedFont;
+            }
+            //-----
+            //when not found
+            //find it
+            RequestFont.OtherChoice otherChoice = null;
+            Typeface typeface;
+            if ((typeface = _txtServices.GetTypeface(font.Name, PixelFarm.Drawing.FontStyleExtensions.ConvToInstalledFontStyle(font.Style))) == null)
+            {
+                //not found!
+                //select other font?
+                int otherChoiceCount;
+                if ((otherChoiceCount = font.OtherChoicesCount) > 0)
+                {
+                    for (int i = 0; i < otherChoiceCount; ++i)
+                    {
+                        otherChoice = font.GetOtherChoice(i);
+                        if ((typeface = _txtServices.GetTypeface(otherChoice.Name, PixelFarm.Drawing.FontStyleExtensions.ConvToInstalledFontStyle(otherChoice.Style))) != null)
+                        {
+                            break;
+                        }
+                    }
+                }
+                //still not found
                 if (typeface == null)
                 {
-                    throw new NotSupportedException(font.Name);
+                    //register this font key => not found
+                    _resolvedTypefaceCache.Add(font.FontKey, ResolvedFont.s_empty);
+                    return null;
                 }
-                //
-                //cache here (level-1)
-                _resolvedTypefaceCache.Add(font.FontKey, typeface);
             }
-            //and cache into level-0
 
-            float pxSize = Typeface.ConvPointsToPixels(font.SizeInPoints);
-            float pxscale = typeface.CalculateScaleToPixelFromPointSize(font.SizeInPoints);
+            //-----------
+            //Here, we found some typeface for the request,
+            //it may come from primary or other choice
 
-            float recommedLineSpacingInPx = typeface.CalculateRecommendLineSpacing() * pxscale;
-            float descentInPx = typeface.Descender * pxscale;
-            float ascentInPx = typeface.Ascender * pxscale;
-            float lineGapInPx = typeface.LineGap * pxscale;
 
-            PixelFarm.Drawing.Internal.RequestFontCacheAccess.SetActualFont(font, _system_id, typeface);
-            PixelFarm.Drawing.Internal.RequestFontCacheAccess.SetGeneralFontMetricInfo(font,
-                pxSize,
-                ascentInPx,
-                descentInPx,
-                lineGapInPx,
-                recommedLineSpacingInPx);
-
-            var span = new TextBufferSpan(new char[] { ' ' });
-            Size whiteSpaceW = MeasureString(span, font);
-            PixelFarm.Drawing.Internal.RequestFontCacheAccess.SetWhitespaceWidth(font, _system_id, whiteSpaceW.Width);
-            return typeface;
+            if (otherChoice != null)
+            {
+                //this come from other choice
+                resolvedFont = new ResolvedFont(typeface, otherChoice.SizeInPoints, otherChoice.Style, otherChoice.GetFontKey());
+            }
+            else
+            {
+                resolvedFont = new ResolvedFont(typeface, font.SizeInPoints, font.Style, font.FontKey);
+            }
+            //cache to level2
+            _resolvedTypefaceCache.Add(resolvedFont.FontKey, resolvedFont);
+            //cache to level 1
+            RequestFont.SetResolvedFont1(font, resolvedFont);
+            return resolvedFont;
         }
+
         public float MeasureWhitespace(RequestFont f)
         {
-            ResolveTypeface(f);
-            return PixelFarm.Drawing.Internal.RequestFontCacheAccess.GetWhitespaceWidth(f, _system_id);
+            ResolvedFont resolvedFont = this.ResolveFont(f);
+            if (resolvedFont != null)
+            {
+                return resolvedFont.WhitespaceWidthF;
+            }
+            return 0;
         }
-
-
-
         public GlyphPlanSequence CreateGlyphPlanSeq(in TextBufferSpan textBufferSpan, Typeface typeface, float sizeInPts)
         {
             _txtServices.SetCurrentFont(typeface, sizeInPts);
@@ -327,124 +334,51 @@ namespace PixelFarm.Drawing
         }
         public GlyphPlanSequence CreateGlyphPlanSeq(in TextBufferSpan textBufferSpan, RequestFont font)
         {
-            return CreateGlyphPlanSeq(textBufferSpan, ResolveTypeface(font), font.SizeInPoints);
+            return CreateGlyphPlanSeq(textBufferSpan, ResolveFont(font).Typeface, font.SizeInPoints);
+        }
+        public GlyphPlanSequence CreateGlyphPlanSeq(in TextBufferSpan textBufferSpan, ResolvedFont font)
+        {
+            return CreateGlyphPlanSeq(textBufferSpan, font.Typeface, font.SizeInPoints);
         }
         public Size MeasureString(in TextBufferSpan textBufferSpan, RequestFont font)
         {
-            Typeface typeface = ResolveTypeface(font);
+            //TODO: review here
+            Typeface typeface = ResolveFont(font).Typeface;
+            _txtServices.SetCurrentFont(typeface, font.SizeInPoints);
+            _txtServices.MeasureString(textBufferSpan.GetRawCharBuffer(), textBufferSpan.start, textBufferSpan.len, out int w, out int h);
+            return new Size(w, h);
+        }
+        public Size MeasureString(in TextBufferSpan textBufferSpan, ResolvedFont font)
+        {
+            //TODO: review here
+            Typeface typeface = ((ResolvedFont)font).Typeface;
             _txtServices.SetCurrentFont(typeface, font.SizeInPoints);
             _txtServices.MeasureString(textBufferSpan.GetRawCharBuffer(), textBufferSpan.start, textBufferSpan.len, out int w, out int h);
             return new Size(w, h);
         }
         public void MeasureString(in TextBufferSpan textBufferSpan, RequestFont font, int limitWidth, out int charFit, out int charFitWidth)
         {
-            Typeface typeface = ResolveTypeface(font);
+            Typeface typeface = ResolveFont(font).Typeface;
             _txtServices.SetCurrentFont(typeface, font.SizeInPoints);
-
-            charFit = 0;
             _txtServices.MeasureString(textBufferSpan.GetRawCharBuffer(), textBufferSpan.start, textBufferSpan.len, limitWidth, out charFit, out charFitWidth);
 
         }
         float ITextService.MeasureBlankLineHeight(RequestFont font)
         {
-            Typeface typeface = ResolveTypeface(font);
-
-            return (int)(Math.Round(typeface.CalculateMaxLineClipHeight() *
-                                    typeface.CalculateScaleToPixelFromPointSize(font.SizeInPoints)));
+            ResolvedFont resolvedFont = ResolveFont(font);
+            return resolvedFont.LineSpacingInPixels;
         }
         //
         public bool SupportsWordBreak => true;
-        //
-        struct MyLineSegment : ILineSegment
-        {
-            readonly int _startAt;
-            readonly ushort _len;
-            public readonly SpanBreakInfo breakInfo;
-            public MyLineSegment(int startAt, int len, SpanBreakInfo breakInfo)
-            {
-                _startAt = startAt;
-                _len = (ushort)len; //***
-
-#if DEBUG
-                if (breakInfo == null)
-                {
-
-                }
-#endif
-                this.breakInfo = breakInfo;
-
-
-            }
-            public int StartAt => _startAt;
-            public ushort Length => _len;
-
-            public object SpanBreakInfo => breakInfo;
-#if DEBUG
-            public override string ToString()
-            {
-                return _startAt + ":" + _len + (breakInfo.RightToLeft ? "(rtl)" : "");
-            }
-#endif
-        }
-
-        class MyLineSegmentList : ILineSegmentList
-        {
-            List<ILineSegment> _segments = new List<ILineSegment>();
-            public MyLineSegmentList()
-            {
-            }
-            public void AddLineSegment(ILineSegment lineSegment)
-            {
-                _segments.Add(lineSegment);
-            }
-            public void Clear()
-            {
-                _segments.Clear();
-            }
-            //
-            public ILineSegment this[int index] => _segments[index];
-            //
-            public int Count => _segments.Count;
-            //
-            public ILineSegment GetSegment(int index) => _segments[index];
-            //
-#if DEBUG
-            public int dbugStartAt;
-            public int dbugLen;
-#endif
-
-
-        }
-
-        class MyWordVisitor : WordVisitor
-        {
-            //internal use only
-            MyLineSegmentList _lineSegs;
-            public void SetLineSegmentList(MyLineSegmentList lineSegs)
-            {
-                _lineSegs = lineSegs;
-            }
-            protected override void OnBreak()
-            {
-                _lineSegs.AddLineSegment(new MyLineSegment(this.LatestSpanStartAt, this.LatestSpanLen, this.SpanBreakInfo));
-            }
-        }
-
 
         public void BreakToLineSegments(in TextBufferSpan textBufferSpan, WordVisitor wordVisitor)
         {
-
-            //a text buffer span is separated into multiple line segment list 
-            char[] str = textBufferSpan.GetRawCharBuffer();
-#if DEBUG
-            if (str.Length > 10)
-            {
-
-            }
-            int cur_startAt = textBufferSpan.start;
-#endif
-
-            _txtServices.BreakToLineSegments(str, textBufferSpan.start, textBufferSpan.len, wordVisitor);
+            //a text buffer span is separated into multiple line segment list  
+            _txtServices.BreakToLineSegments(
+                textBufferSpan.GetRawCharBuffer(),
+                textBufferSpan.start,
+                textBufferSpan.len,
+                wordVisitor);
         }
         //-----------------------------------
         static OpenFontTextService()

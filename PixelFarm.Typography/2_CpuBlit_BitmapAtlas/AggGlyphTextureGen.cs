@@ -163,7 +163,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                 glyphImage.TextureXOffset = (short)dx;
                 glyphImage.TextureYOffset = (short)dy;
 
-                glyphImage.SetImageBuffer(MemBitmapExtensions.CopyImgBuffer(painter.RenderSurface.DestBitmap, w, h), false);
+                glyphImage.SetImageBuffer(MemBitmapExt.CopyImgBuffer(painter.RenderSurface.DestBitmap, w, h), false);
                 //copy data from agg canvas to glyph image 
                 return glyphImage;
             }
