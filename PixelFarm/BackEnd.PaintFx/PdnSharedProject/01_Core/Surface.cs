@@ -132,7 +132,7 @@ namespace PaintFx
         /// This is a convenience function that returns Rectangle(0, 0, Width, Height).
         /// This property will never throw an ObjectDisposedException.
         /// </remarks>
-        public Rectangle Bounds =>new Rectangle(0, 0, Width, Height);
+        public Rectangle Bounds => new Rectangle(0, 0, Width, Height);
 
         ///// <summary>
         ///// Creates a new instance of the Surface class.

@@ -61,7 +61,6 @@ namespace PixelFarm.Drawing
             /// </summary>
             public string Name { get; }
             public FontStyle Style { get; }
-            public int FontKey { get; }
             public float SizeInPoints { get; }
 
             public OtherChoice(string facename, float fontSizeInPts, FontStyle style = FontStyle.Regular)
@@ -73,13 +72,13 @@ namespace PixelFarm.Drawing
                 Name = facename; //primary typeface name
                 Size = fontSize; //store user font size here 
                 Style = style;
-                FontKey = CalculateFontKey(facename, SizeInPoints = fontSize.ToPoints(), style);
             }
 
+            int _fontKey;
+            public int GetFontKey() => (_fontKey != 0) ? _fontKey : (_fontKey = CalculateFontKey(Name, SizeInPoints, Style));
         }
 
 
-        public int FontKey { get; }
         public Len Size { get; }
         public string Name { get; }
         public FontStyle Style { get; }
@@ -98,22 +97,35 @@ namespace PixelFarm.Drawing
         {
             Name = facename; //primary typeface name
             Size = fontSize; //store user font size here 
+            SizeInPoints = fontSize.ToPoints();
             Style = style;
-            FontKey = CalculateFontKey(facename, SizeInPoints = fontSize.ToPoints(), style);
-
             _otherChoices = otherChoices;
+
         }
 
         public int OtherChoicesCount => (_otherChoices != null) ? _otherChoices.Length : 0;
         public OtherChoice GetOtherChoice(int index) => _otherChoices[index];
 
+        public static int CalculateTypefaceKey(string typefaceName) => InternalFontKey.RegisterFontName(typefaceName);
 
         public static int CalculateFontKey(string typefaceName, float fontSizeInPts, FontStyle style)
         {
-            return (new InternalFontKey(typefaceName, fontSizeInPts, style)).GetHashCode();
+            return InternalFontKey.CalculateGetHasCode(
+                InternalFontKey.RegisterFontName(typefaceName),
+                fontSizeInPts.GetHashCode(),
+                style.GetHashCode());
+        }
+        public static int CalculateFontKey(int typefaceFontKey, float fontSizeInPts, FontStyle style)
+        {
+            return InternalFontKey.CalculateGetHasCode(
+                typefaceFontKey,
+                fontSizeInPts.GetHashCode(),
+                style.GetHashCode());
         }
 
 
+        int _fontKey;
+        public int FontKey => (_fontKey != 0) ? _fontKey : (_fontKey = CalculateFontKey(Name, SizeInPoints, Style));
 
         //------------------ 
         //caching ...
@@ -150,30 +162,19 @@ namespace PixelFarm.Drawing
     }
 
 
-    struct InternalFontKey
+    static class InternalFontKey
     {
 
-        public readonly int FontNameIndex;
-        public readonly float FontSize;
-        public readonly FontStyle FontStyle;
-
-        public InternalFontKey(string typefaceName, float fontSize, FontStyle fs)
-        {
-            //font name/ not filename
-            this.FontNameIndex = RegisterFontName(typefaceName.ToLower());
-            this.FontSize = fontSize;
-            this.FontStyle = fs;
-        }
-
-        static Dictionary<string, int> s_registerFontNames = new Dictionary<string, int>();
+        //only typeface name
+        static readonly Dictionary<string, int> s_registerFontNames = new Dictionary<string, int>();
 
         static InternalFontKey()
         {
             RegisterFontName(""); //blank font name
         }
-        static int RegisterFontName(string fontName)
+        public static int RegisterFontName(string fontName)
         {
-            fontName = fontName.ToUpper();
+            fontName = fontName.ToUpper();//***
             if (!s_registerFontNames.TryGetValue(fontName, out int found))
             {
                 int nameCrc32 = TinyCRC32Calculator.CalculateCrc32(fontName);
@@ -182,17 +183,13 @@ namespace PixelFarm.Drawing
             }
             return found;
         }
-        public override int GetHashCode()
-        {
-            return CalculateGetHasCode(this.FontNameIndex, this.FontSize, (int)this.FontStyle);
-        }
-        static int CalculateGetHasCode(int nameIndex, float fontSize, int fontstyle)
+        public static int CalculateGetHasCode(int typefaceKey, float fontSize, int fontstyle)
         {
             //modified from https://stackoverflow.com/questions/1646807/quick-and-simple-hash-code-combinations
             unchecked
             {
                 int hash = 17;
-                hash = hash * 31 + nameIndex.GetHashCode();
+                hash = hash * 31 + typefaceKey.GetHashCode();
                 hash = hash * 31 + fontSize.GetHashCode();
                 hash = hash * 31 + fontstyle.GetHashCode();
                 return hash;
@@ -200,7 +197,7 @@ namespace PixelFarm.Drawing
         }
     }
 
-    public struct TextBufferSpan
+    public readonly struct TextBufferSpan
     {
         public readonly int start;
         public readonly int len;

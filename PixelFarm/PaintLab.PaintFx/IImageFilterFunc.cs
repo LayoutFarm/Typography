@@ -27,7 +27,7 @@ using System;
 namespace PixelFarm.CpuBlit.Imaging
 {
 
-    public struct ImageFilterBilinear : IImageFilterFunc
+    public readonly struct ImageFilterBilinear : IImageFilterFunc
     {
         public double GetRadius() => 1.0;
         public double CalculateWeight(double x)
@@ -49,7 +49,7 @@ namespace PixelFarm.CpuBlit.Imaging
     }
 
     //-----------------------------------------------image_filter_hanning
-    public struct ImageFilterHanning : IImageFilterFunc
+    public readonly struct ImageFilterHanning : IImageFilterFunc
     {
         public double GetRadius() => 1.0;
         public double CalculateWeight(double x)
@@ -59,7 +59,7 @@ namespace PixelFarm.CpuBlit.Imaging
     }
 
     //-----------------------------------------------image_filter_hamming
-    public struct ImageFilterHamming : IImageFilterFunc
+    public readonly struct ImageFilterHamming : IImageFilterFunc
     {
         public double GetRadius() => 1.0;
         public double CalculateWeight(double x)
@@ -68,7 +68,7 @@ namespace PixelFarm.CpuBlit.Imaging
         }
     }
     //-----------------------------------------------image_filter_hermite
-    public struct ImageFilterHermite : IImageFilterFunc
+    public readonly struct ImageFilterHermite : IImageFilterFunc
     {
         public double GetRadius() => 1.0;
         public double CalculateWeight(double x)
@@ -77,7 +77,7 @@ namespace PixelFarm.CpuBlit.Imaging
         }
     }
     //------------------------------------------------image_filter_quadric
-    public struct ImageFilterQuadric : IImageFilterFunc
+    public readonly struct ImageFilterQuadric : IImageFilterFunc
     {
         public double GetRadius() => 1.5;
         public double CalculateWeight(double x)
@@ -89,7 +89,7 @@ namespace PixelFarm.CpuBlit.Imaging
         }
     }
     //------------------------------------------------image_filter_bicubic
-    public struct ImageFilterBicubic : IImageFilterFunc
+    public readonly struct ImageFilterBicubic : IImageFilterFunc
     {
         public double GetRadius() => 2.0;
         static double pow3(double x) => (x <= 0.0) ? 0.0 : x * x * x;
@@ -101,11 +101,11 @@ namespace PixelFarm.CpuBlit.Imaging
         }
     }
     //-------------------------------------------------image_filter_kaiser
-    public struct ImageFilterKaiser : IImageFilterFunc
+    public readonly struct ImageFilterKaiser : IImageFilterFunc
     {
-        double _a;
-        double _i0a;
-        double _epsilon;
+        readonly double _a;
+        readonly double _i0a;
+        readonly double _epsilon;
 
         public ImageFilterKaiser(double b = 6.33)
         {
@@ -138,7 +138,7 @@ namespace PixelFarm.CpuBlit.Imaging
         }
     }
     //----------------------------------------------image_filter_catrom
-    public struct ImageFilterCatrom : IImageFilterFunc
+    public readonly struct ImageFilterCatrom : IImageFilterFunc
     {
         public double GetRadius() => 2.0;
         public double CalculateWeight(double x)
@@ -149,10 +149,10 @@ namespace PixelFarm.CpuBlit.Imaging
         }
     }
     //---------------------------------------------image_filter_mitchell
-    public struct ImageFilterMichell : IImageFilterFunc
+    public readonly struct ImageFilterMichell : IImageFilterFunc
     {
-        double _p0, _p2, _p3;
-        double _q0, _q1, _q2, q3;
+        readonly double _p0, _p2, _p3;
+        readonly double _q0, _q1, _q2, q3;
         public ImageFilterMichell(double b = 1.0 / 3.0, double c = 1.0 / 3)
         {
             _p0 = ((6.0 - 2.0 * b) / 6.0);
@@ -173,7 +173,7 @@ namespace PixelFarm.CpuBlit.Imaging
         }
     }
     //----------------------------------------------image_filter_spline16
-    public struct ImageFilterSpline16 : IImageFilterFunc
+    public readonly struct ImageFilterSpline16 : IImageFilterFunc
     {
         public double GetRadius() => 2.0;
         public double CalculateWeight(double x)
@@ -186,7 +186,7 @@ namespace PixelFarm.CpuBlit.Imaging
         }
     }
     //---------------------------------------------image_filter_spline36
-    public struct ImageFilterSpline36 : IImageFilterFunc
+    public readonly struct ImageFilterSpline36 : IImageFilterFunc
     {
         public double GetRadius() => 3.0;
         public double CalculateWeight(double x)
@@ -203,7 +203,7 @@ namespace PixelFarm.CpuBlit.Imaging
         }
     }
     //----------------------------------------------image_filter_gaussian
-    public struct ImageFilterGaussian : IImageFilterFunc
+    public readonly struct ImageFilterGaussian : IImageFilterFunc
     {
         public double GetRadius() => 2.0;
         public double CalculateWeight(double x)
@@ -212,7 +212,7 @@ namespace PixelFarm.CpuBlit.Imaging
         }
     }
     //------------------------------------------------image_filter_bessel
-    public struct ImageFilterBessel : IImageFilterFunc
+    public readonly struct ImageFilterBessel : IImageFilterFunc
     {
         public double GetRadius() => 3.2383;
         public double CalculateWeight(double x)
@@ -221,9 +221,9 @@ namespace PixelFarm.CpuBlit.Imaging
         }
     }
     //-------------------------------------------------image_filter_sinc
-    public struct ImageFilterSinc : IImageFilterFunc
+    public readonly struct ImageFilterSinc : IImageFilterFunc
     {
-        double _radius;
+        readonly double _radius;
         public ImageFilterSinc(double r)
         {
             _radius = (r < 2.0 ? 2.0 : r);
@@ -238,9 +238,9 @@ namespace PixelFarm.CpuBlit.Imaging
 
     }
     //-----------------------------------------------image_filter_lanczos
-    public struct ImageFilterLanczos : IImageFilterFunc
+    public readonly struct ImageFilterLanczos : IImageFilterFunc
     {
-        double _radius;
+        readonly double _radius;
         public ImageFilterLanczos(double r)
         {
             _radius = (r < 2.0 ? 2.0 : r);
@@ -257,9 +257,9 @@ namespace PixelFarm.CpuBlit.Imaging
 
     }
     //----------------------------------------------image_filter_blackman
-    public struct ImageFilterBlackMan : IImageFilterFunc
+    public readonly struct ImageFilterBlackMan : IImageFilterFunc
     {
-        double _radius;
+        readonly double _radius;
         public ImageFilterBlackMan(double r)
         {
             _radius = (r < 2.0 ? 2.0 : r);

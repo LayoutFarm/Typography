@@ -16,7 +16,7 @@ namespace LayoutFarm.Css
     /// <remarks>
     /// http://www.w3.org/TR/CSS21/syndata.html#length-units
     /// </remarks>
-    public struct CssLength
+    public readonly struct CssLength
     {
         //has 2 instance fields
         //================================     

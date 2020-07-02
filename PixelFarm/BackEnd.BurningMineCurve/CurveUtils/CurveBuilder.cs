@@ -196,21 +196,21 @@ namespace burningmime.curves
         // We provide these for both convience and performance, since a call to List<T>.GetEnumerator() doesn't actually allocate if
         // the type is never boxed
         public List<CubicBezier>.Enumerator GetEnumerator() => _result.GetEnumerator();
-        IEnumerator<CubicBezier> IEnumerable<CubicBezier>.GetEnumerator() => GetEnumerator(); 
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator(); 
+        IEnumerator<CubicBezier> IEnumerable<CubicBezier>.GetEnumerator() => GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         /// <summary>
         /// The current curves in the builder.
         /// </summary>
-        public ReadOnlyCollection<CubicBezier> Curves => _resultView; 
+        public ReadOnlyCollection<CubicBezier> Curves => _resultView;
 
         /// <summary>
         /// Changes made to the CurveBuilder.curves list after a call to <see cref="CurveBuilder.AddPoint"/>.
         /// This seems like a prime candidate for an F#-style discriminated union/algebraic data type.
         /// </summary>
-        public struct AddPointResult
+        public readonly struct AddPointResult
         {
-            private readonly int _data; // packed value... need this so that default(AddPointResult) which is always 0 to represent no change
+            readonly int _data; // packed value... need this so that default(AddPointResult) which is always 0 to represent no change
             /// <summary>
             /// No changes were made.
             /// </summary>

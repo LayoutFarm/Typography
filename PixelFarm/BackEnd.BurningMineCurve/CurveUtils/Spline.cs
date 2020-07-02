@@ -266,7 +266,7 @@ namespace burningmime.curves
         /// <summary>
         /// Point at which to sample the spline.
         /// </summary>
-        public struct SamplePos
+        public readonly struct SamplePos
         {
             /// <summary>
             /// Index of sampled curve in the spline curves array.

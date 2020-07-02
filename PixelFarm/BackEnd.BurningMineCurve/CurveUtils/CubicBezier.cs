@@ -43,7 +43,7 @@ namespace burningmime.curves
     /// <summary>
     /// Cubic Bezier curve in 2D consisting of 4 control points.
     /// </summary>
-    public struct CubicBezier : IEquatable<CubicBezier>
+    public readonly struct CubicBezier : IEquatable<CubicBezier>
     {
         // Control points
         public readonly VECTOR p0;

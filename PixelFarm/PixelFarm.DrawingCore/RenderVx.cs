@@ -3,21 +3,18 @@
 using System;
 namespace PixelFarm.Drawing
 {
-    
+
     public abstract class RenderVx : IDisposable
     {
         public virtual void Dispose() { }
     }
 
-
-
     public abstract class RenderVxFormattedString : RenderVx
-    {        
+    {
         public short DescendingInPx { get; set; }
         public float Width { get; set; }
         public float SpanHeight { get; set; }
-        public VxState State { get; set; }
-        
+        public VxState State { get; set; } 
         public enum VxState : byte
         {
             NoStrip,

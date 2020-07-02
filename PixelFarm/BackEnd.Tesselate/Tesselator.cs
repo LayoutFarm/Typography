@@ -45,7 +45,7 @@
 using System;
 namespace Tesselate
 {
-    public struct TessVertex2d
+    public readonly struct TessVertex2d
     {
         public readonly double x;
         public readonly double y;
@@ -73,7 +73,7 @@ namespace Tesselate
 
 
         public struct CombineParameters
-        {
+        {//mutable-struct//
             public int d0, d1, d2, d3;
             public double w0, w1, w2, w3;
         }
@@ -893,7 +893,7 @@ namespace Tesselate
         /************************ Quick-and-dirty decomposition ******************/
 
         const int SIGN_INCONSISTENT = 2;
-        int ComputeNormal(ref double nx, ref double ny, ref double nz)       
+        int ComputeNormal(ref double nx, ref double ny, ref double nz)
         {
 
             /*

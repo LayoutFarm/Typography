@@ -38,9 +38,6 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         CoordTransformerKind Kind { get; }
         bool IsIdentity { get; }
     }
-
-
-
     public enum CoordTransformerKind
     {
         Unknown,

@@ -27,9 +27,9 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
         CoordAndColor _coord_0;
         CoordAndColor _coord_1;
         CoordAndColor _coord_2;
-        double[] _x = new double[8];
-        double[] _y = new double[8];
-        VertexCmd[] _cmd = new VertexCmd[8];
+        readonly double[] _x = new double[8];
+        readonly double[] _y = new double[8];
+        readonly VertexCmd[] _cmd = new VertexCmd[8];
 
         public struct CoordAndColor
         {
