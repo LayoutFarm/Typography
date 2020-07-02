@@ -496,8 +496,15 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                         aggTextureGen.TextureKind = TextureKind.Bitmap;
                         //test this with TwitterEmoji
                         //generate membitmap from svg
+#if DEBUG
+                        System.Diagnostics.Stopwatch sw1 = new System.Diagnostics.Stopwatch();
+                        sw1.Start();
+#endif
+
                         for (int i = 0; i < j; ++i)
                         {
+                            //TODO: add mutli-threads / async version
+
                             ushort gindex = glyphIndices[i];
                             GlyphBitmap glyphBmp = GetGlyphBitmapFromSvg(typeface, sizeInPoint, gindex);
                             if (glyphBmp == null)
@@ -526,6 +533,12 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                                 glyphBmp.Bitmap = null;
                             }
                         }
+
+#if DEBUG
+                        sw1.Stop();
+                        long ms = sw1.ElapsedMilliseconds;
+#endif
+
 
                     }
                     return; //NO go below //***

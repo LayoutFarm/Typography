@@ -308,9 +308,12 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                 //    totalGlyphsImg.Width, totalGlyphsImg.Height,
                 //    "total_" + reqFont.Name + "_" + reqFont.SizeInPoints + ".png");
                 ////save image to cache                 
-                //totalGlyphsImg.SaveImage(fontTextureImgFilename);
+
 #endif
 
+                //same 
+                //TODO: cache the generate bitmap???
+                totalGlyphsImg.SaveImage(fontTextureImgFilename);
 
                 //6. cache this in the memory,
                 _createdAtlases.Add(fontKey, fontAtlas);
