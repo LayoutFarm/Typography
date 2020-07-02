@@ -4,6 +4,7 @@ using System.IO;
 using System.Windows.Forms;
 
 using Typography.OpenFont;
+using Typography.OpenFont.Extensions;
 using Typography.OpenFont.Trimmable;
 
 namespace SampleWinForms

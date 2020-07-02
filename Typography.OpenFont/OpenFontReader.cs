@@ -202,6 +202,7 @@ namespace Typography.OpenFont
             {
                 return ReadActualFontPreview(input, true);//skip version data (majorVersion, minorVersion)
             }
+
         }
         FontCollectionHeader ReadTTCHeader(ByteOrderSwappingBinaryReader input)
         {

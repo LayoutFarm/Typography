@@ -1,12 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <DefineConstants>TRACE;NETSTANDARD1_6;NETSTANDARD1_6;NETSTANDARD1_3</DefineConstants>
+    <DefineConstants>TRACE;NETSTANDARD1_6;NETSTANDARD1_6;NETSTANDARD2_0</DefineConstants>
   </PropertyGroup>
 
   <Import Project="..\..\..\Typography.OpenFont\Typography.OpenFont.projitems" Label="Shared" />

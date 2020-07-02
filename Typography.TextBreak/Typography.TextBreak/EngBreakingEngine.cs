@@ -491,54 +491,79 @@ namespace Typography.TextBreak
                         break;
                     case LexState.CollectSurrogatePair:
                         {
-
-                            if (i < endBefore - 1 && //not the last one
-                               char.IsLowSurrogate(input[i + 1]))
+                            if (i == endBefore - 1)
                             {
-                                //surrogate pair 
-                                //clear accum state
-                                if (i > bb.startIndex)
-                                {
-                                    //some remaining data
-                                    bb.length = i - bb.startIndex;
-                                    //
-                                    OnBreak(visitor, bb);
-                                }
-                                //-------------------------------
-                                //surrogate pair
+                                //can't check next char
+                                //error 
 
-                                if (SurrogatePairBreakingOption == SurrogatePairBreakingOption.OnlySurrogatePair)
-                                {
-                                    bb.startIndex = i;
-                                    bb.length = 2;
-                                    bb.kind = WordKind.SurrogatePair;
-                                    OnBreak(visitor, bb);
-                                    i++;//consume next***
-                                    bb.startIndex += 2;//reset 
-                                }
-                                else
-                                {
-                                    //see https://github.com/LayoutFarm/Typography/issues/18#issuecomment-345480185
-                                    int begin = i + 2;
-                                    CollectConsecutiveSurrogatePairs(input, ref begin, endBefore - begin, SurrogatePairBreakingOption == SurrogatePairBreakingOption.ConsecutiveSurrogatePairsAndJoiner);
+                                bb.length = 1;
+                                bb.kind = WordKind.Unknown; //error 
+                                OnBreak(visitor, bb);
 
-                                    bb.startIndex = i;
-                                    bb.length = begin - i;
-                                    bb.kind = WordKind.SurrogatePair;
-                                    OnBreak(visitor, bb);
-                                    i += bb.length - 1;//consume 
-                                    bb.startIndex += bb.length;//reset 
-                                }
                                 bb.length = 0; //reset
+                                bb.startIndex++;
+
                                 lexState = LexState.Init;
                                 continue; //***
                             }
                             else
                             {
-                                //error
-                                throw new System.FormatException($"A high surrogate (U+{((ushort)c).ToString("X4")}) was not followed by a low surrogate.");
+                                if (!char.IsLowSurrogate(input[i + 1]))
+                                {
+                                    //the next one this not low surrogate
+                                    //so this is error too
+                                    bb.length = 1;
+                                    bb.kind = WordKind.Unknown; //error 
+                                    OnBreak(visitor, bb);
+
+                                    bb.length = 0; //reset
+                                    bb.startIndex++;
+                                    lexState = LexState.Init;
+                                    continue; //***
+                                }
+                                else
+                                {
+                                    //surrogate pair 
+                                    //clear accum state
+                                    if (i > bb.startIndex)
+                                    {
+                                        //some remaining data
+                                        bb.length = i - bb.startIndex;
+                                        //
+                                        OnBreak(visitor, bb);
+                                    }
+                                    //-------------------------------
+                                    //surrogate pair
+
+                                    if (SurrogatePairBreakingOption == SurrogatePairBreakingOption.OnlySurrogatePair)
+                                    {
+                                        bb.startIndex = i;
+                                        bb.length = 2;
+                                        bb.kind = WordKind.SurrogatePair;
+                                        OnBreak(visitor, bb);
+                                        i++;//consume next***
+                                        bb.startIndex += 2;//reset 
+                                    }
+                                    else
+                                    {
+                                        //see https://github.com/LayoutFarm/Typography/issues/18#issuecomment-345480185
+                                        int begin = i + 2;
+                                        CollectConsecutiveSurrogatePairs(input, ref begin, endBefore - begin, SurrogatePairBreakingOption == SurrogatePairBreakingOption.ConsecutiveSurrogatePairsAndJoiner);
+
+                                        bb.startIndex = i;
+                                        bb.length = begin - i;
+                                        bb.kind = WordKind.SurrogatePair;
+                                        OnBreak(visitor, bb);
+                                        i += bb.length - 1;//consume 
+                                        bb.startIndex += bb.length;//reset 
+                                    }
+                                    bb.length = 0; //reset
+                                    lexState = LexState.Init;
+                                    continue; //***
+                                }
                             }
                         }
+                        break;
                     case LexState.CollectConsecutiveUnicode:
                         {
                             int begin = i;
