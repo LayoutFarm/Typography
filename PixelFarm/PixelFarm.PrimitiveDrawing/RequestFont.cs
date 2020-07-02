@@ -31,6 +31,7 @@ using System;
 using System.Collections.Generic;
 namespace PixelFarm.Drawing
 {
+
     [Flags]
     public enum FontStyle : byte
     {
@@ -118,10 +119,10 @@ namespace PixelFarm.Drawing
         //caching ...
 
         //preserve 2 field user cache their actual here
-        internal ResolvedFontBase _resolvedFont1;
+        internal object _resolvedFont1;
         internal object _resolvedFont2;
 
-        public static void SetResolvedFont1(RequestFont reqFont, ResolvedFontBase resolvedFont)
+        public static void SetResolvedFont1(RequestFont reqFont, object resolvedFont)
         {
             reqFont._resolvedFont1 = resolvedFont;
         }
@@ -130,7 +131,7 @@ namespace PixelFarm.Drawing
             reqFont._resolvedFont2 = resolvedFont;
         }
         public static T GetResolvedFont1<T>(RequestFont reqFont)
-           where T : ResolvedFontBase
+            where T : class
         {
             return reqFont._resolvedFont1 as T;
         }
@@ -139,7 +140,7 @@ namespace PixelFarm.Drawing
         {
             return reqFont._resolvedFont2 as T;
         }
-       
+
 #if DEBUG
         public override string ToString()
         {
@@ -199,38 +200,55 @@ namespace PixelFarm.Drawing
         }
     }
 
-    public abstract class ResolvedFontBase
+    public struct TextBufferSpan
     {
-        public float SizeInPoints { get; protected set; }
-        public FontStyle FontStyle { get; protected set; }
-        public int FontKey { get; protected set; }
-        public float ScaleToPixel { get; protected set; }
+        public readonly int start;
+        public readonly int len;
 
-        public float WhitespaceWidthF { get; protected set; }
-        public int WhitespaceWidth { get; protected set; }
+        readonly char[] _rawString;
 
-        public float AscentInPixels { get; protected set; }
-        public float DescentInPixels { get; protected set; }
-        public int LineSpacingInPixels { get; protected set; }
-        public float LineGapInPx { get; protected set; }
-
-
-        public ResolvedFontBase(string name, float sizeInPoints, FontStyle fontStyle, int fontKey)
+        public TextBufferSpan(char[] rawCharBuffer)
         {
-            Name = name;
-            SizeInPoints = sizeInPoints;
-            FontStyle = fontStyle;
-            FontKey = fontKey;
+            _rawString = rawCharBuffer;
+            this.len = rawCharBuffer.Length;
+            this.start = 0;
         }
-        public ResolvedFontBase(string name, float sizeInPoints, FontStyle fontStyle)
+        public TextBufferSpan(char[] rawCharBuffer, int start, int len)
         {
-            SizeInPoints = sizeInPoints;
-            FontStyle = fontStyle;
-            Name = name;
-            FontKey = (new InternalFontKey(name ?? "", sizeInPoints, fontStyle)).GetHashCode();
+            this.start = start;
+            this.len = len;
+            _rawString = rawCharBuffer;
         }
-        public string Name { get; }
+
+        public override string ToString()
+        {
+            return start + ":" + len;
+        }
+
+
+        public char[] GetRawCharBuffer() => _rawString;
     }
 
- 
+    public struct TextSpanMeasureResult
+    {
+        public int[] outputXAdvances;
+        public int outputTotalW;
+        public ushort lineHeight;
+
+        public bool hasSomeExtraOffsetY;
+        public short minOffsetY;
+        public short maxOffsetY;
+    }
+
+
+    public interface ITextService
+    {
+        float MeasureWhitespace(RequestFont f);
+        float MeasureBlankLineHeight(RequestFont f);
+
+        Size MeasureString(in TextBufferSpan textBufferSpan, RequestFont font);
+        void MeasureString(in TextBufferSpan textBufferSpan, RequestFont font, int maxWidth, out int charFit, out int charFitWidth);
+    }
 }
+
+

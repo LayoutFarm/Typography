@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using PixelFarm.Drawing;
 using PixelFarm.Platforms;
 using Typography.OpenFont;
+using Typography.OpenFont.Extensions;
 
 namespace PixelFarm.CpuBlit.BitmapAtlas
 {
@@ -166,6 +167,8 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                 outputBitmap = _loadAtlases.GetOrCreateNewOne(msdfTexture);
                 return msdfTexture;
             }
+
+
             return InternalGetFontAtlas(_textServices.ResolveFont(font), out outputBitmap);
         }
 
@@ -199,6 +202,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
 
             return InternalGetFontAtlas(font, out outputBitmap);
         }
+
         SimpleBitmapAtlas InternalGetFontAtlas(ResolvedFont font, out B outputBitmap)
         {
             //--------------------------------
@@ -304,9 +308,12 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                 //    totalGlyphsImg.Width, totalGlyphsImg.Height,
                 //    "total_" + reqFont.Name + "_" + reqFont.SizeInPoints + ".png");
                 ////save image to cache                 
-                //totalGlyphsImg.SaveImage(fontTextureImgFilename);
+
 #endif
 
+                //same 
+                //TODO: cache the generate bitmap???
+                totalGlyphsImg.SaveImage(fontTextureImgFilename);
 
                 //6. cache this in the memory,
                 _createdAtlases.Add(fontKey, fontAtlas);
@@ -340,7 +347,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             return fontAtlas;
 
         }
-        
+
         static PixelFarm.CpuBlit.MemBitmap ReadGlyphImages(System.IO.Stream stream)
         {
             return PixelFarm.CpuBlit.MemBitmapExt.LoadBitmap(stream);

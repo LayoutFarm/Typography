@@ -158,7 +158,7 @@ namespace Typography.OpenFont.Tables.BitmapFonts
 
 
 
-    struct IndexSubTableArray
+    readonly struct IndexSubTableArray
     {
         public readonly ushort firstGlyphIndex;
         public readonly ushort lastGlyphIndex;
@@ -177,7 +177,7 @@ namespace Typography.OpenFont.Tables.BitmapFonts
 #endif
     }
 
-    struct IndexSubHeader
+    readonly struct IndexSubHeader
     {
         public readonly ushort indexFormat;
         public readonly ushort imageFormat;
@@ -458,7 +458,7 @@ namespace Typography.OpenFont.Tables.BitmapFonts
     //uint16    glyphID     Glyph ID of glyph present.
     //Offset16  offset      Location in EBDT.
 
-    struct GlyphIdOffsetPair
+    readonly struct GlyphIdOffsetPair
     {
         public readonly ushort glyphId;
         public readonly ushort offset;

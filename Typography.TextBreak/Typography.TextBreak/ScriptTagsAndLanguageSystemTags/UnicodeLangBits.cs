@@ -23,10 +23,10 @@ namespace Typography.OpenFont
         public override string ToString() => Name;
     }
 
-    public struct BitposAndAssciatedUnicodeRanges
+    public readonly struct BitposAndAssciatedUnicodeRanges
     {
-        public int Bitpos { get; }
-        public UnicodeLangRange[] Ranges { get; }
+        public readonly int Bitpos;
+        public readonly UnicodeLangRange[] Ranges;
         public BitposAndAssciatedUnicodeRanges(int bitpos, UnicodeLangRange[] ranges)
         {
             Bitpos = bitpos;

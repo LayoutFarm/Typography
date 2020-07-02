@@ -82,6 +82,7 @@ namespace Typography.OpenFont.Trimmable
 namespace Typography.OpenFont
 {
     using Typography.OpenFont.Tables;
+    using Typography.OpenFont.Trimmable;
 
     //-------------------------
     //This is our extension***,
@@ -89,7 +90,6 @@ namespace Typography.OpenFont
     //-------------------------
     //user can reload a new clone of glyphs with fewer detail
     //or restore a new clone of glyphs with full detail 
-    using Typography.OpenFont.Trimmable;
 
     partial class Typeface
     {

@@ -56,6 +56,9 @@
     <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="1_General\LineSegmentsAndWordVisitors.cs" />
+    <Compile Include="1_General\OpenFontTextService_Part2.cs" />
+    <Compile Include="1_General\ResolvedFonts.cs" />
     <Compile Include="2_CpuBlit_BitmapAtlas\FontAtlasTextPrinter.cs" />
     <Compile Include="2_CpuBlit_BitmapAtlas\GlyphBitmapStore.cs" />
     <Compile Include="3_Typography_Contours\GlyphPathBuilder.cs" />

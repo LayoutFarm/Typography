@@ -15,12 +15,12 @@ namespace Typography.OpenFont.CFF
 
 
         float _scale = 1;//default 
-        Stack<Type2EvaluationStack> _evalStackPool = new Stack<Type2EvaluationStack>();
+        readonly Stack<Type2EvaluationStack> _evalStackPool = new Stack<Type2EvaluationStack>();
 
         class PxScaleGlyphTx : IGlyphTranslator
         {
-            float _scale;
-            IGlyphTranslator _tx;
+            readonly float _scale;
+            readonly IGlyphTranslator _tx;
 
             bool _is_contour_opened;
 
