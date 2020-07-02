@@ -30,8 +30,6 @@ public class BasicTests
 
         //
         customBreaker.BreakWords(input);
-
-
         //customBreaker.CopyBreakResults(outputList);
         for (int i = 0; i < outputList.Count - 1; i++)
         {
@@ -48,7 +46,7 @@ public class BasicTests
     [DataRow("Hi!", 0, new[] { "Hi", "!" })]
     [DataRow("We are #1", 0, new[] { "We", " ", "are", " ", "#", "1" })]
     [DataRow("1337 5P34K", 0, new[] { "1337", " ", "5", "P34K" })]
-    [DataRow("ščěěščž čšřžščřž čšřžščř", 0, new[] { "ščěěščž", " ", "čšřžščřž"," ", "čšřžščř" })]
+    [DataRow("ščěěščž čšřžščřž čšřžščř", 0, new[] { "ščěěščž", " ", "čšřžščřž", " ", "čšřžščř" })]
     [DataRow("!@#$%^&*()", 0, new[] { "!", "@", "#", "$", "%", "^", "&", "*", "(", ")" })]
     [DataRow("1st line\r2nd line\n3rd line\r\n4th line\u00855th line", 0,
         new[] { "1", "st", " ", "line", "\r", "2", "nd", " ", "line", "\n",
@@ -86,11 +84,46 @@ public class BasicTests
     [DataTestMethod]
     [DataRow("👩🏾‍👨🏾‍👧🏾‍👶🏾", 0, new[] { "👩🏾‍👨🏾‍👧🏾‍👶🏾" })]
     [DataRow("👩🏾‍👨🏾‍👧🏾‍👶🏾 👩🏾‍👨🏾‍👧🏾‍👶🏾", 0, new[] { "👩🏾‍👨🏾‍👧🏾‍👶🏾", " ", "👩🏾‍👨🏾‍👧🏾‍👶🏾" })]
-    [DataRow("a👩🏾‍👨🏾‍👧🏾‍👶🏾bc👩🏾‍👨🏾‍👧🏾‍👶🏾d", 0, new[] {"a", "👩🏾‍👨🏾‍👧🏾‍👶🏾", "bc", "👩🏾‍👨🏾‍👧🏾‍👶🏾","d" })]
+    [DataRow("a👩🏾‍👨🏾‍👧🏾‍👶🏾bc👩🏾‍👨🏾‍👧🏾‍👶🏾d", 0, new[] { "a", "👩🏾‍👨🏾‍👧🏾‍👶🏾", "bc", "👩🏾‍👨🏾‍👧🏾‍👶🏾", "d" })]
     public void ConsecutiveSurrogatePairsAndJoiner(string input, int _, string[] output)
     {
         BasicTest(input, output, new TestOptions { SurrogatePairBreakingOption = SurrogatePairBreakingOption.ConsecutiveSurrogatePairsAndJoiner });
     }
+
+    [DataTestMethod]
+    public void Surrogates_1()
+    {
+        string str = new string(new[] { '\ud83d', '\udc69', '\ud83c', '\udffe' });
+        string[] output = new[] { new string(new[] { '\ud83d', '\udc69', '\ud83c', '\udffe' }) };
+        BasicTest(str, output, new TestOptions { SurrogatePairBreakingOption = SurrogatePairBreakingOption.ConsecutiveSurrogatePairsAndJoiner });
+    }
+    [DataTestMethod]
+    public void Surrogates_Incorrect1_High_no_Low()
+    {
+        string str = new string(new[] { '\ud83d', '\udc69', '\ud83c' });
+        string[] output = new[] { new string(new[] { '\ud83d', '\udc69' }), new string(new char[] { '\ud83c' }) };
+        BasicTest(str, output, new TestOptions { SurrogatePairBreakingOption = SurrogatePairBreakingOption.ConsecutiveSurrogatePairsAndJoiner });
+
+    }
+    [DataTestMethod]
+    public void Surrogates_Incorrect2_High_no_Low_Mixed()
+    {
+        string str = new string(new[] { '\ud83d', '\udc69', '\ud83c', 'a' });
+        string[] output = new[] { new string(new[] { '\ud83d', '\udc69' }), new string(new char[] { '\ud83c' }), "a", };
+        BasicTest(str, output, new TestOptions { SurrogatePairBreakingOption = SurrogatePairBreakingOption.ConsecutiveSurrogatePairsAndJoiner });
+    }
+
+    [DataTestMethod]
+    public void Surrogates_Incorrect3_Low_no_High()
+    {
+        string str = new string(new[] { '\udc69', '\ud83c', '\udffe' });
+        string[] output = new[] { new string(new[] { '\udc69' }), new string(new char[] { '\ud83c', '\udffe' }) };
+        BasicTest(str, output, new TestOptions { SurrogatePairBreakingOption = SurrogatePairBreakingOption.ConsecutiveSurrogatePairsAndJoiner });
+    }
+
+
+
+
 
 
     [DataTestMethod]
