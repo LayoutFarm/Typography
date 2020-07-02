@@ -14,13 +14,14 @@ namespace Msdfgen
         {
             get
             {
+
                 switch (index)
                 {
                     case 0: return x0;
                     case 1: return x1;
                     case 2: return x2;
                     default: throw new NotSupportedException();
-                }
+                };
             }
         }
     }

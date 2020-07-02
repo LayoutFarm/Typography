@@ -75,7 +75,7 @@ namespace PixelFarm.Contours
         }
 
 #if DEBUG
-        struct dbugTmpPoint
+        readonly struct dbugTmpPoint
         {
             public readonly double x;
             public readonly double y;

@@ -71,15 +71,8 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
         /// <param name="uniqueUint16Name"></param>
         /// <param name="atlasItem"></param>
         /// <returns></returns>
-        public bool TryGetItem(ushort uniqueUint16Name, out AtlasItem atlasItem)
-        {
-            if (!_atlasItems.TryGetValue(uniqueUint16Name, out atlasItem))
-            {
-                atlasItem = null;
-                return false;
-            }
-            return true;
-        }
+        public bool TryGetItem(ushort uniqueUint16Name, out AtlasItem atlasItem) => _atlasItems.TryGetValue(uniqueUint16Name, out atlasItem);
+
         /// <summary>
         /// try get atlas item by unique name
         /// </summary>
@@ -106,7 +99,8 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             foreach (var kp in org._atlasItems)
             {
                 AtlasItem orgMapData = kp.Value;
-                cloneDic.Add(kp.Key, new AtlasItem(orgMapData.UniqueUint16Name) {
+                cloneDic.Add(kp.Key, new AtlasItem(orgMapData.UniqueUint16Name)
+                {
                     Left = orgMapData.Left + dx,
                     Top = orgMapData.Top + dy,
                     //

@@ -23,7 +23,7 @@ using PixelFarm.CpuBlit.PixelProcessing;
 using CO = PixelFarm.Drawing.Internal.CO;
 namespace PixelFarm.CpuBlit.Rasterization.Lines
 {
-    public struct PatternFilterBilnearColorRGBA : IPatternFilter
+    public readonly struct PatternFilterBilnearColorRGBA : IPatternFilter
     {
         public int Dilation => 1;
 

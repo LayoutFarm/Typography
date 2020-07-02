@@ -2,7 +2,7 @@
 
 namespace PixelFarm.Drawing
 {
-    public struct Point
+    public readonly struct Point
     {
         public readonly int X, Y;
         public Point(int x, int y)
@@ -46,10 +46,10 @@ namespace PixelFarm.Drawing
 
     }
 
-    public struct PointF
+    public readonly struct PointF
     {
-        public float X;
-        public float Y;
+        public readonly float X;
+        public readonly float Y;
 
         public PointF(float x, float y)
         {
@@ -76,7 +76,7 @@ namespace PixelFarm.Drawing
         public bool IsEmpty => X == 0 && Y == 0;
     }
 
-    public struct PointD
+    public readonly struct PointD
     {
         public readonly double X;
         public readonly double Y;

@@ -11,8 +11,7 @@ namespace PixelFarm.Drawing
 
         public abstract void Dispose();
         public abstract int Width { get; }
-        public abstract int Height { get; }
-        public Size Size => new Size(this.Width, this.Height);
+        public abstract int Height { get; } 
         public abstract bool IsReferenceImage { get; }
         
         public abstract int ReferenceX { get; }

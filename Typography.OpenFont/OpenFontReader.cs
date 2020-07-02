@@ -4,6 +4,7 @@
 using System;
 using System.IO;
 
+using Typography.OpenFont.Extensions;
 using Typography.OpenFont.IO;
 using Typography.OpenFont.Tables;
 using Typography.OpenFont.Trimmable;
@@ -123,12 +124,7 @@ namespace Typography.OpenFont
 
     public class OpenFontReader
     {
-#if DEBUG
-        public OpenFontReader()
-        {
 
-        }
-#endif
         class FontCollectionHeader
         {
             public ushort majorVersion;
@@ -208,6 +204,7 @@ namespace Typography.OpenFont
                     return ReadActualFontPreview(input, true);//skip version data (majorVersion, minorVersion)
                 }
             }
+
         }
         FontCollectionHeader ReadTTCHeader(ByteOrderSwappingBinaryReader input)
         {
@@ -414,10 +411,11 @@ namespace Typography.OpenFont
 
             GSUB gsub = rd.Read(new GSUB() { OnlyScriptList = true });
             GPOS gpos = rd.Read(new GPOS() { OnlyScriptList = true });
+            Cmap cmap = rd.Read(new Cmap());
             //gsub and gpos contains actual script_list that are in the typeface
 
             Languages langs = new Languages();
-            langs.Update(os2Table, metaTable, gsub, gpos);
+            langs.Update(os2Table, metaTable, cmap, gsub, gpos);
 
             return new PreviewFontInfo(
               nameEntry.FontName,
@@ -685,9 +683,8 @@ namespace Typography.OpenFont
                 typeface.UpdateAllCffGlyphBounds();
             }
 #endif
-
-
             typeface.UpdateLangs(meta);
+            typeface.UpdateFrequentlyUsedValues();
             return true;
         }
 
@@ -699,9 +696,6 @@ namespace Typography.OpenFont
                 input.ReadUInt32(),
                 input.ReadUInt32());
         }
-
-
-
     }
 
 }

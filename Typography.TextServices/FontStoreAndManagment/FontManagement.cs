@@ -9,11 +9,8 @@ namespace Typography.OpenFont
     public static class TypefaceExtension3
     {
 
-        internal static bool DoesSupportUnicode(Languages langs, UnicodeLangBits unicodeLangBits)
+        internal static bool DoesSupportUnicode(Languages langs, int bitpos)
         {
-            long bits = (long)unicodeLangBits;
-            int bitpos = (int)(bits >> 32);
-
             if (bitpos < 32)
             {
                 //use range 1
@@ -79,25 +76,30 @@ namespace Typography.OpenFont
                 }
             }
         }
+
+        /// <summary>
+        /// if the typeface support specific range or not
+        /// </summary>
+        /// <param name="previewFontInfo"></param>
+        /// <param name="range"></param>
+        /// <returns></returns>
         public static bool DoesSupportUnicode(
                this PreviewFontInfo previewFontInfo,
-               UnicodeLangBits unicodeLangBits)
+               BitposAndAssciatedUnicodeRanges bitposAndAssocUnicodeRange)
         {
-            return DoesSupportUnicode(previewFontInfo.Languages, unicodeLangBits);
+            return DoesSupportUnicode(previewFontInfo.Languages, bitposAndAssocUnicodeRange.Bitpos);
         }
-
-
         public static bool DoesSupportUnicode(
             this Typeface typeface,
-            UnicodeLangBits unicodeLangBits)
+            BitposAndAssciatedUnicodeRanges bitposAndAssocUnicodeRange)
         {
-            return DoesSupportUnicode(typeface.Languages, unicodeLangBits);
+            return DoesSupportUnicode(typeface.Languages, bitposAndAssocUnicodeRange.Bitpos);
         }
 
-        static UnicodeLangBits[] FilterOnlySelectedRange(UnicodeLangBits[] inputRanges, UnicodeLangBits[] userSpecificRanges)
+        static UnicodeLangRange[] FilterOnlySelectedRange(UnicodeLangRange[] inputRanges, UnicodeLangRange[] userSpecificRanges)
         {
-            List<UnicodeLangBits> selectedRanges = new List<UnicodeLangBits>();
-            foreach (UnicodeLangBits range in inputRanges)
+            List<UnicodeLangRange> selectedRanges = new List<UnicodeLangRange>();
+            foreach (UnicodeLangRange range in inputRanges)
             {
                 int foundAt = System.Array.IndexOf(userSpecificRanges, range);
                 if (foundAt > 0)
@@ -108,7 +110,7 @@ namespace Typography.OpenFont
             return selectedRanges.ToArray();
         }
 
-        public static void CollectAllAssociateGlyphIndex(this Typeface typeface, List<ushort> outputGlyphIndexList, ScriptLang scLang, UnicodeLangBits[] selectedRangs = null)
+        public static void CollectAllAssociateGlyphIndex(this Typeface typeface, List<ushort> outputGlyphIndexList, ScriptLang scLang, UnicodeLangRange[] selectedRangs = null)
         {
             //-----------
             //general glyph index in the unicode range
@@ -116,22 +118,19 @@ namespace Typography.OpenFont
             //if user dose not specific the unicode lanf bit ranges
             //the we try to select it ourself. 
 
-            if (ScriptLangs.TryGetUnicodeLangBitsArray(scLang.GetScriptTagString(), out UnicodeLangBits[] unicodeLangBitsRanges))
+            if (ScriptLangs.TryGetUnicodeLangRangesArray(scLang.GetScriptTagString(), out UnicodeLangRange[] unicodeLangRange))
             {
                 //one lang may contains may ranges
                 if (selectedRangs != null)
                 {
                     //select only in range 
-                    unicodeLangBitsRanges = FilterOnlySelectedRange(unicodeLangBitsRanges, selectedRangs);
+                    unicodeLangRange = FilterOnlySelectedRange(unicodeLangRange, selectedRangs);
                 }
 
-                foreach (UnicodeLangBits unicodeLangBits in unicodeLangBitsRanges)
+                foreach (UnicodeLangRange rng in unicodeLangRange)
                 {
-                    UnicodeRangeInfo rngInfo = unicodeLangBits.ToUnicodeRangeInfo();
-                    int endAt = rngInfo.EndAt;
-                    for (int codePoint = rngInfo.StartAt; codePoint <= endAt; ++codePoint)
+                    for (int codePoint = rng.StarAt; codePoint <= rng.EndAt; ++codePoint)
                     {
-
                         ushort glyphIndex = typeface.GetGlyphIndex(codePoint);
                         if (glyphIndex > 0)
                         {
@@ -154,12 +153,25 @@ namespace Typography.FontManagement
 
     public abstract class AlternativeTypefaceSelector
     {
+        //TODO: review here
+        public enum UnicodeHint
+        {
+            Unknown,
+            Emoji,
+            Math,
+        }
+        public class AddtionalHint
+        {
+            public UnicodeHint UnicodeHint { get; set; }
+            public UnicodeLangRange UnicodeLangRange { get; set; }
+        }
+
 #if DEBUG
         public AlternativeTypefaceSelector() { }
 #endif
 
         public Typeface LatestTypeface { get; set; }
-        public virtual InstalledTypeface Select(List<InstalledTypeface> choices, ScriptLangInfo scriptLangInfo, char hintChar)
+        public virtual InstalledTypeface Select(List<InstalledTypeface> choices, ScriptLangInfo scriptLangInfo, int codepoint, AddtionalHint additionalHint)
         {
             if (choices.Count > 0)
             {
@@ -171,6 +183,8 @@ namespace Typography.FontManagement
 
     public class InstalledTypeface
     {
+        readonly PreviewFontInfo _previewFontInfo;
+
         internal InstalledTypeface(PreviewFontInfo previewFontInfo, TypefaceStyle style, string fontPath)
         {
             FontName = previewFontInfo.Name;
@@ -182,8 +196,18 @@ namespace Typography.FontManagement
 
             PostScriptName = previewFontInfo.PostScriptName;
             UniqueFontIden = previewFontInfo.UniqueFontIden;
+
+#if DEBUG
+            if (string.IsNullOrEmpty(UniqueFontIden))
+            {
+
+            }
+#endif
+
             Languages = previewFontInfo.Languages;
             TypefaceStyle = style;
+
+            _previewFontInfo = previewFontInfo;
         }
 
         public string FontName { get; internal set; }
@@ -196,12 +220,18 @@ namespace Typography.FontManagement
         public TypefaceStyle TypefaceStyle { get; internal set; }
         public ushort Weight { get; internal set; }
         public Languages Languages { get; }
-
         public string FontPath { get; internal set; }
         public int ActualStreamOffset { get; internal set; }
 
         //TODO: UnicodeLangBits vs UnicodeLangBits5_1
-        public bool DoesSupportUnicode(UnicodeLangBits unicodeLangBits) => TypefaceExtension3.DoesSupportUnicode(Languages, unicodeLangBits);
+        public bool DoesSupportUnicode(BitposAndAssciatedUnicodeRanges bitposAndAssocUnicode) => TypefaceExtension3.DoesSupportUnicode(Languages, bitposAndAssocUnicode.Bitpos);
+        public bool DoesSupportUnicode(int bitpos) => TypefaceExtension3.DoesSupportUnicode(Languages, bitpos);
+
+        /// <summary>
+        /// check if this font has glyph for the given code point or not
+        /// </summary>
+        /// <returns></returns>
+        public bool ContainGlyphForUnicode(int codepoint) => _previewFontInfo.Languages.ContainGlyphForUnicode(codepoint);
 
 #if DEBUG
         public override string ToString()
@@ -745,53 +775,112 @@ namespace Typography.FontManagement
             }
         }
 
+        readonly Dictionary<UnicodeLangRange, List<InstalledTypeface>> _regisiterWithUnicodeRangeDic = new Dictionary<UnicodeLangRange, List<InstalledTypeface>>();
+        readonly List<InstalledTypeface> _emojiSupportedTypefaces = new List<InstalledTypeface>();
+        readonly List<InstalledTypeface> _mathTypefaces = new List<InstalledTypeface>();
+
+        //unicode 13:
+        //https://unicode.org/emoji/charts/full-emoji-list.html
+        //emoji start at U+1F600 	
+        const int UNICODE_EMOJI_START = 0x1F600; //"😁" //first emoji
+        const int UNICODE_EMOJI_END = 0x1F64F;
+
+        //https://www.unicode.org/charts/PDF/U1D400.pdf
+        const int UNICODE_MATH_ALPHANUM_EXAMPLE = 0x1D400; //1D400–1D7FF;
+
         public void UpdateUnicodeRanges()
         {
-            _registeredWithUniCodeLangBits.Clear();
+            _regisiterWithUnicodeRangeDic.Clear();
+            _emojiSupportedTypefaces.Clear();
+            _mathTypefaces.Clear();
+
             foreach (InstalledTypeface instFont in GetInstalledFontIter())
             {
-                foreach (UnicodeLangBits unicodeLangBit in instFont.GetSupportedUnicodeLangBitIter())
+                foreach (BitposAndAssciatedUnicodeRanges bitposAndAssocUnicodeRanges in instFont.GetSupportedUnicodeLangIter())
                 {
-
-                    RegisterUnicodeSupport(unicodeLangBit, instFont);
-                }
-            }
-        }
-        public bool TryGetAlternativeTypefaceFromChar(char c, out ScriptLangInfo foundScriptLang, out List<InstalledTypeface> found)
-        {
-            //find a typeface that supported input char c
-            //1. unicode to lang=> to script
-            //2. then find typeface the support it 
-
-            if (ScriptLangs.TryGetScriptLang(c, out foundScriptLang) && foundScriptLang.unicodeLangs != null)
-            {
-                foreach (UnicodeLangBits langBits in foundScriptLang.unicodeLangs)
-                {
-                    if (_registeredWithUniCodeLangBits.TryGetValue(langBits, out List<InstalledTypeface> typefaceList) && typefaceList.Count > 0)
+                    foreach (UnicodeLangRange range in bitposAndAssocUnicodeRanges.Ranges)
                     {
-                        //select a proper typeface                        
-                        found = typefaceList;
-                        return true;
+                        if (!_regisiterWithUnicodeRangeDic.TryGetValue(range, out List<InstalledTypeface> found))
+                        {
+                            found = new List<InstalledTypeface>();
+                            _regisiterWithUnicodeRangeDic.Add(range, found);
+                        }
+                        found.Add(instFont);
+
+                        if (range == UnicodeLangRanges.Non_Plane_0)
+                        {
+                            //special search
+                            if (instFont.ContainGlyphForUnicode(UNICODE_EMOJI_START))
+                            {
+                                _emojiSupportedTypefaces.Add(instFont);
+                            }
+                            if (instFont.ContainGlyphForUnicode(UNICODE_MATH_ALPHANUM_EXAMPLE))
+                            {
+                                _mathTypefaces.Add(instFont);
+                            }
+                        }
                     }
                 }
             }
-            found = null;
+            //------
+            //select perfer unicode font
+
+        }
+
+
+        /// <summary>
+        /// get alternative typeface from a given unicode codepoint
+        /// </summary>
+        /// <param name="codepoint"></param>
+        /// <param name="selector"></param>
+        /// <param name="found"></param>
+        /// <returns></returns>
+        public bool TryGetAlternativeTypefaceFromCodepoint(int codepoint, AlternativeTypefaceSelector selector, out InstalledTypeface selectedTypeface)
+        {
+            //find a typeface that supported input char c
+
+            List<InstalledTypeface> installedTypefaceList = null;
+            if (ScriptLangs.TryGetScriptLang(codepoint, out ScriptLangInfo scripLangInfo) && scripLangInfo.unicodeLangs != null)
+            {
+                foreach (UnicodeLangRange unicodeLangRange in scripLangInfo.unicodeLangs)
+                {
+                    if (_regisiterWithUnicodeRangeDic.TryGetValue(unicodeLangRange, out List<InstalledTypeface> typefaceList) && typefaceList.Count > 0)
+                    {
+                        //select a proper typeface                        
+                        installedTypefaceList = typefaceList;
+                        break;
+                    }
+                }
+            }
+
+            var additionHint = new AlternativeTypefaceSelector.AddtionalHint();
+            //not found
+            if (installedTypefaceList == null && codepoint >= UNICODE_EMOJI_START && codepoint <= UNICODE_EMOJI_END)
+            {
+                if (_emojiSupportedTypefaces.Count > 0)
+                {
+                    installedTypefaceList = _emojiSupportedTypefaces;
+                    additionHint.UnicodeHint = AlternativeTypefaceSelector.UnicodeHint.Emoji;
+                }
+            }
+            //-------------
+            if (installedTypefaceList != null)
+            {
+                //select a prefer font
+
+                if (selector != null)
+                {
+                    return (selectedTypeface = selector.Select(installedTypefaceList, scripLangInfo, codepoint, additionHint)) != null;
+                }
+                else if (installedTypefaceList.Count > 0)
+                {
+                    selectedTypeface = installedTypefaceList[0];//default
+                    return true;
+                }
+            }
+            selectedTypeface = null;
             return false;
         }
-
-
-        readonly Dictionary<UnicodeLangBits, List<InstalledTypeface>> _registeredWithUniCodeLangBits = new Dictionary<UnicodeLangBits, List<InstalledTypeface>>();
-        void RegisterUnicodeSupport(UnicodeLangBits langBit, InstalledTypeface instFont)
-        {
-
-            if (!_registeredWithUniCodeLangBits.TryGetValue(langBit, out List<InstalledTypeface> found))
-            {
-                found = new List<InstalledTypeface>();
-                _registeredWithUniCodeLangBits.Add(langBit, found);
-            }
-            found.Add(instFont);
-        }
-
     }
 
 
@@ -868,15 +957,18 @@ namespace Typography.FontManagement
 
         }
 
-        public static IEnumerable<UnicodeLangBits> GetSupportedUnicodeLangBitIter(this InstalledTypeface instTypeface)
+        public static IEnumerable<BitposAndAssciatedUnicodeRanges> GetSupportedUnicodeLangIter(this InstalledTypeface instTypeface)
         {
-            foreach (UnicodeLangBits unicodeLangBit in UnicodeLangs.GetUnicodeLangBitIter())
+
+            //check all 0-125 bits 
+            for (int i = 0; i <= UnicodeLangRanges.MAX_BITPOS; ++i)
             {
-                if (instTypeface.DoesSupportUnicode(unicodeLangBit))
+                if (instTypeface.DoesSupportUnicode(i))
                 {
-                    yield return unicodeLangBit;
+                    yield return UnicodeLangRanges.GetUnicodeRanges(i);
                 }
             }
+
         }
 
         //for Windows , how to find Windows' Font Directory from Windows Registry

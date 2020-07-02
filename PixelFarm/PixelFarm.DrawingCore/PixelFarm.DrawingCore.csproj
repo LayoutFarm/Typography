@@ -11,7 +11,8 @@
     <AssemblyName>PixelFarm.DrawingCore</AssemblyName>
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
+	  <LangVersion>8.0</LangVersion>
+	  <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -38,18 +39,16 @@
     <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DrawBoard.cs" />
     <Compile Include="Brushes_Pens.cs" />
     <Compile Include="CombineMode.cs" />
     <Compile Include="DashStyle.cs" />
+    <Compile Include="FillingRule.cs" />
     <Compile Include="MemMx.cs" />
     <Compile Include="NativeMemMx.cs" />
     <Compile Include="Region.cs" />
     <Compile Include="RenderVx.cs" />
-    <Compile Include="VertexCommandAndOrientation.cs" />
     <Compile Include="VertexStore.cs" />
     <Compile Include="ExtensionAttribute.cs" />
-    <Compile Include="Painter.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />

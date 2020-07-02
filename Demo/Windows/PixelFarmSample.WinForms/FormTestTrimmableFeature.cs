@@ -4,8 +4,8 @@ using System.IO;
 using System.Windows.Forms;
 
 using Typography.OpenFont;
+using Typography.OpenFont.Extensions;
 using Typography.OpenFont.Trimmable;
-
 
 namespace SampleWinForms
 {
@@ -45,11 +45,10 @@ namespace SampleWinForms
             //   and you don't want any glyph-building-detail (eg. to reduce memory usuage)
             //   but you still want to use the typeface for text-layout
             //   you can trim it down
-            RestoreTicket ticket = typeface.TrimDown();//***
+            RestoreTicket ticket = typeface.TrimDown();//*** 
 
             //[C] you can GetGlyph() but this is ANOTHER NEW GLYPH
-            //without building instruction( eg. no cff,ttf,svg data,bitmap)
-            //
+            //without building instruction( eg. no cff,ttf,svg data,bitmap) 
 
             Glyph g1_2 = typeface.GetGlyph(1);
 
@@ -107,7 +106,7 @@ namespace SampleWinForms
                 "Test/Sarabun-Regular.woff2", //woff2
                 "Test/Sarabun-Regular.woff", //woff
             };
-                        
+ 
             TestIncorrectRestore(files[0], files[1]);
 
             foreach (string filename in files)

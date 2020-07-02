@@ -527,10 +527,7 @@ namespace Typography.OpenFont.MathGlyphs
             BottomRight = bottomRight;
             BottomLeft = bottomLeft;
         }
-
     }
-
-
 }
 
 namespace Typography.OpenFont.Tables
@@ -1287,15 +1284,7 @@ namespace Typography.OpenFont.Tables
                     );
             }
         }
-
-
     }
-
-
-
-
-
-
 
     class MathItalicsCorrectonInfoTable
     {
@@ -1314,7 +1303,6 @@ namespace Typography.OpenFont.Tables
 
         public MathValueRecord[] ItalicCorrections;
         public CoverageTable CoverageTable;
-
 
     }
     class MathTopAccentAttachmentTable

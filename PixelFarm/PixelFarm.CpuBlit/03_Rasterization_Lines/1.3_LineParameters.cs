@@ -19,7 +19,7 @@ using System;
 namespace PixelFarm.CpuBlit.Rasterization.Lines
 {
     //==========================================================line_parameters
-    public struct LineParameters
+    public readonly struct LineParameters
     {
         //---------------------------------------------------------------------
 

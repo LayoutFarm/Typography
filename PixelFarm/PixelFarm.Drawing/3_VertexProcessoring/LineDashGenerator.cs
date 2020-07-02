@@ -4,7 +4,7 @@ using PixelFarm.Drawing;
 
 namespace PixelFarm.CpuBlit.VertexProcessing
 {
-    public struct DashSegment
+    public readonly struct DashSegment
     {
         public readonly float Len;
         public readonly bool IsSolid;

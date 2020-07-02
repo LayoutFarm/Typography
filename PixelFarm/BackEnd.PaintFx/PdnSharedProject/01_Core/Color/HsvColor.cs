@@ -18,6 +18,8 @@ namespace PaintFx
     /// </summary>
     public struct HsvColor
     {
+        //mutable-struct//
+
         public int Hue; // 0-360
         public int Saturation; // 0-100
         public int Value; // 0-100

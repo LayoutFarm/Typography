@@ -11,6 +11,7 @@
     <AssemblyName>PixelFarm.Typography</AssemblyName>
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+	  <LangVersion>8.0</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -56,6 +57,9 @@
     <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="1_General\LineSegmentsAndWordVisitors.cs" />
+    <Compile Include="1_General\OpenFontTextService_Part2.cs" />
+    <Compile Include="1_General\ResolvedFonts.cs" />
     <Compile Include="2_CpuBlit_BitmapAtlas\FontAtlasTextPrinter.cs" />
     <Compile Include="2_CpuBlit_BitmapAtlas\GlyphBitmapStore.cs" />
     <Compile Include="3_Typography_Contours\GlyphPathBuilder.cs" />

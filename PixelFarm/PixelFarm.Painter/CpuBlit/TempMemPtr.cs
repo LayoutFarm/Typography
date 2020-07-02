@@ -24,9 +24,9 @@ namespace PixelFarm.CpuBlit
 
     public struct TempMemPtr : IDisposable
     {
-        int _lenInBytes; //in bytes 
+        readonly int _lenInBytes; //in bytes         
+        readonly bool _isOwner;
         IntPtr _nativeBuffer;
-        bool _isOwner;
 
         public TempMemPtr(IntPtr nativeBuffer32, int lenInBytes, bool isOwner = false)
         {
@@ -41,19 +41,12 @@ namespace PixelFarm.CpuBlit
         //
         public void Dispose()
         {
-            if (_isOwner)
+            if (_isOwner && _nativeBuffer != IntPtr.Zero)
             {
                 //destroy in
                 System.Runtime.InteropServices.Marshal.FreeHGlobal(_nativeBuffer);
                 _nativeBuffer = IntPtr.Zero;
-            } 
-        } 
-
-        //---------------
-        //helper...
-        public static TempMemPtr FromBmp(MemBitmap memBmp)
-        {
-            return MemBitmap.GetBufferPtr(memBmp);
+            }
         }
         public unsafe static TempMemPtr FromBmp(IBitmapSrc actualBmp, out int* headPtr)
         {
@@ -62,17 +55,7 @@ namespace PixelFarm.CpuBlit
             return ptr;
         }
 
-        public unsafe static TempMemPtr FromBmp(MemBitmap memBmp, out int* headPtr)
-        {
-            TempMemPtr ptr = MemBitmap.GetBufferPtr(memBmp);
-            headPtr = (int*)ptr.Ptr;
-            return ptr;
-        }
-        public unsafe static TempMemPtr FromBmp(MemBitmap bmp, out byte* headPtr)
-        {
-            TempMemPtr ptr = MemBitmap.GetBufferPtr(bmp);
-            headPtr = (byte*)ptr.Ptr;
-            return ptr;
-        }
+
+       
     }
 }

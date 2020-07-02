@@ -66,7 +66,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             }
         }
 
-        struct DistanceToT
+        readonly struct DistanceToT
         {
             public readonly float distance;
             public readonly float t;

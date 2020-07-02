@@ -343,7 +343,7 @@ namespace SampleWinForms
         private void button1_Click_1(object sender, EventArgs e)
         {
 
-            PixelFarm.CpuBlit.MemBitmapExtensions.DefaultMemBitmapIO = new PixelFarm.Drawing.WinGdi.GdiBitmapIO();
+            PixelFarm.CpuBlit.MemBitmapExt.DefaultMemBitmapIO = new PixelFarm.Drawing.WinGdi.GdiBitmapIO();
 
 
             var storageProvider = new LocalFileStorageProvider("", true);
@@ -399,7 +399,7 @@ namespace SampleWinForms
             string fontTextureInfoFile = resolveFontTextureFile;
             string fontTextureImgFilename = fontTextureInfoFile + ".png";
 
-            _textServices.ResolveTypeface(reqFont); //resolve for 'actual' font
+            ResolvedFont resolvedFont = _textServices.ResolveFont(reqFont); //resolve for 'actual' font
             if (PixelFarm.Platforms.StorageService.Provider.DataExists(resolveFontTextureFile) &&
                 File.Exists(fontTextureImgFilename))
             {
@@ -412,8 +412,10 @@ namespace SampleWinForms
             else
             {
                 //create a new one 
-                SimpleBitmapAtlas fontAtlas = bmpFontMx.GetFontAtlas(reqFont, out MemBitmap fontBmp);
-                bmpFontMx.GetFontAtlas(reqFont, out fontBmp);
+                //resolve this font
+
+                SimpleBitmapAtlas fontAtlas = bmpFontMx.GetFontAtlas(resolvedFont, out MemBitmap fontBmp);
+                bmpFontMx.GetFontAtlas(resolvedFont, out fontBmp);
                 multisizeFontAtlasBuilder.AddSimpleAtlasFile(reqFont,
                     resolveFontTextureFile,
                     fontTextureImgFilename,
