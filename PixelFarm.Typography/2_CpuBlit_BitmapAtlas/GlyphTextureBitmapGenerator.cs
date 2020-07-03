@@ -36,15 +36,32 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             _svgBmpBuilderFunc = svgBmpBuilderFunc;
         }
 
-
+        Typeface _typeface;
+        float _sizeInPoints;
+        float _px_scale;
         OnEachGlyph _onEachGlyphDel;
+        int _currentDPI;
+
+        void SetCurrentFontInfo(Typeface typeface, float sizeInPoints)
+        {
+
+            _typeface = typeface;
+            _sizeInPoints = sizeInPoints;
+            //please not that DPI effect glyph size
+
+            _currentDPI = (int)Typeface.DefaultDpi;
+            _px_scale = _typeface.CalculateScaleToPixelFromPointSize(_sizeInPoints, _currentDPI);
+        }
         public SimpleBitmapAtlasBuilder CreateTextureFontFromBuildDetail(
-            Typeface typeface, float sizeInPoint,
+            Typeface typeface,
+            float sizeInPoint,
             TextureKind textureKind,
             GlyphTextureBuildDetail[] details,
             OnEachGlyph onEachGlyphDel = null)
         {
+
             _onEachGlyphDel = onEachGlyphDel;
+            SetCurrentFontInfo(typeface, sizeInPoint);
             //-------------------------------------------------------------
             var atlasBuilder = new SimpleBitmapAtlasBuilder();
 
@@ -66,8 +83,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                     {
                         glyphIndexList[m] = m;
                     }
-                    CreateTextureFontFromGlyphIndices(typeface,
-                       sizeInPoint,
+                    CreateTextureFontFromGlyphIndices(
                        detail.HintTechnique,
                        atlasBuilder,
                        glyphIndexList
@@ -79,8 +95,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                     //2. find associated glyph index base on input script langs
                     List<ushort> outputGlyphIndexList = new List<ushort>();
                     typeface.CollectAllAssociateGlyphIndex(outputGlyphIndexList, detail.ScriptLang);
-                    CreateTextureFontFromGlyphIndices(typeface,
-                        sizeInPoint,
+                    CreateTextureFontFromGlyphIndices(
                         detail.HintTechnique,
                         atlasBuilder,
                         GetUniqueGlyphIndexList(outputGlyphIndexList)
@@ -95,8 +110,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                     //skip those script lang=null
                     //2. find associated glyph index base on input script langs
 
-                    CreateTextureFontFromGlyphIndices(typeface,
-                        sizeInPoint,
+                    CreateTextureFontFromGlyphIndices(
                         detail.HintTechnique,
                         atlasBuilder,
                         detail.OnlySelectedGlyphIndices
@@ -116,6 +130,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
         {
 
             _onEachGlyphDel = onEachGlyphDel;
+            SetCurrentFontInfo(typeface, sizeInPoint);
             //convert input chars into glyphIndex
             List<ushort> glyphIndices = new List<ushort>(chars.Length);
             int i = 0;
@@ -129,15 +144,16 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             atlasBuilder.SetAtlasInfo(textureKind, sizeInPoint);
             //------------------------------------------------------------- 
             //we can specfic subset with special setting for each set 
-            CreateTextureFontFromGlyphIndices(typeface, sizeInPoint,
-                HintTechnique.TrueTypeInstruction_VerticalOnly, atlasBuilder, GetUniqueGlyphIndexList(glyphIndices));
+            CreateTextureFontFromGlyphIndices(
+                HintTechnique.TrueTypeInstruction_VerticalOnly,
+                atlasBuilder,
+                GetUniqueGlyphIndexList(glyphIndices));
 
             _onEachGlyphDel = null;//reset                
             return atlasBuilder;
         }
+
         void CreateTextureFontFromGlyphIndices(
-              Typeface typeface,
-              float sizeInPoint,
               HintTechnique hintTechnique,
               SimpleBitmapAtlasBuilder atlasBuilder,
               char[] chars)
@@ -146,17 +162,17 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             ushort[] glyphIndices = new ushort[j];
             for (int i = 0; i < j; ++i)
             {
-                glyphIndices[i] = typeface.GetGlyphIndex(chars[i]);
+                glyphIndices[i] = _typeface.GetGlyphIndex(chars[i]);
             }
 
-            CreateTextureFontFromGlyphIndices(typeface, sizeInPoint, hintTechnique, atlasBuilder, glyphIndices);
+            CreateTextureFontFromGlyphIndices(hintTechnique, atlasBuilder, glyphIndices);
         }
-        GlyphBitmap GetGlyphBitmapFromColorOutlineGlyph(Typeface typeface, ushort glyphIndex, GlyphMeshStore glyphMeshStore, ushort colorLayerStart)
+        GlyphBitmap GetGlyphBitmapFromColorOutlineGlyph(ushort glyphIndex, GlyphMeshStore glyphMeshStore, ushort colorLayerStart)
         {
 
             //not found=> create a newone 
-            Typography.OpenFont.Tables.COLR _colrTable = typeface.COLRTable;
-            Typography.OpenFont.Tables.CPAL _cpalTable = typeface.CPALTable;
+            Typography.OpenFont.Tables.COLR _colrTable = _typeface.COLRTable;
+            Typography.OpenFont.Tables.CPAL _cpalTable = _typeface.CPALTable;
 
 
             Q1RectD totalBounds = Q1RectD.ZeroIntersection();
@@ -213,25 +229,24 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                 ImageStartY = -offset_y //offset back
             };
         }
-        GlyphBitmap GetGlyphBitmapFromBitmapFont(Typeface typeface, float sizeInPoint, ushort glyphIndex)
+        GlyphBitmap GetGlyphBitmapFromBitmapFont(ushort glyphIndex)
         {
             //not found=> create a new one
-            if (typeface.IsBitmapFont)
+            if (_typeface.IsBitmapFont)
             {
                 //try load
                 using (System.IO.MemoryStream ms = new System.IO.MemoryStream())
                 {
                     //load actual bitmap font
-                    Glyph glyph = typeface.GetGlyph(glyphIndex);
-                    typeface.ReadBitmapContent(glyph, ms);
+                    Glyph glyph = _typeface.GetGlyph(glyphIndex);
+                    _typeface.ReadBitmapContent(glyph, ms);
 
                     using (MemBitmap memBitmap = MemBitmapExt.LoadBitmap(ms))
                     {
                         //bitmap that are load may be larger than we need
                         //so we need to scale it to specfic size
 
-                        float bmpScale = typeface.CalculateScaleToPixelFromPointSize(sizeInPoint);
-                        float target_advW = typeface.GetAdvanceWidthFromGlyphIndex(glyphIndex) * bmpScale;
+                        float target_advW = _typeface.GetAdvanceWidthFromGlyphIndex(glyphIndex) * _px_scale;
                         float scaleForBmp = target_advW / memBitmap.Width;
 
                         MemBitmap scaledMemBmp = memBitmap.ScaleImage(scaleForBmp, scaleForBmp);
@@ -249,16 +264,15 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             return null;
         }
 
-        GlyphBitmap GetGlyphBitmapFromSvg(Typeface typeface, float sizeInPoint, ushort glyphIndex)
+        GlyphBitmap GetGlyphBitmapFromSvg(ushort glyphIndex)
         {
 
             //TODO: use string builder from pool?  
 
             var stbuilder = new System.Text.StringBuilder();
-            typeface.ReadSvgContent(glyphIndex, stbuilder);
+            _typeface.ReadSvgContent(glyphIndex, stbuilder);
 
-            float bmpScale = typeface.CalculateScaleToPixelFromPointSize(sizeInPoint);
-            float target_advW = typeface.GetAdvanceWidthFromGlyphIndex(glyphIndex) * bmpScale;
+            float target_advW = _typeface.GetAdvanceWidthFromGlyphIndex(glyphIndex) * _px_scale;
 
             var req = new PixelFarm.Drawing.SvgBmpBuilderReq
             {
@@ -290,9 +304,46 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                 ImageStartY = -offset_y //offset back
             };
         }
+
+
+
+        readonly struct GlyphNotFoundHelper
+        {
+            readonly SimpleBitmapAtlasBuilder _atlasBuilder;
+            readonly GlyphOutlineBuilder _outlineBuilder;
+            readonly OnEachGlyph _onEachGlyphDel;
+            readonly AggGlyphTextureGen _aggTextureGen;
+            readonly float _sizeInPoints;
+            public GlyphNotFoundHelper(
+                SimpleBitmapAtlasBuilder atlasBuilder,
+                GlyphOutlineBuilder outlineBuilder,
+                OnEachGlyph onEachGlyphDel,
+                AggGlyphTextureGen aggTextureGen, float sizeInPoints)
+            {
+                _atlasBuilder = atlasBuilder;
+                _outlineBuilder = outlineBuilder;
+                _onEachGlyphDel = onEachGlyphDel;
+                _aggTextureGen = aggTextureGen;
+                _sizeInPoints = sizeInPoints;
+            }
+            public void HandleNotFoundGlyph(ushort glyphIndex)
+            {
+
+#if DEBUG
+                System.Diagnostics.Debug.WriteLine("bitmap texture,create fallback glyph:" + glyphIndex);
+#endif
+
+                //NESTED
+                //draw a glyph into tmpMemBmp and then copy to a GlyphImage      
+                //build glyph 
+                _outlineBuilder.BuildFromGlyphIndex(glyphIndex, _sizeInPoints);
+                BitmapAtlasItemSource glyphImg = _aggTextureGen.CreateAtlasItem(_outlineBuilder, 1);
+                glyphImg.UniqueInt16Name = glyphIndex;
+                _onEachGlyphDel?.Invoke(glyphImg);
+                _atlasBuilder.AddItemSource(glyphImg);
+            }
+        }
         void CreateTextureFontFromGlyphIndices(
-              Typeface typeface,
-              float sizeInPoint,
               HintTechnique hintTechnique,
               SimpleBitmapAtlasBuilder atlasBuilder,
               ushort[] glyphIndices)
@@ -300,21 +351,31 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
 
             //sample: create sample msdf texture 
             //-------------------------------------------------------------
-            var outlineBuilder = new GlyphOutlineBuilder(typeface);
+            var outlineBuilder = new GlyphOutlineBuilder(_typeface);
             outlineBuilder.SetHintTechnique(hintTechnique);
             //
             AggGlyphTextureGen aggTextureGen = new AggGlyphTextureGen();
 
+            GlyphNotFoundHelper glyphNotFoundHelper = new GlyphNotFoundHelper(atlasBuilder,
+                outlineBuilder,
+                _onEachGlyphDel,
+                aggTextureGen,
+                _sizeInPoints);
+
+
             //create reusable agg painter*** 
             //assume each glyph size= 2 * line height
             //TODO: review here again...
-            int tmpMemBmpHeight = (int)(2 * typeface.CalculateRecommendLineSpacing() * typeface.CalculateScaleToPixelFromPointSize(sizeInPoint));
+
+            //please note that DPI effect glyph size //***
+
+            int tmpMemBmpHeight = (int)(2 * _typeface.CalculateRecommendLineSpacing() * _px_scale);
 
             //
             if (atlasBuilder.TextureKind == TextureKind.Msdf)
             {
 
-                float pxscale = typeface.CalculateScaleToPixelFromPointSize(sizeInPoint);
+
                 var msdfGenParams = new Msdfgen.MsdfGenParams();
                 int j = glyphIndices.Length;
 
@@ -333,7 +394,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
 
                         using (Tools.BorrowVxs(out var vxs))
                         {
-                            glyphToVxs.WriteUnFlattenOutput(vxs, pxscale);
+                            glyphToVxs.WriteUnFlattenOutput(vxs, _px_scale);
                             BitmapAtlasItemSource glyphImg = gen3.GenerateMsdfTexture(vxs);
                             glyphImg.UniqueInt16Name = gindex;
                             _onEachGlyphDel?.Invoke(glyphImg);
@@ -359,7 +420,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
 
                         using (Tools.BorrowVxs(out var vxs))
                         {
-                            glyphToVxs.WriteUnFlattenOutput(vxs, pxscale);
+                            glyphToVxs.WriteUnFlattenOutput(vxs, _px_scale);
                             BitmapAtlasItemSource glyphImg = gen3.GenerateMsdfTexture(vxs);
                             glyphImg.UniqueInt16Name = gindex;
                             _onEachGlyphDel?.Invoke(glyphImg);
@@ -376,7 +437,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                 int j = glyphIndices.Length;
 
                 GlyphMeshStore glyphMeshStore = new GlyphMeshStore();
-                glyphMeshStore.SetFont(typeface, sizeInPoint);
+                glyphMeshStore.SetFont(_typeface, _sizeInPoints);
                 aggTextureGen.TextureKind = TextureKind.Bitmap;
 
                 using (PixelFarm.CpuBlit.MemBitmap tmpMemBmp = new PixelFarm.CpuBlit.MemBitmap(tmpMemBmpHeight, tmpMemBmpHeight)) //square
@@ -387,46 +448,30 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
 #endif
 
 
-                    void HandleNotFoundGlyph(ushort glyphIndex, OnEachGlyph onEachDel)
-                    {
-
-#if DEBUG
-                        System.Diagnostics.Debug.WriteLine("bitmap texture,create fallback glyph:" + glyphIndex);
-#endif
-
-                        //NESTED
-                        //draw a glyph into tmpMemBmp and then copy to a GlyphImage      
-                        //build glyph 
-                        outlineBuilder.BuildFromGlyphIndex(glyphIndex, sizeInPoint);
-                        BitmapAtlasItemSource glyphImg = aggTextureGen.CreateAtlasItem(outlineBuilder, 1);
-                        glyphImg.UniqueInt16Name = glyphIndex;
-                        onEachDel?.Invoke(glyphImg);
-                        atlasBuilder.AddItemSource(glyphImg);
-                    }
-
-
-                    if (typeface.HasColorTable())
+                    if (_typeface.HasColorTable())
                     {
                         //outline glyph
 
                         for (int i = 0; i < j; ++i)
                         {
                             ushort gindex = glyphIndices[i];
-                            if (!typeface.COLRTable.LayerIndices.TryGetValue(gindex, out ushort colorLayerStart))
+                            if (!_typeface.COLRTable.LayerIndices.TryGetValue(gindex, out ushort colorLayerStart))
                             {
                                 //not found, then render as normal
                                 //TODO: impl   
 
                                 //create glyph img    
-                                HandleNotFoundGlyph(gindex, _onEachGlyphDel);
+                                glyphNotFoundHelper.HandleNotFoundGlyph(gindex);
+
                             }
                             else
                             {
                                 //TODO: review this again
-                                GlyphBitmap glyphBmp = GetGlyphBitmapFromColorOutlineGlyph(typeface, gindex, glyphMeshStore, colorLayerStart);
+                                GlyphBitmap glyphBmp = GetGlyphBitmapFromColorOutlineGlyph(gindex, glyphMeshStore, colorLayerStart);
                                 if (glyphBmp == null)
                                 {
-                                    HandleNotFoundGlyph(gindex, _onEachGlyphDel);
+
+                                    glyphNotFoundHelper.HandleNotFoundGlyph(gindex);
                                 }
                                 else
                                 {
@@ -454,7 +499,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
 
 
                     }
-                    else if (typeface.IsBitmapFont)
+                    else if (_typeface.IsBitmapFont)
                     {
                         aggTextureGen.TextureKind = TextureKind.Bitmap;
                         //test this with Noto Color Emoji
@@ -462,10 +507,11 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                         {
                             ushort gindex = glyphIndices[i];
 
-                            GlyphBitmap glyphBmp = GetGlyphBitmapFromBitmapFont(typeface, sizeInPoint, gindex);
+                            GlyphBitmap glyphBmp = GetGlyphBitmapFromBitmapFont(gindex);
                             if (glyphBmp == null)
                             {
-                                HandleNotFoundGlyph(gindex, _onEachGlyphDel);
+
+                                glyphNotFoundHelper.HandleNotFoundGlyph(gindex);
                             }
                             else
                             {
@@ -491,7 +537,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                         }
 
                     }
-                    else if (typeface.HasSvgTable())
+                    else if (_typeface.HasSvgTable())
                     {
                         aggTextureGen.TextureKind = TextureKind.Bitmap;
                         //test this with TwitterEmoji
@@ -506,10 +552,10 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                             //TODO: add mutli-threads / async version
 
                             ushort gindex = glyphIndices[i];
-                            GlyphBitmap glyphBmp = GetGlyphBitmapFromSvg(typeface, sizeInPoint, gindex);
+                            GlyphBitmap glyphBmp = GetGlyphBitmapFromSvg(gindex);
                             if (glyphBmp == null)
                             {
-                                HandleNotFoundGlyph(gindex, _onEachGlyphDel);
+                                glyphNotFoundHelper.HandleNotFoundGlyph(gindex);
                             }
                             else
                             {
@@ -564,7 +610,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                     {
                         //build glyph
                         ushort gindex = glyphIndices[i];
-                        outlineBuilder.BuildFromGlyphIndex(gindex, sizeInPoint);
+                        outlineBuilder.BuildFromGlyphIndex(gindex, _sizeInPoints);
 
                         BitmapAtlasItemSource glyphImg = aggTextureGen.CreateAtlasItem(outlineBuilder, 1);
 
