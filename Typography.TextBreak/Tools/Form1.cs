@@ -148,7 +148,27 @@ namespace Tools
                     throw new NotSupportedException("unicode overlap found!");
                 }
             }
+            //----------------------
+            //example 1
+            //since the range is not overlap each other
+            //we can simply search it with binary search
+            {
+                int[] beginAt_list = new int[count];
+                for (int i = 0; i < count; ++i)
+                {
+                    beginAt_list[i] = _unicode13Ranges[i].StartCodePoint;
+                }
 
+
+                //test 
+                int test_char = '+';
+                int foundAt = Array.BinarySearch(beginAt_list, test_char);
+                foundAt = foundAt < 0 ? ~foundAt - 1 : foundAt;
+
+                UnicodeRangeInfo rangeInfo = _unicode13Ranges[foundAt];
+            }
+            //----------------------
+            //generate code for this range
 
         }
         static bool CheckIfNotOverlap(UnicodeRangeInfo test, List<UnicodeRangeInfo> others, int exceptIndex)
