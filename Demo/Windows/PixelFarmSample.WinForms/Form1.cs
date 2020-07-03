@@ -11,7 +11,6 @@ using PixelFarm.CpuBlit.BitmapAtlas;
 using PixelFarm.Contours;
 
 using Typography.OpenFont;
-using Typography.OpenFont.Trimmable;
 using Typography.TextLayout;
 using Typography.Contours;
 using Typography.WebFont;
@@ -817,8 +816,8 @@ namespace SampleWinForms
                 OpenFontReader openFontReader = new OpenFontReader();
                 PreviewFontInfo previewFontInfo = openFontReader.ReadPreview(fs);
             }
-        } 
-   
+        }
+
 
         private void cmdTestReloadGlyphs_Click(object sender, EventArgs e)
         {

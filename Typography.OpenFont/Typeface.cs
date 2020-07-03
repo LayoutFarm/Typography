@@ -294,21 +294,34 @@ namespace Typography.OpenFont
         public short UnderlinePosition => PostTable.UnderlinePosition; //TODO: review here
         //
 
-        const int pointsPerInch = 72; //TODO: should be configurable
+        const int s_pointsPerInch = 72;//point per inch, fix?        
+
+        /// <summary>
+        /// default dpi
+        /// </summary>
+        public static uint DefaultDpi { get; set; } = 96;
+
         /// <summary>
         /// convert from point-unit value to pixel value
         /// </summary>
         /// <param name="targetPointSize"></param>
-        /// <param name="resolution"></param>
+        /// <param name="resolution">dpi</param>
         /// <returns></returns>
-        public static float ConvPointsToPixels(float targetPointSize, int resolution = 96)
+        public static float ConvPointsToPixels(float targetPointSize, int resolution = -1)
         {
             //http://stackoverflow.com/questions/139655/convert-pixels-to-points
             //points = pixels * 72 / 96
             //------------------------------------------------
             //pixels = targetPointSize * 96 /72
             //pixels = targetPointSize * resolution / pointPerInch
-            return targetPointSize * resolution / pointsPerInch;
+
+            if (resolution < 0)
+            {
+                //use current DefaultDPI
+                resolution = (int)DefaultDpi;
+            }
+
+            return targetPointSize * resolution / s_pointsPerInch;
         }
         /// <summary>
         /// calculate scale to target pixel size based on current typeface's UnitsPerEm
@@ -324,13 +337,19 @@ namespace Typography.OpenFont
         ///  calculate scale to target pixel size based on current typeface's UnitsPerEm
         /// </summary>
         /// <param name="targetPointSize">target font size in point unit</param>
-        /// <param name="resolution"></param>
+        /// <param name="resolution">dpi</param>
         /// <returns></returns>
-        public float CalculateScaleToPixelFromPointSize(float targetPointSize, int resolution = 96)
+        public float CalculateScaleToPixelFromPointSize(float targetPointSize, int resolution = -1)
         {
             //1. var sizeInPixels = ConvPointsToPixels(sizeInPointUnit);
-            //2. return  sizeInPixels / UnitsPerEm
-            return (targetPointSize * resolution / pointsPerInch) / this.UnitsPerEm;
+            //2. return sizeInPixels / UnitsPerEm
+
+            if (resolution < 0)
+            {
+                //use current DefaultDPI
+                resolution = (int)DefaultDpi;
+            }
+            return (targetPointSize * resolution / s_pointsPerInch) / this.UnitsPerEm;
         }
 
 
