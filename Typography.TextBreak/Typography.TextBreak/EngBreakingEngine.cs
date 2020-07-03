@@ -89,14 +89,14 @@ namespace Typography.TextBreak
         static void OnBreak(WordVisitor vis, in BreakBounds bb) => vis.AddWordBreak_AndSetCurrentIndex(bb.startIndex + bb.length, bb.kind);
 
 
-        static void CollectConsecutiveUnicodeRange(char[] input, ref int start, int len, out SpanBreakInfo spanBreakInfo)
+        static void CollectConsecutiveUnicodeRange(char[] input, ref int start, int endBefore, out SpanBreakInfo spanBreakInfo)
         {
 
             char c1 = input[start];
             if (UnicodeRangeFinder.GetUniCodeRangeFor(c1, out int startCodePoint, out int endCodePoint, out spanBreakInfo))
             {
-                int lim = start + len;
-                for (int i = start; i < lim; ++i)
+
+                for (int i = start; i < endBefore; ++i)
                 {
                     c1 = input[i];
                     if (c1 < startCodePoint || c1 > endCodePoint)
@@ -107,7 +107,7 @@ namespace Typography.TextBreak
                         return;
                     }
                 }
-                start = lim;
+                start = endBefore;
             }
             else
             {
@@ -117,9 +117,7 @@ namespace Typography.TextBreak
                 System.Diagnostics.Debug.WriteLine("unknown unicode range:");
 #endif
 
-
-                int lim = start + len;
-                for (int i = start; i < lim; ++i)
+                for (int i = start; i < endBefore; ++i)
                 {
                     c1 = input[i];
                     if ((c1 >= 0 && c1 < 256) || //eng range
@@ -132,7 +130,7 @@ namespace Typography.TextBreak
                     }
                 }
 
-                start = lim;
+                start = endBefore;
                 spanBreakInfo = s_unknown;
             }
         }
@@ -569,7 +567,7 @@ namespace Typography.TextBreak
                             int begin = i;
                             bb.startIndex = i;
                             bb.kind = WordKind.Text;
-                            CollectConsecutiveUnicodeRange(input, ref begin, len - i, out SpanBreakInfo spBreakInfo);
+                            CollectConsecutiveUnicodeRange(input, ref begin, endBefore, out SpanBreakInfo spBreakInfo);
                             bb.length = begin - i;
                             if (bb.length > 0)
                             {
