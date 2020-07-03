@@ -47,7 +47,12 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
 
             _typeface = typeface;
             _sizeInPoints = sizeInPoints;
-            //please not that DPI effect glyph size
+
+            //please note that DPI effect glyph size
+            //TODO: 
+            //1. add information about dpi to generated texture
+            //2. when dpi is changed we need to use correct texture for that dpi
+
 
             _currentDPI = (int)Typeface.DefaultDpi;
             _px_scale = _typeface.CalculateScaleToPixelFromPointSize(_sizeInPoints, _currentDPI);
