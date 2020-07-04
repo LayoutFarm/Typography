@@ -1,8 +1,6 @@
-﻿name,start_unicode,end_unicode
-Basic Latin,0000,007F
-Letters of Basic Latin,0041,007A
-Latin-1 Supplement,0080,00FF
-Letters of the Latin-1 Supplement,00C0,00FF
+﻿name,start_unicode,end_unicode 
+C0 Controls and Basic Latin,0000, 007F
+C1 Controls and Latin-1 Supplement, 0080, 00FF
 Latin Extended-A,0100,017F
 Latin Extended-B,0180,024F
 IPA Extensions,0250,02AF
@@ -67,12 +65,13 @@ Cyrillic Extended-C,1C80,1C8F
 Georgian Extended,1C90,1CBF
 Sundanese Supplement,1CC0,1CCF
 Vedic Extensions,1CD0,1CFF
-Phonetic Extensions,1D00,1DBF
+Phonetic Extensions,1D00,1D7F
+Phonetic Extensions Supplement,1D80, 1DBF
 Combining Diacritical Marks Supplement,1DC0,1DFF
 Latin Extended Additional,1E00,1EFF
 Greek Extended,1F00,1FFF
 General Punctuation,2000,206F
-Deprecated Format Characters,206A,206F
+#Deprecated Format Characters,206A,206F(this is inside=> General Punctuation,2000,206F)
 Superscripts and Subscripts,2070,209F
 Currency Symbols,20A0,20CF
 Combining Diacritical Marks for Symbols,20D0,20FF
@@ -150,7 +149,7 @@ Meetei Mayek,ABC0,ABFF
 Hangul Syllables,AC00,D7A3
 Hangul Jamo Extended-B,D7B0,D7FF
 High Surrogates,D800,DBFF
-High Private Use Surrogates,DB80,DBFF
+#High Private Use Surrogates,DB80,DBFF (this is inside High Surrogates,D800,DBFF)
 Low Surrogates,DC00,DFFF
 Private Use Area,E000,F8FF
 CJK Compatibility Ideographs,F900,FAFF
@@ -312,3 +311,5 @@ CJK Compatibility Ideographs Supplement,2F800,2FA1F
 CJK Unified Ideographs Extension G,30000,3134F
 Tags,E0000,E007F
 Variation Selectors Supplement,E0100,E01EF
+Supplementary Private Use Area-A, F0000,FFFFF
+Supplementary Private Use Area-B, 100000,10FFFD

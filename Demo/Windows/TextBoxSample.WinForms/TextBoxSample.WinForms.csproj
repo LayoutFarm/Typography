@@ -10,7 +10,7 @@
     <AssemblyName>TextBoxSample.WinForms</AssemblyName>
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-	  <LangVersion>8.0</LangVersion>
+    <LangVersion>8.0</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -38,7 +38,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\..\..\PixelFarm.Typography\3_Typography_Contours\GlyphMeshCollection.cs">
-      <Link>TextServices\GlyphMeshCollection.cs</Link>
+      <Link>GlyphMeshCollection.cs</Link>
     </Compile>
     <Compile Include="..\..\..\PixelFarm.Typography\3_Typography_Contours\GlyphOutlineBuilderBase.cs">
       <Link>GlyphOutlineBuilder\GlyphOutlineBuilderBase.cs</Link>
@@ -48,15 +48,6 @@
     </Compile>
     <Compile Include="..\..\..\PixelFarm\PixelFarm.Painter\Drawing\TextBaseline.cs">
       <Link>DevTextPrinter\TextBaseline.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\Typography.TextBreak\Typography.TextBreak\ScriptTagsAndLanguageSystemTags\ScriptLangInfo.cs">
-      <Link>TextServices\ScriptLangInfo.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\Typography.TextBreak\Typography.TextBreak\ScriptTagsAndLanguageSystemTags\UnicodeLangBits.cs">
-      <Link>TextServices\UnicodeLangBits.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\Typography.TextServices\FontStoreAndManagment\FontManagement.cs">
-      <Link>TextServices\FontManagement.cs</Link>
     </Compile>
     <Compile Include="..\..\Shared\GlyphOutlineBuilder\GlyphOutlineBuilder.cs">
       <Link>GlyphOutlineBuilder\GlyphOutlineBuilder.cs</Link>
@@ -124,9 +115,9 @@
       <Project>{29ed0dfe-373c-4e98-bd4b-43f8e5fb16f6}</Project>
       <Name>Typography.OpenFont</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\Build\N20\Typography.TextFlow\Typography.TextFlow.csproj">
-      <Project>{333f3209-8da9-4d33-a560-299ed4c6dfa5}</Project>
-      <Name>Typography.TextFlow</Name>
+    <ProjectReference Include="..\..\..\Build\N20\Typography.TextServices\Typography.TextServices.csproj">
+      <Project>{6b0e034b-0ebd-4907-ad7f-437de66d78d4}</Project>
+      <Name>Typography.TextServices</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

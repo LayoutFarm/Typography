@@ -1430,7 +1430,7 @@ namespace Typography.OpenFont.CFF
 
 
 #if DEBUG
-            if (offsets.Length >= ushort.MaxValue) { throw new NotSupportedException(); }
+            if (offsets.Length > ushort.MaxValue) { throw new NotSupportedException(); }
 #endif
             int glyphCount = offsets.Length;
             //assume Type2
