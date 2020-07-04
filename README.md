@@ -112,7 +112,8 @@ Apache2, 2018, Apache/PDFBox Authors,  https://github.com/apache/pdfbox
 
 **Text Processing**
 
-Unicode License (BSD style), 2020, _UNICODE, INC_
+Unicode License (BSD style), 2020, _UNICODE, INC_, https://www.unicode.org/license.html
+
 Apache2, 2014 , Muhammad Tayyab Akram, https://sheenbidi.codeplex.com/ , https://github.com/Tehreer
 
 
