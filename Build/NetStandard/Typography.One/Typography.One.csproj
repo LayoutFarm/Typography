@@ -19,8 +19,6 @@
 
   <Import Project="..\..\..\Typography.TextBreak\Typography.TextBreak\Typography.TextBreak.projitems" Label="Shared" />
 
-  <Import Project="..\..\..\Typography.TextFlow\Typography.TextFlow.projitems" Label="Shared" />
-
   <ItemGroup>
     <Compile Include="..\..\..\Demo\Shared\GlyphOutlineBuilder\GlyphOutlineBuilder.cs" Link="GlyphPathBuilder\GlyphOutlineBuilder.cs" />
     <Compile Include="..\..\..\PixelFarm.Typography\3_Typography_Contours\GlyphMeshCollection.cs" Link="GlyphPathBuilder\GlyphMeshCollection.cs" />

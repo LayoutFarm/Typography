@@ -12,7 +12,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Dom\EditableTextBlockLayoutEngine.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Dom\EditableTextLine.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Dom\IRun.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Dom\TextBuffer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Dom\TextRun.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Simple\SmallLine.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TextLexer\TextLexer.cs" />
