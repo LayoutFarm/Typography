@@ -93,9 +93,10 @@ namespace Typography.TextBreak
         {
 
             char c1 = input[start];
-            if (UnicodeRangeFinder.GetUniCodeRangeFor(c1, out int startCodePoint, out int endCodePoint, out spanBreakInfo))
+            if (UnicodeRangeFinder.GetUniCodeRangeFor(c1, out UnicodeRangeInfo unicodeRangeInfo, out spanBreakInfo))
             {
-
+                int startCodePoint = unicodeRangeInfo.StarCodepoint;
+                int endCodePoint = unicodeRangeInfo.EndCodepoint;
                 for (int i = start; i < endBefore; ++i)
                 {
                     c1 = input[i];
@@ -122,7 +123,7 @@ namespace Typography.TextBreak
                     c1 = input[i];
                     if ((c1 >= 0 && c1 < 256) || //eng range
                         char.IsHighSurrogate(c1) || //surrogate pair
-                        UnicodeRangeFinder.GetUniCodeRangeFor(c1, out startCodePoint, out endCodePoint, out spanBreakInfo)) //or found some wellknown range
+                        UnicodeRangeFinder.GetUniCodeRangeFor(c1, out unicodeRangeInfo, out spanBreakInfo)) //or found some wellknown range
                     {
                         //break here
                         start = i;

@@ -40,7 +40,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)SheenBidi\RunAgent.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SheenBidi\Text\UnicodeAgent.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SheenBidi\Text\UnicodeLocator.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)UnicodeInfo\UnicodeRangeInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UnicodeInfo\Unicode13RangeInfoList.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)WordKind.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BreakingEngine.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CustomBreaker.cs" />

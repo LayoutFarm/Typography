@@ -176,7 +176,9 @@ namespace Tools
                 for (int i = 0; i < count; ++i)
                 {
                     UnicodeRangeInfo rng = _unicode13Ranges[i];
-                    sb.AppendLine(GetProperFieldName(rng.RangeName) + "=_(\"" + rng.RangeName + "\"," + rng.StartCodePoint + "," + rng.EndCodePoint + "),");
+
+                    sb.AppendLine(GetProperFieldName(rng.RangeName) + $"=_(\"{ rng.RangeName }\",0x{rng.StartCodePoint.ToString("X")}/*{rng.StartCodePoint}*/,0x{rng.EndCodePoint.ToString("X")}/*{rng.StartCodePoint}*/),");
+
                 }
                 sb.AppendLine();
                 sb.AppendLine();

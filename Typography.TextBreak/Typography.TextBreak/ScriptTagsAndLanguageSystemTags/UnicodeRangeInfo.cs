@@ -28,6 +28,7 @@ namespace Typography.OpenFont
         }
         public bool IsInRange(int codepoint) => codepoint >= StarCodepoint && codepoint <= EndCodepoint;
         public override string ToString() => Name;
+
     }
 
     public readonly struct BitposAndAssciatedUnicodeRanges
