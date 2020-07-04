@@ -23,15 +23,22 @@ namespace PixelFarm.Drawing
 #if DEBUG
         public MyAlternativeTypefaceSelector() { }
 #endif
-        public void SetPreferTypefaces(string scriptTag, PreferTypefaceList typefaceNames)
+        //public void SetPreferTypefaces(string scriptTag, PreferTypefaceList typefaceNames)
+        //{
+        //    _dics[scriptTag] = typefaceNames;
+        //}
+        public void SetPreferTypefaces(UnicodeRangeInfo unicodeRangeInfo, PreferTypefaceList typefaceNames)
         {
-            _dics[scriptTag] = typefaceNames;
+            _dics[unicodeRangeInfo.Name] = typefaceNames;
         }
-        public void SetPreferTypefaces(ScriptTagDef scriptTag, PreferTypefaceList typefaceNames)
+        public void SetPreferTypefaces(UnicodeRangeInfo[] unicodeRangeInfos, PreferTypefaceList typefaceNames)
         {
-            _dics[scriptTag.StringTag] = typefaceNames;
-        }
+            for (int i = 0; i < unicodeRangeInfos.Length; ++i)
+            {
+                _dics[unicodeRangeInfos[i].Name] = typefaceNames;
+            }
 
+        }
         public void SetPerferEmoji(PreferTypefaceList typefaceNames)
         {
             _emojiPreferList = typefaceNames;
@@ -39,14 +46,14 @@ namespace PixelFarm.Drawing
 
         public PreferTypefaceList GetPreferTypefaces(string scriptTag) => _dics.TryGetValue(scriptTag, out PreferTypefaceList foundList) ? foundList : null;
 
-        public override InstalledTypeface Select(List<InstalledTypeface> choices, ScriptLangInfo scriptLangInfo, int hintCodePoint, AddtionalHint additionalHint)
+        public override InstalledTypeface Select(List<InstalledTypeface> choices, UnicodeRangeInfo unicodeRangeInfo, int hintCodePoint, AddtionalHint additionalHint)
         {
             List<PreferTypeface> list = null;
             if (additionalHint.UnicodeHint == UnicodeHint.Emoji)
             {
                 list = _emojiPreferList._list;
             }
-            else if (_dics.TryGetValue(scriptLangInfo.shortname, out PreferTypefaceList foundList))
+            else if (_dics.TryGetValue(unicodeRangeInfo.Name, out PreferTypefaceList foundList))
             {
                 list = foundList._list;
             }
@@ -85,7 +92,7 @@ namespace PixelFarm.Drawing
                 }
             }
 
-            return base.Select(choices, scriptLangInfo, hintCodePoint, additionalHint);
+            return base.Select(choices, unicodeRangeInfo, hintCodePoint, additionalHint);
         }
 
         public class PreferTypeface

@@ -219,14 +219,25 @@ namespace SampleWinForms
                 _devVxsTextPrinter.AlternativeTypefaceSelector = _myAlternativeTypefaceSelector;
                 {
                     var preferTypefaces = new PixelFarm.Drawing.MyAlternativeTypefaceSelector.PreferTypefaceList();
-                    _myAlternativeTypefaceSelector.SetPreferTypefaces(ScriptTagDefs.Arabic, preferTypefaces);
-
                     preferTypefaces.AddTypefaceName("Noto Sans Arabic UI");
+
+                    _myAlternativeTypefaceSelector.SetPreferTypefaces(
+                         new[]{Typography.TextBreak.Unicode13RangeInfoList.Arabic,
+                               Typography.TextBreak.Unicode13RangeInfoList.Arabic_Supplement,
+                               Typography.TextBreak.Unicode13RangeInfoList.Arabic_Extended_A},
+                        preferTypefaces);
                 }
                 {
                     var preferTypefaces = new PixelFarm.Drawing.MyAlternativeTypefaceSelector.PreferTypefaceList();
-                    _myAlternativeTypefaceSelector.SetPreferTypefaces(ScriptTagDefs.Latin, preferTypefaces);
                     preferTypefaces.AddTypefaceName("Sarabun");
+
+                    _myAlternativeTypefaceSelector.SetPreferTypefaces(
+                         new[]{Typography.TextBreak.Unicode13RangeInfoList.C0_Controls_and_Basic_Latin,
+                               Typography.TextBreak.Unicode13RangeInfoList.C1_Controls_and_Latin_1_Supplement,
+                               Typography.TextBreak.Unicode13RangeInfoList.Latin_Extended_A,
+                               Typography.TextBreak.Unicode13RangeInfoList.Latin_Extended_B,
+                         },
+                        preferTypefaces);
                 }
             }
 

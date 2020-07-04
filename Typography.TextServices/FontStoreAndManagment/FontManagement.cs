@@ -171,7 +171,7 @@ namespace Typography.FontManagement
 #endif
 
         public Typeface LatestTypeface { get; set; }
-        public virtual InstalledTypeface Select(List<InstalledTypeface> choices, ScriptLangInfo scriptLangInfo, int codepoint, AddtionalHint additionalHint)
+        public virtual InstalledTypeface Select(List<InstalledTypeface> choices, UnicodeRangeInfo unicodeRangeInfo, int codepoint, AddtionalHint additionalHint)
         {
             if (choices.Count > 0)
             {
@@ -840,25 +840,27 @@ namespace Typography.FontManagement
             //find a typeface that supported input char c
 
             List<InstalledTypeface> installedTypefaceList = null;
-            if (ScriptLangs.TryGetUnicodeRangeInfo(codepoint, out UnicodeRangeInfo found))
+            if (ScriptLangs.TryGetUnicodeRangeInfo(codepoint, out UnicodeRangeInfo unicodeRangeInfo))
             {
-                if (_registerWithUnicodeRangeDic.TryGetValue(found, out List<InstalledTypeface> typefaceList))
+                if (_registerWithUnicodeRangeDic.TryGetValue(unicodeRangeInfo, out List<InstalledTypeface> typefaceList) &&
+                    typefaceList.Count > 0)
                 {
-
+                    //select a proper typeface                        
+                    installedTypefaceList = typefaceList;
                 }
             }
-            if (ScriptLangs.TryGetScriptLang(codepoint, out ScriptLangInfo scripLangInfo) && scripLangInfo.unicodeLangs != null)
-            {
-                foreach (UnicodeRangeInfo unicodeLangRange in scripLangInfo.unicodeLangs)
-                {
-                    if (_registerWithUnicodeRangeDic.TryGetValue(unicodeLangRange, out List<InstalledTypeface> typefaceList) && typefaceList.Count > 0)
-                    {
-                        //select a proper typeface                        
-                        installedTypefaceList = typefaceList;
-                        break;
-                    }
-                }
-            }
+            //if (ScriptLangs.TryGetScriptLang(codepoint, out ScriptLangInfo scripLangInfo) && scripLangInfo.unicodeLangs != null)
+            //{
+            //    foreach (UnicodeRangeInfo unicodeLangRange in scripLangInfo.unicodeLangs)
+            //    {
+            //        if (_registerWithUnicodeRangeDic.TryGetValue(unicodeLangRange, out List<InstalledTypeface> typefaceList) && typefaceList.Count > 0)
+            //        {
+            //            //select a proper typeface                        
+            //            installedTypefaceList = typefaceList;
+            //            break;
+            //        }
+            //    }
+            //}
 
             var additionHint = new AlternativeTypefaceSelector.AddtionalHint();
             //not found
@@ -877,7 +879,7 @@ namespace Typography.FontManagement
 
                 if (selector != null)
                 {
-                    return (selectedTypeface = selector.Select(installedTypefaceList, scripLangInfo, codepoint, additionHint)) != null;
+                    return (selectedTypeface = selector.Select(installedTypefaceList, unicodeRangeInfo, codepoint, additionHint)) != null;
                 }
                 else if (installedTypefaceList.Count > 0)
                 {

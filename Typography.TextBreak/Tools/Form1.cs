@@ -148,6 +148,20 @@ namespace Tools
                     throw new NotSupportedException("unicode overlap found!");
                 }
             }
+            {
+                //ensure that code points are arranged ascending
+                int latest_codepoint = -1;
+                for (int i = 0; i < count; ++i)
+                {
+                    int cp = _unicode13Ranges[i].StartCodePoint;
+                    if (latest_codepoint > cp)
+                    {
+                        throw new NotSupportedException();
+                    }
+                    latest_codepoint = cp;
+                }
+            }
+
             //----------------------
             //example 1
             //since the range is not overlap each other
@@ -177,7 +191,7 @@ namespace Tools
                 {
                     UnicodeRangeInfo rng = _unicode13Ranges[i];
 
-                    sb.AppendLine(GetProperFieldName(rng.RangeName) + $"=_(\"{ rng.RangeName }\",0x{rng.StartCodePoint.ToString("X")}/*{rng.StartCodePoint}*/,0x{rng.EndCodePoint.ToString("X")}/*{rng.StartCodePoint}*/),");
+                    sb.AppendLine(GetProperFieldName(rng.RangeName) + $"=_(\"{ rng.RangeName }\",0x{rng.StartCodePoint.ToString("X4")}/*{rng.StartCodePoint}*/,0x{rng.EndCodePoint.ToString("X4")}/*{rng.StartCodePoint}*/),");
 
                 }
                 sb.AppendLine();
