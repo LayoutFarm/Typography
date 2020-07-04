@@ -5,6 +5,41 @@ using static Typography.TextBreak.Unicode13RangeInfoList;
 
 namespace Typography.OpenFont.Tables
 {
+    public readonly struct BitposAndAssciatedUnicodeRanges
+    {
+        public readonly int Bitpos;
+        public readonly UnicodeRangeInfo[] Ranges;
+        public BitposAndAssciatedUnicodeRanges(int bitpos, UnicodeRangeInfo[] ranges)
+        {
+            Bitpos = bitpos;
+            Ranges = ranges;
+        }
+        public override string ToString()
+        {
+            System.Text.StringBuilder sb = new System.Text.StringBuilder();
+            sb.Append(Bitpos + ",");
+            for (int i = 0; i < Ranges.Length; ++i)
+            {
+                sb.Append(Ranges[i].ToString());
+            }
+            return sb.ToString();
+        }
+        public bool IsInRange(int codepoint)
+        {
+            for (int i = 0; i < Ranges.Length; ++i)
+            {
+                if (Ranges[i].IsInRange(codepoint))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+
+        public static readonly UnicodeRangeInfo None_Plane_0 = new UnicodeRangeInfo(0x10000, 0x10FFFF, "None Plane 0");
+    }
+
     public static class OpenFontBitPosInfo
     {
         //from https://docs.microsoft.com/en-us/typography/opentype/spec/os2#ulunicoderange1-bits-031ulunicoderange2-bits-3263ulunicoderange3-bits-6495ulunicoderange4-bits-96127     
@@ -14,7 +49,6 @@ namespace Typography.OpenFont.Tables
         //See the 'dlng' and 'slng' tags in the 'meta' table for an alternate mechanism to declare what scripts or languages that a font can support or 
         //is designed for. 
 
-        static readonly UnicodeRangeInfo None_Plane_0 = new UnicodeRangeInfo(0x10000, 0x10FFFF, "None Plane 0");
 
 
         static readonly BitposAndAssciatedUnicodeRanges[] s_bitposAndAssocRanges = new BitposAndAssciatedUnicodeRanges[]
@@ -77,7 +111,7 @@ _(54,Enclosed_CJK_Letters_and_Months),
 _(55,CJK_Compatibility),
 _(56,Hangul_Syllables),
 
-_(57,None_Plane_0), //**TODO: review here again
+_(57,BitposAndAssciatedUnicodeRanges.None_Plane_0), //**TODO: review here again
 
 _(58,Phoenician),
 _(59,CJK_Unified_Ideographs,CJK_Radicals_Supplement,Kangxi_radical ,Ideographic_Description_Characters,CJK_Unified_Ideographs_Extension_A,CJK_Unified_Ideographs_Extension_B,Kanbun),

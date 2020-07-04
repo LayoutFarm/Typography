@@ -806,19 +806,19 @@ namespace Typography.FontManagement
                             _registerWithUnicodeRangeDic.Add(range, found);
                         }
                         found.Add(instFont);
-
-                        //if (range == Unicode5_1Ranges.Non_Plane_0)
-                        //{
-                        //    //special search
-                        //    if (instFont.ContainGlyphForUnicode(UNICODE_EMOJI_START))
-                        //    {
-                        //        _emojiSupportedTypefaces.Add(instFont);
-                        //    }
-                        //    if (instFont.ContainGlyphForUnicode(UNICODE_MATH_ALPHANUM_EXAMPLE))
-                        //    {
-                        //        _mathTypefaces.Add(instFont);
-                        //    }
-                        //}
+                        if (range == BitposAndAssciatedUnicodeRanges.None_Plane_0)
+                        {
+                            //special search
+                            //TODO: review here again
+                            if (instFont.ContainGlyphForUnicode(UNICODE_EMOJI_START))
+                            {
+                                _emojiSupportedTypefaces.Add(instFont);
+                            }
+                            if (instFont.ContainGlyphForUnicode(UNICODE_MATH_ALPHANUM_EXAMPLE))
+                            {
+                                _mathTypefaces.Add(instFont);
+                            }
+                        }
                     }
                 }
             }
@@ -849,18 +849,6 @@ namespace Typography.FontManagement
                     installedTypefaceList = typefaceList;
                 }
             }
-            //if (ScriptLangs.TryGetScriptLang(codepoint, out ScriptLangInfo scripLangInfo) && scripLangInfo.unicodeLangs != null)
-            //{
-            //    foreach (UnicodeRangeInfo unicodeLangRange in scripLangInfo.unicodeLangs)
-            //    {
-            //        if (_registerWithUnicodeRangeDic.TryGetValue(unicodeLangRange, out List<InstalledTypeface> typefaceList) && typefaceList.Count > 0)
-            //        {
-            //            //select a proper typeface                        
-            //            installedTypefaceList = typefaceList;
-            //            break;
-            //        }
-            //    }
-            //}
 
             var additionHint = new AlternativeTypefaceSelector.AddtionalHint();
             //not found

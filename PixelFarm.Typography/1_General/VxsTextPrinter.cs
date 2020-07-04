@@ -795,7 +795,8 @@ namespace PixelFarm.Drawing
 
                     if (line_seg.Length > 1 && line_seg.WordKind == WordKind.SurrogatePair)
                     {
-                        sample_glyphIndex = curTypeface.GetGlyphIndex(char.ConvertToUtf32(sample_char, textBuffer[line_seg.StartAt + 1]));
+                        codepoint = char.ConvertToUtf32(sample_char, textBuffer[line_seg.StartAt + 1]);
+                        sample_glyphIndex = curTypeface.GetGlyphIndex(codepoint);
                     }
                     else
                     {
