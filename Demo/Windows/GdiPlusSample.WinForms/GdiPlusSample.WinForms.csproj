@@ -40,7 +40,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\..\..\PixelFarm.Typography\3_Typography_Contours\GlyphMeshCollection.cs">
-      <Link>TextServices\GlyphMeshCollection.cs</Link>
+      <Link>GlyphPathBuilder\GlyphMeshCollection.cs</Link>
     </Compile>
     <Compile Include="..\..\..\PixelFarm.Typography\3_Typography_Contours\GlyphOutlineBuilderBase.cs">
       <Link>GlyphPathBuilder\GlyphOutlineBuilderBase.cs</Link>
@@ -50,27 +50,6 @@
     </Compile>
     <Compile Include="..\..\..\PixelFarm\PixelFarm.Painter\Drawing\TextBaseline.cs">
       <Link>DevTextPrinter\TextBaseline.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\Typography.TextBreak\Typography.TextBreak\LineSegments\ILineSegments.cs">
-      <Link>TextServices\ILineSegments.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\Typography.TextBreak\Typography.TextBreak\ScriptTagsAndLanguageSystemTags\ScriptLangInfo.cs">
-      <Link>TextServices\ScriptLangInfo.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\Typography.TextBreak\Typography.TextBreak\ScriptTagsAndLanguageSystemTags\Unicode5_1Ranges.cs">
-      <Link>TextServices\Unicode5_1Ranges.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\Typography.TextBreak\Typography.TextBreak\ScriptTagsAndLanguageSystemTags\UnicodeRangeFinder.cs">
-      <Link>TextServices\UnicodeRangeFinder.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\Typography.TextBreak\Typography.TextBreak\ScriptTagsAndLanguageSystemTags\UnicodeRangeInfo.cs">
-      <Link>TextServices\UnicodeRangeInfo.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\Typography.TextBreak\Typography.TextBreak\UnicodeInfo\Unicode13RangeInfoList.cs">
-      <Link>TextServices\Unicode13RangeInfoList.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\Typography.TextServices\FontStoreAndManagment\FontManagement.cs">
-      <Link>TextServices\FontManagement.cs</Link>
     </Compile>
     <Compile Include="..\..\Shared\GlyphOutlineBuilder\GlyphOutlineBuilder.cs">
       <Link>GlyphPathBuilder\GlyphOutlineBuilder.cs</Link>
@@ -117,6 +96,10 @@
     <ProjectReference Include="..\..\..\Build\N20\Typography.OpenFont\Typography.OpenFont.csproj">
       <Project>{f7d71e61-9342-4dd7-9afd-69045f2ec98b}</Project>
       <Name>Typography.OpenFont</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Build\N20\Typography.TextServices\Typography.TextServices.csproj">
+      <Project>{6b0e034b-0ebd-4907-ad7f-437de66d78d4}</Project>
+      <Name>Typography.TextServices</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

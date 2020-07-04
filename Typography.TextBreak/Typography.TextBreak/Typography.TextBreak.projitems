@@ -13,7 +13,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)LineSegments\BreakingParameters.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)LineSegments\ILineSegments.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ScriptTagsAndLanguageSystemTags\ScriptLangInfo.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ScriptTagsAndLanguageSystemTags\Unicode5_1Ranges.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ScriptTagsAndLanguageSystemTags\OpenFontBitPosInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ScriptTagsAndLanguageSystemTags\UnicodeRangeInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ScriptTagsAndLanguageSystemTags\UnicodeRangeFinder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SheenBidi\BaseDirection.cs" />

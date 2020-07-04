@@ -969,11 +969,11 @@ namespace Typography.FontManagement
         public static IEnumerable<BitposAndAssciatedUnicodeRanges> GetSupportedUnicodeLangIter(this InstalledTypeface instTypeface)
         {
             //check all 0-125 bits 
-            for (int i = 0; i <= Unicode5_1Ranges.MAX_BITPOS; ++i)
+            for (int i = 0; i <= OpenFontBitPosInfo.MAX_BITPOS; ++i)
             {
                 if (instTypeface.DoesSupportUnicode(i))
                 {
-                    yield return Unicode5_1Ranges.GetUnicodeRanges(i);
+                    yield return OpenFontBitPosInfo.GetUnicodeRanges(i);
                 }
             }
 

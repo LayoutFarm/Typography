@@ -3,11 +3,9 @@
 
 using static Typography.TextBreak.Unicode13RangeInfoList;
 
-namespace Typography.OpenFont
+namespace Typography.OpenFont.Tables
 {
-
-
-    public static class Unicode5_1Ranges
+    public static class OpenFontBitPosInfo
     {
         //from https://docs.microsoft.com/en-us/typography/opentype/spec/os2#ulunicoderange1-bits-031ulunicoderange2-bits-3263ulunicoderange3-bits-6495ulunicoderange4-bits-96127     
         //All available bits were exhausted as of Unicode 5.1. 
@@ -17,10 +15,7 @@ namespace Typography.OpenFont
         //is designed for. 
 
         static readonly UnicodeRangeInfo None_Plane_0 = new UnicodeRangeInfo(0x10000, 0x10FFFF, "None Plane 0");
-        public static BitposAndAssciatedUnicodeRanges GetUnicodeRanges(int bitpos)
-        {
-            return s_bitposAndAssocRanges[bitpos];
-        }
+
 
         static readonly BitposAndAssciatedUnicodeRanges[] s_bitposAndAssocRanges = new BitposAndAssciatedUnicodeRanges[]
         {
@@ -156,5 +151,6 @@ _(122,Domino_Tiles,Mahjong_Tiles),
 
         public const int MAX_BITPOS = 122;
 
+        public static BitposAndAssciatedUnicodeRanges GetUnicodeRanges(int bitpos) => s_bitposAndAssocRanges[bitpos];
     }
 }
