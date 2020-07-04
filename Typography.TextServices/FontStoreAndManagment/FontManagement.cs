@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.IO;
 using Typography.OpenFont;
 using Typography.OpenFont.Tables;
+using Typography.TextBreak;
+
 namespace Typography.OpenFont
 {
     public static class TypefaceExtension3
@@ -788,8 +790,21 @@ namespace Typography.FontManagement
         //https://www.unicode.org/charts/PDF/U1D400.pdf
         const int UNICODE_MATH_ALPHANUM_EXAMPLE = 0x1D400; //1D400–1D7FF;
 
+
+
+
+        List<InstalledTypeface> GetExisitingOrCreateNewListForUnicodeRange(UnicodeRangeInfo range)
+        {
+            if (!_registerWithUnicodeRangeDic.TryGetValue(range, out List<InstalledTypeface> found))
+            {
+                found = new List<InstalledTypeface>();
+                _registerWithUnicodeRangeDic.Add(range, found);
+            }
+            return found;
+        }
         public void UpdateUnicodeRanges()
         {
+
             _registerWithUnicodeRangeDic.Clear();
             _emojiSupportedTypefaces.Clear();
             _mathTypefaces.Clear();
@@ -800,16 +815,23 @@ namespace Typography.FontManagement
                 {
                     foreach (UnicodeRangeInfo range in bitposAndAssocUnicodeRanges.Ranges)
                     {
-                        if (!_registerWithUnicodeRangeDic.TryGetValue(range, out List<InstalledTypeface> found))
-                        {
-                            found = new List<InstalledTypeface>();
-                            _registerWithUnicodeRangeDic.Add(range, found);
-                        }
-                        found.Add(instFont);
+
+                        List<InstalledTypeface> typefaceList = GetExisitingOrCreateNewListForUnicodeRange(range);
+                        typefaceList.Add(instFont);
+                        //----------------
+                        //sub range
                         if (range == BitposAndAssciatedUnicodeRanges.None_Plane_0)
                         {
                             //special search
                             //TODO: review here again
+                            foreach (UnicodeRangeInfo rng in Unicode13RangeInfoList.GetNonePlane0Iter())
+                            {
+                                if (instFont.ContainGlyphForUnicode(rng.StarCodepoint))
+                                {
+                                    typefaceList = GetExisitingOrCreateNewListForUnicodeRange(rng);
+                                    typefaceList.Add(instFont);
+                                }
+                            }
                             if (instFont.ContainGlyphForUnicode(UNICODE_EMOJI_START))
                             {
                                 _emojiSupportedTypefaces.Add(instFont);
