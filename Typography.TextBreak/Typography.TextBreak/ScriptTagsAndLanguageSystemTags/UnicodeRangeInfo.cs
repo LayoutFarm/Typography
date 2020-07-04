@@ -1,6 +1,4 @@
-﻿//MIT, 2016-present, WinterDev
-
-using System.Collections.Generic;
+﻿//MIT, 2016-present, WinterDev 
 
 namespace Typography.OpenFont
 {
@@ -31,37 +29,7 @@ namespace Typography.OpenFont
 
     }
 
-    public readonly struct BitposAndAssciatedUnicodeRanges
-    {
-        public readonly int Bitpos;
-        public readonly UnicodeRangeInfo[] Ranges;
-        public BitposAndAssciatedUnicodeRanges(int bitpos, UnicodeRangeInfo[] ranges)
-        {
-            Bitpos = bitpos;
-            Ranges = ranges;
-        }
-        public override string ToString()
-        {
-            System.Text.StringBuilder sb = new System.Text.StringBuilder();
-            sb.Append(Bitpos + ",");
-            for (int i = 0; i < Ranges.Length; ++i)
-            {
-                sb.Append(Ranges[i].ToString());
-            }
-            return sb.ToString();
-        }
-        public bool IsInRange(int codepoint)
-        {
-            for (int i = 0; i < Ranges.Length; ++i)
-            {
-                if (Ranges[i].IsInRange(codepoint))
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-    }
+  
 
 
 

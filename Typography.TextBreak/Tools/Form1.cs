@@ -148,6 +148,20 @@ namespace Tools
                     throw new NotSupportedException("unicode overlap found!");
                 }
             }
+            {
+                //ensure that code points are arranged ascending
+                int latest_codepoint = -1;
+                for (int i = 0; i < count; ++i)
+                {
+                    int cp = _unicode13Ranges[i].StartCodePoint;
+                    if (latest_codepoint > cp)
+                    {
+                        throw new NotSupportedException();
+                    }
+                    latest_codepoint = cp;
+                }
+            }
+
             //----------------------
             //example 1
             //since the range is not overlap each other
@@ -177,7 +191,7 @@ namespace Tools
                 {
                     UnicodeRangeInfo rng = _unicode13Ranges[i];
 
-                    sb.AppendLine(GetProperFieldName(rng.RangeName) + $"=_(\"{ rng.RangeName }\",0x{rng.StartCodePoint.ToString("X")}/*{rng.StartCodePoint}*/,0x{rng.EndCodePoint.ToString("X")}/*{rng.StartCodePoint}*/),");
+                    sb.AppendLine(GetProperFieldName(rng.RangeName) + $"=_(\"{ rng.RangeName }\",0x{rng.StartCodePoint.ToString("X4")}/*{rng.StartCodePoint}*/,0x{rng.EndCodePoint.ToString("X4")}/*{rng.StartCodePoint}*/),");
 
                 }
                 sb.AppendLine();
@@ -191,13 +205,17 @@ namespace Tools
 
             }
         }
-        static bool CheckIfNotOverlap(UnicodeRangeInfo test, List<UnicodeRangeInfo> others, int exceptIndex)
+        static bool CheckIfNotOverlap(UnicodeRangeInfo test, List<UnicodeRangeInfo> others, int exceptIndex, int exceptIndex2 = -1)
         {
             int count = others.Count;
 
             for (int i = 0; i < count; ++i)
             {
                 if (i == exceptIndex)
+                {
+                    continue;
+                }
+                if (exceptIndex2 > -1 && i == exceptIndex2)
                 {
                     continue;
                 }
@@ -252,7 +270,10 @@ namespace Tools
 
             for (int i = 1; i < allLines.Length; ++i)
             {
-                string[] fields = allLines[i].Split('\t');
+                string line = allLines[i].Trim();
+                if (line.Length == 0 || line.StartsWith("#")) { continue; }//skip blank line or comment line
+
+                string[] fields = line.Split('\t');
                 if (fields.Length != 3)
                 {
                     throw new NotSupportedException();
@@ -267,6 +288,26 @@ namespace Tools
                     EndCodePoint = int.Parse(codePointRanges[1], System.Globalization.NumberStyles.HexNumber)
                 });
             }
+
+
+            //----
+            //ensure the unicode5_1 not overlap
+            int count = _unicode5_1Ranges.Count;
+            for (int i = 0; i < count; ++i)
+            {
+                if (i == 77)
+                {
+                    //Non-plane0, 
+                    //skip
+                    continue;
+                }
+                if (!CheckIfNotOverlap(_unicode5_1Ranges[i], _unicode5_1Ranges, i, 77))
+                {
+                    //found overlap!                     
+                    throw new NotSupportedException("unicode overlap found!");
+                }
+            }
+
 
             Dictionary<int, List<UnicodeRangeInfo>> bitpos_group_dic = new Dictionary<int, List<UnicodeRangeInfo>>();
 

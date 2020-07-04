@@ -116,6 +116,7 @@ Global
 		Typography.OpenFont\Typography.OpenFont.projitems*{235a071b-8d06-40ae-a5c5-b1ce59715ee9}*SharedItemsImports = 13
 		Demo\Shared\DrawingGL.Common.projitems*{2e1e828f-6d2c-4b0e-a2e2-ddf24798cacf}*SharedItemsImports = 13
 		Typography.TextBreak\Typography.TextBreak\Typography.TextBreak.projitems*{2e593fca-b809-4270-9eb2-93f380af2d6c}*SharedItemsImports = 4
+		Typography.TextBreak\Typography.TextBreak\Typography.TextBreak.projitems*{333f3209-8da9-4d33-a560-299ed4c6dfa5}*SharedItemsImports = 4
 		Typography.TextFlow\Typography.TextFlow.projitems*{333f3209-8da9-4d33-a560-299ed4c6dfa5}*SharedItemsImports = 4
 		PixelFarm\BackEnd.Triangulation\Triangulation.projitems*{4f435da3-706a-4e6d-ae29-e1e95bd6f68a}*SharedItemsImports = 13
 		Typography.OpenFont\Typography.OpenFont.projitems*{55c6ccff-6bf9-45fe-bf86-406100e8d170}*SharedItemsImports = 5
@@ -131,6 +132,8 @@ Global
 		Unpack_SH\Unpack_SH.projitems*{901a60ed-baef-45f6-8919-6e07ee6bad8d}*SharedItemsImports = 4
 		Typography.GlyphLayout\Typography.GlyphLayout.projitems*{95e23dee-0aaa-4f93-94dd-a18ab84625f9}*SharedItemsImports = 5
 		Typography.OpenFont\Typography.OpenFont.projitems*{95e23dee-0aaa-4f93-94dd-a18ab84625f9}*SharedItemsImports = 5
+		Typography.TextBreak\Typography.TextBreak\Typography.TextBreak.projitems*{95e23dee-0aaa-4f93-94dd-a18ab84625f9}*SharedItemsImports = 5
+		Typography.TextServices\Typography.TextServices.projitems*{95e23dee-0aaa-4f93-94dd-a18ab84625f9}*SharedItemsImports = 5
 		Unpack_SH\Unpack_SH.projitems*{95e23dee-0aaa-4f93-94dd-a18ab84625f9}*SharedItemsImports = 5
 		Typography.TextBreak\Typography.TextBreak\Typography.TextBreak.projitems*{9a99f103-b119-4a4d-8093-6a03baa6d36b}*SharedItemsImports = 13
 		Unpack_SH\Unpack_SH.projitems*{9b1d6d45-7a2f-4ed1-95a6-54b3b892bbd1}*SharedItemsImports = 5

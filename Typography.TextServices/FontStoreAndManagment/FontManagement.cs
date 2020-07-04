@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.IO;
 using Typography.OpenFont;
 using Typography.OpenFont.Tables;
+using Typography.TextBreak;
+
 namespace Typography.OpenFont
 {
     public static class TypefaceExtension3
@@ -171,7 +173,7 @@ namespace Typography.FontManagement
 #endif
 
         public Typeface LatestTypeface { get; set; }
-        public virtual InstalledTypeface Select(List<InstalledTypeface> choices, ScriptLangInfo scriptLangInfo, int codepoint, AddtionalHint additionalHint)
+        public virtual InstalledTypeface Select(List<InstalledTypeface> choices, UnicodeRangeInfo unicodeRangeInfo, int codepoint, AddtionalHint additionalHint)
         {
             if (choices.Count > 0)
             {
@@ -775,7 +777,7 @@ namespace Typography.FontManagement
             }
         }
 
-        readonly Dictionary<UnicodeRangeInfo, List<InstalledTypeface>> _regisiterWithUnicodeRangeDic = new Dictionary<UnicodeRangeInfo, List<InstalledTypeface>>();
+        readonly Dictionary<UnicodeRangeInfo, List<InstalledTypeface>> _registerWithUnicodeRangeDic = new Dictionary<UnicodeRangeInfo, List<InstalledTypeface>>();
         readonly List<InstalledTypeface> _emojiSupportedTypefaces = new List<InstalledTypeface>();
         readonly List<InstalledTypeface> _mathTypefaces = new List<InstalledTypeface>();
 
@@ -788,9 +790,22 @@ namespace Typography.FontManagement
         //https://www.unicode.org/charts/PDF/U1D400.pdf
         const int UNICODE_MATH_ALPHANUM_EXAMPLE = 0x1D400; //1D400–1D7FF;
 
+
+
+
+        List<InstalledTypeface> GetExisitingOrCreateNewListForUnicodeRange(UnicodeRangeInfo range)
+        {
+            if (!_registerWithUnicodeRangeDic.TryGetValue(range, out List<InstalledTypeface> found))
+            {
+                found = new List<InstalledTypeface>();
+                _registerWithUnicodeRangeDic.Add(range, found);
+            }
+            return found;
+        }
         public void UpdateUnicodeRanges()
         {
-            _regisiterWithUnicodeRangeDic.Clear();
+
+            _registerWithUnicodeRangeDic.Clear();
             _emojiSupportedTypefaces.Clear();
             _mathTypefaces.Clear();
 
@@ -800,16 +815,23 @@ namespace Typography.FontManagement
                 {
                     foreach (UnicodeRangeInfo range in bitposAndAssocUnicodeRanges.Ranges)
                     {
-                        if (!_regisiterWithUnicodeRangeDic.TryGetValue(range, out List<InstalledTypeface> found))
-                        {
-                            found = new List<InstalledTypeface>();
-                            _regisiterWithUnicodeRangeDic.Add(range, found);
-                        }
-                        found.Add(instFont);
 
-                        if (range == Unicode5_1Ranges.Non_Plane_0)
+                        List<InstalledTypeface> typefaceList = GetExisitingOrCreateNewListForUnicodeRange(range);
+                        typefaceList.Add(instFont);
+                        //----------------
+                        //sub range
+                        if (range == BitposAndAssciatedUnicodeRanges.None_Plane_0)
                         {
                             //special search
+                            //TODO: review here again
+                            foreach (UnicodeRangeInfo rng in Unicode13RangeInfoList.GetNonePlane0Iter())
+                            {
+                                if (instFont.ContainGlyphForUnicode(rng.StarCodepoint))
+                                {
+                                    typefaceList = GetExisitingOrCreateNewListForUnicodeRange(rng);
+                                    typefaceList.Add(instFont);
+                                }
+                            }
                             if (instFont.ContainGlyphForUnicode(UNICODE_EMOJI_START))
                             {
                                 _emojiSupportedTypefaces.Add(instFont);
@@ -840,16 +862,13 @@ namespace Typography.FontManagement
             //find a typeface that supported input char c
 
             List<InstalledTypeface> installedTypefaceList = null;
-            if (ScriptLangs.TryGetScriptLang(codepoint, out ScriptLangInfo scripLangInfo) && scripLangInfo.unicodeLangs != null)
+            if (ScriptLangs.TryGetUnicodeRangeInfo(codepoint, out UnicodeRangeInfo unicodeRangeInfo))
             {
-                foreach (UnicodeRangeInfo unicodeLangRange in scripLangInfo.unicodeLangs)
+                if (_registerWithUnicodeRangeDic.TryGetValue(unicodeRangeInfo, out List<InstalledTypeface> typefaceList) &&
+                    typefaceList.Count > 0)
                 {
-                    if (_regisiterWithUnicodeRangeDic.TryGetValue(unicodeLangRange, out List<InstalledTypeface> typefaceList) && typefaceList.Count > 0)
-                    {
-                        //select a proper typeface                        
-                        installedTypefaceList = typefaceList;
-                        break;
-                    }
+                    //select a proper typeface                        
+                    installedTypefaceList = typefaceList;
                 }
             }
 
@@ -870,7 +889,7 @@ namespace Typography.FontManagement
 
                 if (selector != null)
                 {
-                    return (selectedTypeface = selector.Select(installedTypefaceList, scripLangInfo, codepoint, additionHint)) != null;
+                    return (selectedTypeface = selector.Select(installedTypefaceList, unicodeRangeInfo, codepoint, additionHint)) != null;
                 }
                 else if (installedTypefaceList.Count > 0)
                 {
@@ -959,13 +978,12 @@ namespace Typography.FontManagement
 
         public static IEnumerable<BitposAndAssciatedUnicodeRanges> GetSupportedUnicodeLangIter(this InstalledTypeface instTypeface)
         {
-
             //check all 0-125 bits 
-            for (int i = 0; i <= Unicode5_1Ranges.MAX_BITPOS; ++i)
+            for (int i = 0; i <= OpenFontBitPosInfo.MAX_BITPOS; ++i)
             {
                 if (instTypeface.DoesSupportUnicode(i))
                 {
-                    yield return Unicode5_1Ranges.GetUnicodeRanges(i);
+                    yield return OpenFontBitPosInfo.GetUnicodeRanges(i);
                 }
             }
 

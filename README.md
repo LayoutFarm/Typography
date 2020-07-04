@@ -1,7 +1,7 @@
 ![Typography, this image was rendered with this library, in subpixel rendering mode](https://user-images.githubusercontent.com/7447159/31848163-cc9e00fe-b655-11e7-8a40-69258e440c7a.png)
 ===========
 
-Pure C# Font Reading, Glyph Layout and Rendering.
+Pure C# Font Reader, Glyph Layout and Rendering.
 ---
 
 While developing the [PixelFarm Rendering library](https://github.com/PaintLab/PixelFarm),
@@ -106,13 +106,14 @@ MIT, 2015, Michael Popoloski, https://github.com/MikePopoloski/SharpFont
 
 The FreeType Project LICENSE (3-clauses BSD style),2003-2016, David Turner, Robert Wilhelm, and Werner Lemberg and others, https://www.freetype.org/
 
-MIT, 2016, Viktor Chlumsky, https://github.com/Chlumsky/msdfgen
-
 Apache2, 2018, Apache/PDFBox Authors,  https://github.com/apache/pdfbox
 
 **Text Processing**
 
+Unicode (BSD style), 2020, _UNICODE, INC_, https://www.unicode.org/license.html
+
 Apache2, 2014 , Muhammad Tayyab Akram, https://sheenbidi.codeplex.com/ , https://github.com/Tehreer
+
 
 **Geometry**
 
