@@ -47,58 +47,58 @@ namespace Typography.TextBreak
         {
             s_registerSpanBreakInfo = new Dictionary<UnicodeRangeInfo, SpanBreakInfo>();
 
-            SpanBreakInfo s_thai = new SpanBreakInfo(false, ScriptTagDefs.Thai.Tag);
-            SpanBreakInfo s_lao = new SpanBreakInfo(false, ScriptTagDefs.Lao.Tag);
+            SpanBreakInfo brk_thai = new SpanBreakInfo(false, ScriptTagDefs.Thai.Tag);
+            SpanBreakInfo brk_lao = new SpanBreakInfo(false, ScriptTagDefs.Lao.Tag);
 
-            SpanBreakInfo s_arabic = new SpanBreakInfo(true, ScriptTagDefs.Arabic.Tag);
-            SpanBreakInfo s_hana = new SpanBreakInfo(false, ScriptTagDefs.Katakana.Tag);
-            SpanBreakInfo s_hangul = new SpanBreakInfo(false, ScriptTagDefs.Hangul.Tag);
-            SpanBreakInfo s_hangul_jumo = new SpanBreakInfo(false, ScriptTagDefs.Hangul_Jamo.Tag);
-            SpanBreakInfo s_hani = new SpanBreakInfo(false, ScriptTagDefs.CJK_Ideographic.Tag);
-
-
-            s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.Thai, s_thai);
-            s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.Lao, s_lao);
-
-            s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.Arabic, s_arabic);
-            s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.Arabic_Extended_A, s_arabic);
-            s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.Arabic_Presentation_Forms_A, s_arabic);
-            s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.Arabic_Presentation_Forms_B, s_arabic);
-            s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.Arabic_Mathematical_Alphabetic_Symbols, s_arabic);
-            s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.Arabic_Supplement, s_arabic);
-
-            s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.Katakana, s_hana);
-            s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.Katakana_Phonetic_Extensions, s_hana);
-
-            s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.Hangul_Syllables, s_hangul);
-            s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.Hangul_Compatibility_Jamo, s_hangul_jumo);//TODO:??
+            SpanBreakInfo brk_arabic = new SpanBreakInfo(true, ScriptTagDefs.Arabic.Tag);
+            SpanBreakInfo brk_hana = new SpanBreakInfo(false, ScriptTagDefs.Katakana.Tag);
+            SpanBreakInfo brk_hangul = new SpanBreakInfo(false, ScriptTagDefs.Hangul.Tag);
+            SpanBreakInfo brk_hangul_jumo = new SpanBreakInfo(false, ScriptTagDefs.Hangul_Jamo.Tag);
+            SpanBreakInfo brk_hani = new SpanBreakInfo(false, ScriptTagDefs.CJK_Ideographic.Tag);
 
 
-            s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.CJK_Compatibility_Forms, s_hani);
-            s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.CJK_Compatibility, s_hani);
-            s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.CJK_Compatibility_Ideographs, s_hani);
-            s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.CJK_Compatibility_Ideographs_Supplement, s_hani);
-            s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.CJK_Radicals_Supplement, s_hani);
-            s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.CJK_Strokes, s_hani);
-            s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.CJK_Symbols_and_Punctuation, s_hani);
-            s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.CJK_Unified_Ideographs, s_hani);
-            s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.CJK_Unified_Ideographs_Extension_A, s_hani);
-            s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.CJK_Unified_Ideographs_Extension_B, s_hani);
-            s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.CJK_Unified_Ideographs_Extension_C, s_hani);
-            s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.CJK_Unified_Ideographs_Extension_D, s_hani);
-            s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.CJK_Unified_Ideographs_Extension_E, s_hani);
-            s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.CJK_Unified_Ideographs_Extension_F, s_hani);
-            s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.CJK_Unified_Ideographs_Extension_G, s_hani);
+            s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.Thai, brk_thai);
+            s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.Lao, brk_lao);
+
+            s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.Arabic, brk_arabic);
+            s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.Arabic_Extended_A, brk_arabic);
+            s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.Arabic_Presentation_Forms_A, brk_arabic);
+            s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.Arabic_Presentation_Forms_B, brk_arabic);
+            s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.Arabic_Mathematical_Alphabetic_Symbols, brk_arabic);
+            s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.Arabic_Supplement, brk_arabic);
+
+            s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.Katakana, brk_hana);
+            s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.Katakana_Phonetic_Extensions, brk_hana);
+
+            s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.Hangul_Syllables, brk_hangul);
+            s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.Hangul_Compatibility_Jamo, brk_hangul_jumo);//TODO:??
 
 
-            s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.CJK_Unified_Ideographs, s_hani);
-            s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.CJK_Symbols_and_Punctuation, s_hani);
-            s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.CJK_Unified_Ideographs, s_hani);
-            s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.CJK_Unified_Ideographs_Extension_A, s_hani);
-            s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.CJK_Unified_Ideographs_Extension_B, s_hani);
+            s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.CJK_Compatibility_Forms, brk_hani);
+            s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.CJK_Compatibility, brk_hani);
+            s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.CJK_Compatibility_Ideographs, brk_hani);
+            s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.CJK_Compatibility_Ideographs_Supplement, brk_hani);
+            s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.CJK_Radicals_Supplement, brk_hani);
+            s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.CJK_Strokes, brk_hani);
+            s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.CJK_Symbols_and_Punctuation, brk_hani);
+            s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.CJK_Unified_Ideographs, brk_hani);
+            s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.CJK_Unified_Ideographs_Extension_A, brk_hani);
+            s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.CJK_Unified_Ideographs_Extension_B, brk_hani);
+            s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.CJK_Unified_Ideographs_Extension_C, brk_hani);
+            s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.CJK_Unified_Ideographs_Extension_D, brk_hani);
+            s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.CJK_Unified_Ideographs_Extension_E, brk_hani);
+            s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.CJK_Unified_Ideographs_Extension_F, brk_hani);
+            s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.CJK_Unified_Ideographs_Extension_G, brk_hani);
 
-            s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.CJK_Unified_Ideographs_Extension_B, s_hani);
-            s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.CJK_Unified_Ideographs_Extension_B, s_hani);
+
+            s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.CJK_Unified_Ideographs, brk_hani);
+            s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.CJK_Symbols_and_Punctuation, brk_hani);
+            s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.CJK_Unified_Ideographs, brk_hani);
+            s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.CJK_Unified_Ideographs_Extension_A, brk_hani);
+            s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.CJK_Unified_Ideographs_Extension_B, brk_hani);
+
+            s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.CJK_Unified_Ideographs_Extension_B, brk_hani);
+            s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.CJK_Unified_Ideographs_Extension_B, brk_hani);
 
         }
         public static bool GetUniCodeRangeFor(char c1, out UnicodeRangeInfo unicodeRangeInfo, out SpanBreakInfo spanBreakInfo)
