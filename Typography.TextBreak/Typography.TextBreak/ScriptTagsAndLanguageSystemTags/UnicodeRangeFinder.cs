@@ -6,6 +6,10 @@ using Typography.OpenFont;
 
 namespace Typography.TextBreak
 {
+
+
+
+
     static class UnicodeRangeFinder
     {
         //TODO: review this again, with AUTOGEN code
@@ -207,4 +211,7 @@ namespace Typography.TextBreak
             }
         }
     }
+
+
+ 
 }

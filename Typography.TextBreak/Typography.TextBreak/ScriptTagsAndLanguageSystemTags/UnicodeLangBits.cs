@@ -1,33 +1,40 @@
 ﻿//MIT, 2016-present, WinterDev
 
 using System.Collections.Generic;
-using System.ComponentModel;
 
 namespace Typography.OpenFont
 {
 
     //https://docs.microsoft.com/en-us/typography/opentype/spec/os2#ulunicoderange1-bits-031ulunicoderange2-bits-3263ulunicoderange3-bits-6495ulunicoderange4-bits-96127     
 
-    public class UnicodeLangRange
+    public class UnicodeRangeInfo
     {
-        public int StarAt { get; }
-        public int EndAt { get; }
+        /// <summary>
+        /// begin code point
+        /// </summary>
+        public int StarCodepoint { get; }
+        /// <summary>
+        /// end codepoint
+        /// </summary>
+        public int EndCodepoint { get; }
+
         public string Name { get; }
-        internal UnicodeLangRange(int startAt, int endAt, string name)
+
+        internal UnicodeRangeInfo(int startAt, int endAt, string name)
         {
-            StarAt = startAt;
-            EndAt = endAt;
+            StarCodepoint = startAt;
+            EndCodepoint = endAt;
             Name = name;
         }
-        public bool IsInRange(int codepoint) => codepoint >= StarAt && codepoint <= EndAt;
+        public bool IsInRange(int codepoint) => codepoint >= StarCodepoint && codepoint <= EndCodepoint;
         public override string ToString() => Name;
     }
 
     public readonly struct BitposAndAssciatedUnicodeRanges
     {
         public readonly int Bitpos;
-        public readonly UnicodeLangRange[] Ranges;
-        public BitposAndAssciatedUnicodeRanges(int bitpos, UnicodeLangRange[] ranges)
+        public readonly UnicodeRangeInfo[] Ranges;
+        public BitposAndAssciatedUnicodeRanges(int bitpos, UnicodeRangeInfo[] ranges)
         {
             Bitpos = bitpos;
             Ranges = ranges;
@@ -56,13 +63,19 @@ namespace Typography.OpenFont
     }
 
 
-    public static class UnicodeLangRanges
+    public static class Unicode5_1Ranges
     {
+        //from https://docs.microsoft.com/en-us/typography/opentype/spec/os2#ulunicoderange1-bits-031ulunicoderange2-bits-3263ulunicoderange3-bits-6495ulunicoderange4-bits-96127     
+        //All available bits were exhausted as of Unicode 5.1. 
+        //The bit assignments were last updated for OS/2 version 4 in OpenType 1.5. 
+        //There are many additional ranges supported in the current version of Unicode that are not supported by these fields in the OS/2 table.
+        //See the 'dlng' and 'slng' tags in the 'meta' table for an alternate mechanism to declare what scripts or languages that a font can support or 
+        //is designed for. 
 
-        static UnicodeLangRange _(int startAt, int endAt, string name) => new UnicodeLangRange(startAt, endAt, name);
+        static UnicodeRangeInfo _(int startAt, int endAt, string name) => new UnicodeRangeInfo(startAt, endAt, name);
 
         //AUTOGEN
-        public static readonly UnicodeLangRange
+        public static readonly UnicodeRangeInfo
         Basic_Latin = _(0x0000, 0x007F, nameof(Basic_Latin)),
 Latin_1_Supplement = _(0x0080, 0x00FF, nameof(Latin_1_Supplement)),
 Latin_Extended_A = _(0x0100, 0x017F, nameof(Latin_Extended_A)),
@@ -241,7 +254,7 @@ Reserved127 = _(0x0, 0x0, nameof(Reserved127));
 
         //---------
         //AUTOGEN
-        static readonly UnicodeLangRange[] s_langRangs = new UnicodeLangRange[]
+        static readonly UnicodeRangeInfo[] s_langRangs = new UnicodeRangeInfo[]
         {
                 Basic_Latin,
 Latin_1_Supplement,
@@ -422,7 +435,7 @@ Reserved127,
 
 
         //-----------
-        public static IEnumerable<UnicodeLangRange> GetUnicodeLangRangeIter()
+        public static IEnumerable<UnicodeRangeInfo> GetUnicodeLangRangeIter()
         {
             for (int i = 0; i < s_langRangs.Length; ++i)
             {
@@ -568,7 +581,7 @@ _(125,Reserved125),
 _(126,Reserved126),
 _(127,Reserved127)
         };
-        static BitposAndAssciatedUnicodeRanges _(int bitpos, params UnicodeLangRange[] ranges) => new BitposAndAssciatedUnicodeRanges(bitpos, ranges);
+        static BitposAndAssciatedUnicodeRanges _(int bitpos, params UnicodeRangeInfo[] ranges) => new BitposAndAssciatedUnicodeRanges(bitpos, ranges);
 
         public const int MAX_BITPOS = 122;
     }

@@ -122,12 +122,12 @@ namespace Tools
                 }
                 var rangeInfo = new UnicodeRangeInfo
                 {
-                    LangName = fields[0].Trim(),
+                    RangeName = fields[0].Trim(),
                     StartCodePoint = int.Parse(fields[1].Trim(), System.Globalization.NumberStyles.HexNumber),
                     EndCodePoint = int.Parse(fields[2].Trim(), System.Globalization.NumberStyles.HexNumber)
                 };
                 _unicode13Ranges.Add(rangeInfo);
-                _unicode13Dic.Add(rangeInfo.LangName, rangeInfo);
+                _unicode13Dic.Add(rangeInfo.RangeName, rangeInfo);
             }
 
             //----------------------
@@ -168,8 +168,26 @@ namespace Tools
                 UnicodeRangeInfo rangeInfo = _unicode13Ranges[foundAt];
             }
             //----------------------
-            //generate code for this range
 
+            {
+
+                //generate code 
+                StringBuilder sb = new StringBuilder();
+                for (int i = 0; i < count; ++i)
+                {
+                    UnicodeRangeInfo rng = _unicode13Ranges[i];
+                    sb.AppendLine(GetProperFieldName(rng.RangeName) + "=_(\"" + rng.RangeName + "\"," + rng.StartCodePoint + "," + rng.EndCodePoint + "),");
+                }
+                sb.AppendLine();
+                sb.AppendLine();
+
+                for (int i = 0; i < count; ++i)
+                {
+                    UnicodeRangeInfo rng = _unicode13Ranges[i];
+                    sb.AppendLine(GetProperFieldName(rng.RangeName) + ",");
+                }
+
+            }
         }
         static bool CheckIfNotOverlap(UnicodeRangeInfo test, List<UnicodeRangeInfo> others, int exceptIndex)
         {
@@ -198,18 +216,18 @@ namespace Tools
         class UnicodeRangeInfo
         {
             public int BitPlane { get; set; }
-            public string LangName { get; set; }
+            public string RangeName { get; set; }
             public int StartCodePoint { get; set; }
             public int EndCodePoint { get; set; }
             public override string ToString()
             {
-                if (BitPlane == null)
+                if (BitPlane == 0)
                 {
-                    return LangName + "," + StartCodePoint + "," + EndCodePoint;
+                    return RangeName + "," + StartCodePoint + "," + EndCodePoint;
                 }
                 else
                 {
-                    return BitPlane + "," + LangName + "," + StartCodePoint + "," + EndCodePoint;
+                    return BitPlane + "," + RangeName + "," + StartCodePoint + "," + EndCodePoint;
                 }
 
             }
@@ -242,7 +260,7 @@ namespace Tools
                 _unicode5_1Ranges.Add(new UnicodeRangeInfo
                 {
                     BitPlane = int.Parse(fields[0].Trim()),
-                    LangName = fields[1].Trim(),
+                    RangeName = fields[1].Trim(),
                     StartCodePoint = int.Parse(codePointRanges[0], System.Globalization.NumberStyles.HexNumber),
                     EndCodePoint = int.Parse(codePointRanges[1], System.Globalization.NumberStyles.HexNumber)
                 });
@@ -268,7 +286,7 @@ namespace Tools
                     sb.Append("_2(" + index);
                     foreach (UnicodeRangeInfo rangeInfo in bitpos_group)
                     {
-                        string field_name = GetProperFieldName(rangeInfo.LangName);
+                        string field_name = GetProperFieldName(rangeInfo.RangeName);
                         sb.Append(",");
                         sb.Append(field_name);
                     }
@@ -286,7 +304,7 @@ namespace Tools
                 StringBuilder sb = new StringBuilder();
                 foreach (UnicodeRangeInfo unicodeRangeInfo in _unicode5_1Ranges)
                 {
-                    string field_name = GetProperFieldName(unicodeRangeInfo.LangName);
+                    string field_name = GetProperFieldName(unicodeRangeInfo.RangeName);
 
                     sb.AppendLine(field_name + "= _(0x" + unicodeRangeInfo.StartCodePoint + ",0x" + unicodeRangeInfo.EndCodePoint + ",nameof(" + field_name + ")),");
                 }
@@ -297,7 +315,7 @@ namespace Tools
                 StringBuilder sb = new StringBuilder();
                 foreach (UnicodeRangeInfo unicodeRangeInfo in _unicode5_1Ranges)
                 {
-                    string field_name = GetProperFieldName(unicodeRangeInfo.LangName);
+                    string field_name = GetProperFieldName(unicodeRangeInfo.RangeName);
                     sb.AppendLine(field_name + ", ");
                 }
                 File.WriteAllText("unicode5.1.enum.gen.txt", sb.ToString());
@@ -467,7 +485,7 @@ namespace Tools
                     {
                         mappingLangAndScripts.Add(script_name, new MappingLangAndScript()
                         {
-                            FullLangName = rangeInfo.LangName,
+                            FullLangName = rangeInfo.RangeName,
                             ShortScript = script_tag,
                             ShortLang = "?"
                         });
