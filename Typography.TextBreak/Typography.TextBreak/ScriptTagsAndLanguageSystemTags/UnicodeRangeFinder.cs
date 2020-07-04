@@ -57,6 +57,7 @@ namespace Typography.TextBreak
             SpanBreakInfo brk_hani = new SpanBreakInfo(false, ScriptTagDefs.CJK_Ideographic.Tag);
 
 
+            //TODO: autogen
             s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.Thai, brk_thai);
             s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.Lao, brk_lao);
 
@@ -67,8 +68,11 @@ namespace Typography.TextBreak
             s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.Arabic_Mathematical_Alphabetic_Symbols, brk_arabic);
             s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.Arabic_Supplement, brk_arabic);
 
+            s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.Hiragana, brk_hana);
             s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.Katakana, brk_hana);
             s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.Katakana_Phonetic_Extensions, brk_hana);
+            
+
 
             s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.Hangul_Syllables, brk_hangul);
             s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.Hangul_Compatibility_Jamo, brk_hangul_jumo);//TODO:??
@@ -89,16 +93,6 @@ namespace Typography.TextBreak
             s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.CJK_Unified_Ideographs_Extension_E, brk_hani);
             s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.CJK_Unified_Ideographs_Extension_F, brk_hani);
             s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.CJK_Unified_Ideographs_Extension_G, brk_hani);
-
-
-            s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.CJK_Unified_Ideographs, brk_hani);
-            s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.CJK_Symbols_and_Punctuation, brk_hani);
-            s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.CJK_Unified_Ideographs, brk_hani);
-            s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.CJK_Unified_Ideographs_Extension_A, brk_hani);
-            s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.CJK_Unified_Ideographs_Extension_B, brk_hani);
-
-            s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.CJK_Unified_Ideographs_Extension_B, brk_hani);
-            s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.CJK_Unified_Ideographs_Extension_B, brk_hani);
 
         }
         public static bool GetUniCodeRangeFor(char c1, out UnicodeRangeInfo unicodeRangeInfo, out SpanBreakInfo spanBreakInfo)

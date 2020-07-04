@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using Typography.OpenFont;
 namespace Typography.TextBreak
-{ 
+{
 
     public static class Unicode13RangeInfoList
     {
@@ -303,7 +303,7 @@ namespace Typography.TextBreak
         Mathematical_Alphanumeric_Symbols = _("Mathematical Alphanumeric Symbols", 119808, 120831),
         Sutton_SignWriting = _("Sutton SignWriting", 120832, 121519),
         Glagolitic_Supplement = _("Glagolitic Supplement", 122880, 122927),
-        Nyiakeng_Puachue_Hmong = _("Nyiakeng Puachue Hmong", 123136, 123215),            
+        Nyiakeng_Puachue_Hmong = _("Nyiakeng Puachue Hmong", 123136, 123215),
         Wancho = _("Wancho", 123584, 123647),
         Mende_Kikakui = _("Mende Kikakui", 124928, 125151),
         Adlam = _("Adlam", 125184, 125279),
@@ -692,12 +692,11 @@ Variation_Selectors_Supplement
 
             found = s_list[foundAt];
 
-            if (found.EndCodepoint > sampleCodepoint)
+            if (sampleCodepoint <= found.EndCodepoint)
             {
-                found = null;
                 return true;
             }
-
+            found = null;
             return false;
         }
     }
