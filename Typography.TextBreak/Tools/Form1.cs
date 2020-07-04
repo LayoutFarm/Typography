@@ -4,7 +4,7 @@ using System.Windows.Forms;
 using System.Text;
 using System.IO;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
+using Tools.UnicodeLangTool;
 
 namespace Tools
 {
@@ -96,6 +96,7 @@ namespace Tools
         Dictionary<string, UnicodeRangeInfo> _unicode13Dic;
         private void button2_Click(object sender, EventArgs e)
         {
+            //ucd.all.flat.xml
             LoadUnicode13Ranges();
         }
         void LoadUnicode13Ranges()
@@ -109,37 +110,126 @@ namespace Tools
             _unicode13Dic = new Dictionary<string, UnicodeRangeInfo>();
             for (int i = 1; i < allLines.Length; ++i)
             {
-                string[] fields = allLines[i].Split(',');
+                string line = allLines[i].Trim();
+
+                if (line.Length == 0 || line.StartsWith("#")) { continue; }//skip blank line or comment line
+                                                                           //
+
+                string[] fields = line.Split(',');
                 if (fields.Length != 3)
                 {
                     throw new NotSupportedException();
                 }
-
-
-                var rangeInfo = new UnicodeRangeInfo { LangName = fields[0].Trim(), StartCodePoint = fields[1].Trim(), EndCodePoint = fields[2].Trim() };
-
+                var rangeInfo = new UnicodeRangeInfo
+                {
+                    RangeName = fields[0].Trim(),
+                    StartCodePoint = int.Parse(fields[1].Trim(), System.Globalization.NumberStyles.HexNumber),
+                    EndCodePoint = int.Parse(fields[2].Trim(), System.Globalization.NumberStyles.HexNumber)
+                };
                 _unicode13Ranges.Add(rangeInfo);
-
-                _unicode13Dic.Add(rangeInfo.LangName, rangeInfo);
+                _unicode13Dic.Add(rangeInfo.RangeName, rangeInfo);
             }
 
+            //----------------------
+            //from https://www.unicode.org/faq/blocks_ranges.html
+            //Q: Can blocks overlap?
+            //A: No.Every Unicode block is discrete, and cannot overlap with any other block.
+            //Also, every assigned character in the Unicode Standard has to be in a block(and only one block, of course).            
+            //This ensures that when code charts are printed, no characters are omitted simply because they aren't in a block
+            //----------------------
 
+            //***ensure no overlap unicode range***
+            int count = _unicode13Ranges.Count;
+            for (int i = 0; i < count; ++i)
+            {
+                if (!CheckIfNotOverlap(_unicode13Ranges[i], _unicode13Ranges, i))
+                {
+                    //found overlap!                     
+                    throw new NotSupportedException("unicode overlap found!");
+                }
+            }
+            //----------------------
+            //example 1
+            //since the range is not overlap each other
+            //we can simply search it with binary search
+            {
+                int[] beginAt_list = new int[count];
+                for (int i = 0; i < count; ++i)
+                {
+                    beginAt_list[i] = _unicode13Ranges[i].StartCodePoint;
+                }
+
+
+                //test 
+                int test_char = '+';
+                int foundAt = Array.BinarySearch(beginAt_list, test_char);
+                foundAt = foundAt < 0 ? ~foundAt - 1 : foundAt;
+
+                UnicodeRangeInfo rangeInfo = _unicode13Ranges[foundAt];
+            }
+            //----------------------
+
+            {
+
+                //generate code 
+                StringBuilder sb = new StringBuilder();
+                for (int i = 0; i < count; ++i)
+                {
+                    UnicodeRangeInfo rng = _unicode13Ranges[i];
+
+                    sb.AppendLine(GetProperFieldName(rng.RangeName) + $"=_(\"{ rng.RangeName }\",0x{rng.StartCodePoint.ToString("X")}/*{rng.StartCodePoint}*/,0x{rng.EndCodePoint.ToString("X")}/*{rng.StartCodePoint}*/),");
+
+                }
+                sb.AppendLine();
+                sb.AppendLine();
+
+                for (int i = 0; i < count; ++i)
+                {
+                    UnicodeRangeInfo rng = _unicode13Ranges[i];
+                    sb.AppendLine(GetProperFieldName(rng.RangeName) + ",");
+                }
+
+            }
+        }
+        static bool CheckIfNotOverlap(UnicodeRangeInfo test, List<UnicodeRangeInfo> others, int exceptIndex)
+        {
+            int count = others.Count;
+
+            for (int i = 0; i < count; ++i)
+            {
+                if (i == exceptIndex)
+                {
+                    continue;
+                }
+
+                UnicodeRangeInfo rng = others[i];
+                int b_begin = rng.StartCodePoint;
+                int b_end = rng.EndCodePoint;
+
+                if ((test.StartCodePoint >= b_begin && test.StartCodePoint <= b_end) ||
+                     (test.EndCodePoint >= b_begin && test.EndCodePoint <= b_begin))
+                {
+                    //overlap found
+                    return false;
+                }
+            }
+            return true;
         }
         class UnicodeRangeInfo
         {
             public int BitPlane { get; set; }
-            public string LangName { get; set; }
-            public string StartCodePoint { get; set; }
-            public string EndCodePoint { get; set; }
+            public string RangeName { get; set; }
+            public int StartCodePoint { get; set; }
+            public int EndCodePoint { get; set; }
             public override string ToString()
             {
-                if (BitPlane == null)
+                if (BitPlane == 0)
                 {
-                    return LangName + "," + StartCodePoint + "," + EndCodePoint;
+                    return RangeName + "," + StartCodePoint + "," + EndCodePoint;
                 }
                 else
                 {
-                    return BitPlane + "," + LangName + "," + StartCodePoint + "," + EndCodePoint;
+                    return BitPlane + "," + RangeName + "," + StartCodePoint + "," + EndCodePoint;
                 }
 
             }
@@ -172,9 +262,9 @@ namespace Tools
                 _unicode5_1Ranges.Add(new UnicodeRangeInfo
                 {
                     BitPlane = int.Parse(fields[0].Trim()),
-                    LangName = fields[1].Trim(),
-                    StartCodePoint = codePointRanges[0],
-                    EndCodePoint = codePointRanges[1]
+                    RangeName = fields[1].Trim(),
+                    StartCodePoint = int.Parse(codePointRanges[0], System.Globalization.NumberStyles.HexNumber),
+                    EndCodePoint = int.Parse(codePointRanges[1], System.Globalization.NumberStyles.HexNumber)
                 });
             }
 
@@ -198,7 +288,7 @@ namespace Tools
                     sb.Append("_2(" + index);
                     foreach (UnicodeRangeInfo rangeInfo in bitpos_group)
                     {
-                        string field_name = GetProperFieldName(rangeInfo.LangName);
+                        string field_name = GetProperFieldName(rangeInfo.RangeName);
                         sb.Append(",");
                         sb.Append(field_name);
                     }
@@ -216,7 +306,7 @@ namespace Tools
                 StringBuilder sb = new StringBuilder();
                 foreach (UnicodeRangeInfo unicodeRangeInfo in _unicode5_1Ranges)
                 {
-                    string field_name = GetProperFieldName(unicodeRangeInfo.LangName);
+                    string field_name = GetProperFieldName(unicodeRangeInfo.RangeName);
 
                     sb.AppendLine(field_name + "= _(0x" + unicodeRangeInfo.StartCodePoint + ",0x" + unicodeRangeInfo.EndCodePoint + ",nameof(" + field_name + ")),");
                 }
@@ -227,7 +317,7 @@ namespace Tools
                 StringBuilder sb = new StringBuilder();
                 foreach (UnicodeRangeInfo unicodeRangeInfo in _unicode5_1Ranges)
                 {
-                    string field_name = GetProperFieldName(unicodeRangeInfo.LangName);
+                    string field_name = GetProperFieldName(unicodeRangeInfo.RangeName);
                     sb.AppendLine(field_name + ", ");
                 }
                 File.WriteAllText("unicode5.1.enum.gen.txt", sb.ToString());
@@ -397,7 +487,7 @@ namespace Tools
                     {
                         mappingLangAndScripts.Add(script_name, new MappingLangAndScript()
                         {
-                            FullLangName = rangeInfo.LangName,
+                            FullLangName = rangeInfo.RangeName,
                             ShortScript = script_tag,
                             ShortLang = "?"
                         });
@@ -822,6 +912,12 @@ namespace Tools
                     dic1[langSub.SubLang] = langSub;
                 }
             }
+        }
+
+        private void button9_Click(object sender, EventArgs e)
+        {
+            UnicodeDataTxtParser unicodeTxtParser = new UnicodeDataTxtParser();
+            unicodeTxtParser.Parse("icu_data/data/unidata/UnicodeData.txt");
 
         }
     }
