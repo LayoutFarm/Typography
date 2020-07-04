@@ -12,17 +12,7 @@ namespace Typography.TextBreak
 
     static class UnicodeRangeFinder
     {
-        //TODO: review this again, with AUTOGEN code
-
-
-        static readonly SpanBreakInfo s_thai = new SpanBreakInfo(false, ScriptTagDefs.Thai.Tag);
-        static readonly SpanBreakInfo s_lao = new SpanBreakInfo(false, ScriptTagDefs.Lao.Tag);
-
-        static readonly SpanBreakInfo s_arabic = new SpanBreakInfo(true, ScriptTagDefs.Arabic.Tag);
-        static readonly SpanBreakInfo s_hana = new SpanBreakInfo(false, ScriptTagDefs.Katakana.Tag);
-        static readonly SpanBreakInfo s_hangul = new SpanBreakInfo(false, ScriptTagDefs.Hangul.Tag);
-        static readonly SpanBreakInfo s_hangul_jumo = new SpanBreakInfo(false, ScriptTagDefs.Hangul_Jamo.Tag);
-        static readonly SpanBreakInfo s_hani = new SpanBreakInfo(false, ScriptTagDefs.CJK_Ideographic.Tag);
+        //TODO: review this again, with AUTOGEN code 
 
         //CJK_Symbols_And_Punctuation = (48L << 32) | (0x3000 << 16) | 0x303F,   
         //Enclosed_CJK_Letters_And_Months = (54L << 32) | (0x3200 << 16) | 0x32FF,
@@ -56,6 +46,17 @@ namespace Typography.TextBreak
         static UnicodeRangeFinder()
         {
             s_registerSpanBreakInfo = new Dictionary<UnicodeRangeInfo, SpanBreakInfo>();
+
+            SpanBreakInfo s_thai = new SpanBreakInfo(false, ScriptTagDefs.Thai.Tag);
+            SpanBreakInfo s_lao = new SpanBreakInfo(false, ScriptTagDefs.Lao.Tag);
+
+            SpanBreakInfo s_arabic = new SpanBreakInfo(true, ScriptTagDefs.Arabic.Tag);
+            SpanBreakInfo s_hana = new SpanBreakInfo(false, ScriptTagDefs.Katakana.Tag);
+            SpanBreakInfo s_hangul = new SpanBreakInfo(false, ScriptTagDefs.Hangul.Tag);
+            SpanBreakInfo s_hangul_jumo = new SpanBreakInfo(false, ScriptTagDefs.Hangul_Jamo.Tag);
+            SpanBreakInfo s_hani = new SpanBreakInfo(false, ScriptTagDefs.CJK_Ideographic.Tag);
+
+
             s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.Thai, s_thai);
             s_registerSpanBreakInfo.Add(Unicode13RangeInfoList.Lao, s_lao);
 
