@@ -1,7 +1,7 @@
 ![Typography, this image was rendered with this library, in subpixel rendering mode](https://user-images.githubusercontent.com/7447159/31848163-cc9e00fe-b655-11e7-8a40-69258e440c7a.png)
 ===========
 
-Pure C# Font Reading, Glyph Layout and Rendering.
+Pure C# Font Reader, Glyph Layout and Rendering.
 ---
 
 While developing the [PixelFarm Rendering library](https://github.com/PaintLab/PixelFarm),
