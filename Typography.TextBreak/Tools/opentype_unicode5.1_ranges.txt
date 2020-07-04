@@ -168,8 +168,8 @@
 121	Lydian	10920-1093F
 122	Domino Tiles	1F030-1F09F
 122	Mahjong Tiles	1F000-1F02F
-123	Reserved123	0-0
-124	Reserved124	0-0
-125	Reserved125	0-0
-126	Reserved126	0-0
-127	Reserved127	0-0
+#123	Reserved123	0-0
+#124	Reserved124	0-0
+#125	Reserved125	0-0
+#126	Reserved126	0-0
+#127	Reserved127	0-0

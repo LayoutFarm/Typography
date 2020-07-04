@@ -775,7 +775,7 @@ namespace Typography.FontManagement
             }
         }
 
-        readonly Dictionary<UnicodeRangeInfo, List<InstalledTypeface>> _regisiterWithUnicodeRangeDic = new Dictionary<UnicodeRangeInfo, List<InstalledTypeface>>();
+        readonly Dictionary<UnicodeRangeInfo, List<InstalledTypeface>> _registerWithUnicodeRangeDic = new Dictionary<UnicodeRangeInfo, List<InstalledTypeface>>();
         readonly List<InstalledTypeface> _emojiSupportedTypefaces = new List<InstalledTypeface>();
         readonly List<InstalledTypeface> _mathTypefaces = new List<InstalledTypeface>();
 
@@ -790,7 +790,7 @@ namespace Typography.FontManagement
 
         public void UpdateUnicodeRanges()
         {
-            _regisiterWithUnicodeRangeDic.Clear();
+            _registerWithUnicodeRangeDic.Clear();
             _emojiSupportedTypefaces.Clear();
             _mathTypefaces.Clear();
 
@@ -800,25 +800,25 @@ namespace Typography.FontManagement
                 {
                     foreach (UnicodeRangeInfo range in bitposAndAssocUnicodeRanges.Ranges)
                     {
-                        if (!_regisiterWithUnicodeRangeDic.TryGetValue(range, out List<InstalledTypeface> found))
+                        if (!_registerWithUnicodeRangeDic.TryGetValue(range, out List<InstalledTypeface> found))
                         {
                             found = new List<InstalledTypeface>();
-                            _regisiterWithUnicodeRangeDic.Add(range, found);
+                            _registerWithUnicodeRangeDic.Add(range, found);
                         }
                         found.Add(instFont);
 
-                        if (range == Unicode5_1Ranges.Non_Plane_0)
-                        {
-                            //special search
-                            if (instFont.ContainGlyphForUnicode(UNICODE_EMOJI_START))
-                            {
-                                _emojiSupportedTypefaces.Add(instFont);
-                            }
-                            if (instFont.ContainGlyphForUnicode(UNICODE_MATH_ALPHANUM_EXAMPLE))
-                            {
-                                _mathTypefaces.Add(instFont);
-                            }
-                        }
+                        //if (range == Unicode5_1Ranges.Non_Plane_0)
+                        //{
+                        //    //special search
+                        //    if (instFont.ContainGlyphForUnicode(UNICODE_EMOJI_START))
+                        //    {
+                        //        _emojiSupportedTypefaces.Add(instFont);
+                        //    }
+                        //    if (instFont.ContainGlyphForUnicode(UNICODE_MATH_ALPHANUM_EXAMPLE))
+                        //    {
+                        //        _mathTypefaces.Add(instFont);
+                        //    }
+                        //}
                     }
                 }
             }
@@ -840,11 +840,18 @@ namespace Typography.FontManagement
             //find a typeface that supported input char c
 
             List<InstalledTypeface> installedTypefaceList = null;
+            if (ScriptLangs.TryGetUnicodeRangeInfo(codepoint, out UnicodeRangeInfo found))
+            {
+                if (_registerWithUnicodeRangeDic.TryGetValue(found, out List<InstalledTypeface> typefaceList))
+                {
+
+                }
+            }
             if (ScriptLangs.TryGetScriptLang(codepoint, out ScriptLangInfo scripLangInfo) && scripLangInfo.unicodeLangs != null)
             {
                 foreach (UnicodeRangeInfo unicodeLangRange in scripLangInfo.unicodeLangs)
                 {
-                    if (_regisiterWithUnicodeRangeDic.TryGetValue(unicodeLangRange, out List<InstalledTypeface> typefaceList) && typefaceList.Count > 0)
+                    if (_registerWithUnicodeRangeDic.TryGetValue(unicodeLangRange, out List<InstalledTypeface> typefaceList) && typefaceList.Count > 0)
                     {
                         //select a proper typeface                        
                         installedTypefaceList = typefaceList;
@@ -959,7 +966,6 @@ namespace Typography.FontManagement
 
         public static IEnumerable<BitposAndAssciatedUnicodeRanges> GetSupportedUnicodeLangIter(this InstalledTypeface instTypeface)
         {
-
             //check all 0-125 bits 
             for (int i = 0; i <= Unicode5_1Ranges.MAX_BITPOS; ++i)
             {

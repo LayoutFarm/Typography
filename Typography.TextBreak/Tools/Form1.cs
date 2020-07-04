@@ -191,13 +191,17 @@ namespace Tools
 
             }
         }
-        static bool CheckIfNotOverlap(UnicodeRangeInfo test, List<UnicodeRangeInfo> others, int exceptIndex)
+        static bool CheckIfNotOverlap(UnicodeRangeInfo test, List<UnicodeRangeInfo> others, int exceptIndex, int exceptIndex2 = -1)
         {
             int count = others.Count;
 
             for (int i = 0; i < count; ++i)
             {
                 if (i == exceptIndex)
+                {
+                    continue;
+                }
+                if (exceptIndex2 > -1 && i == exceptIndex2)
                 {
                     continue;
                 }
@@ -252,7 +256,10 @@ namespace Tools
 
             for (int i = 1; i < allLines.Length; ++i)
             {
-                string[] fields = allLines[i].Split('\t');
+                string line = allLines[i].Trim();
+                if (line.Length == 0 || line.StartsWith("#")) { continue; }//skip blank line or comment line
+
+                string[] fields = line.Split('\t');
                 if (fields.Length != 3)
                 {
                     throw new NotSupportedException();
@@ -267,6 +274,26 @@ namespace Tools
                     EndCodePoint = int.Parse(codePointRanges[1], System.Globalization.NumberStyles.HexNumber)
                 });
             }
+
+
+            //----
+            //ensure the unicode5_1 not overlap
+            int count = _unicode5_1Ranges.Count;
+            for (int i = 0; i < count; ++i)
+            {
+                if (i == 77)
+                {
+                    //Non-plane0, 
+                    //skip
+                    continue;
+                }
+                if (!CheckIfNotOverlap(_unicode5_1Ranges[i], _unicode5_1Ranges, i, 77))
+                {
+                    //found overlap!                     
+                    throw new NotSupportedException("unicode overlap found!");
+                }
+            }
+
 
             Dictionary<int, List<UnicodeRangeInfo>> bitpos_group_dic = new Dictionary<int, List<UnicodeRangeInfo>>();
 
