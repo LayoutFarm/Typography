@@ -28,6 +28,8 @@ namespace Typography.TextServices
         ScriptLang _scLang;
 
         ActiveTypefaceCache _typefaceStore;
+        Typeface _latestTypeface;
+        float _latestFontSizeInPts;
 
         public TextServices()
         {
@@ -46,10 +48,17 @@ namespace Typography.TextServices
             get => _scLang;
             set => _scLang = _glyphLayout.ScriptLang = value;
         }
+        public bool EnableGsub
+        {
+            get => _glyphLayout.EnableGsub;
+            set => _glyphLayout.EnableGsub = value;
+        }
+        public bool EnableGpos
+        {
+            get => _glyphLayout.EnableGpos;
+            set => _glyphLayout.EnableGpos = value;
+        }
 
-
-        Typeface _latestTypeface;
-        float _latestFontSizeInPts;
         public Typeface CurrentTypeface => _latestTypeface;
         public float CurrentFontSizeInPts => _latestFontSizeInPts;
 
@@ -240,7 +249,7 @@ namespace Typography.TextServices
         }
 
 #if DEBUG
-        public bool dbug_disableCache = false;
+        public bool dbug_disableCache = true;
 #endif
 
         public GlyphPlanSequence GetUnscaledGlyphPlanSequence(
@@ -381,7 +390,7 @@ namespace Typography.TextServices
                 //custom key
                 char[] upperCaseName = typeface.Name.ToUpper().ToCharArray();
                 OpenFont.Extensions.TypefaceExtensions.SetCustomTypefaceKey(
-                    typeface, 
+                    typeface,
                     CRC32.CalculateCRC32(upperCaseName, 0, upperCaseName.Length));
 
                 return _loadedTypefaces[installedFont] = typeface;

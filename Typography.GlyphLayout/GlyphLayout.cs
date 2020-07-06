@@ -250,6 +250,7 @@ namespace Typography.TextLayout
             PositionTechnique = PositionTechnique.OpenFont;
             EnableLigature = true;
             EnableComposition = true;
+            EnableGsub = EnableGpos = true;
             ScriptLang = s_latin;
         }
 
@@ -305,6 +306,8 @@ namespace Typography.TextLayout
         List<dbugCodePointFromUserChar> _dbugReusableCodePointFromUserCharList = new List<dbugCodePointFromUserChar>();
 #endif
 
+        public bool EnableGsub { get; set; }
+        public bool EnableGpos { get; set; }
 
         /// <summary>
         /// do glyph shaping and glyph out, output is unscaled glyph-plan
@@ -426,7 +429,7 @@ namespace Typography.TextLayout
             //[C]
             //----------------------------------------------  
             //glyph substitution            
-            if (_gsub != null && glyphs.Count > 0)
+            if (EnableGsub && _gsub != null && glyphs.Count > 0)
             {
                 //TODO: review perf here
                 _gsub.EnableLigation = this.EnableLigature;
@@ -460,7 +463,7 @@ namespace Typography.TextLayout
             }
 
             PositionTechnique posTech = this.PositionTechnique;
-            if (_gpos != null && glyphs.Count > 1 && posTech == PositionTechnique.OpenFont)
+            if (EnableGpos && _gpos != null && glyphs.Count > 1 && posTech == PositionTechnique.OpenFont)
             {
                 _gpos.DoGlyphPosition(_glyphPositions);
             }
