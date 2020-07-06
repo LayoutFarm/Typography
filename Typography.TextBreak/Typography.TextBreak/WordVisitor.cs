@@ -67,13 +67,10 @@ namespace Typography.TextBreak
             _endIndex = index + len;
 
             _startIndex = _currentIndex = index;
-            LatestSpanStartAt = _startIndex;
+            _latestBreakAt = LatestSpanStartAt = _startIndex;
 
             _currentChar = buffer[_currentIndex];
-
-
-            _tempCandidateBreaks.Clear();
-            _latestBreakAt = 0;
+            _tempCandidateBreaks.Clear();            
 
             //#if DEBUG
             //            dbugBreakAtList.Clear();
