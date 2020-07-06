@@ -193,6 +193,14 @@ namespace Typography.TextLayout
             this.t = t;
             this.scriptLang = scriptLang;
         }
+        public override int GetHashCode()
+        {
+            int hash = 17;
+            hash = hash * 31 + t.GetHashCode();
+            hash = hash * 31 + scriptLang.scriptTag.GetHashCode();
+            hash = hash * 31 + scriptLang.sysLangTag.GetHashCode();
+            return hash;             
+        }
     }
     readonly struct GlyphLayoutPlanContext
     {
