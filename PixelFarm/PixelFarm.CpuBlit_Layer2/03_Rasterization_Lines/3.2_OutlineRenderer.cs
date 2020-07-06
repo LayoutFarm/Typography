@@ -15,7 +15,7 @@
 //----------------------------------------------------------------------------
 
 using System;
-using System.Collections.Generic; 
+using System.Collections.Generic;
 using PixelFarm.CpuBlit.PrimitiveProcessing;
 using PixelFarm.CpuBlit.FragmentProcessing;
 
@@ -36,7 +36,7 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
             _gammaValues = gammaValues;
         }
         public PreBuiltLineAAGammaTable(IGammaFunction generator) : this(generator.GetGamma)
-        { 
+        {
         }
         public PreBuiltLineAAGammaTable(Func<float, float> gammaValueGenerator)
         {
@@ -315,11 +315,10 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
         public void ResetClipping() => _doClipping = false;
         public void SetClipBox(double x1, double y1, double x2, double y2)
         {
-            _clippingRectangle.Left = LineCoordSat.Convert(x1);
-            _clippingRectangle.Bottom = LineCoordSat.Convert(y1);
-            _clippingRectangle.Right = LineCoordSat.Convert(x2);
-            _clippingRectangle.Top = LineCoordSat.Convert(y2);
-
+            _clippingRectangle = new VertexProcessing.Q1Rect(
+                LineCoordSat.Convert(x1), LineCoordSat.Convert(y1),
+                LineCoordSat.Convert(x2), LineCoordSat.Convert(y2)
+                );
             //clippingRectangle.Left = LineCoordSat.Convert(x1);
             //clippingRectangle.Top = LineCoordSat.Convert(y1);
             //clippingRectangle.Right = LineCoordSat.Convert(x2);

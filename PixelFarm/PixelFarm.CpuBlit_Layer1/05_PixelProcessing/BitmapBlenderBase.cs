@@ -259,22 +259,18 @@ namespace PixelFarm.CpuBlit.PixelProcessing
             }
         }
 
-        public void CopyFrom(IBitmapSrc sourceImage, Q1Rect sourceImageRect, int destXOffset, int destYOffset)
+        public void CopyFrom(IBitmapSrc srcimg, Q1Rect srcImgRect, int destXOffset, int destYOffset)
         {
-            Q1Rect sourceImageBounds = sourceImage.GetBounds();
-            Q1Rect clippedSourceImageRect = new Q1Rect();
-            if (clippedSourceImageRect.IntersectRectangles(sourceImageRect, sourceImageBounds))
+
+            if (Q1Rect.IntersectRectangles(srcimg.GetBounds(), srcImgRect, out Q1Rect clipped_srcRect))
             {
-                Q1Rect destImageRect = clippedSourceImageRect;
-                destImageRect.Offset(destXOffset, destYOffset);
-                Q1Rect destImageBounds = GetBounds();
-                Q1Rect clippedDestImageRect = new Q1Rect();
-                if (clippedDestImageRect.IntersectRectangles(destImageRect, destImageBounds))
+                Q1Rect dstImgRect = clipped_srcRect.CreateNewFromOffset(destXOffset, destYOffset);
+
+                if (Q1Rect.IntersectRectangles(dstImgRect, GetBounds(), out Q1Rect clipped_dstRect))
                 {
                     // we need to make sure the source is also clipped to the dest. So, we'll copy this back to source and offset it.
-                    clippedSourceImageRect = clippedDestImageRect;
-                    clippedSourceImageRect.Offset(-destXOffset, -destYOffset);
-                    CopyFromNoClipping(sourceImage, clippedSourceImageRect, destXOffset, destYOffset);
+                    clipped_srcRect = clipped_dstRect.CreateNewFromOffset(-destXOffset, -destYOffset);
+                    CopyFromNoClipping(srcimg, clipped_srcRect, destXOffset, destYOffset);
                 }
             }
         }
@@ -429,7 +425,7 @@ namespace PixelFarm.CpuBlit.PixelProcessing
 #endif
         }
 
-        
+
 
         public void BlendVL(int x, int y1, int y2, Color sourceColor, byte cover)
         {
@@ -509,7 +505,7 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                 while (--len != 0);
             }
         }
-        
+
 
         public void BlendSolidVSpan(int x, int y, int len, Color sourceColor, byte[] covers, int coversIndex)
         {
@@ -759,10 +755,10 @@ namespace PixelFarm.CpuBlit.PixelProcessing
             //    }
             //    while (--len != 0);
             //} 
-        } 
+        }
         public void BlendHL(int x1, int y, int x2, Color srcColor, byte cover)
         {
-              
+
 
             if (srcColor.A == 0) { return; } //TODO: review here again, blend other channel???
 
@@ -794,7 +790,7 @@ namespace PixelFarm.CpuBlit.PixelProcessing
 
         public void BlendSolidHSpan(int x, int y, int len, Color sourceColor, byte[] covers, int coversIndex)
         {
-              
+
             int colorAlpha = sourceColor.A;
             if (colorAlpha != 0)
             {

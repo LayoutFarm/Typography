@@ -620,10 +620,10 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
 
         public void SetClipBox(double x1, double y1, double x2, double y2)
         {
-            _clip_box.Left = LineCoordSat.Convert(x1);
-            _clip_box.Bottom = LineCoordSat.Convert(y1);
-            _clip_box.Right = LineCoordSat.Convert(x2);
-            _clip_box.Top = LineCoordSat.Convert(y2);
+            _clip_box = new Q1Rect(
+                LineCoordSat.Convert(x1), LineCoordSat.Convert(y1),
+                LineCoordSat.Convert(x2), LineCoordSat.Convert(y2)
+                );
             _clipping = true;
         }
 
