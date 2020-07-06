@@ -103,7 +103,9 @@ namespace Typography.TextLayout
             _typeface = typeface;
             _mustRebuildTables = true;
         }
-
+#if DEBUG
+        public string dbugScriptLang;
+#endif
 
         public void DoSubstitution(IGlyphIndexList glyphIndexList)
         {

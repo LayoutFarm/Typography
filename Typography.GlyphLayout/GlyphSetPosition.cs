@@ -18,7 +18,9 @@ namespace Typography.TextLayout
 
         readonly GPOS _gposTable;
         internal List<GPOS.LookupTable> _lookupTables;
-
+#if DEBUG
+        public string dbugScriptLang;
+#endif
         public GlyphSetPosition(Typeface typeface, uint scriptTag, uint langTag)
         {
             this.ScriptTag = scriptTag; //script tag

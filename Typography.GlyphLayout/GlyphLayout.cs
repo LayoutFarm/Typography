@@ -151,9 +151,7 @@ namespace Typography.TextLayout
 
     class GlyphLayoutPlanCollection
     {
-        Dictionary<GlyphLayoutPlanKey, GlyphLayoutPlanContext> _collection = new Dictionary<GlyphLayoutPlanKey, GlyphLayoutPlanContext>();
-
-        static readonly Dictionary<string, int> s_scriptLangKeys = new Dictionary<string, int>();
+        Dictionary<int, GlyphLayoutPlanContext> _collection = new Dictionary<int, GlyphLayoutPlanContext>();
         /// <summary>
         /// get glyph layout plan or create if not exists
         /// </summary>
@@ -162,20 +160,25 @@ namespace Typography.TextLayout
         /// <returns></returns>
         public GlyphLayoutPlanContext GetPlanOrCreate(Typeface typeface, ScriptLang scriptLang)
         {
-            string key_string = scriptLang.ToString();
-            if (!s_scriptLangKeys.TryGetValue(key_string, out int key1))
-            {
-                key1 = s_scriptLangKeys.Count + 1;
-                s_scriptLangKeys.Add(key_string, key1);
-            }
-
-            GlyphLayoutPlanKey key = new GlyphLayoutPlanKey(typeface, key1);
-
-            if (!_collection.TryGetValue(key, out GlyphLayoutPlanContext context))
+            GlyphLayoutPlanKey key = new GlyphLayoutPlanKey(typeface, scriptLang);
+            int hash_code = key.GetHashCode();
+            if (!_collection.TryGetValue(hash_code, out GlyphLayoutPlanContext context))
             {
                 var g_sub = (typeface.GSUBTable != null) ? new GlyphSubstitution(typeface, scriptLang.scriptTag, scriptLang.sysLangTag) : null;
                 var g_pos = (typeface.GPOSTable != null) ? new GlyphSetPosition(typeface, scriptLang.scriptTag, scriptLang.sysLangTag) : null;
-                _collection.Add(key, context = new GlyphLayoutPlanContext(g_sub, g_pos));
+
+#if DEBUG
+                if (g_sub != null)
+                {
+                    g_sub.dbugScriptLang = scriptLang.ToString();
+                }
+                if (g_pos != null)
+                {
+                    g_pos.dbugScriptLang = scriptLang.ToString();
+                }
+#endif
+
+                _collection.Add(hash_code, context = new GlyphLayoutPlanContext(g_sub, g_pos));
             }
             return context;
         }
@@ -184,11 +187,11 @@ namespace Typography.TextLayout
     readonly struct GlyphLayoutPlanKey
     {
         public readonly Typeface t;
-        public readonly int scriptInternameName;
-        public GlyphLayoutPlanKey(Typeface t, int scriptInternameName)
+        public readonly ScriptLang scriptLang;
+        public GlyphLayoutPlanKey(Typeface t, ScriptLang scriptLang)
         {
             this.t = t;
-            this.scriptInternameName = scriptInternameName;
+            this.scriptLang = scriptLang;
         }
     }
     readonly struct GlyphLayoutPlanContext
