@@ -39,10 +39,8 @@ namespace PixelFarm.CpuBlit.PixelProcessing
         public virtual int Height => _linkedImage.Height;
         public virtual int Stride => _linkedImage.Stride;
         // 
-        public virtual Q1Rect GetBounds()
-        {
-            return _linkedImage.GetBounds();
-        }
+        public virtual Q1Rect GetBounds() => _linkedImage.GetBounds();
+
         public PixelProcessing.PixelBlender32 OutputPixelBlender
         {
             get => _linkedImage.OutputPixelBlender;
