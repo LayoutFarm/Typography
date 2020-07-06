@@ -106,17 +106,17 @@ namespace PixelFarm.CpuBlit.VertexProcessing
 
 
     //----------------------------------------------------
-    public static class BoundingRectInt
-    {
-        public static void GetBoundingRect(this VertexStore vxs, ref Q1Rect rect)
-        {
-            Q1RectD rect1 = new Q1RectD();
-            BoundingRect.GetBoundingRect(vxs, ref rect1);
-            rect.Left = (int)System.Math.Round(rect1.Left);
-            rect.Bottom = (int)System.Math.Round(rect1.Bottom);
-            rect.Right = (int)System.Math.Round(rect1.Right);
-            rect.Top = (int)System.Math.Round(rect1.Top);
-        }
-
-    }
+    //public static class BoundingRectInt
+    //{
+    //    public static void GetBoundingRect(this VertexStore vxs, ref Q1Rect rect)
+    //    {
+    //        Q1RectD rect1 = new Q1RectD();
+    //        BoundingRect.GetBoundingRect(vxs, ref rect1);
+    //        //
+    //        rect.Left = (int)System.Math.Round(rect1.Left);
+    //        rect.Bottom = (int)System.Math.Round(rect1.Bottom);
+    //        rect.Right = (int)System.Math.Round(rect1.Right);
+    //        rect.Top = (int)System.Math.Round(rect1.Top);
+    //    } 
+    //}
 }
