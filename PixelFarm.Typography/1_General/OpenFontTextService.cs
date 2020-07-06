@@ -130,6 +130,16 @@ namespace PixelFarm.Drawing
             get => _txtServices.CurrentScriptLang;
             set => _txtServices.CurrentScriptLang = value;
         }
+        public bool EnableGsub
+        {
+            get => _txtServices.EnableGsub;
+            set => _txtServices.EnableGsub = value;
+        }
+        public bool EnableGpos
+        {
+            get => _txtServices.EnableGpos;
+            set => _txtServices.EnableGpos = value;
+        }
 
         readonly TextPrinterWordVisitor _wordVisitor = new TextPrinterWordVisitor();
         readonly TextPrinterLineSegmentList<TextPrinterLineSegment> _lineSegmentList = new TextPrinterLineSegmentList<TextPrinterLineSegment>();
