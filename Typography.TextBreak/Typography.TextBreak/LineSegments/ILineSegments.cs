@@ -2,8 +2,7 @@
 namespace Typography.TextBreak
 { 
     public class SpanBreakInfo
-    {
-        
+    {        
         internal SpanBreakInfo(bool isRightToLeft, uint scriptTag, uint langTag = 0)
         {
             RightToLeft = isRightToLeft;
