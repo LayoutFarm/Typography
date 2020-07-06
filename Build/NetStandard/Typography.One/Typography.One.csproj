@@ -24,7 +24,7 @@
     <Compile Include="..\..\..\PixelFarm.Typography\3_Typography_Contours\GlyphMeshCollection.cs" Link="GlyphPathBuilder\GlyphMeshCollection.cs" />
     <Compile Include="..\..\..\PixelFarm.Typography\3_Typography_Contours\GlyphOutlineBuilderBase.cs" Link="GlyphPathBuilder\GlyphOutlineBuilderBase.cs" />
     <Compile Include="..\..\..\PixelFarm.Typography\3_Typography_Contours\TextPrinterBase.cs" Link="DevTextPrinter\TextPrinterBase.cs" />
-    <Compile Include="..\..\..\PixelFarm\PixelFarm.Painter\Drawing\TextBaseline.cs" Link="DevTextPrinter\TextBaseline.cs" />
+    <Compile Include="..\..\..\PixelFarm\PixelFarm.Painter_Layer2_SH\Drawing\TextBaseline.cs" Link="DevTextPrinter\TextBaseline.cs" />
   </ItemGroup>
 
   <ItemGroup>
