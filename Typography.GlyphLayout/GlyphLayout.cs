@@ -160,8 +160,8 @@ namespace Typography.TextLayout
         /// <returns></returns>
         public GlyphLayoutPlanContext GetPlanOrCreate(Typeface typeface, ScriptLang scriptLang)
         {
-            GlyphLayoutPlanKey key = new GlyphLayoutPlanKey(typeface, scriptLang);
-            int hash_code = key.GetHashCode();
+
+            int hash_code = CalculateHash(typeface, scriptLang);
             if (!_collection.TryGetValue(hash_code, out GlyphLayoutPlanContext context))
             {
                 var g_sub = (typeface.GSUBTable != null) ? new GlyphSubstitution(typeface, scriptLang.scriptTag, scriptLang.sysLangTag) : null;
@@ -182,26 +182,17 @@ namespace Typography.TextLayout
             }
             return context;
         }
-
-    }
-    readonly struct GlyphLayoutPlanKey
-    {
-        public readonly Typeface t;
-        public readonly ScriptLang scriptLang;
-        public GlyphLayoutPlanKey(Typeface t, ScriptLang scriptLang)
-        {
-            this.t = t;
-            this.scriptLang = scriptLang;
-        }
-        public override int GetHashCode()
+        static int CalculateHash(Typeface t, ScriptLang scriptLang)
         {
             int hash = 17;
             hash = hash * 31 + t.GetHashCode();
             hash = hash * 31 + scriptLang.scriptTag.GetHashCode();
             hash = hash * 31 + scriptLang.sysLangTag.GetHashCode();
-            return hash;             
+            return hash;
         }
+
     }
+
     readonly struct GlyphLayoutPlanContext
     {
         public readonly GlyphSubstitution _glyphSub;
