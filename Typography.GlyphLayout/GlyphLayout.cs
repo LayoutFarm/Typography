@@ -151,7 +151,7 @@ namespace Typography.TextLayout
 
     class GlyphLayoutPlanCollection
     {
-        Dictionary<int, GlyphLayoutPlanContext> _collection = new Dictionary<int, GlyphLayoutPlanContext>();
+        readonly Dictionary<int, GlyphLayoutPlanContext> _collection = new Dictionary<int, GlyphLayoutPlanContext>();
         /// <summary>
         /// get glyph layout plan or create if not exists
         /// </summary>
