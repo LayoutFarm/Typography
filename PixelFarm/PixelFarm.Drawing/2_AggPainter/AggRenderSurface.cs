@@ -31,11 +31,11 @@ namespace PixelFarm.CpuBlit
     public sealed partial class AggRenderSurface
     {
         MemBitmap _destBmp;
-      
+
         readonly ScanlinePacked8 _sclinePack8;
         readonly ScanlineRasterizer _sclineRas;
 
-        MyBitmapBlender _destBitmapBlender; 
+        MyBitmapBlender _destBitmapBlender;
         PixelBlenderBGRA _pixelBlenderBGRA;
         DestBitmapRasterizer _bmpRasterizer;
 
@@ -121,8 +121,10 @@ namespace PixelFarm.CpuBlit
         public Q1Rect GetClippingRect() => ScanlineRasterizer.GetVectorClipBox();
         public void SetClippingRect(Q1Rect rect)
         {
-            rect.IntersectWithRectangle(new Q1Rect(0, 0, this.Width, this.Height));
-            ScanlineRasterizer.SetClipBox(rect);
+            if (Q1Rect.IntersectRectangles(rect, new Q1Rect(0, 0, this.Width, this.Height), out Q1Rect result))
+            {
+                ScanlineRasterizer.SetClipBox(result);
+            }
         }
         public PixelFarm.CpuBlit.FragmentProcessing.ImgSpanGen CustomImgSpanGen
         {

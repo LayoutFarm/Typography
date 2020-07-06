@@ -37,62 +37,19 @@ namespace PixelFarm.CpuBlit.PixelProcessing
 
         public bool SetClippingBox(int x1, int y1, int x2, int y2)
         {
-            Q1Rect cb = new Q1Rect(x1, y1, x2, y2);
-            cb.Normalize();
-            if (cb.Clip(new Q1Rect(0, 0, (int)Width - 1, (int)Height - 1)))
+            Q1Rect cb = new Q1Rect(x1, y1, x2, y2, true);
+            if (Q1Rect.Clip(cb, new Q1Rect(0, 0, (int)Width - 1, (int)Height - 1), out cb))
             {
                 _clippingRect = cb;
                 return true;
             }
-            _clippingRect.Left = 1;
-            _clippingRect.Bottom = 1;
-            _clippingRect.Right = 0;
-            _clippingRect.Top = 0;
+
+            _clippingRect = new Q1Rect(1, 1, 0, 0);
             return false;
         }
 
-        public bool InClipArea(int x, int y)
-        {
-            return _clippingRect.Contains(x, y);
-        }
-        public Q1Rect GetClipArea(ref Q1Rect destRect, ref Q1Rect sourceRect, int sourceWidth, int sourceHeight)
-        {
-            Q1Rect rc = new Q1Rect(0, 0, 0, 0);
-            Q1Rect cb = ClipBox;
-            ++cb.Right;
-            ++cb.Top;
-            if (sourceRect.Left < 0)
-            {
-                destRect.Left -= sourceRect.Left;
-                sourceRect.Left = 0;
-            }
-            if (sourceRect.Bottom < 0)
-            {
-                destRect.Bottom -= sourceRect.Bottom;
-                sourceRect.Bottom = 0;
-            }
-
-            if (sourceRect.Right > sourceWidth) sourceRect.Right = sourceWidth;
-            if (sourceRect.Top > sourceHeight) sourceRect.Top = sourceHeight;
-            if (destRect.Left < cb.Left)
-            {
-                sourceRect.Left += cb.Left - destRect.Left;
-                destRect.Left = cb.Left;
-            }
-            if (destRect.Bottom < cb.Bottom)
-            {
-                sourceRect.Bottom += cb.Bottom - destRect.Bottom;
-                destRect.Bottom = cb.Bottom;
-            }
-
-            if (destRect.Right > cb.Right) destRect.Right = cb.Right;
-            if (destRect.Top > cb.Top) destRect.Top = cb.Top;
-            rc.Right = destRect.Right - destRect.Left;
-            rc.Top = destRect.Top - destRect.Bottom;
-            if (rc.Right > sourceRect.Right - sourceRect.Left) rc.Right = sourceRect.Right - sourceRect.Left;
-            if (rc.Top > sourceRect.Top - sourceRect.Bottom) rc.Top = sourceRect.Top - sourceRect.Bottom;
-            return rc;
-        }
+        public bool InClipArea(int x, int y) => _clippingRect.Contains(x, y);
+         
         public void Clear(Color color)
         {
             Color c = color;
@@ -110,9 +67,7 @@ namespace PixelFarm.CpuBlit.PixelProcessing
         int XMin => _clippingRect.Left;
         int YMin => _clippingRect.Bottom;
         int XMax => _clippingRect.Right;
-        int YMax => _clippingRect.Top;
-
-
+        int YMax => _clippingRect.Top; 
 
         public override Color GetPixel(int x, int y)
         {
@@ -312,14 +267,12 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                        int destXOffset,
                        int destYOffset)
         {
-            Q1Rect destRect = sourceImageRect;
-            destRect.Offset(destXOffset, destYOffset);
-            Q1Rect clippedSourceRect = new Q1Rect();
-            if (clippedSourceRect.IntersectRectangles(destRect, _clippingRect))
+            Q1Rect destRect = sourceImageRect.CreateNewFromOffset(destXOffset, destYOffset);
+
+            if (Q1Rect.IntersectRectangles(destRect, _clippingRect, out Q1Rect clippedSourceRect))
             {
-                // move it back relative to the source
-                clippedSourceRect.Offset(-destXOffset, -destYOffset);
-                base.CopyFrom(sourceImage, clippedSourceRect, destXOffset, destYOffset);
+                // move it back relative to the source 
+                base.CopyFrom(sourceImage, clippedSourceRect.CreateNewFromOffset(-destXOffset, -destYOffset), destXOffset, destYOffset);
             }
         }
         public override void BlendColorVSpan(int x, int y, int len, Color[] colors, int colorsIndex, byte[] covers, int coversIndex, bool firstCoverForAll)
