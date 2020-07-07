@@ -31,16 +31,11 @@ namespace PixelFarm.Drawing
 
     public partial class OpenFontTextService : ITextService
     {
-        /// <summary>
-        /// instance of Typography lib's text service
-        /// </summary>
+        
         readonly TextServices _txtServices;
         readonly Dictionary<int, ResolvedFont> _resolvedTypefaceCache = new Dictionary<int, ResolvedFont>(); //similar to TypefaceStore
-
         //
         public static ScriptLang DefaultScriptLang { get; set; }
-
-
 
         public OpenFontTextService()
         {

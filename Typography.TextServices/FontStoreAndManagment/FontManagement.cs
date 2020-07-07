@@ -235,6 +235,8 @@ namespace Typography.FontManagement
         /// <returns></returns>
         public bool ContainGlyphForUnicode(int codepoint) => _previewFontInfo.Languages.ContainGlyphForUnicode(codepoint);
 
+        internal Typeface ResolvedTypeface;
+
 #if DEBUG
         public override string ToString()
         {
