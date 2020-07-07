@@ -32,8 +32,6 @@ namespace Typography.TextBreak
         public bool BreakPeroidInTextSpan { get; set; }
         public bool EnableCustomAbbrv { get; set; }
         public bool EnableUnicodeRangeBreaker { get; set; }
-
-
         public bool IncludeLatinExtended { get; set; } = true;
 
 
@@ -54,7 +52,14 @@ namespace Typography.TextBreak
             }
         }
 
-        static readonly SpanBreakInfo s_latin = new SpanBreakInfo(false, ScriptTagDefs.Latin.Tag);
+        static readonly SpanBreakInfo s_c0BasicLatin = new SpanBreakInfo(Unicode13RangeInfoList.C0_Controls_and_Basic_Latin, false, ScriptTagDefs.Latin.Tag);
+        static readonly SpanBreakInfo s_c1LatinSupplement = new SpanBreakInfo(Unicode13RangeInfoList.C1_Controls_and_Latin_1_Supplement, false, ScriptTagDefs.Latin.Tag);
+        static readonly SpanBreakInfo s_latinExtendA = new SpanBreakInfo(Unicode13RangeInfoList.Latin_Extended_A, false, ScriptTagDefs.Latin.Tag);
+        static readonly SpanBreakInfo s_latinExtendB = new SpanBreakInfo(Unicode13RangeInfoList.Latin_Extended_B, false, ScriptTagDefs.Latin.Tag);
+
+        static readonly SpanBreakInfo s_emoticon = new SpanBreakInfo(Unicode13RangeInfoList.Emoticons, false, ScriptTagDefs.Latin.Tag);
+
+        static readonly SpanBreakInfo s_latin = new SpanBreakInfo(false, ScriptTagDefs.Latin.Tag);//other         
         static readonly SpanBreakInfo s_unknown = new SpanBreakInfo(false, ScriptTagDefs.Latin.Tag);
 
         public EngBreakingEngine()
@@ -166,10 +171,35 @@ namespace Typography.TextBreak
 
         }
 
-        const char FIRST_CHAR = (char)0;
-        const char LAST_CHAR = (char)255;
-        bool IsInOurLetterRange(char c) => (c >= FIRST_CHAR && c <= LAST_CHAR) || (IncludeLatinExtended && (IsLatinExtendedA(c) || IsLatinExtendedB(c)));
 
+        bool IsInOurLetterRange(char c, out SpanBreakInfo brkInfo)
+        {
+            if (c >= 0 && c <= 127)
+            {
+                brkInfo = s_c0BasicLatin;
+                return true;
+            }
+            else if (c <= 255)
+            {
+                brkInfo = s_c1LatinSupplement;
+                return true;
+            }
+            else if (IncludeLatinExtended)
+            {
+                if (s_latinExtendA.UnicodeRange.IsInRange(c))
+                {
+                    brkInfo = s_latinExtendA;
+                    return true;
+                }
+                else if (s_latinExtendB.UnicodeRange.IsInRange(c))
+                {
+                    brkInfo = s_latinExtendB;
+                    return true;
+                }
+            }
+            brkInfo = null;
+            return false;
+        }
 
         void DoBreak(WordVisitor visitor, char[] input, int start, int len)
         {
@@ -195,7 +225,7 @@ namespace Typography.TextBreak
             bool enableUnicodeRangeBreaker = EnableUnicodeRangeBreaker;
             bool breakPeroidInTextSpan = BreakPeroidInTextSpan;
 
-            visitor.SpanBreakInfo = s_latin;
+            visitor.SpanBreakInfo = s_c0BasicLatin;//default
 
             for (int i = start; i < endBefore; ++i)
             {
@@ -239,11 +269,9 @@ namespace Typography.TextBreak
                             }
                             else if (char.IsLetter(c))
                             {
-                                if (!IsInOurLetterRange(c))
+                                if (!IsInOurLetterRange(c, out SpanBreakInfo brkInfo))
                                 {
-
                                     //letter is OUT_OF_RANGE
-
                                     if (i > bb.startIndex)
                                     {
                                         //flush
@@ -273,7 +301,16 @@ namespace Typography.TextBreak
                                     }
                                 }
 
+                                //if this is a letter in our range 
+                                //special for eng breaking ening, check 
+                                //if a letter is in basic latin range or not                                
                                 //------------------
+                                if (brkInfo != s_c0BasicLatin)
+                                {
+                                    //change to general latin
+                                    visitor.SpanBreakInfo = s_latin;
+                                }
+
                                 //just collect
                                 bb.startIndex = i;
                                 bb.kind = WordKind.Text;
@@ -340,27 +377,8 @@ namespace Typography.TextBreak
                                 lexState = LexState.CollectSurrogatePair;
                                 goto case LexState.CollectSurrogatePair;
                             }
-                            else if (!IsInOurLetterRange(c))
+                            else
                             {
-                                //letter is out-of-range or not 
-                                //clear accum state
-                                if (i > bb.startIndex)
-                                {
-                                    //some remaining data
-                                    bb.length = i - bb.startIndex;
-                                    //flush
-                                    OnBreak(visitor, bb);
-                                    //
-                                    //
-                                    //TODO: check if we should set startIndex and length
-                                    //      like other 'after' onBreak()
-                                }
-                                if (char.IsHighSurrogate(c))
-                                {
-                                    lexState = LexState.CollectSurrogatePair;
-                                    goto case LexState.CollectSurrogatePair;
-                                }
-
                                 if (enableUnicodeRangeBreaker)
                                 {
                                     lexState = LexState.CollectConsecutiveUnicode;
@@ -372,10 +390,7 @@ namespace Typography.TextBreak
                                     return;
                                 }
                             }
-                            else
-                            {
-                                throw new System.NotSupportedException($"The character {c} (U+{((ushort)c).ToString("X4")}) was unhandled.");
-                            }
+
                         }
                         break;
                     case LexState.Number:
@@ -383,9 +398,7 @@ namespace Typography.TextBreak
                             //in number state
                             if (!char.IsNumber(c) && c != '.')
                             {
-                                //if number then continue collect
                                 //if not
-
                                 //flush current state 
                                 bb.length = i - bb.startIndex;
                                 bb.kind = WordKind.Number;
@@ -402,15 +415,27 @@ namespace Typography.TextBreak
                         break;
                     case LexState.Text:
                         {
-                            bool is_number = char.IsNumber(c);
-                            if (char.IsLetter(c) || is_number || (c == '.' && !breakPeroidInTextSpan))
-                            {
-                                //
-                                //c may be out-of-range letter
-                                //letter is out-of-range or not 
-                                //clear accum state   
+                            //we are in letter mode
 
-                                if (!IsInOurLetterRange(c))
+                            if (char.IsNumber(c))
+                            {
+                                //flush 
+                                if (BreakNumberAfterText)
+                                {
+                                    bb.length = i - bb.startIndex;
+                                    bb.kind = WordKind.Text;
+                                    //
+                                    OnBreak(visitor, bb);
+                                    //
+                                    bb.length = 1;
+                                    bb.startIndex = i;
+                                    lexState = LexState.Number;
+                                }
+                            }
+                            else if (char.IsLetter(c))
+                            {
+                                //c is letter
+                                if (!IsInOurLetterRange(c, out SpanBreakInfo brk3))
                                 {
                                     if (i > bb.startIndex)
                                     {
@@ -421,6 +446,8 @@ namespace Typography.TextBreak
                                         OnBreak(visitor, bb);
                                         //TODO: check if we should set startIndex and length
                                         //      like other 'after' onBreak()
+                                        bb.startIndex += bb.length;//***
+
                                     }
 
                                     if (char.IsHighSurrogate(c))
@@ -441,21 +468,23 @@ namespace Typography.TextBreak
                                     }
                                 }
 
-                                if (is_number && BreakNumberAfterText)
+                                //if this is a letter in our range 
+                                //special for eng breaking ening, check 
+                                //if a letter is in basic latin range or not                                
+                                //------------------
+                                if (brk3 != s_c0BasicLatin)
                                 {
-                                    //flush 
-                                    bb.length = i - bb.startIndex;
-                                    bb.kind = WordKind.Text;
-                                    //
-                                    OnBreak(visitor, bb);
-                                    //
-                                    bb.length = 1;
-                                    bb.startIndex = i;
-                                    lexState = LexState.Number;
+                                    //change to general latin
+                                    visitor.SpanBreakInfo = s_latin;
                                 }
+                            }
+                            else if (c == '.' && !breakPeroidInTextSpan)
+                            {
+                                //continue collecting
                             }
                             else
                             {
+                                //other characer
                                 //flush existing text ***
                                 bb.length = i - bb.startIndex;
                                 bb.kind = WordKind.Text;
@@ -468,7 +497,6 @@ namespace Typography.TextBreak
                                 lexState = LexState.Init;
                                 goto case LexState.Init;
                             }
-
                         }
                         break;
                     case LexState.Whitespace:

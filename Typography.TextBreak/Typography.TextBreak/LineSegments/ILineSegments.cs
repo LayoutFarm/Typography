@@ -26,7 +26,15 @@ namespace Typography.TextBreak
 #if DEBUG
         public override string ToString()
         {
-            return Typography.OpenFont.TagUtils.TagToString(ScriptTag) + ":" + Typography.OpenFont.TagUtils.TagToString(LangTag);
+            if (UnicodeRange != null)
+            {
+                return UnicodeRange.ToString() + " " + Typography.OpenFont.TagUtils.TagToString(ScriptTag) + ":" + Typography.OpenFont.TagUtils.TagToString(LangTag);
+            }
+            else
+            {
+                return Typography.OpenFont.TagUtils.TagToString(ScriptTag) + ":" + Typography.OpenFont.TagUtils.TagToString(LangTag);
+            }
+
         }
 #endif
     }
