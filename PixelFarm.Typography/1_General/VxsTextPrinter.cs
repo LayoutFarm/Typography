@@ -804,6 +804,12 @@ namespace PixelFarm.Drawing
                     TextPrinterLineSegment line_seg = _lineSegs.GetLineSegment(i);
                     SpanBreakInfo spBreakInfo = line_seg.BreakInfo;
 
+                    if (spBreakInfo.RightToLeft)
+                    {
+                        needRightToLeftArr = true;
+                    }
+
+
                     if (line_seg.WordKind == WordKind.Whitespace)
                     {
                         if (latestFmtGlyphPlanSeq == null)
@@ -818,12 +824,7 @@ namespace PixelFarm.Drawing
                     }
 
 
-                    if (spBreakInfo.RightToLeft)
-                    {
-                        needRightToLeftArr = true;
-                    }
 
-                    TextBufferSpan buff = new TextBufferSpan(textBuffer, line_seg.StartAt, line_seg.Length);
 
                     //each line segment may have different unicode range 
                     //and the current typeface may not support that range
@@ -871,9 +872,19 @@ namespace PixelFarm.Drawing
                     }
 
 
-                    _textServices.CurrentScriptLang = new ScriptLang(spBreakInfo.ScriptTag, spBreakInfo.LangTag);
+
                     //layout glyphs in each context
+
+                    TextBufferSpan buff = new TextBufferSpan(textBuffer, line_seg.StartAt, line_seg.Length);
+                    _textServices.CurrentScriptLang = new ScriptLang(spBreakInfo.ScriptTag, spBreakInfo.LangTag);
+
+                    //in some text context (+typeface)=>user can disable gsub, gpos
+
+                    _textServices.EnableGpos = false;
+                    _textServices.EnableGsub = false;
+
                     GlyphPlanSequence seq = _textServices.CreateGlyphPlanSeq(buff, curTypeface, FontSizeInPoints);
+
                     seq.IsRightToLeft = spBreakInfo.RightToLeft;
 
                     //create an object that hold more information about GlyphPlanSequence
