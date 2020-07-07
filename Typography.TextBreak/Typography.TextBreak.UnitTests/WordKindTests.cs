@@ -2,7 +2,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Typography.TextBreak;
 using static Typography.TextBreak.WordKind;
-using o = System.Object;
+
 
 [TestClass]
 public class WordKindTests
@@ -23,6 +23,14 @@ public class WordKindTests
                 input.Substring(outputList[i].breakAt,
                                 outputList[i + 1].breakAt - outputList[i].breakAt)
             );
+
+            Typography.TextBreak.WordKind w0 = output[i].wordKind;
+            Typography.TextBreak.WordKind w1 = outputList[i + 1].wordKind;
+            if (w0 != w1)
+            {
+
+            }
+
             Assert.AreEqual(output[i].wordKind, outputList[i + 1].wordKind);
         }
     }

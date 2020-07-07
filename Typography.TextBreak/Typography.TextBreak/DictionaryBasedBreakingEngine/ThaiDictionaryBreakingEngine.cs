@@ -14,14 +14,12 @@ namespace Typography.TextBreak
     public class ThaiDictionaryBreakingEngine : DictionaryBreakingEngine
     {
         CustomDic _customDic;
+        static readonly SpanBreakInfo s_brk = new SpanBreakInfo(Unicode13RangeInfoList.Thai, false, ScriptTagDefs.Thai.Tag);
         public void SetDictionaryData(CustomDic customDic)
         {
             _customDic = customDic;
         }
-        protected override SpanBreakInfo GetSpanBreakInfo()
-        {
-            return new SpanBreakInfo(false, ScriptTagDefs.Thai.Tag);
-        }
+        protected override SpanBreakInfo GetSpanBreakInfo() => s_brk;
         //
         protected override CustomDic CurrentCustomDic => _customDic;
         //
