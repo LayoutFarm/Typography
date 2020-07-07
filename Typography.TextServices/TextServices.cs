@@ -19,8 +19,8 @@ namespace Typography.TextServices
         // 
 
         GlyphPlanCacheForTypefaceAndScriptLang _currentGlyphPlanSeqCache;
-        Dictionary<TextShapingContextKey, GlyphPlanCacheForTypefaceAndScriptLang> _registerShapingContexts = new Dictionary<TextShapingContextKey, GlyphPlanCacheForTypefaceAndScriptLang>();
 
+        readonly Dictionary<TextShapingContextKey, GlyphPlanCacheForTypefaceAndScriptLang> _registerShapingContexts = new Dictionary<TextShapingContextKey, GlyphPlanCacheForTypefaceAndScriptLang>();
         readonly GlyphLayout _glyphLayout;
         float _fontSizeInPts;
 
@@ -79,10 +79,14 @@ namespace Typography.TextServices
             {
                 //not found
                 //the create the new one 
-                var shapingContext = new GlyphPlanCacheForTypefaceAndScriptLang(typeface, _glyphLayout.ScriptLang);
+                var cache = new GlyphPlanCacheForTypefaceAndScriptLang();
+#if DEBUG
+                cache.dbug_scLang = _glyphLayout.ScriptLang;
+                cache.dbug_typeface = typeface;
+#endif
                 //shaping context setup ...
-                _registerShapingContexts.Add(key, shapingContext);
-                _currentGlyphPlanSeqCache = shapingContext;
+                _registerShapingContexts.Add(key, cache);
+                _currentGlyphPlanSeqCache = cache;
             }
 
             _glyphLayout.Typeface = typeface;
@@ -166,89 +170,37 @@ namespace Typography.TextServices
             }
 #endif
         }
-
-
-
     }
 
 
-    class GlyphPlanSeqSet
-    {
-        //TODO: consider this value, make this a variable (static int)
-        const int PREDEFINE_LEN = 10;
 
-        /// <summary>
-        /// common len 0-10?
-        /// </summary>
-        GlyphPlanSeqCollection[] _cacheSeqCollection1;
-        //other len
-        Dictionary<int, GlyphPlanSeqCollection> _cacheSeqCollection2; //lazy init
-        public GlyphPlanSeqSet()
-        {
-            _cacheSeqCollection1 = new GlyphPlanSeqCollection[PREDEFINE_LEN];
-
-            this.MaxCacheLen = 20;//stop caching, please managed this ...
-                                  //TODO:
-                                  //what is the proper number of cache word ?
-                                  //init free dic
-            for (int i = PREDEFINE_LEN - 1; i >= 0; --i)
-            {
-                _cacheSeqCollection1[i] = new GlyphPlanSeqCollection(i);
-            }
-        }
-        public int MaxCacheLen
-        {
-            get;
-            private set;
-        }
-
-        public GlyphPlanSeqCollection GetSeqCollectionOrCreateIfNotExist(int len)
-        {
-            if (len < PREDEFINE_LEN)
-            {
-                return _cacheSeqCollection1[len];
-            }
-            else
-            {
-                if (_cacheSeqCollection2 == null)
-                {
-                    _cacheSeqCollection2 = new Dictionary<int, GlyphPlanSeqCollection>();
-                }
-                if (!_cacheSeqCollection2.TryGetValue(len, out GlyphPlanSeqCollection seqCol))
-                {
-                    //new one if not exist
-                    seqCol = new GlyphPlanSeqCollection(len);
-                    _cacheSeqCollection2.Add(len, seqCol);
-                }
-                return seqCol;
-            }
-        }
-    }
 
     /// <summary>
     /// glyph-cache based on typeface and script-lang with specific gsub/gpos features
     /// </summary>
     class GlyphPlanCacheForTypefaceAndScriptLang
     {
-        readonly Typeface _typeface;
-        readonly ScriptLang _scLang;
-        readonly GlyphPlanSeqSet _glyphPlanSeqSet;
+
+        readonly MultiLengthGlyphPlanSeqCache _multiLenSeqsCache = new MultiLengthGlyphPlanSeqCache(10);
         readonly UnscaledGlyphPlanList _reusableGlyphPlanList = new UnscaledGlyphPlanList();
 
-        public GlyphPlanCacheForTypefaceAndScriptLang(Typeface typeface, ScriptLang scLang)
+        public GlyphPlanCacheForTypefaceAndScriptLang()
         {
-            _typeface = typeface;
-            _scLang = scLang;
-            _glyphPlanSeqSet = new GlyphPlanSeqSet();
         }
         static int CalculateHash(TextBuffer buffer, int startAt, int len)
         {
             //reference,
+            //TODO: we can use other hash function here 
+            //eg ..
+            //https://stackoverflow.com/questions/114085/fast-string-hashing-algorithm-with-low-collision-rates-with-32-bit-integer
             //https://stackoverflow.com/questions/2351087/what-is-the-best-32bit-hash-function-for-short-strings-tag-names
+
+
             return CRC32.CalculateCRC32(buffer.UnsafeGetInternalBuffer(), startAt, len);
         }
-
 #if DEBUG
+        internal Typeface dbug_typeface;
+        internal ScriptLang dbug_scLang;
         public bool dbug_disableCache = false;
 #endif
 
@@ -259,6 +211,7 @@ namespace Typography.TextServices
 
             //UNSCALED VERSION
             //use current typeface + scriptlang
+
             int seqHashValue = CalculateHash(buffer, start, seqLen);
 
             //this func get the raw char from buffer
@@ -266,14 +219,14 @@ namespace Typography.TextServices
             //check if we have the string cache in specific value 
             //---------
 #if DEBUG
-            if (seqLen > _glyphPlanSeqSet.MaxCacheLen)
+            if (seqLen > _multiLenSeqsCache.MaxCacheLen)
             {
                 //layout string is too long to be cache
                 //it need to split into small buffer 
             }
 #endif
             GlyphPlanSequence planSeq = GlyphPlanSequence.Empty;
-            GlyphPlanSeqCollection seqCol = _glyphPlanSeqSet.GetSeqCollectionOrCreateIfNotExist(seqLen);
+            GlyphPlanSeqCollection seqCol = _multiLenSeqsCache.GetGlyphPlanSeqCollection(seqLen);
 
             if (
 
@@ -310,16 +263,63 @@ namespace Typography.TextServices
             return planSeq;
         }
 
+        struct MultiLengthGlyphPlanSeqCache
+        {
+            //per-typeface and script lang 
+            /// <summary>
+            /// common len 0-10?
+            /// </summary>
+            GlyphPlanSeqCollection[] _cacheSeqCollection1;
+            //other len
+            Dictionary<int, GlyphPlanSeqCollection> _cacheSeqCollection2; //lazy init
 
+            readonly int _predefinedLen;
+
+            public MultiLengthGlyphPlanSeqCache(int predefineLen)
+            {
+                _predefinedLen = predefineLen;
+                _cacheSeqCollection1 = new GlyphPlanSeqCollection[predefineLen];
+                _cacheSeqCollection2 = null;
+
+                this.MaxCacheLen = 20;//stop caching, please managed this ...
+                                      //TODO:
+                                      //what is the proper number of cache word ?
+                                      //init free dic
+            }
+            public int MaxCacheLen { get; }
+
+            public GlyphPlanSeqCollection GetGlyphPlanSeqCollection(int len)
+            {
+                if (len < _predefinedLen)
+                {
+                    GlyphPlanSeqCollection seq = _cacheSeqCollection1[len];
+                    return seq ?? (_cacheSeqCollection1[len] = new GlyphPlanSeqCollection(len));
+                }
+                else
+                {
+                    if (_cacheSeqCollection2 == null)
+                    {
+                        _cacheSeqCollection2 = new Dictionary<int, GlyphPlanSeqCollection>();
+                    }
+                    if (!_cacheSeqCollection2.TryGetValue(len, out GlyphPlanSeqCollection seqCol))
+                    {
+                        //new one if not exist
+                        seqCol = new GlyphPlanSeqCollection(len);
+                        _cacheSeqCollection2.Add(len, seqCol);
+                    }
+                    return seqCol;
+                }
+            }
+        }
     }
 
     class GlyphPlanSeqCollection
     {
-        int _seqLen;
+        readonly int _seqLen;
         /// <summary>
         /// dic of hash string value and the cache seq
         /// </summary>
-        Dictionary<int, GlyphPlanSequence> _knownSeqs = new Dictionary<int, GlyphPlanSequence>();
+        readonly Dictionary<int, GlyphPlanSequence> _knownSeqs = new Dictionary<int, GlyphPlanSequence>();
 
         public GlyphPlanSeqCollection(int seqLen)
         {
