@@ -46,6 +46,7 @@ public class BasicTests
     [DataRow("Hi!", 0, new[] { "Hi", "!" })]
     [DataRow("We are #1", 0, new[] { "We", " ", "are", " ", "#", "1" })]
     [DataRow("1337 5P34K", 0, new[] { "1337", " ", "5", "P34K" })]
+    [DataRow("ša bčš čš", 0, new[] { "ša", " ", "bčš", " ", "čš" })]
     [DataRow("ščěěščž čšřžščřž čšřžščř", 0, new[] { "ščěěščž", " ", "čšřžščřž", " ", "čšřžščř" })]
     [DataRow("!@#$%^&*()", 0, new[] { "!", "@", "#", "$", "%", "^", "&", "*", "(", ")" })]
     [DataRow("1st line\r2nd line\n3rd line\r\n4th line\u00855th line", 0,
@@ -73,12 +74,20 @@ public class BasicTests
     public void OutOfRange(string input, int _, string[] output) => BasicTest(input, output);
 
     [DataTestMethod]
+    [DataRow("\t\t", 0, new[] { "\t\t" })]
+    [DataRow("\t\t\t\t  \t\t\t\t", 0, new[] { "\t\t\t\t", "  ", "\t\t\t\t" })]
+    [DataRow("a\t\tb", 0, new[] { "a", "\t\t", "b" })]
+    [DataRow("a\t \tb", 0, new[] { "a", "\t", " ", "\t", "b" })]
+    [DataRow("\t\ta\t\tb", 0, new[] { "\t\t", "a", "\t\t", "b" })]
+    public void WhitespacesAndTabs(string input, int _, string[] output) => BasicTest(input, output);
+
+
+    [DataTestMethod]
     [DataRow("😀", 0, new[] { "😀" })]
     [DataRow("😂", 0, new[] { "😂" })]
     [DataRow("😂😂", 0, new[] { "😂", "😂" })]
     [DataRow("😂A😂", 0, new[] { "😂", "A", "😂" })]
     [DataRow("😂A123😂", 0, new[] { "😂", "A123", "😂" })]
-
     public void Surrogates(string input, int _, string[] output) => BasicTest(input, output);
 
     [DataTestMethod]

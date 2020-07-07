@@ -10,7 +10,9 @@ namespace Typography.TextBreak
     {
         Unknown,
         //
-        Whitespace,
+        Whitespace, //' ' 
+        Tab, //'\t'
+        OtherWhitespace, //other whitespace
         NewLine,
         Number,
         Punc,
@@ -21,6 +23,6 @@ namespace Typography.TextBreak
         Text,
     }
 
-   
+
 
 }
