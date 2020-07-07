@@ -19,37 +19,44 @@ namespace Typography.TextServices
         // 
 
         GlyphPlanCacheForTypefaceAndScriptLang _currentGlyphPlanSeqCache;
-        Dictionary<TextShapingContextKey, GlyphPlanCacheForTypefaceAndScriptLang> _registerShapingContexts = new Dictionary<TextShapingContextKey, GlyphPlanCacheForTypefaceAndScriptLang>();
 
+        readonly Dictionary<TextShapingContextKey, GlyphPlanCacheForTypefaceAndScriptLang> _registerShapingContexts = new Dictionary<TextShapingContextKey, GlyphPlanCacheForTypefaceAndScriptLang>();
         readonly GlyphLayout _glyphLayout;
         float _fontSizeInPts;
 
         ScriptLang _defaultScriptLang;
         ScriptLang _scLang;
 
-        ActiveTypefaceCache _typefaceStore;
+
+        Typeface _latestTypeface;
+        float _latestFontSizeInPts;
 
         public TextServices()
         {
-
-            _typefaceStore = ActiveTypefaceCache.GetTypefaceStoreOrCreateNewIfNotExist();
             _glyphLayout = new GlyphLayout();
         }
         public void SetDefaultScriptLang(ScriptLang scLang)
         {
             _scLang = _defaultScriptLang = scLang;
         }
-        public InstalledTypefaceCollection InstalledFontCollection { get; set; }
+       
 
         public ScriptLang CurrentScriptLang
         {
             get => _scLang;
             set => _scLang = _glyphLayout.ScriptLang = value;
         }
+        public bool EnableGsub
+        {
+            get => _glyphLayout.EnableGsub;
+            set => _glyphLayout.EnableGsub = value;
+        }
+        public bool EnableGpos
+        {
+            get => _glyphLayout.EnableGpos;
+            set => _glyphLayout.EnableGpos = value;
+        }
 
-
-        Typeface _latestTypeface;
-        float _latestFontSizeInPts;
         public Typeface CurrentTypeface => _latestTypeface;
         public float CurrentFontSizeInPts => _latestFontSizeInPts;
 
@@ -70,21 +77,20 @@ namespace Typography.TextServices
             {
                 //not found
                 //the create the new one 
-                var shapingContext = new GlyphPlanCacheForTypefaceAndScriptLang(typeface, _glyphLayout.ScriptLang);
+                var cache = new GlyphPlanCacheForTypefaceAndScriptLang();
+#if DEBUG
+                cache.dbug_scLang = _glyphLayout.ScriptLang;
+                cache.dbug_typeface = typeface;
+#endif
                 //shaping context setup ...
-                _registerShapingContexts.Add(key, shapingContext);
-                _currentGlyphPlanSeqCache = shapingContext;
+                _registerShapingContexts.Add(key, cache);
+                _currentGlyphPlanSeqCache = cache;
             }
 
             _glyphLayout.Typeface = typeface;
             _fontSizeInPts = fontSizeInPts;
         }
-        public Typeface GetTypeface(string name, TypefaceStyle installedFontStyle)
-        {
-            InstalledTypeface inst = InstalledFontCollection.GetInstalledTypeface(name, InstalledTypefaceCollection.GetSubFam(installedFontStyle));
-            return (inst != null) ? _typefaceStore.GetTypeface(inst) : null;
-        }
-
+       
         public GlyphPlanSequence GetUnscaledGlyphPlanSequence(TextBuffer buffer, int start, int len)
         {
             //under current typeface + scriptlang setting 
@@ -157,89 +163,37 @@ namespace Typography.TextServices
             }
 #endif
         }
-
-
-
     }
 
 
-    class GlyphPlanSeqSet
-    {
-        //TODO: consider this value, make this a variable (static int)
-        const int PREDEFINE_LEN = 10;
 
-        /// <summary>
-        /// common len 0-10?
-        /// </summary>
-        GlyphPlanSeqCollection[] _cacheSeqCollection1;
-        //other len
-        Dictionary<int, GlyphPlanSeqCollection> _cacheSeqCollection2; //lazy init
-        public GlyphPlanSeqSet()
-        {
-            _cacheSeqCollection1 = new GlyphPlanSeqCollection[PREDEFINE_LEN];
-
-            this.MaxCacheLen = 20;//stop caching, please managed this ...
-                                  //TODO:
-                                  //what is the proper number of cache word ?
-                                  //init free dic
-            for (int i = PREDEFINE_LEN - 1; i >= 0; --i)
-            {
-                _cacheSeqCollection1[i] = new GlyphPlanSeqCollection(i);
-            }
-        }
-        public int MaxCacheLen
-        {
-            get;
-            private set;
-        }
-
-        public GlyphPlanSeqCollection GetSeqCollectionOrCreateIfNotExist(int len)
-        {
-            if (len < PREDEFINE_LEN)
-            {
-                return _cacheSeqCollection1[len];
-            }
-            else
-            {
-                if (_cacheSeqCollection2 == null)
-                {
-                    _cacheSeqCollection2 = new Dictionary<int, GlyphPlanSeqCollection>();
-                }
-                if (!_cacheSeqCollection2.TryGetValue(len, out GlyphPlanSeqCollection seqCol))
-                {
-                    //new one if not exist
-                    seqCol = new GlyphPlanSeqCollection(len);
-                    _cacheSeqCollection2.Add(len, seqCol);
-                }
-                return seqCol;
-            }
-        }
-    }
 
     /// <summary>
     /// glyph-cache based on typeface and script-lang with specific gsub/gpos features
     /// </summary>
     class GlyphPlanCacheForTypefaceAndScriptLang
     {
-        Typeface _typeface;
-        ScriptLang _scLang;
-        GlyphPlanSeqSet _glyphPlanSeqSet;
-        UnscaledGlyphPlanList _reusableGlyphPlanList = new UnscaledGlyphPlanList();
 
-        public GlyphPlanCacheForTypefaceAndScriptLang(Typeface typeface, ScriptLang scLang)
+        readonly MultiLengthGlyphPlanSeqCache _multiLenSeqsCache = new MultiLengthGlyphPlanSeqCache(10);
+        readonly UnscaledGlyphPlanList _reusableGlyphPlanList = new UnscaledGlyphPlanList();
+
+        public GlyphPlanCacheForTypefaceAndScriptLang()
         {
-            _typeface = typeface;
-            _scLang = scLang;
-            _glyphPlanSeqSet = new GlyphPlanSeqSet();
         }
         static int CalculateHash(TextBuffer buffer, int startAt, int len)
         {
             //reference,
+            //TODO: we can use other hash function here 
+            //eg ..
+            //https://stackoverflow.com/questions/114085/fast-string-hashing-algorithm-with-low-collision-rates-with-32-bit-integer
             //https://stackoverflow.com/questions/2351087/what-is-the-best-32bit-hash-function-for-short-strings-tag-names
+
+
             return CRC32.CalculateCRC32(buffer.UnsafeGetInternalBuffer(), startAt, len);
         }
-
 #if DEBUG
+        internal Typeface dbug_typeface;
+        internal ScriptLang dbug_scLang;
         public bool dbug_disableCache = false;
 #endif
 
@@ -250,6 +204,7 @@ namespace Typography.TextServices
 
             //UNSCALED VERSION
             //use current typeface + scriptlang
+
             int seqHashValue = CalculateHash(buffer, start, seqLen);
 
             //this func get the raw char from buffer
@@ -257,14 +212,14 @@ namespace Typography.TextServices
             //check if we have the string cache in specific value 
             //---------
 #if DEBUG
-            if (seqLen > _glyphPlanSeqSet.MaxCacheLen)
+            if (seqLen > _multiLenSeqsCache.MaxCacheLen)
             {
                 //layout string is too long to be cache
                 //it need to split into small buffer 
             }
 #endif
             GlyphPlanSequence planSeq = GlyphPlanSequence.Empty;
-            GlyphPlanSeqCollection seqCol = _glyphPlanSeqSet.GetSeqCollectionOrCreateIfNotExist(seqLen);
+            GlyphPlanSeqCollection seqCol = _multiLenSeqsCache.GetGlyphPlanSeqCollection(seqLen);
 
             if (
 
@@ -301,16 +256,63 @@ namespace Typography.TextServices
             return planSeq;
         }
 
+        struct MultiLengthGlyphPlanSeqCache
+        {
+            //per-typeface and script lang 
+            /// <summary>
+            /// common len 0-10?
+            /// </summary>
+            GlyphPlanSeqCollection[] _cacheSeqCollection1;
+            //other len
+            Dictionary<int, GlyphPlanSeqCollection> _cacheSeqCollection2; //lazy init
 
+            readonly int _predefinedLen;
+
+            public MultiLengthGlyphPlanSeqCache(int predefineLen)
+            {
+                _predefinedLen = predefineLen;
+                _cacheSeqCollection1 = new GlyphPlanSeqCollection[predefineLen];
+                _cacheSeqCollection2 = null;
+
+                this.MaxCacheLen = 20;//stop caching, please managed this ...
+                                      //TODO:
+                                      //what is the proper number of cache word ?
+                                      //init free dic
+            }
+            public int MaxCacheLen { get; }
+
+            public GlyphPlanSeqCollection GetGlyphPlanSeqCollection(int len)
+            {
+                if (len < _predefinedLen)
+                {
+                    GlyphPlanSeqCollection seq = _cacheSeqCollection1[len];
+                    return seq ?? (_cacheSeqCollection1[len] = new GlyphPlanSeqCollection(len));
+                }
+                else
+                {
+                    if (_cacheSeqCollection2 == null)
+                    {
+                        _cacheSeqCollection2 = new Dictionary<int, GlyphPlanSeqCollection>();
+                    }
+                    if (!_cacheSeqCollection2.TryGetValue(len, out GlyphPlanSeqCollection seqCol))
+                    {
+                        //new one if not exist
+                        seqCol = new GlyphPlanSeqCollection(len);
+                        _cacheSeqCollection2.Add(len, seqCol);
+                    }
+                    return seqCol;
+                }
+            }
+        }
     }
 
     class GlyphPlanSeqCollection
     {
-        int _seqLen;
+        readonly int _seqLen;
         /// <summary>
         /// dic of hash string value and the cache seq
         /// </summary>
-        Dictionary<int, GlyphPlanSequence> _knownSeqs = new Dictionary<int, GlyphPlanSequence>();
+        readonly Dictionary<int, GlyphPlanSequence> _knownSeqs = new Dictionary<int, GlyphPlanSequence>();
 
         public GlyphPlanSeqCollection(int seqLen)
         {
@@ -328,67 +330,4 @@ namespace Typography.TextServices
             return _knownSeqs.TryGetValue(hashValue, out seq);
         }
     }
-
-
-    class ActiveTypefaceCache
-    {
-
-        readonly Dictionary<InstalledTypeface, Typeface> _loadedTypefaces = new Dictionary<InstalledTypeface, Typeface>();
-
-        static ActiveTypefaceCache s_typefaceStore;
-        public ActiveTypefaceCache()
-        {
-
-        }
-        public static ActiveTypefaceCache GetTypefaceStoreOrCreateNewIfNotExist()
-        {
-            if (s_typefaceStore == null)
-            {
-                s_typefaceStore = new ActiveTypefaceCache();
-            }
-            return s_typefaceStore;
-        }
-
-        public Typeface GetTypeface(InstalledTypeface installedFont) => GetTypefaceOrCreateNew(installedFont);
-
-        Typeface GetTypefaceOrCreateNew(InstalledTypeface installedFont)
-        {
-            //load 
-            //check if we have create this typeface or not 
-            if (!_loadedTypefaces.TryGetValue(installedFont, out Typeface typeface))
-            {
-                //TODO: review how to load font here 
-                if (Typography.FontManagement.InstalledTypefaceCollectionExtensions.CustomFontStreamLoader != null)
-                {
-                    using (var fontStream = Typography.FontManagement.InstalledTypefaceCollectionExtensions.CustomFontStreamLoader(installedFont.FontPath))
-                    {
-                        var reader = new OpenFontReader();
-                        typeface = reader.Read(fontStream, installedFont.ActualStreamOffset);
-                        typeface.Filename = installedFont.FontPath;
-                    }
-                }
-                else
-                {
-                    using (var fs = new FileStream(installedFont.FontPath, FileMode.Open, FileAccess.Read))
-                    {
-                        var reader = new OpenFontReader();
-                        typeface = reader.Read(fs, installedFont.ActualStreamOffset);
-                        typeface.Filename = installedFont.FontPath;
-                    }
-                }
-
-                //calculate typeface key for the font
-                //custom key
-                char[] upperCaseName = typeface.Name.ToUpper().ToCharArray();
-                OpenFont.Extensions.TypefaceExtensions.SetCustomTypefaceKey(
-                    typeface, 
-                    CRC32.CalculateCRC32(upperCaseName, 0, upperCaseName.Length));
-
-                return _loadedTypefaces[installedFont] = typeface;
-            }
-            return typeface;
-        }
-
-    }
-
 }

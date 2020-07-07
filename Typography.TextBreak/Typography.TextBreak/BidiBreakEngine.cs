@@ -17,48 +17,38 @@ namespace Typography.TextBreak
             //temp fix
             return CanHandle(c);
         }
-        static bool IsArabicChar(char c)
+        readonly static SpanBreakInfo s_brkArabic = new SpanBreakInfo(Unicode13RangeInfoList.Arabic, true, ScriptTagDefs.Arabic.Tag);
+        readonly static SpanBreakInfo s_brkArabicSupplement = new SpanBreakInfo(Unicode13RangeInfoList.Arabic_Supplement, true, ScriptTagDefs.Arabic.Tag);
+        readonly static SpanBreakInfo s_brkArabicExtendA = new SpanBreakInfo(Unicode13RangeInfoList.Arabic_Extended_A, true, ScriptTagDefs.Arabic.Tag);
+        readonly static SpanBreakInfo s_brkArabicPresentFormA = new SpanBreakInfo(Unicode13RangeInfoList.Arabic_Presentation_Forms_A, true, ScriptTagDefs.Arabic.Tag);
+        readonly static SpanBreakInfo s_brkArabicPresentFormB = new SpanBreakInfo(Unicode13RangeInfoList.Arabic_Presentation_Forms_B, true, ScriptTagDefs.Arabic.Tag);
+
+        static bool IsArabicChar(char c, out SpanBreakInfo brInfo)
         {
-            //https://en.wikipedia.org/wiki/Arabic_script_in_Unicode             
+            brInfo = s_brkArabic;
+            if (brInfo.UnicodeRange.IsInRange(c)) return true;
 
-            //Rumi Numeral Symbols(10E60–10E7F, 31 characters)
-            //Indic Siyaq Numbers(1EC70–1ECBF, 68 characters)
-            //Ottoman Siyaq Numbers(1ED00–1ED4F, 61 characters)
-            //Arabic Mathematical Alphabetic Symbols(1EE00–1EEFF, 143 characters)
+            brInfo = s_brkArabicSupplement;
+            if (brInfo.UnicodeRange.IsInRange(c)) return true;
 
-            if (c >= 0x0600 && c <= 0x06FF)
-            {
-                //Arabic (0600–06FF, 255 characters)
-                return true;
-            }
-            else if (c >= 0x0750 && c <= 0x077F)
-            { //Arabic Supplement(0750–077F, 48 characters)
-                return true;
-            }
-            else if (c >= 0x8A0 && c <= 0x08FF)
-            {
-                //Arabic Extended-A(08A0–08FF, 84 characters)
-                return true;
-            }
-            else if (c >= 0xFB50 && c <= 0xFDFF)
-            {  //Arabic Presentation Forms - A(FB50–FDFF, 611 characters)
-                return true;
-            }
-            else if (c >= 0xFE70 && c <= 0xFEFF)
-            {
-                //Arabic Presentation Forms - B(FE70–FEFF, 141 characters)
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            brInfo = s_brkArabicExtendA;
+            if (brInfo.UnicodeRange.IsInRange(c)) return true;
+
+
+            brInfo = s_brkArabicPresentFormA;
+            if (brInfo.UnicodeRange.IsInRange(c)) return true;
+
+            brInfo = s_brkArabicPresentFormB;
+            if (brInfo.UnicodeRange.IsInRange(c)) return true;
+
+            //
+            brInfo = null;
+            return false;
         }
 
-        public override bool CanHandle(char c) => IsArabicChar(c);
+        public override bool CanHandle(char c) => IsArabicChar(c, out _);
 
         RunAdapter _runAdapter = new RunAdapter();
-        readonly SpanBreakInfo _breakInfo = new SpanBreakInfo(true, ScriptTagDefs.Arabic.Tag);
 
         internal override void BreakWord(WordVisitor visitor, char[] charBuff, int startAt, int len)
         {
@@ -72,13 +62,14 @@ namespace Typography.TextBreak
             int arabic_len = 0;
             int lim = startAt + len;
 
-
+            SpanBreakInfo latest_ar = null;
             for (int i = startAt; i < lim; ++i)
             {
                 char c = charBuff[i];
-                if (IsArabicChar(c))
+                if (IsArabicChar(c, out SpanBreakInfo spBreak))
                 {
                     arabic_len++;
+                    latest_ar = spBreak;
                 }
                 else
                 {
@@ -93,7 +84,7 @@ namespace Typography.TextBreak
             }
 
 
-            visitor.SpanBreakInfo = _breakInfo;
+            visitor.SpanBreakInfo = latest_ar;
 
             //only collect char
             Line line1 = new Line(new string(charBuff, startAt, arabic_len));

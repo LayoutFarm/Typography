@@ -52,8 +52,8 @@ namespace Typography.TextBreak
 
         Stack<int> _tempCandidateBreaks = new Stack<int>();
 
+        public virtual SpanBreakInfo SpanBreakInfo { get; set; }
 
-        public SpanBreakInfo SpanBreakInfo { get; set; }
         internal void LoadText(char[] buffer, int index)
         {
             LoadText(buffer, index, buffer.Length);
@@ -70,7 +70,7 @@ namespace Typography.TextBreak
             _latestBreakAt = LatestSpanStartAt = _startIndex;
 
             _currentChar = buffer[_currentIndex];
-            _tempCandidateBreaks.Clear();            
+            _tempCandidateBreaks.Clear();
 
             //#if DEBUG
             //            dbugBreakAtList.Clear();

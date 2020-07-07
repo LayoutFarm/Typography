@@ -15,7 +15,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)AdditionalInfo\MacPostFormat1.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AdditionalInfo\OS2_IBMFontClassParameters.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Bounds.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ScriptLang.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tables\CharacterMap.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Geometry.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Glyph.cs" />

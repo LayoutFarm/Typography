@@ -13,15 +13,12 @@ namespace Typography.TextBreak
     public class LaoDictionaryBreakingEngine : DictionaryBreakingEngine
     {
         CustomDic _customDic;
+        static readonly SpanBreakInfo s_brk = new SpanBreakInfo(Unicode13RangeInfoList.Lao, false, ScriptTagDefs.Lao.Tag);
         public void SetDictionaryData(CustomDic customDic)
         {
             _customDic = customDic;
         }
-        protected override SpanBreakInfo GetSpanBreakInfo()
-        {
-            return new SpanBreakInfo(false, ScriptTagDefs.Lao.Tag);
-        }
-        //
+        protected override SpanBreakInfo GetSpanBreakInfo() => s_brk;
         protected override CustomDic CurrentCustomDic => _customDic;
         //
         public override bool CanBeStartChar(char c)

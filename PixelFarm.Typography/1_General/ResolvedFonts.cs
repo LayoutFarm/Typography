@@ -9,13 +9,15 @@ namespace PixelFarm.Drawing
 
     public class ResolvedFont
     {
-        float _px_scale;
+        readonly float _px_scale;
+        readonly int _ws;
         public ResolvedFont(Typeface typeface, float sizeInPoints, FontStyle fontStyle, int fontKey)
         {
             Typeface = typeface;
             if (Typeface != null)
             {
                 _px_scale = Typeface.CalculateScaleToPixelFromPointSize(sizeInPoints);
+                _ws = (int)Math.Round(Typeface.GetWhitespaceWidth() * _px_scale);
                 Name = typeface.Name;
             }
             SizeInPoints = sizeInPoints;
@@ -37,17 +39,7 @@ namespace PixelFarm.Drawing
                 return 0;
             }
         }
-        public int WhitespaceWidth
-        {
-            get
-            {
-                if (Typeface != null)
-                {
-                    return (int)Math.Round(Typeface.GetWhitespaceWidth() * _px_scale);
-                }
-                return 0;
-            }
-        }
+        public int WhitespaceWidth => _ws;
         public float GetScaleToPixelFromPointInSize() => _px_scale;
         public float AscentInPixels => (Typeface != null) ? _px_scale * Typeface.Ascender : 0;
         public float DescentInPixels => (Typeface != null) ? _px_scale * Typeface.Descender : 0;

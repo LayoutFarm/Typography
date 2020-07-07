@@ -125,21 +125,7 @@ namespace Typography.TextLayout
         int _exactY;
         bool _rightToLeft;
         ushort _currentGlyphIndex;
-        public GlyphPlanSequenceSnapPixelScaleLayout(GlyphPlanSequence glyphPlans, float pxscale)
-        {
-            _seq = glyphPlans;
-            _pxscale = pxscale;
-            _accW = 0;
-            _index = glyphPlans.startAt;
-            _end = glyphPlans.startAt + glyphPlans.len;
-            _exactX = _exactY = 0;
-            _currentGlyphIndex = 0;
-
-            if (_rightToLeft = glyphPlans.IsRightToLeft)
-            {
-                _index = _end - 1;
-            }
-        }
+      
         public GlyphPlanSequenceSnapPixelScaleLayout(GlyphPlanSequence glyphPlans, int start, int len, float pxscale)
         {
             _seq = glyphPlans;

@@ -103,7 +103,9 @@ namespace Typography.TextLayout
             _typeface = typeface;
             _mustRebuildTables = true;
         }
-
+#if DEBUG
+        public string dbugScriptLang;
+#endif
 
         public void DoSubstitution(IGlyphIndexList glyphIndexList)
         {
@@ -218,6 +220,7 @@ namespace Typography.TextLayout
                     //found
                     selectedLang = scriptTable.defaultLang;
                 }
+
                 if (scriptTable.langSysTables != null && scriptTable.langSysTables.Length > 0)
                 {  //find selected lang,
                    //if not => choose default
