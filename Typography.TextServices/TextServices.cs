@@ -39,7 +39,7 @@ namespace Typography.TextServices
         {
             _scLang = _defaultScriptLang = scLang;
         }
-        public InstalledTypefaceCollection InstalledFontCollection { get; set; }
+       
 
         public ScriptLang CurrentScriptLang
         {
@@ -90,48 +90,7 @@ namespace Typography.TextServices
             _glyphLayout.Typeface = typeface;
             _fontSizeInPts = fontSizeInPts;
         }
-        public Typeface GetTypeface(string name, TypefaceStyle installedFontStyle)
-        {
-            InstalledTypeface inst = InstalledFontCollection.GetInstalledTypeface(name, InstalledTypefaceCollection.GetSubFam(installedFontStyle));
-            return (inst != null) ? ResolveTypeface(inst) : null;
-        }
-        Typeface ResolveTypeface(InstalledTypeface installedFont)
-        {
-            if (installedFont.ResolvedTypeface != null) return installedFont.ResolvedTypeface;
-
-            //load  
-            Typeface typeface;
-            if (Typography.FontManagement.InstalledTypefaceCollectionExtensions.CustomFontStreamLoader != null)
-            {
-                using (var fontStream = Typography.FontManagement.InstalledTypefaceCollectionExtensions.CustomFontStreamLoader(installedFont.FontPath))
-                {
-                    var reader = new OpenFontReader();
-                    typeface = reader.Read(fontStream, installedFont.ActualStreamOffset);
-                    typeface.Filename = installedFont.FontPath;
-                    installedFont.ResolvedTypeface = typeface;//cache 
-                }
-            }
-            else
-            {
-                using (var fs = new FileStream(installedFont.FontPath, FileMode.Open, FileAccess.Read))
-                {
-                    var reader = new OpenFontReader();
-                    typeface = reader.Read(fs, installedFont.ActualStreamOffset);
-                    typeface.Filename = installedFont.FontPath;
-                    installedFont.ResolvedTypeface = typeface;//cache 
-                }
-            }
-
-            //calculate typeface key for the new create typeface
-            //custom key
-            char[] upperCaseName = typeface.Name.ToUpper().ToCharArray();
-            OpenFont.Extensions.TypefaceExtensions.SetCustomTypefaceKey(
-                typeface,
-                CRC32.CalculateCRC32(upperCaseName, 0, upperCaseName.Length));
-
-            return typeface;
-
-        }
+       
         public GlyphPlanSequence GetUnscaledGlyphPlanSequence(TextBuffer buffer, int start, int len)
         {
             //under current typeface + scriptlang setting 

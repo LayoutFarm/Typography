@@ -31,11 +31,13 @@ namespace PixelFarm.Drawing
 
     public partial class OpenFontTextService : ITextService
     {
-        
+
         readonly TextServices _txtServices;
         readonly Dictionary<int, ResolvedFont> _resolvedTypefaceCache = new Dictionary<int, ResolvedFont>(); //similar to TypefaceStore
         //
         public static ScriptLang DefaultScriptLang { get; set; }
+
+        readonly InstalledTypefaceCollection _installedTypefaceCollection;
 
         public OpenFontTextService()
         {
@@ -43,7 +45,7 @@ namespace PixelFarm.Drawing
             //set up typography text service
             _txtServices = new TextServices();
             //default, user can set this later
-            _txtServices.InstalledFontCollection = InstalledTypefaceCollection.GetSharedTypefaceCollection(collection =>
+            _installedTypefaceCollection = InstalledTypefaceCollection.GetSharedTypefaceCollection(collection =>
             {
                 collection.SetFontNameDuplicatedHandler((f0, f1) => FontNameDuplicatedDecision.Skip);
 
@@ -79,11 +81,11 @@ namespace PixelFarm.Drawing
             _txtServices.CurrentScriptLang = scLang;
         }
 
-        public void LoadSystemFonts() => _txtServices.InstalledFontCollection.LoadSystemFonts();
+        public void LoadSystemFonts() => _installedTypefaceCollection.LoadSystemFonts();
 
-        public void LoadFontsFromFolder(string folder) => _txtServices.InstalledFontCollection.LoadFontsFromFolder(folder);
+        public void LoadFontsFromFolder(string folder) => _installedTypefaceCollection.LoadFontsFromFolder(folder);
 
-        public void UpdateUnicodeRanges() => _txtServices.InstalledFontCollection.UpdateUnicodeRanges();
+        public void UpdateUnicodeRanges() => _installedTypefaceCollection.UpdateUnicodeRanges();
 
 
         static readonly ScriptLang s_latin = new ScriptLang(ScriptTagDefs.Latin.Tag);
@@ -129,14 +131,15 @@ namespace PixelFarm.Drawing
         /// <returns></returns>
         public bool TryGetAlternativeTypefaceFromCodepoint(int codepoint, AlternativeTypefaceSelector selector, out Typeface found)
         {
-            if (_txtServices.InstalledFontCollection.TryGetAlternativeTypefaceFromCodepoint(codepoint, selector, out InstalledTypeface foundInstalledTypeface))
+            if (_installedTypefaceCollection.TryGetAlternativeTypefaceFromCodepoint(codepoint, selector, out InstalledTypeface foundInstalledTypeface))
             {
-                found = _txtServices.GetTypeface(foundInstalledTypeface.FontName, TypefaceStyle.Regular);
+                found = _installedTypefaceCollection.ResolveTypeface(foundInstalledTypeface);
                 return true;
             }
             found = null;
             return false;
         }
+ 
         //
         public ScriptLang CurrentScriptLang
         {
@@ -291,8 +294,9 @@ namespace PixelFarm.Drawing
             //when not found
             //find it
             RequestFont.OtherChoice otherChoice = null;
+
             Typeface typeface;
-            if ((typeface = _txtServices.GetTypeface(font.Name, PixelFarm.Drawing.FontStyleExtensions.ConvToInstalledFontStyle(font.Style))) == null)
+            if ((typeface = _installedTypefaceCollection.ResolveTypeface(font.Name, PixelFarm.Drawing.FontStyleExtensions.ConvToInstalledFontStyle(font.Style))) == null)
             {
                 //not found!
                 //select other font?
@@ -302,7 +306,7 @@ namespace PixelFarm.Drawing
                     for (int i = 0; i < otherChoiceCount; ++i)
                     {
                         otherChoice = font.GetOtherChoice(i);
-                        if ((typeface = _txtServices.GetTypeface(otherChoice.Name, PixelFarm.Drawing.FontStyleExtensions.ConvToInstalledFontStyle(otherChoice.Style))) != null)
+                        if ((typeface = _installedTypefaceCollection.ResolveTypeface(otherChoice.Name, PixelFarm.Drawing.FontStyleExtensions.ConvToInstalledFontStyle(otherChoice.Style))) != null)
                         {
                             break;
                         }
