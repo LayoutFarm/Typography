@@ -22,6 +22,7 @@ namespace Typography.TextBreak
         {
             Init,
             Whitespace,
+            Tab,
             Text,
             Number,
             CollectSurrogatePair,
@@ -243,7 +244,6 @@ namespace Typography.TextBreak
                                 bb.kind = WordKind.NewLine;
                                 //
                                 OnBreak(visitor, bb);
-
                                 //
                                 bb.startIndex += 2;//***
                                 bb.length = 0;
@@ -267,6 +267,21 @@ namespace Typography.TextBreak
                                 lexState = LexState.Init;
                                 continue;
                             }
+                            else if (c == ' ')
+                            {
+                                //explicit whitespace
+                                //we collect whitespace
+                                bb.startIndex = i;
+                                bb.kind = WordKind.Whitespace;
+                                lexState = LexState.Whitespace;
+                            }
+                            else if (c == '\t')
+                            {
+                                //explicit tab
+                                bb.startIndex = i;
+                                bb.kind = WordKind.Tab;
+                                lexState = LexState.Tab;
+                            } 
                             else if (char.IsLetter(c))
                             {
                                 if (!IsInOurLetterRange(c, out SpanBreakInfo brkInfo))
@@ -274,6 +289,8 @@ namespace Typography.TextBreak
                                     //letter is OUT_OF_RANGE
                                     if (i > bb.startIndex)
                                     {
+
+                                        //???TODO: review here
                                         //flush
                                         bb.length = i - bb.startIndex;
                                         //
@@ -301,15 +318,7 @@ namespace Typography.TextBreak
                                     }
                                 }
 
-                                //if this is a letter in our range 
-                                //special for eng breaking ening, check 
-                                //if a letter is in basic latin range or not                                
-                                //------------------
-                                if (brkInfo != s_c0BasicLatin)
-                                {
-                                    //change to general latin
-                                    visitor.SpanBreakInfo = s_latin;
-                                }
+                                visitor.SpanBreakInfo = brkInfo;
 
                                 //just collect
                                 bb.startIndex = i;
@@ -324,11 +333,34 @@ namespace Typography.TextBreak
                             }
                             else if (char.IsWhiteSpace(c))
                             {
-                                //we collect whitespace
+                                //other whitespace***=> similar to control
                                 bb.startIndex = i;
-                                bb.kind = WordKind.Whitespace;
-                                lexState = LexState.Whitespace;
+                                bb.length = 1;
+                                bb.kind = WordKind.OtherWhitespace;
+                                //
+                                OnBreak(visitor, bb);
+                                //
+                                bb.length = 0;
+                                bb.startIndex++;
+                                lexState = LexState.Init;
+                                continue;
                             }
+                            else if (char.IsControl(c))
+                            {
+                                //\t is control and \t is also whitespace
+                                //we assign that \t to be a control
+                                bb.startIndex = i;
+                                bb.length = 1;
+                                bb.kind = WordKind.Control;
+                                //
+                                OnBreak(visitor, bb);
+                                //
+                                bb.length = 0;
+                                bb.startIndex++;
+                                lexState = LexState.Init;
+                                continue;
+                            }
+
                             else if (char.IsPunctuation(c) || char.IsSymbol(c))
                             {
 
@@ -359,19 +391,7 @@ namespace Typography.TextBreak
                                 lexState = LexState.Init;
                                 continue;
                             }
-                            else if (char.IsControl(c))
-                            {
-                                bb.startIndex = i;
-                                bb.length = 1;
-                                bb.kind = WordKind.Control;
-                                //
-                                OnBreak(visitor, bb);
-                                //
-                                bb.length = 0;
-                                bb.startIndex++;
-                                lexState = LexState.Init;
-                                continue;
-                            }
+
                             else if (char.IsHighSurrogate(c))
                             {
                                 lexState = LexState.CollectSurrogatePair;
@@ -435,7 +455,7 @@ namespace Typography.TextBreak
                             else if (char.IsLetter(c))
                             {
                                 //c is letter
-                                if (!IsInOurLetterRange(c, out SpanBreakInfo brk3))
+                                if (!IsInOurLetterRange(c, out SpanBreakInfo brkInfo))
                                 {
                                     if (i > bb.startIndex)
                                     {
@@ -472,11 +492,12 @@ namespace Typography.TextBreak
                                 //special for eng breaking ening, check 
                                 //if a letter is in basic latin range or not                                
                                 //------------------
-                                if (brk3 != s_c0BasicLatin)
+                                if (visitor.SpanBreakInfo != brkInfo)
                                 {
-                                    //change to general latin
+                                    //mixed span break info => change to general latin
                                     visitor.SpanBreakInfo = s_latin;
                                 }
+
                             }
                             else if (c == '.' && !breakPeroidInTextSpan)
                             {
@@ -501,10 +522,28 @@ namespace Typography.TextBreak
                         break;
                     case LexState.Whitespace:
                         {
-                            if (!char.IsWhiteSpace(c))
+                            //for explicit whitespace
+                            if (c != ' ')
                             {
                                 bb.length = i - bb.startIndex;
                                 bb.kind = WordKind.Whitespace;
+                                //
+                                OnBreak(visitor, bb);
+                                //
+                                bb.length = 0;
+                                bb.startIndex = i;
+                                bb.kind = WordKind.Unknown;
+                                lexState = LexState.Init;
+                                goto case LexState.Init;
+                            }
+                        }
+                        break;
+                    case LexState.Tab:
+                        {
+                            if (c != '\t')
+                            {
+                                bb.length = i - bb.startIndex;
+                                bb.kind = WordKind.Tab;
                                 //
                                 OnBreak(visitor, bb);
                                 //
