@@ -168,27 +168,7 @@ namespace PixelFarm.Drawing
 
             return _txtServices.GetUnscaledGlyphPlanSequence(_reusableTextBuffer, textBufferSpan.start, textBufferSpan.len);
         }
-        public void CreateGlyphPlanSeq(GlyphSeqRequest req)
-        {
-
-            //1. typeface
-            ResolvedFont resolvedFont = req.ResolvedFont;
-            _txtServices.SetCurrentFont(resolvedFont.Typeface, resolvedFont.SizeInPoints);
-            //2. script lang
-            ScriptLang prevScriptLang = CurrentScriptLang;
-            CurrentScriptLang = req.ScriptLang;
-
-            //3. 
-            TextBufferSpan textBufferSpan = req.TextBufferSpan;
-            _reusableTextBuffer.SetRawCharBuffer(textBufferSpan.GetRawCharBuffer());
-
-            //4. get result
-            req.ResultGlyphPlanSeq = _txtServices.GetUnscaledGlyphPlanSequence(_reusableTextBuffer, textBufferSpan.start, textBufferSpan.len);
-
-            //restore
-            CurrentScriptLang = prevScriptLang;
-
-        }
+         
         public GlyphPlanSequence CreateGlyphPlanSeq(in TextBufferSpan textBufferSpan, RequestFont font)
         {
             return CreateGlyphPlanSeq(textBufferSpan, _openFontTextService.ResolveFont(font).Typeface, font.SizeInPoints);
@@ -236,18 +216,10 @@ namespace PixelFarm.Drawing
                 textBufferSpan.len,
                 wordVisitor);
         }
+        public ResolvedFont ResolveFont(RequestFont reqFont) => _openFontTextService.ResolveFont(reqFont);
+        public bool TryGetAlternativeTypefaceFromCodepoint(int codepoint, AlternativeTypefaceSelector selector, out Typeface found) => _openFontTextService.TryGetAlternativeTypefaceFromCodepoint(codepoint, selector, out found);
     }
-    /// <summary>
-    /// request
-    /// </summary>
-    public class GlyphSeqRequest
-    {
-        public ScriptLang ScriptLang { get; set; }
-        public ResolvedFont ResolvedFont { get; set; }
-        public TextBufferSpan TextBufferSpan { get; set; }
-        //
-        public GlyphPlanSequence ResultGlyphPlanSeq { get; set; }
-    }
+   
 
     public partial class OpenFontTextService : ITextService
     {
@@ -427,7 +399,9 @@ namespace PixelFarm.Drawing
             RequestFont.SetResolvedFont1(font, resolvedFont);
             return resolvedFont;
         }
-       
+
+        public TextServiceClient CreateNewServiceClient() => new TextServiceClient(this);
+
         //
         public ScriptLang CurrentScriptLang
         {
@@ -575,27 +549,7 @@ namespace PixelFarm.Drawing
 
             return _txtServices.GetUnscaledGlyphPlanSequence(_reusableTextBuffer, textBufferSpan.start, textBufferSpan.len);
         }
-        public void CreateGlyphPlanSeq(GlyphSeqRequest req)
-        {
-
-            //1. typeface
-            ResolvedFont resolvedFont = req.ResolvedFont;
-            _txtServices.SetCurrentFont(resolvedFont.Typeface, resolvedFont.SizeInPoints);
-            //2. script lang
-            ScriptLang prevScriptLang = CurrentScriptLang;
-            CurrentScriptLang = req.ScriptLang;
-
-            //3. 
-            TextBufferSpan textBufferSpan = req.TextBufferSpan;
-            _reusableTextBuffer.SetRawCharBuffer(textBufferSpan.GetRawCharBuffer());
-
-            //4. get result
-            req.ResultGlyphPlanSeq = _txtServices.GetUnscaledGlyphPlanSequence(_reusableTextBuffer, textBufferSpan.start, textBufferSpan.len);
-
-            //restore
-            CurrentScriptLang = prevScriptLang;
-
-        }
+      
         public GlyphPlanSequence CreateGlyphPlanSeq(in TextBufferSpan textBufferSpan, RequestFont font)
         {
             return CreateGlyphPlanSeq(textBufferSpan, ResolveFont(font).Typeface, font.SizeInPoints);

@@ -133,8 +133,8 @@ namespace PixelFarm.Drawing
 
     public class VxsTextPrinter : TextPrinterBase, ITextPrinter
     {
-        OpenFontTextService _textServices;
 
+        TextServiceClient _txtClient;
         /// <summary>
         /// target canvas
         /// </summary>
@@ -144,14 +144,15 @@ namespace PixelFarm.Drawing
         Typeface _currentTypeface;
         GlyphBitmapStore _glyphBitmapStore;
 
-        public VxsTextPrinter(Painter painter, OpenFontTextService textService)
+        public VxsTextPrinter(Painter painter, OpenFontTextService opentFontTextService)
         {
             _painter = painter;
             _glyphMeshStore = new GlyphMeshStore();
             _glyphMeshStore.FlipGlyphUpward = true;
             this.PositionTechnique = PositionTechnique.OpenFont;
             //
-            _textServices = textService;
+            _txtClient = opentFontTextService.CreateNewServiceClient();
+
             ChangeFont(new RequestFont("Source Sans Pro", 10));
 
             _glyphBitmapStore = new GlyphBitmapStore();
@@ -175,7 +176,7 @@ namespace PixelFarm.Drawing
             //if not found then ask the service***
 
 
-            ResolvedFont resolvedFont = _textServices.ResolveFont(reqFont);
+            ResolvedFont resolvedFont = _txtClient.ResolveFont(reqFont);
             if (resolvedFont != null)
             {
                 this.Typeface = resolvedFont.Typeface;
@@ -261,7 +262,7 @@ namespace PixelFarm.Drawing
             //
             _glyphMeshStore.SetHintTechnique(this.HintTechnique);
 
-            _textServices.CurrentScriptLang = this.ScriptLang;
+            _txtClient.CurrentScriptLang = this.ScriptLang;
         }
 
         public void MeasureString(char[] buffer, int startAt, int len, out int w, out int h)
@@ -270,7 +271,7 @@ namespace PixelFarm.Drawing
             _glyphMeshStore.SetFont(_currentTypeface, this.FontSizeInPoints);
             _glyphMeshStore.SimulateOblique = this.SimulateSlant;
             var textBuffSpan = new TextBufferSpan(buffer, startAt, len);
-            Size s = _textServices.MeasureString(textBuffSpan, _painter.CurrentFont);
+            Size s = _txtClient.MeasureString(textBuffSpan, _painter.CurrentFont);
             w = s.Width;
             h = s.Height;
         }
@@ -773,7 +774,7 @@ namespace PixelFarm.Drawing
 
             if (!EnableMultiTypefaces)
             {
-                GlyphPlanSequence glyphPlanSeq = _textServices.CreateGlyphPlanSeq(buffSpan, _currentTypeface, FontSizeInPoints);
+                GlyphPlanSequence glyphPlanSeq = _txtClient.CreateGlyphPlanSeq(buffSpan, _currentTypeface, FontSizeInPoints);
                 DrawFromGlyphPlans(glyphPlanSeq, xpos, y);
             }
             else
@@ -784,7 +785,7 @@ namespace PixelFarm.Drawing
 
                 _lineSegs.Clear();//clear before reuse
                 _textPrinterWordVisitor.SetLineSegmentList(_lineSegs);
-                _textServices.BreakToLineSegments(buffSpan, _textPrinterWordVisitor);//***
+                _txtClient.BreakToLineSegments(buffSpan, _textPrinterWordVisitor);//***
                 _textPrinterWordVisitor.SetLineSegmentList(null);
 
                 ClearTempFormattedGlyphPlanSeq();
@@ -855,7 +856,7 @@ namespace PixelFarm.Drawing
                             AlternativeTypefaceSelector.LatestTypeface = curTypeface;
                         }
 
-                        if (_textServices.TryGetAlternativeTypefaceFromCodepoint(codepoint, AlternativeTypefaceSelector, out Typeface alternative))
+                        if (_txtClient.TryGetAlternativeTypefaceFromCodepoint(codepoint, AlternativeTypefaceSelector, out Typeface alternative))
                         {
                             curTypeface = alternative;
                         }
@@ -877,7 +878,7 @@ namespace PixelFarm.Drawing
 
                     TextBufferSpan buff = new TextBufferSpan(textBuffer, line_seg.StartAt, line_seg.Length);
 
-                    _textServices.CurrentScriptLang = new ScriptLang(spBreakInfo.ScriptTag, spBreakInfo.LangTag);
+                    _txtClient.CurrentScriptLang = new ScriptLang(spBreakInfo.ScriptTag, spBreakInfo.LangTag);
 
                     //in some text context (+typeface)=>user can disable gsub, gpos
                     //this is an example                  
@@ -885,17 +886,17 @@ namespace PixelFarm.Drawing
                     if (line_seg.WordKind == WordKind.Tab || line_seg.WordKind == WordKind.Number ||
                         (spBreakInfo.UnicodeRange == Unicode13RangeInfoList.C0_Controls_and_Basic_Latin))
                     {
-                        _textServices.EnableGpos = false;
-                        _textServices.EnableGsub = false;
+                        _txtClient.EnableGpos = false;
+                        _txtClient.EnableGsub = false;
                     }
                     else
                     {
-                        _textServices.EnableGpos = true;
-                        _textServices.EnableGsub = true;
+                        _txtClient.EnableGpos = true;
+                        _txtClient.EnableGsub = true;
                     }
 
 
-                    GlyphPlanSequence seq = _textServices.CreateGlyphPlanSeq(buff, curTypeface, FontSizeInPoints);
+                    GlyphPlanSequence seq = _txtClient.CreateGlyphPlanSeq(buff, curTypeface, FontSizeInPoints);
 
                     seq.IsRightToLeft = spBreakInfo.RightToLeft;
 
