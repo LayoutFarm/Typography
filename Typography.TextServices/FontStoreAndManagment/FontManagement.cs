@@ -235,6 +235,8 @@ namespace Typography.FontManagement
         /// <returns></returns>
         public bool ContainGlyphForUnicode(int codepoint) => _previewFontInfo.Languages.ContainGlyphForUnicode(codepoint);
 
+        internal Typeface ResolvedTypeface;
+
 #if DEBUG
         public override string ToString()
         {
@@ -324,17 +326,18 @@ namespace Typography.FontManagement
         /// <summary>
         /// map from font subfam to internal group name
         /// </summary>
-        Dictionary<string, InstalledTypefaceGroup> _subFamToFontGroup = new Dictionary<string, InstalledTypefaceGroup>();
-        Dictionary<string, bool> _onlyFontNames = new Dictionary<string, bool>();
+        readonly Dictionary<string, InstalledTypefaceGroup> _subFamToFontGroup = new Dictionary<string, InstalledTypefaceGroup>();
+        readonly Dictionary<string, bool> _onlyFontNames = new Dictionary<string, bool>();
 
 
-        InstalledTypefaceGroup _regular, _bold, _italic, _bold_italic;
-        List<InstalledTypefaceGroup> _allGroups = new List<InstalledTypefaceGroup>();
+        readonly InstalledTypefaceGroup _regular, _bold, _italic, _bold_italic;
+        readonly List<InstalledTypefaceGroup> _allGroups = new List<InstalledTypefaceGroup>();       
+
+        readonly Dictionary<string, InstalledTypeface> _otherFontNames = new Dictionary<string, InstalledTypeface>();
+        readonly Dictionary<string, InstalledTypeface> _postScriptNames = new Dictionary<string, InstalledTypeface>();
+
         FontNameDuplicatedHandler _fontNameDuplicatedHandler;
         FontNotFoundHandler _fontNotFoundHandler;
-
-        Dictionary<string, InstalledTypeface> _otherFontNames = new Dictionary<string, InstalledTypeface>();
-        Dictionary<string, InstalledTypeface> _postScriptNames = new Dictionary<string, InstalledTypeface>();
 
         public InstalledTypefaceCollection()
         {
@@ -988,7 +991,49 @@ namespace Typography.FontManagement
             }
 
         }
+        public static Typeface ResolveTypeface(this InstalledTypefaceCollection fontCollection, string fontName, TypefaceStyle style)
+        {
+            InstalledTypeface inst = fontCollection.GetInstalledTypeface(fontName, InstalledTypefaceCollection.GetSubFam(style));
+            return (inst != null) ? fontCollection.ResolveTypeface(inst) : null;
+        }
+        public static Typeface ResolveTypeface(this InstalledTypefaceCollection fontCollection, InstalledTypeface installedFont)
+        {
 
+            if (installedFont.ResolvedTypeface != null) return installedFont.ResolvedTypeface;
+
+            //load  
+            Typeface typeface;
+            if (CustomFontStreamLoader != null)
+            {
+                using (var fontStream = CustomFontStreamLoader(installedFont.FontPath))
+                {
+                    var reader = new OpenFontReader();
+                    typeface = reader.Read(fontStream, installedFont.ActualStreamOffset);
+                    typeface.Filename = installedFont.FontPath;
+                    installedFont.ResolvedTypeface = typeface;//cache 
+                }
+            }
+            else
+            {
+                using (var fs = new FileStream(installedFont.FontPath, FileMode.Open, FileAccess.Read))
+                {
+                    var reader = new OpenFontReader();
+                    typeface = reader.Read(fs, installedFont.ActualStreamOffset);
+                    typeface.Filename = installedFont.FontPath;
+                    installedFont.ResolvedTypeface = typeface;//cache 
+                }
+            }
+
+            //calculate typeface key for the new create typeface
+            //custom key
+            char[] upperCaseName = typeface.Name.ToUpper().ToCharArray();
+            OpenFont.Extensions.TypefaceExtensions.SetCustomTypefaceKey(
+                typeface,
+                Typography.TextServices.CRC32.CalculateCRC32(upperCaseName, 0, upperCaseName.Length));
+
+            return typeface;
+
+        }
         //for Windows , how to find Windows' Font Directory from Windows Registry
         //        string[] localMachineFonts = Registry.LocalMachine.OpenSubKey("Software\\Microsoft\\Windows NT\\CurrentVersion\\Fonts", false).GetValueNames();
         //        // get parent of System folder to have Windows folder

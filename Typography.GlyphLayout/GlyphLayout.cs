@@ -151,9 +151,7 @@ namespace Typography.TextLayout
 
     class GlyphLayoutPlanCollection
     {
-        Dictionary<GlyphLayoutPlanKey, GlyphLayoutPlanContext> _collection = new Dictionary<GlyphLayoutPlanKey, GlyphLayoutPlanContext>();
-
-        static readonly Dictionary<string, int> s_scriptLangKeys = new Dictionary<string, int>();
+        readonly Dictionary<int, GlyphLayoutPlanContext> _collection = new Dictionary<int, GlyphLayoutPlanContext>();
         /// <summary>
         /// get glyph layout plan or create if not exists
         /// </summary>
@@ -162,35 +160,39 @@ namespace Typography.TextLayout
         /// <returns></returns>
         public GlyphLayoutPlanContext GetPlanOrCreate(Typeface typeface, ScriptLang scriptLang)
         {
-            string key_string = scriptLang.ToString();
-            if (!s_scriptLangKeys.TryGetValue(key_string, out int key1))
-            {
-                key1 = s_scriptLangKeys.Count + 1;
-                s_scriptLangKeys.Add(key_string, key1);
-            }
 
-            GlyphLayoutPlanKey key = new GlyphLayoutPlanKey(typeface, key1);
-
-            if (!_collection.TryGetValue(key, out GlyphLayoutPlanContext context))
+            int hash_code = CalculateHash(typeface, scriptLang);
+            if (!_collection.TryGetValue(hash_code, out GlyphLayoutPlanContext context))
             {
                 var g_sub = (typeface.GSUBTable != null) ? new GlyphSubstitution(typeface, scriptLang.scriptTag, scriptLang.sysLangTag) : null;
                 var g_pos = (typeface.GPOSTable != null) ? new GlyphSetPosition(typeface, scriptLang.scriptTag, scriptLang.sysLangTag) : null;
-                _collection.Add(key, context = new GlyphLayoutPlanContext(g_sub, g_pos));
+
+#if DEBUG
+                if (g_sub != null)
+                {
+                    g_sub.dbugScriptLang = scriptLang.ToString();
+                }
+                if (g_pos != null)
+                {
+                    g_pos.dbugScriptLang = scriptLang.ToString();
+                }
+#endif
+
+                _collection.Add(hash_code, context = new GlyphLayoutPlanContext(g_sub, g_pos));
             }
             return context;
         }
+        static int CalculateHash(Typeface t, ScriptLang scriptLang)
+        {
+            int hash = 17;
+            hash = hash * 31 + t.GetHashCode();
+            hash = hash * 31 + scriptLang.scriptTag.GetHashCode();
+            hash = hash * 31 + scriptLang.sysLangTag.GetHashCode();
+            return hash;
+        }
 
     }
-    readonly struct GlyphLayoutPlanKey
-    {
-        public readonly Typeface t;
-        public readonly int scriptInternameName;
-        public GlyphLayoutPlanKey(Typeface t, int scriptInternameName)
-        {
-            this.t = t;
-            this.scriptInternameName = scriptInternameName;
-        }
-    }
+
     readonly struct GlyphLayoutPlanContext
     {
         public readonly GlyphSubstitution _glyphSub;
@@ -248,6 +250,7 @@ namespace Typography.TextLayout
             PositionTechnique = PositionTechnique.OpenFont;
             EnableLigature = true;
             EnableComposition = true;
+            EnableGsub = EnableGpos = true;
             ScriptLang = s_latin;
         }
 
@@ -303,6 +306,8 @@ namespace Typography.TextLayout
         List<dbugCodePointFromUserChar> _dbugReusableCodePointFromUserCharList = new List<dbugCodePointFromUserChar>();
 #endif
 
+        public bool EnableGsub { get; set; }
+        public bool EnableGpos { get; set; }
 
         /// <summary>
         /// do glyph shaping and glyph out, output is unscaled glyph-plan
@@ -424,7 +429,7 @@ namespace Typography.TextLayout
             //[C]
             //----------------------------------------------  
             //glyph substitution            
-            if (_gsub != null && glyphs.Count > 0)
+            if (EnableGsub && _gsub != null && glyphs.Count > 0)
             {
                 //TODO: review perf here
                 _gsub.EnableLigation = this.EnableLigature;
@@ -458,7 +463,7 @@ namespace Typography.TextLayout
             }
 
             PositionTechnique posTech = this.PositionTechnique;
-            if (_gpos != null && glyphs.Count > 1 && posTech == PositionTechnique.OpenFont)
+            if (EnableGpos && _gpos != null && glyphs.Count > 1 && posTech == PositionTechnique.OpenFont)
             {
                 _gpos.DoGlyphPosition(_glyphPositions);
             }

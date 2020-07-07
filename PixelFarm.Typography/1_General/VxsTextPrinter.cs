@@ -133,25 +133,26 @@ namespace PixelFarm.Drawing
 
     public class VxsTextPrinter : TextPrinterBase, ITextPrinter
     {
-        OpenFontTextService _textServices;
 
+        TextServiceClient _txtClient;
         /// <summary>
         /// target canvas
         /// </summary>
         Painter _painter;
         GlyphMeshStore _glyphMeshStore;
-        float _currentFontSizePxScale;
+
         Typeface _currentTypeface;
         GlyphBitmapStore _glyphBitmapStore;
 
-        public VxsTextPrinter(Painter painter, OpenFontTextService textService)
+        public VxsTextPrinter(Painter painter, OpenFontTextService opentFontTextService)
         {
             _painter = painter;
             _glyphMeshStore = new GlyphMeshStore();
             _glyphMeshStore.FlipGlyphUpward = true;
             this.PositionTechnique = PositionTechnique.OpenFont;
             //
-            _textServices = textService;
+            _txtClient = opentFontTextService.CreateNewServiceClient();
+
             ChangeFont(new RequestFont("Source Sans Pro", 10));
 
             _glyphBitmapStore = new GlyphBitmapStore();
@@ -175,7 +176,7 @@ namespace PixelFarm.Drawing
             //if not found then ask the service***
 
 
-            ResolvedFont resolvedFont = _textServices.ResolveFont(reqFont);
+            ResolvedFont resolvedFont = _txtClient.ResolveFont(reqFont);
             if (resolvedFont != null)
             {
                 this.Typeface = resolvedFont.Typeface;
@@ -246,22 +247,22 @@ namespace PixelFarm.Drawing
             }
         }
 
-        public void PrepareStringForRenderVx(RenderVxFormattedString renderVx, char[] text, int startAt, int len)
-        {
-            UpdateGlyphLayoutSettings();
-        }
-        public void PrepareStringForRenderVx(RenderVxFormattedString renderVx)
-        {
-            UpdateGlyphLayoutSettings();
-        }
+        //public void PrepareStringForRenderVx(RenderVxFormattedString renderVx, char[] text, int startAt, int len)
+        //{
+        //    UpdateGlyphLayoutSettings();
+        //}
+        //public void PrepareStringForRenderVx(RenderVxFormattedString renderVx)
+        //{
+        //    UpdateGlyphLayoutSettings();
+        //}
 
         public void UpdateGlyphLayoutSettings()
         {
             if (Typeface == null) return;
             //
             _glyphMeshStore.SetHintTechnique(this.HintTechnique);
-            _currentFontSizePxScale = Typeface.CalculateScaleToPixelFromPointSize(FontSizeInPoints);
-            _textServices.CurrentScriptLang = this.ScriptLang;
+
+            _txtClient.CurrentScriptLang = this.ScriptLang;
         }
 
         public void MeasureString(char[] buffer, int startAt, int len, out int w, out int h)
@@ -270,7 +271,7 @@ namespace PixelFarm.Drawing
             _glyphMeshStore.SetFont(_currentTypeface, this.FontSizeInPoints);
             _glyphMeshStore.SimulateOblique = this.SimulateSlant;
             var textBuffSpan = new TextBufferSpan(buffer, startAt, len);
-            Size s = _textServices.MeasureString(textBuffSpan, _painter.CurrentFont);
+            Size s = _txtClient.MeasureString(textBuffSpan, _painter.CurrentFont);
             w = s.Width;
             h = s.Height;
         }
@@ -318,7 +319,8 @@ namespace PixelFarm.Drawing
             _painter.SetOrigin(ox, oy);
         }
 
-        public int LatestAccumulateWidth { get; private set; }
+
+        int _latestAccumulateWidth;
 
 #if DEBUG
         int dbugExportCount = 0;
@@ -501,7 +503,7 @@ namespace PixelFarm.Drawing
         }
         public override void DrawFromGlyphPlans(GlyphPlanSequence seq, int startAt, int len, float left, float top)
         {
-            LatestAccumulateWidth = 0;//reset
+            _latestAccumulateWidth = 0;//reset
 
             if (_currentTypeface == null) return;
 
@@ -533,6 +535,7 @@ namespace PixelFarm.Drawing
             //---------------------------------------------------
 
 
+
             if (_currentTypeface.HasSvgTable())
             {
                 //Test svg font with Twitter Color Emoji Regular
@@ -559,7 +562,7 @@ namespace PixelFarm.Drawing
                         _painter.DrawImage(glyphBmp.Bitmap);
                     }
                 }
-                LatestAccumulateWidth = snapToPx.AccumWidth;
+                _latestAccumulateWidth = snapToPx.AccumWidth;
             }
             else if (_currentTypeface.IsBitmapFont)
             {
@@ -591,7 +594,7 @@ namespace PixelFarm.Drawing
                         _painter.DrawImage(glyphBmp.Bitmap);
                     }
                 }
-                LatestAccumulateWidth = snapToPx.AccumWidth;
+                _latestAccumulateWidth = snapToPx.AccumWidth;
             }
             else
             {
@@ -618,7 +621,7 @@ namespace PixelFarm.Drawing
                         _painter.Fill(_glyphMeshStore.GetGlyphMesh(snapToPx.CurrentGlyphIndex));
                     }
 
-                    LatestAccumulateWidth = snapToPx.AccumWidth;
+                    _latestAccumulateWidth = snapToPx.AccumWidth;
                     //restore
                     _painter.RenderQuality = savedRederQuality;
                     _painter.UseLcdEffectSubPixelRendering = savedUseLcdMode;
@@ -671,7 +674,7 @@ namespace PixelFarm.Drawing
                                     }
                                 }
 
-                                LatestAccumulateWidth = (int)maxAccumWidth;
+                                _latestAccumulateWidth = (int)maxAccumWidth;
                             }
                             else
                             {
@@ -692,7 +695,7 @@ namespace PixelFarm.Drawing
                                     _painter.Fill(_glyphMeshStore.GetGlyphMesh(gIndex));
                                 }
 
-                                LatestAccumulateWidth = snapToPx.AccumWidth;
+                                _latestAccumulateWidth = snapToPx.AccumWidth;
                             }
                         }
                         else
@@ -703,7 +706,7 @@ namespace PixelFarm.Drawing
                             //if we have create a vxs we can cache it for later use?
                             //----------------------------------- 
                             _painter.Fill(_glyphMeshStore.GetGlyphMesh(snapToPx.CurrentGlyphIndex));
-                            LatestAccumulateWidth = snapToPx.AccumWidth;
+                            _latestAccumulateWidth = snapToPx.AccumWidth;
                         }
                     }
 
@@ -729,6 +732,27 @@ namespace PixelFarm.Drawing
         readonly TextPrinterWordVisitor _textPrinterWordVisitor = new TextPrinterWordVisitor();
         readonly TextPrinterLineSegmentList<TextPrinterLineSegment> _lineSegs = new TextPrinterLineSegmentList<TextPrinterLineSegment>();
         readonly Dictionary<int, ResolvedFont> _localResolvedFonts = new Dictionary<int, ResolvedFont>();
+        ResolvedFont LocalResolveFont(Typeface typeface, float sizeInPoint, FontStyle style)
+        {
+            //find local resolved font cache
+
+            //check if we have a cache key or not
+            int typefaceKey = TypefaceExtensions.GetCustomTypefaceKey(typeface);
+            if (typefaceKey == 0)
+            {
+                //calculate and cache
+                TypefaceExtensions.SetCustomTypefaceKey(typeface,
+                    typefaceKey = RequestFont.CalculateTypefaceKey(typeface.Name));
+            }
+
+            int key = RequestFont.CalculateFontKey(typefaceKey, sizeInPoint, style);
+            if (!_localResolvedFonts.TryGetValue(key, out ResolvedFont found))
+            {
+                return _localResolvedFonts[key] = new ResolvedFont(typeface, sizeInPoint, style, key);
+            }
+            return found;
+        }
+
 
         void InnerDrawString(char[] textBuffer, int startAt, int len, float x, float y)
         {
@@ -741,7 +765,7 @@ namespace PixelFarm.Drawing
 #endif 
 
             UpdateGlyphLayoutSettings();
-
+            _latestAccumulateWidth = 0;
             //unscale layout, with design unit scale
             var buffSpan = new TextBufferSpan(textBuffer, startAt, len);
 
@@ -750,7 +774,7 @@ namespace PixelFarm.Drawing
 
             if (!EnableMultiTypefaces)
             {
-                GlyphPlanSequence glyphPlanSeq = _textServices.CreateGlyphPlanSeq(buffSpan, _currentTypeface, FontSizeInPoints);
+                GlyphPlanSequence glyphPlanSeq = _txtClient.CreateGlyphPlanSeq(buffSpan, _currentTypeface, FontSizeInPoints);
                 DrawFromGlyphPlans(glyphPlanSeq, xpos, y);
             }
             else
@@ -761,7 +785,7 @@ namespace PixelFarm.Drawing
 
                 _lineSegs.Clear();//clear before reuse
                 _textPrinterWordVisitor.SetLineSegmentList(_lineSegs);
-                _textServices.BreakToLineSegments(buffSpan, _textPrinterWordVisitor);//***
+                _txtClient.BreakToLineSegments(buffSpan, _textPrinterWordVisitor);//***
                 _textPrinterWordVisitor.SetLineSegmentList(null);
 
                 ClearTempFormattedGlyphPlanSeq();
@@ -771,18 +795,37 @@ namespace PixelFarm.Drawing
                 Typeface defaultTypeface = _currentTypeface;
                 Typeface curTypeface = defaultTypeface;
 
+                FormattedGlyphPlanSeq latestFmtGlyphPlanSeq = null;
+                int prefix_whitespaceCount = 0;
+
                 int count = _lineSegs.Count;
                 for (int i = 0; i < count; ++i)
                 {
                     //
                     TextPrinterLineSegment line_seg = _lineSegs.GetLineSegment(i);
                     SpanBreakInfo spBreakInfo = line_seg.BreakInfo;
+
                     if (spBreakInfo.RightToLeft)
                     {
                         needRightToLeftArr = true;
                     }
 
-                    TextBufferSpan buff = new TextBufferSpan(textBuffer, line_seg.StartAt, line_seg.Length);
+
+                    if (line_seg.WordKind == WordKind.Whitespace)
+                    {
+                        if (latestFmtGlyphPlanSeq == null)
+                        {
+                            prefix_whitespaceCount += line_seg.Length;
+                        }
+                        else
+                        {
+                            latestFmtGlyphPlanSeq.PostfixWhitespaceCount += line_seg.Length;
+                        }
+                        continue; //***
+                    }
+
+
+
 
                     //each line segment may have different unicode range 
                     //and the current typeface may not support that range
@@ -795,8 +838,7 @@ namespace PixelFarm.Drawing
 
                     if (line_seg.Length > 1 && line_seg.WordKind == WordKind.SurrogatePair)
                     {
-                        codepoint = char.ConvertToUtf32(sample_char, textBuffer[line_seg.StartAt + 1]);
-                        sample_glyphIndex = curTypeface.GetGlyphIndex(codepoint);
+                        sample_glyphIndex = curTypeface.GetGlyphIndex(codepoint = char.ConvertToUtf32(sample_char, textBuffer[line_seg.StartAt + 1]));
                     }
                     else
                     {
@@ -814,7 +856,7 @@ namespace PixelFarm.Drawing
                             AlternativeTypefaceSelector.LatestTypeface = curTypeface;
                         }
 
-                        if (_textServices.TryGetAlternativeTypefaceFromCodepoint(codepoint, AlternativeTypefaceSelector, out Typeface alternative))
+                        if (_txtClient.TryGetAlternativeTypefaceFromCodepoint(codepoint, AlternativeTypefaceSelector, out Typeface alternative))
                         {
                             curTypeface = alternative;
                         }
@@ -831,25 +873,45 @@ namespace PixelFarm.Drawing
                     }
 
 
-                    _textServices.CurrentScriptLang = new ScriptLang(spBreakInfo.ScriptTag, spBreakInfo.LangTag);
+
                     //layout glyphs in each context
-                    GlyphPlanSequence seq = _textServices.CreateGlyphPlanSeq(buff, curTypeface, FontSizeInPoints);
+
+                    TextBufferSpan buff = new TextBufferSpan(textBuffer, line_seg.StartAt, line_seg.Length);
+
+                    _txtClient.CurrentScriptLang = new ScriptLang(spBreakInfo.ScriptTag, spBreakInfo.LangTag);
+
+                    //in some text context (+typeface)=>user can disable gsub, gpos
+                    //this is an example                  
+
+                    if (line_seg.WordKind == WordKind.Tab || line_seg.WordKind == WordKind.Number ||
+                        (spBreakInfo.UnicodeRange == Unicode13RangeInfoList.C0_Controls_and_Basic_Latin))
+                    {
+                        _txtClient.EnableGpos = false;
+                        _txtClient.EnableGsub = false;
+                    }
+                    else
+                    {
+                        _txtClient.EnableGpos = true;
+                        _txtClient.EnableGsub = true;
+                    }
+
+
+                    GlyphPlanSequence seq = _txtClient.CreateGlyphPlanSeq(buff, curTypeface, FontSizeInPoints);
+
                     seq.IsRightToLeft = spBreakInfo.RightToLeft;
 
                     //create an object that hold more information about GlyphPlanSequence
 
                     FormattedGlyphPlanSeq formattedGlyphPlanSeq = _pool.GetFreeFmtGlyphPlanSeqs();
+                    formattedGlyphPlanSeq.PrefixWhitespaceCount = (ushort)prefix_whitespaceCount;//***
+                    prefix_whitespaceCount = 0;//reset 
 
                     //TODO: other style?... (bold, italic)  
 
-                    int fontkey = RequestFont.CalculateFontKey(curTypeface.Name, FontSizeInPoints, FontStyle.Regular);
-                    if (!_localResolvedFonts.TryGetValue(fontkey, out ResolvedFont foundResolvedFont))
-                    {
-                        foundResolvedFont = new ResolvedFont(curTypeface, FontSizeInPoints, FontStyle.Regular, fontkey);
-                    }
-
+                    ResolvedFont foundResolvedFont = LocalResolveFont(curTypeface, FontSizeInPoints, FontStyle.Regular);//temp fix for regular
                     formattedGlyphPlanSeq.SetData(seq, foundResolvedFont);
-                    _tmpGlyphPlanSeqs.Add(formattedGlyphPlanSeq);
+
+                    _tmpGlyphPlanSeqs.Add(latestFmtGlyphPlanSeq = formattedGlyphPlanSeq);
 
                     curTypeface = defaultTypeface;//switch back to default
 
@@ -859,31 +921,36 @@ namespace PixelFarm.Drawing
                 if (needRightToLeftArr)
                 {
                     //special arr left-to-right
+                    count = _tmpGlyphPlanSeqs.Count;//re-count
                     for (int i = count - 1; i >= 0; --i)
                     {
                         FormattedGlyphPlanSeq formattedGlyphPlanSeq = _tmpGlyphPlanSeqs[i];
 
-                        Typeface = formattedGlyphPlanSeq.ResolvedFont.Typeface;
+                        ResolvedFont resolvedFont = formattedGlyphPlanSeq.ResolvedFont;
+                        Typeface = resolvedFont.Typeface;
 
-                        DrawFromGlyphPlans(formattedGlyphPlanSeq.Seq, xpos, y);
+                        DrawFromGlyphPlans(formattedGlyphPlanSeq.Seq, xpos + (resolvedFont.WhitespaceWidth * formattedGlyphPlanSeq.PrefixWhitespaceCount), y);
 
-                        //xpos += (glyphPlanSeq.CalculateWidth() * _currentFontSizePxScale);
-                        xpos += LatestAccumulateWidth;
+                        xpos += _latestAccumulateWidth + (resolvedFont.WhitespaceWidth * formattedGlyphPlanSeq.PostfixWhitespaceCount);
                     }
                 }
                 else
                 {
+                    count = _tmpGlyphPlanSeqs.Count;//re-count
+
                     for (int i = 0; i < count; ++i)
                     {
                         FormattedGlyphPlanSeq formattedGlyphPlanSeq = _tmpGlyphPlanSeqs[i];
 
-                        //change typeface                            
-                        Typeface = formattedGlyphPlanSeq.ResolvedFont.Typeface;
-                        //update pxscale size                             
-                        _currentFontSizePxScale = Typeface.CalculateScaleToPixelFromPointSize(FontSizeInPoints);
+                        //change typeface                     
+                        ResolvedFont resolvedFont = formattedGlyphPlanSeq.ResolvedFont;
+                        Typeface = resolvedFont.Typeface;
 
-                        DrawFromGlyphPlans(formattedGlyphPlanSeq.Seq, xpos, y);
-                        xpos += LatestAccumulateWidth;
+
+
+                        DrawFromGlyphPlans(formattedGlyphPlanSeq.Seq, xpos + (resolvedFont.WhitespaceWidth * formattedGlyphPlanSeq.PrefixWhitespaceCount), y);
+
+                        xpos += _latestAccumulateWidth + (resolvedFont.WhitespaceWidth * formattedGlyphPlanSeq.PostfixWhitespaceCount);
 
                     }
                 }
@@ -948,6 +1015,8 @@ namespace PixelFarm.Drawing
         {
             Seq = s_EmptyGlypgPlanSeq;
             ResolvedFont = null;
+            ColorGlyphOnTransparentBG = false;
+            PrefixWhitespaceCount = PostfixWhitespaceCount = 0;
         }
 
 
