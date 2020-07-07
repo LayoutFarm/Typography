@@ -326,17 +326,18 @@ namespace Typography.FontManagement
         /// <summary>
         /// map from font subfam to internal group name
         /// </summary>
-        Dictionary<string, InstalledTypefaceGroup> _subFamToFontGroup = new Dictionary<string, InstalledTypefaceGroup>();
-        Dictionary<string, bool> _onlyFontNames = new Dictionary<string, bool>();
+        readonly Dictionary<string, InstalledTypefaceGroup> _subFamToFontGroup = new Dictionary<string, InstalledTypefaceGroup>();
+        readonly Dictionary<string, bool> _onlyFontNames = new Dictionary<string, bool>();
 
 
-        InstalledTypefaceGroup _regular, _bold, _italic, _bold_italic;
-        List<InstalledTypefaceGroup> _allGroups = new List<InstalledTypefaceGroup>();
+        readonly InstalledTypefaceGroup _regular, _bold, _italic, _bold_italic;
+        readonly List<InstalledTypefaceGroup> _allGroups = new List<InstalledTypefaceGroup>();       
+
+        readonly Dictionary<string, InstalledTypeface> _otherFontNames = new Dictionary<string, InstalledTypeface>();
+        readonly Dictionary<string, InstalledTypeface> _postScriptNames = new Dictionary<string, InstalledTypeface>();
+
         FontNameDuplicatedHandler _fontNameDuplicatedHandler;
         FontNotFoundHandler _fontNotFoundHandler;
-
-        Dictionary<string, InstalledTypeface> _otherFontNames = new Dictionary<string, InstalledTypeface>();
-        Dictionary<string, InstalledTypeface> _postScriptNames = new Dictionary<string, InstalledTypeface>();
 
         public InstalledTypefaceCollection()
         {

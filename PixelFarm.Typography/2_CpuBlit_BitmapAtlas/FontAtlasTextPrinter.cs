@@ -31,6 +31,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
         Color _fontColor;
 
         OpenFontTextService _textServices;
+        TextServiceClient _txtClient;
         BitmapFontManager<MemBitmap> _bmpFontMx;
         SimpleBitmapAtlas _fontAtlas;
         public FontAtlasTextPrinter(AggPainter painter)
@@ -39,7 +40,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
 
             this.PositionTechnique = PositionTechnique.OpenFont;
             _textServices = new OpenFontTextService();
-
+            _txtClient = _textServices.CreateNewServiceClient();
             //2. 
             _bmpFontMx = new BitmapFontManager<MemBitmap>(
                 _textServices,
@@ -161,7 +162,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
         public void MeasureString(char[] buffer, int startAt, int len, out int w, out int h)
         {
             var textBuffSpan = new TextBufferSpan(buffer, startAt, len);
-            Size s = _textServices.MeasureString(textBuffSpan, _painter.CurrentFont);
+            Size s = _txtClient.MeasureString(textBuffSpan, _painter.CurrentFont);
             w = s.Width;
             h = s.Height;
         }
@@ -307,7 +308,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             var textBufferSpan = new TextBufferSpan(textBuffer, startAt, len);
             //ask text service to parse user input char buffer and create a glyph-plan-sequence (list of glyph-plan) 
             //with specific request font      
-            DrawFromGlyphPlans(_textServices.CreateGlyphPlanSeq(textBufferSpan, _font), startAt, len, x, y);
+            DrawFromGlyphPlans(_txtClient.CreateGlyphPlanSeq(textBufferSpan, _font), startAt, len, x, y);
         }
 
 
