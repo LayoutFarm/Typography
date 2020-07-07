@@ -230,10 +230,10 @@ namespace Typography.TextServices
     /// </summary>
     class GlyphPlanCacheForTypefaceAndScriptLang
     {
-        Typeface _typeface;
-        ScriptLang _scLang;
-        GlyphPlanSeqSet _glyphPlanSeqSet;
-        UnscaledGlyphPlanList _reusableGlyphPlanList = new UnscaledGlyphPlanList();
+        readonly Typeface _typeface;
+        readonly ScriptLang _scLang;
+        readonly GlyphPlanSeqSet _glyphPlanSeqSet;
+        readonly UnscaledGlyphPlanList _reusableGlyphPlanList = new UnscaledGlyphPlanList();
 
         public GlyphPlanCacheForTypefaceAndScriptLang(Typeface typeface, ScriptLang scLang)
         {
@@ -249,7 +249,7 @@ namespace Typography.TextServices
         }
 
 #if DEBUG
-        public bool dbug_disableCache = true;
+        public bool dbug_disableCache = false;
 #endif
 
         public GlyphPlanSequence GetUnscaledGlyphPlanSequence(
