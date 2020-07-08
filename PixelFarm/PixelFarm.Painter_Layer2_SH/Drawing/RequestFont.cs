@@ -214,7 +214,7 @@ namespace PixelFarm.Drawing
         }
 
 
-
+        //------------------ 
         /// <summary>
         /// create req font+ specific typeface path
         /// </summary>
@@ -229,9 +229,12 @@ namespace PixelFarm.Drawing
             reqFont._otherChoices = otherChoices;
             //path to typeface file may be relative path
             return reqFont;
-        }
-
+        } 
         public static RequestFont FromFile(string typefacePath, float sizeInPoints) => FromFile(typefacePath, Len.Pt(sizeInPoints));
+
+        //------------------ 
+
+
 #if DEBUG
         public override string ToString()
         {
