@@ -113,9 +113,10 @@ namespace SampleWinForms
 
         void InitGraphics()
         {
+            //INIT ONCE
             if (_g != null) return;
             //
-            //INIT ONCE
+
             _destImg = new MemBitmap(800, 600);
             _painter = AggPainter.Create(_destImg);
             _winBmp = new Bitmap(_destImg.Width, _destImg.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
