@@ -287,8 +287,7 @@ namespace Typography.OpenFont
 
         internal bool Read(Typeface typeface, RestoreTicket ticket, Stream stream, int streamStartOffset = 0, ReadFlags readFlags = ReadFlags.Full)
         {
-            //bool little = BitConverter.IsLittleEndian; 
-
+             
             if (streamStartOffset > 0)
             {
                 //eg. for ttc

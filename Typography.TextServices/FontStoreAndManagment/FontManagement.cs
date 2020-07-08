@@ -200,6 +200,10 @@ namespace Typography.FontManagement
             UniqueFontIden = previewFontInfo.UniqueFontIden;
 
 #if DEBUG
+            if (FontName.Contains("Robo"))
+            {
+
+            }
             if (string.IsNullOrEmpty(UniqueFontIden))
             {
 
@@ -331,7 +335,7 @@ namespace Typography.FontManagement
 
 
         readonly InstalledTypefaceGroup _regular, _bold, _italic, _bold_italic;
-        readonly List<InstalledTypefaceGroup> _allGroups = new List<InstalledTypefaceGroup>();       
+        readonly List<InstalledTypefaceGroup> _allGroups = new List<InstalledTypefaceGroup>();
 
         readonly Dictionary<string, InstalledTypeface> _otherFontNames = new Dictionary<string, InstalledTypeface>();
         readonly Dictionary<string, InstalledTypeface> _postScriptNames = new Dictionary<string, InstalledTypeface>();
@@ -398,9 +402,10 @@ namespace Typography.FontManagement
 
         public InstalledTypeface AddFontPreview(PreviewFontInfo previewFont, string srcPath)
         {
+
             _onlyFontNames[previewFont.Name] = true;
 
-            TypefaceStyle typefaceStyle = TypefaceStyle.Regular;
+            TypefaceStyle typefaceStyle = TypefaceStyle.Others; //init
             switch (previewFont.OS2TranslatedStyle)
             {
                 case OpenFont.Extensions.TranslatedOS2FontStyle.BOLD:
@@ -438,10 +443,20 @@ namespace Typography.FontManagement
                 //=1
                 switch (fontSubFamUpperCaseName_split[0])
                 {
+                    case "REGULAR": typefaceStyle = TypefaceStyle.Regular; break;
                     case "BOLD": typefaceStyle = TypefaceStyle.Bold; break;
                     case "ITALIC": typefaceStyle = TypefaceStyle.Italic; break;
+                    case "COLOR": typefaceStyle = TypefaceStyle.Others; break;
+                    case "LIGHT": typefaceStyle = TypefaceStyle.Others; break;
                 }
             }
+
+#if DEBUG
+            if (typefaceStyle == TypefaceStyle.Others)
+            {
+
+            }
+#endif
 
             InstalledTypeface installedTypeface = new InstalledTypeface(
                 previewFont,
@@ -663,6 +678,32 @@ namespace Typography.FontManagement
             {
                 return foundInstalledFont;
             }
+            if (upperCaseSubFamName == "")
+            {
+                //eg OTHERS...
+                foreach (var kv in _subFamToFontGroup)
+                {
+                    switch (kv.Key)
+                    {
+                        case "BOLD ITALIC":
+                        case "BOLD":
+                        case "ITALIC":
+                        case "ITALIQUE":
+                        case "REGULAR": continue;
+                        default:
+                            {
+                                if (kv.Value.TryGetValue(upperCaseFontName, out foundInstalledFont))
+                                {
+                                    return foundInstalledFont;
+                                }
+                            }
+                            break;
+                    }
+                }
+
+            }
+
+
             //not found
             if (_fontNotFoundHandler != null)
             {
@@ -1017,6 +1058,7 @@ namespace Typography.FontManagement
             {
                 using (var fs = new FileStream(installedFont.FontPath, FileMode.Open, FileAccess.Read))
                 {
+
                     var reader = new OpenFontReader();
                     typeface = reader.Read(fs, installedFont.ActualStreamOffset);
                     typeface.Filename = installedFont.FontPath;

@@ -566,11 +566,17 @@ namespace SampleWinForms
                     PixelFarm.Drawing.FontStyle fontstyle = PixelFarm.Drawing.FontStyle.Regular;
                     switch (_basicOptions.SelectedTypefaceStyle)
                     {
+                        case Typography.FontManagement.TypefaceStyle.Regular:
+                            fontstyle = PixelFarm.Drawing.FontStyle.Regular;
+                            break;
                         case Typography.FontManagement.TypefaceStyle.Bold:
                             fontstyle = PixelFarm.Drawing.FontStyle.Bold;
                             break;
                         case Typography.FontManagement.TypefaceStyle.Italic:
                             fontstyle = PixelFarm.Drawing.FontStyle.Italic;
+                            break;
+                        case Typography.FontManagement.TypefaceStyle.Others:
+                            fontstyle = PixelFarm.Drawing.FontStyle.Others;
                             break;
                     }
                     _devVxsTextPrinter.Typeface = e.SelectedTypeface;
