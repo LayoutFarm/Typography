@@ -48,6 +48,7 @@
     <Compile Include="FormTestTrimmableFeature.Designer.cs">
       <DependentUpon>FormTestTrimmableFeature.cs</DependentUpon>
     </Compile>
+    <Compile Include="OurOpenFontSystemSetup.cs" />
     <Compile Include="UIFontScriptOpt.cs">
       <SubType>UserControl</SubType>
     </Compile>

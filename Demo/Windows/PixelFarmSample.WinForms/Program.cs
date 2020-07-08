@@ -1,7 +1,8 @@
 ﻿//MIT, 2016-present, WinterDev
 using System;
+using System.IO;
 using System.Windows.Forms;
-using Typography.OpenFont;
+using Typography.OpenFont; 
 
 namespace SampleWinForms
 {
@@ -21,6 +22,8 @@ namespace SampleWinForms
 
             bool dpi_result = SetProcessDPIAware();
             Typeface.DefaultDpi = GetDpiForSystem();
+
+            OurOpenFontSystemSetup.Setup();           
 
 
             Application.EnableVisualStyles();
@@ -46,7 +49,10 @@ namespace SampleWinForms
         //https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getdpiforsystem
         [System.Runtime.InteropServices.DllImport("user32")]
         static extern uint GetDpiForSystem();
-        //-------
+        //------- 
     }
+
+
+
 
 }

@@ -13,10 +13,6 @@ using PixelFarm.Contours;
 using Typography.OpenFont;
 using Typography.TextLayout;
 using Typography.Contours;
-using Typography.WebFont;
-
-using BrotliSharpLib;
-
 
 namespace SampleWinForms
 {
@@ -39,15 +35,6 @@ namespace SampleWinForms
         {
             InitializeComponent();
 
-            var dicProvider = new Typography.TextBreak.IcuSimpleTextFileDictionaryProvider() { DataDir = "../../../../../Typography.TextBreak/icu62/brkitr" };
-            Typography.TextBreak.CustomBreakerBuilder.Setup(dicProvider);
-            this.Load += new System.EventHandler(this.Form1_Load);
-            SetupWoffDecompressFunctions();
-
-
-            MemBitmapExt.DefaultMemBitmapIO = new PixelFarm.Drawing.WinGdi.GdiBitmapIO();
-
-
             lstTextBaseline.Items.AddRange(
                new object[] {
                    PixelFarm.Drawing.TextBaseline.Alphabetic,
@@ -57,73 +44,9 @@ namespace SampleWinForms
                });
             lstTextBaseline.SelectedIndex = 0;//default
             lstTextBaseline.SelectedIndexChanged += (s, e) => UpdateRenderOutput();
+            this.Load += new System.EventHandler(this.Form1_Load);
         }
 
-        void SetupWoffDecompressFunctions()
-        {
-            //
-            //Woff
-            WoffDefaultZlibDecompressFunc.DecompressHandler = (byte[] compressedBytes, byte[] decompressedResult) =>
-            {
-                //ZLIB
-                //****
-                //YOU can change to  your prefer decode libs***
-                //****
-
-                bool result = false;
-                try
-                {
-                    var inflater = new ICSharpCode.SharpZipLib.Zip.Compression.Inflater();
-                    inflater.SetInput(compressedBytes);
-                    inflater.Inflate(decompressedResult);
-#if DEBUG
-                    long outputLen = inflater.TotalOut;
-                    if (outputLen != decompressedResult.Length)
-                    {
-
-                    }
-#endif
-
-                    result = true;
-                }
-                catch (Exception ex)
-                {
-
-                }
-                return result;
-            };
-            //Woff2
-
-            Woff2DefaultBrotliDecompressFunc.DecompressHandler = (byte[] compressedBytes, Stream output) =>
-            {
-                //BROTLI
-                //****
-                //YOU can change to  your prefer decode libs***
-                //****
-
-                bool result = false;
-                try
-                {
-                    using (MemoryStream ms = new MemoryStream(compressedBytes))
-                    {
-
-                        ms.Position = 0;//set to start pos
-                        DecompressAndCalculateCrc1(ms, output);
-                        //
-                        //  
-
-                        //Decompress(ms, output);
-                    }
-                    //DecompressBrotli(compressedBytes, output);
-                    result = true;
-                }
-                catch (Exception ex)
-                {
-
-                }
-                return result;
-            };
-        }
 
         void RenderByGlyphIndex(ushort selectedGlyphIndex)
         {
@@ -185,12 +108,57 @@ namespace SampleWinForms
         void RenderByGlyphName(string selectedGlyphName) => RenderByGlyphIndex(glyphNameListUserControl1.Typeface.GetGlyphIndexByName(selectedGlyphName));
 
         bool _readyToRender;
-
         PixelFarm.Drawing.OpenFontTextService _textService;
-
-
         PixelFarm.Drawing.Color _grayColor = new PixelFarm.Drawing.Color(0xFF, 0x80, 0x80, 0x80);
-        PixelFarm.Drawing.MyAlternativeTypefaceSelector _myAlternativeTypefaceSelector = new PixelFarm.Drawing.MyAlternativeTypefaceSelector();
+
+        void InitGraphics()
+        {
+            if (_g != null) return;
+            //
+            //INIT ONCE
+            _destImg = new MemBitmap(800, 600);
+            _painter = AggPainter.Create(_destImg);
+            _winBmp = new Bitmap(_destImg.Width, _destImg.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+            _g = this.CreateGraphics();
+
+            _painter.CurrentFont = new PixelFarm.Drawing.RequestFont("Source Sans Pro", 10);
+
+
+            _textService = new PixelFarm.Drawing.OpenFontTextService();
+            _textService.LoadFontsFromFolder("../../../TestFonts");
+            _textService.UpdateUnicodeRanges();
+
+            _devVxsTextPrinter = new PixelFarm.Drawing.VxsTextPrinter(_painter, _textService);
+            _devVxsTextPrinter.SetSvgBmpBuilderFunc(PaintLab.SvgBuilderHelper.ParseAndRenderSvg);
+            _devVxsTextPrinter.ScriptLang = _basicOptions.ScriptLang;
+            _devVxsTextPrinter.PositionTechnique = Typography.TextLayout.PositionTechnique.OpenFont;
+
+            //Alternative Typeface selector..
+            var myAlternativeTypefaceSelector = new PixelFarm.Drawing.MyAlternativeTypefaceSelector();
+            _devVxsTextPrinter.AlternativeTypefaceSelector = myAlternativeTypefaceSelector;
+            {
+                var preferTypefaces = new PixelFarm.Drawing.MyAlternativeTypefaceSelector.PreferTypefaceList();
+                preferTypefaces.AddTypefaceName("Noto Sans Arabic UI");
+
+                myAlternativeTypefaceSelector.SetPreferTypefaces(
+                     new[]{Typography.TextBreak.Unicode13RangeInfoList.Arabic,
+                               Typography.TextBreak.Unicode13RangeInfoList.Arabic_Supplement,
+                               Typography.TextBreak.Unicode13RangeInfoList.Arabic_Extended_A},
+                    preferTypefaces);
+            }
+            {
+                var preferTypefaces = new PixelFarm.Drawing.MyAlternativeTypefaceSelector.PreferTypefaceList();
+                preferTypefaces.AddTypefaceName("Sarabun");
+
+                myAlternativeTypefaceSelector.SetPreferTypefaces(
+                     new[]{Typography.TextBreak.Unicode13RangeInfoList.C0_Controls_and_Basic_Latin,
+                               Typography.TextBreak.Unicode13RangeInfoList.C1_Controls_and_Latin_1_Supplement,
+                               Typography.TextBreak.Unicode13RangeInfoList.Latin_Extended_A,
+                               Typography.TextBreak.Unicode13RangeInfoList.Latin_Extended_B,
+                     },
+                    preferTypefaces);
+            }
+        }
 
         void UpdateRenderOutput()
         {
@@ -198,47 +166,7 @@ namespace SampleWinForms
             //
             if (_g == null)
             {
-                _destImg = new MemBitmap(800, 600);
-                _painter = AggPainter.Create(_destImg);
-                _winBmp = new Bitmap(_destImg.Width, _destImg.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-                _g = this.CreateGraphics();
-
-                _painter.CurrentFont = new PixelFarm.Drawing.RequestFont("Source Sans Pro", 10);
-
-                _textService = new PixelFarm.Drawing.OpenFontTextService();
-                _textService.LoadFontsFromFolder("../../../TestFonts");
-                _textService.UpdateUnicodeRanges();
-
-                _devVxsTextPrinter = new PixelFarm.Drawing.VxsTextPrinter(_painter, _textService);
-                _devVxsTextPrinter.SetSvgBmpBuilderFunc(PaintLab.SvgBuilderHelper.ParseAndRenderSvg);
-                _devVxsTextPrinter.ScriptLang = _basicOptions.ScriptLang;
-                _devVxsTextPrinter.PositionTechnique = Typography.TextLayout.PositionTechnique.OpenFont;
-
-
-
-                _devVxsTextPrinter.AlternativeTypefaceSelector = _myAlternativeTypefaceSelector;
-                {
-                    var preferTypefaces = new PixelFarm.Drawing.MyAlternativeTypefaceSelector.PreferTypefaceList();
-                    preferTypefaces.AddTypefaceName("Noto Sans Arabic UI");
-
-                    _myAlternativeTypefaceSelector.SetPreferTypefaces(
-                         new[]{Typography.TextBreak.Unicode13RangeInfoList.Arabic,
-                               Typography.TextBreak.Unicode13RangeInfoList.Arabic_Supplement,
-                               Typography.TextBreak.Unicode13RangeInfoList.Arabic_Extended_A},
-                        preferTypefaces);
-                }
-                {
-                    var preferTypefaces = new PixelFarm.Drawing.MyAlternativeTypefaceSelector.PreferTypefaceList();
-                    preferTypefaces.AddTypefaceName("Sarabun");
-
-                    _myAlternativeTypefaceSelector.SetPreferTypefaces(
-                         new[]{Typography.TextBreak.Unicode13RangeInfoList.C0_Controls_and_Basic_Latin,
-                               Typography.TextBreak.Unicode13RangeInfoList.C1_Controls_and_Latin_1_Supplement,
-                               Typography.TextBreak.Unicode13RangeInfoList.Latin_Extended_A,
-                               Typography.TextBreak.Unicode13RangeInfoList.Latin_Extended_B,
-                         },
-                        preferTypefaces);
-                }
+                InitGraphics();
             }
 
             if (string.IsNullOrEmpty(this.txtInputChar.Text))
@@ -724,107 +652,6 @@ namespace SampleWinForms
 
 
 
-        /// <summary>
-        /// ECMA CRC64 polynomial.
-        /// </summary>
-        static readonly long CRC_64_POLY = Convert.ToInt64("0xC96C5795D7870F42", 16);
-        static long UpdateCrc64(long crc, byte[] data, int offset, int length)
-        {
-            for (int i = offset; i < offset + length; ++i)
-            {
-                long c = (crc ^ (long)(data[i] & 0xFF)) & 0xFF;
-                for (int k = 0; k < 8; k++)
-                {
-                    c = ((c & 1) == 1) ? CRC_64_POLY ^ (long)((ulong)c >> 1) : (long)((ulong)c >> 1);
-                }
-                crc = c ^ (long)((ulong)crc >> 8);
-            }
-            return crc;
-        }
-        static long DecompressAndCalculateCrc1(Stream input, Stream output)
-        {
-            try
-            {
-                long crc = -1;
-                byte[] buffer = new byte[65536];
-                CSharpBrotli.Decode.BrotliInputStream decompressedStream = new CSharpBrotli.Decode.BrotliInputStream(input);
-                using (MemoryStream ms = new MemoryStream())
-                using (BinaryWriter writer = new BinaryWriter(ms))
-                {
-                    while (true)
-                    {
-                        int len = decompressedStream.Read(buffer);
-                        if (len <= 0)
-                        {
-                            break;
-                        }
-                        else
-                        {
-
-                        }
-
-                        writer.Write(buffer, 0, len);
-
-                        crc = UpdateCrc64(crc, buffer, 0, len);
-                    }
-
-                    decompressedStream.Close();
-                    writer.Flush();
-
-                    byte[] outputBuffer = ms.ToArray();
-
-                    output.Write(outputBuffer, 0, outputBuffer.Length);
-
-                    writer.Close();
-                }
-                return crc ^ -1;
-            }
-            catch (IOException ex)
-            {
-                throw ex;
-            }
-        }
-        static void Decompress(Stream input, Stream output)
-        {
-            /// <exception cref="System.IO.IOException"/>
-
-            byte[] buffer = new byte[65536];
-            bool byByte = false;
-
-            Org.Brotli.Dec.BrotliInputStream brotliInput = new Org.Brotli.Dec.BrotliInputStream(input);
-            if (byByte)
-            {
-                byte[] oneByte = new byte[1];
-                while (true)
-                {
-                    int next = brotliInput.ReadByte();
-                    if (next == -1)
-                    {
-                        break;
-                    }
-                    oneByte[0] = unchecked((byte)next);
-                    output.Write(oneByte, 0, 1);
-                }
-            }
-            else
-            {
-                while (true)
-                {
-                    int len = brotliInput.Read(buffer, 0, buffer.Length);
-                    if (len <= 0)
-                    {
-                        break;
-                    }
-                    output.Write(buffer, 0, len);
-                }
-            }
-            brotliInput.Close();
-        }
-        void DecompressBrotli(byte[] compressed, Stream output)
-        {
-            var decompressed = Brotli.DecompressBuffer(compressed, 0, compressed.Length);
-
-        }
         private void button3_Click(object sender, EventArgs e)
         {
             string filename = "Test/Sarabun-Regular.woff2";
