@@ -72,6 +72,7 @@ namespace PixelFarm.Drawing
             {
                 Name = facename; //primary typeface name
                 Size = fontSize; //store user font size here 
+                SizeInPoints = fontSize.ToPoints();
                 Style = style;
             }
 

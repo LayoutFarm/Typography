@@ -377,8 +377,10 @@ namespace PixelFarm.Drawing
                 //still not found
                 if (typeface == null)
                 {
-                    //register this font key => not found
-                    _resolvedTypefaceCache.Add(font.FontKey, ResolvedFont.s_empty);
+
+                    //we don't cache it in central service 
+                    //open opportunity for another search
+                    //_resolvedTypefaceCache.Add(font.FontKey, ResolvedFont.s_empty);
                     return null;
                 }
             }
@@ -391,14 +393,21 @@ namespace PixelFarm.Drawing
             if (otherChoice != null)
             {
                 //this come from other choice
-                resolvedFont = new ResolvedFont(typeface, otherChoice.SizeInPoints, otherChoice.Style, otherChoice.GetFontKey());
+                if (!_resolvedTypefaceCache.TryGetValue(otherChoice.GetFontKey(), out resolvedFont))
+                {
+                    resolvedFont = new ResolvedFont(typeface, otherChoice.SizeInPoints, otherChoice.Style, otherChoice.GetFontKey());
+
+                    //** cache it with otherChoice.GetFontKey()**
+                    _resolvedTypefaceCache.Add(otherChoice.GetFontKey(), resolvedFont);
+                }
             }
             else
             {
                 resolvedFont = new ResolvedFont(typeface, font.SizeInPoints, font.Style, font.FontKey);
+                //cache to level2
+                _resolvedTypefaceCache.Add(resolvedFont.FontKey, resolvedFont);
             }
-            //cache to level2
-            _resolvedTypefaceCache.Add(resolvedFont.FontKey, resolvedFont);
+
             //cache to level 1
             RequestFont.SetResolvedFont1(font, resolvedFont);
             return resolvedFont;

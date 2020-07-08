@@ -7,10 +7,8 @@ using System.IO;
 using System.Windows.Forms;
 
 using PixelFarm.CpuBlit;
-using PixelFarm.CpuBlit.BitmapAtlas;
-using PixelFarm.Contours;
-
 using Typography.OpenFont;
+using Typography.OpenFont.Extensions;
 using Typography.TextLayout;
 using Typography.Contours;
 using PixelFarm.Drawing;
@@ -29,6 +27,7 @@ namespace SampleWinForms
         bool _readyToRender;
         PixelFarm.Drawing.OpenFontTextService _textService;
         PixelFarm.Drawing.Color _grayColor = new PixelFarm.Drawing.Color(0xFF, 0x80, 0x80, 0x80);
+        PixelFarm.Drawing.RequestFont _defaultReqFont;
 
         public FormTestFontRequest()
         {
@@ -54,7 +53,8 @@ namespace SampleWinForms
             _winBmp = new Bitmap(_destImg.Width, _destImg.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
             _g = this.CreateGraphics();
 
-            _painter.CurrentFont = new PixelFarm.Drawing.RequestFont("Source Sans Pro", 10);
+            _defaultReqFont = new PixelFarm.Drawing.RequestFont("Source Sans Pro", 10);
+            _painter.CurrentFont = _defaultReqFont;
 
 
             _textService = new PixelFarm.Drawing.OpenFontTextService();
@@ -64,7 +64,7 @@ namespace SampleWinForms
             _devVxsTextPrinter = new PixelFarm.Drawing.VxsTextPrinter(_painter, _textService);
             _devVxsTextPrinter.SetSvgBmpBuilderFunc(PaintLab.SvgBuilderHelper.ParseAndRenderSvg);
 
-            _devVxsTextPrinter.ScriptLang = new ScriptLang("latn");
+            _devVxsTextPrinter.ScriptLang = new ScriptLang(ScriptTagDefs.Latin.Tag);
             _devVxsTextPrinter.PositionTechnique = Typography.TextLayout.PositionTechnique.OpenFont;
 
             //Alternative Typeface selector..
@@ -104,8 +104,16 @@ namespace SampleWinForms
         void DrawStringToMemBitmap(RequestFont reqFont, string textOutput, float x_pos, float y_pos, int repeatLines = 1)
         {
 
-            ResolvedFont resFont = _textService.ResolveFont(reqFont);
+            ResolvedFont resolvedFont = _textService.ResolveFont(reqFont);
+            if (resolvedFont == null)
+            {
+                //we dont' have 
+                resolvedFont = _textService.ResolveFont(_defaultReqFont);
+                if (resolvedFont == null) { throw new NotSupportedException(); }
 
+                //use alternative typeface, but use reqFont's Size
+                resolvedFont = new ResolvedFont(resolvedFont.Typeface, reqFont.SizeInPoints, _defaultReqFont.Style);
+            }
 
             PixelFarm.Drawing.VxsTextPrinter _selectedTextPrinter = _devVxsTextPrinter;
 
@@ -113,9 +121,9 @@ namespace SampleWinForms
             _painter.FillColor = PixelFarm.Drawing.Color.Black;
 
             _selectedTextPrinter = _devVxsTextPrinter;
-            _selectedTextPrinter.Typeface = resFont.Typeface;
-            _selectedTextPrinter.FontSizeInPoints = resFont.SizeInPoints;
-            _selectedTextPrinter.ScriptLang = new ScriptLang("latn");
+            _selectedTextPrinter.Typeface = resolvedFont.Typeface;
+            _selectedTextPrinter.FontSizeInPoints = resolvedFont.SizeInPoints;
+            _selectedTextPrinter.ScriptLang = new ScriptLang(ScriptTagDefs.Latin.Tag);
             _selectedTextPrinter.PositionTechnique = PositionTechnique.OpenFont;
 
             _selectedTextPrinter.HintTechnique = HintTechnique.None;
@@ -125,7 +133,7 @@ namespace SampleWinForms
             _selectedTextPrinter.EnableMultiTypefaces = true; //*** for auto typeface selection***
 
 
-            _selectedTextPrinter.TextBaseline = PixelFarm.Drawing.TextBaseline.Top;
+            _selectedTextPrinter.TextBaseline = PixelFarm.Drawing.TextBaseline.Alphabetic;
 
             //test print 3 lines
             //#if DEBUG
@@ -220,26 +228,30 @@ namespace SampleWinForms
             _g.Clear(System.Drawing.Color.White);
             _g.DrawImage(_winBmp, new System.Drawing.Point(0, 0));
         }
+
         private void button1_Click(object sender, EventArgs e)
         {
+
             //clear previous draw
             _painter.Clear(PixelFarm.Drawing.Color.White);
 
             string textOutput = "Hello!";
+
             {
                 RequestFont reqFont1 = new RequestFont("Source Sans Pro", 20);
-                DrawStringToMemBitmap(reqFont1, textOutput, 0, 0);
+                DrawStringToMemBitmap(reqFont1, textOutput, 0, 30);
             }
-            {
-                RequestFont reqFont1 = new RequestFont("Source Sans Pro", 18);
 
-                //
-                //***TODO: please improve 1st loading time for CJK font***
-                //
-                textOutput = "😁こんにちは, 你好, 여보세요 abc 0123 ";
+            //{
+            //    RequestFont reqFont1 = new RequestFont("Source Sans Pro", 18);
 
-                DrawStringToMemBitmap(reqFont1, textOutput, 100, 50);
-            }
+            //    //
+            //    //***TODO: please improve 1st loading time for CJK font***
+            //    //
+            //    textOutput = "😁こんにちは, 你好, 여보세요 abc 0123 ";
+
+            //    DrawStringToMemBitmap(reqFont1, textOutput, 100, 50);
+            //}
             {
                 RequestFont reqFont1 = new RequestFont("Source Sans Pro", 30);
 
@@ -248,6 +260,60 @@ namespace SampleWinForms
 
                 DrawStringToMemBitmap(reqFont1, textOutput, 150, 100);
             }
+
+            {
+                //use Roboto 
+                RequestFont reqFont1 = new RequestFont("Roboto", 20);
+
+                //TODO: optimize 1st loading time for CJK font
+                textOutput = "hello Roboto";
+
+                DrawStringToMemBitmap(reqFont1, textOutput, 0, 150);
+            }
+
+            CopyMemBitmapToScreen();
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            //test request missing typeface
+
+            //clear previous draw
+            _painter.Clear(PixelFarm.Drawing.Color.White);
+
+            string textOutput = "Hello! 1";
+
+            {
+                //we have Roboto
+                RequestFont reqFont1 = new RequestFont("Roboto", 20);
+                DrawStringToMemBitmap(reqFont1, textOutput, 0, 30);
+            }
+
+            {
+                //example1 
+                //we don't have Roboto-X, 
+                //the printer should switch back to use _defaultReqFont 
+                textOutput = "Hello! 2";
+                RequestFont reqFont1 = new RequestFont("Roboto-X", 20);
+                DrawStringToMemBitmap(reqFont1, textOutput, 0, 100);
+            }
+
+            {
+                //example2 
+                //we don't have Roboto-X, 
+                //but we add alternative to RequestFont
+                //that if the system does not found Roboto-X
+                //then should use alternative Asana Math
+                textOutput = "Hello! 3";
+                RequestFont reqFont1 = new RequestFont("Roboto-X", 20, PixelFarm.Drawing.FontStyle.Regular,
+                    new[]
+                    {
+                       new RequestFont.OtherChoice("Asana Math",20)
+                    });
+
+                DrawStringToMemBitmap(reqFont1, textOutput, 0, 150);
+            }
+
             CopyMemBitmapToScreen();
         }
     }
