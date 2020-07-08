@@ -6,8 +6,7 @@ using Typography.OpenFont.Extensions;
 
 namespace PixelFarm.Drawing
 {
-
-    public class ResolvedFont
+    public sealed class ResolvedFont
     {
         readonly float _px_scale;
         readonly int _ws;
@@ -22,9 +21,22 @@ namespace PixelFarm.Drawing
             }
             SizeInPoints = sizeInPoints;
             FontStyle = fontStyle;
-            FontKey = fontKey;
             Typeface = typeface;
-
+            FontKey = fontKey;
+        }
+        public ResolvedFont(Typeface typeface, float sizeInPoints, FontStyle fontStyle)
+        {
+            Typeface = typeface;
+            if (Typeface != null)
+            {
+                _px_scale = Typeface.CalculateScaleToPixelFromPointSize(sizeInPoints);
+                _ws = (int)Math.Round(Typeface.GetWhitespaceWidth() * _px_scale);
+                Name = typeface.Name;
+            }
+            SizeInPoints = sizeInPoints;
+            FontStyle = fontStyle;
+            Typeface = typeface;
+            FontKey = RequestFont.CalculateFontKey(TypefaceExtensions.GetCustomTypefaceKey(typeface), sizeInPoints, fontStyle);
         }
         public Typeface Typeface { get; }
 
@@ -48,22 +60,13 @@ namespace PixelFarm.Drawing
         public int LineSpacingInPixels => (Typeface != null) ? (int)(Math.Round(Typeface.CalculateRecommendLineSpacing() * _px_scale)) : 0;
         public int MaxLineClipHeightInPixels => (Typeface != null) ? (int)(Math.Round(Typeface.CalculateMaxLineClipHeight() * _px_scale)) : 0;
 
-        class EmptyResolvedFont : ResolvedFont
-        {
-            public EmptyResolvedFont() : base(null, 0, FontStyle.Regular, 0) { }
-#if DEBUG
-            public override string ToString() => "EMPTY_RESOLVED_FONT";
-#endif
-        }
-
-        internal static readonly ResolvedFont s_empty = new EmptyResolvedFont();
 #if DEBUG
         public override string ToString() => Typeface?.Name;
 #endif
 
-        public float SizeInPoints { get; protected set; }
-        public FontStyle FontStyle { get; protected set; }
-        public int FontKey { get; protected set; }
+        public float SizeInPoints { get; private set; }
+        public FontStyle FontStyle { get; private set; }
+        public int FontKey { get; private set; }
         public string Name { get; }
     }
 

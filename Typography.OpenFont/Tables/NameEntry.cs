@@ -7,7 +7,7 @@ namespace Typography.OpenFont.Tables
 {
     //https://docs.microsoft.com/en-us/typography/opentype/spec/name
 
-    class NameEntry : TableEntry
+    public class NameEntry : TableEntry
     {
         public const string _N = "name";
         public override string Name => _N;

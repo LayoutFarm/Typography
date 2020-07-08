@@ -1,8 +1,6 @@
 ﻿//Apache2, 2017-present, WinterDev 
 
-using System;
-using System.Collections.Generic;
-using Typography.OpenFont.Extensions;
+
 using Typography.OpenFont.Tables;
 
 namespace Typography.OpenFont.Extensions
@@ -567,7 +565,17 @@ namespace Typography.OpenFont.Extensions
     }
 }
 
-
+namespace Typography.OpenFont.Tables
+{
+    /// <summary>
+    /// access to some openfont table directly
+    /// </summary>
+    public static class TypefaceInternalTypeAccessExtensions
+    {
+        public static OS2Table GetOS2Table(this Typeface typeface) => typeface.OS2Table;
+        public static NameEntry GetNameEntry(this Typeface typeface) => typeface.NameEntry;
+    }
+}
 
 
 namespace Typography.OpenFont

@@ -144,10 +144,10 @@ namespace Typography.OpenFont
         public string PostScriptName => _nameEntry.PostScriptName;
         public string VersionString => _nameEntry.VersionString;
         public string UniqueFontIden => _nameEntry.UniqueFontIden;
+
+        internal NameEntry NameEntry => _nameEntry;
+
         public int GlyphCount => _glyphs.Length;
-
-
-
         /// <summary>
         /// find glyph index by codepoint
         /// </summary>

@@ -17,21 +17,18 @@ namespace PixelFarm.Drawing
 {
     public class MyAlternativeTypefaceSelector : AlternativeTypefaceSelector
     {
-        readonly Dictionary<string, PreferTypefaceList> _dics = new Dictionary<string, PreferTypefaceList>();
-        PreferTypefaceList _emojiPreferList = new PreferTypefaceList();
+        readonly Dictionary<string, PreferredTypefaceList> _dics = new Dictionary<string, PreferredTypefaceList>();
+        PreferredTypefaceList _emojiPreferList = new PreferredTypefaceList();
 
 #if DEBUG
         public MyAlternativeTypefaceSelector() { }
 #endif
-        //public void SetPreferTypefaces(string scriptTag, PreferTypefaceList typefaceNames)
-        //{
-        //    _dics[scriptTag] = typefaceNames;
-        //}
-        public void SetPreferTypefaces(UnicodeRangeInfo unicodeRangeInfo, PreferTypefaceList typefaceNames)
+
+        public void SetPreferredTypefaces(UnicodeRangeInfo unicodeRangeInfo, PreferredTypefaceList typefaceNames)
         {
             _dics[unicodeRangeInfo.Name] = typefaceNames;
         }
-        public void SetPreferTypefaces(UnicodeRangeInfo[] unicodeRangeInfos, PreferTypefaceList typefaceNames)
+        public void SetPreferredTypefaces(UnicodeRangeInfo[] unicodeRangeInfos, PreferredTypefaceList typefaceNames)
         {
             for (int i = 0; i < unicodeRangeInfos.Length; ++i)
             {
@@ -39,21 +36,47 @@ namespace PixelFarm.Drawing
             }
 
         }
-        public void SetPerferEmoji(PreferTypefaceList typefaceNames)
+        public void SetPerferredEmoji(PreferredTypefaceList typefaceNames)
         {
             _emojiPreferList = typefaceNames;
         }
 
-        public PreferTypefaceList GetPreferTypefaces(string scriptTag) => _dics.TryGetValue(scriptTag, out PreferTypefaceList foundList) ? foundList : null;
+        public PreferredTypefaceList GetPreferTypefaces(string scriptTag) => _dics.TryGetValue(scriptTag, out PreferredTypefaceList foundList) ? foundList : null;
 
-        public override InstalledTypeface Select(List<InstalledTypeface> choices, UnicodeRangeInfo unicodeRangeInfo, int hintCodePoint, AddtionalHint additionalHint)
+        RequestFont _reqFont;
+        OpenFontTextService _textService;
+        public void SetCurrentReqFont(RequestFont reqFont, OpenFontTextService textService)
         {
+            _reqFont = reqFont;
+            _textService = textService;
+        }
+
+        public override SelectedTypeface Select(List<InstalledTypeface> choices, UnicodeRangeInfo unicodeRangeInfo, int hintCodePoint)
+        {
+            //request font may have hint for typeface 
+            if (_reqFont != null)
+            {
+                for (int i = 0; i < _reqFont.OtherChoicesCount; ++i)
+                {
+                    RequestFont.Choice choice = _reqFont.GetOtherChoice(i);
+                    ResolvedFont resolvedFont = _textService.ResolveFont(choice);
+                    //check if resolvedFont support specific unicodeRange info or not 
+                    Typeface typeface = resolvedFont.Typeface;
+                    ushort codepoint = typeface.GetGlyphIndex(unicodeRangeInfo.StarCodepoint);
+                    if (codepoint > 0)
+                    {
+                        //use this
+                        return new SelectedTypeface(typeface);
+                    }
+                }
+            }
+
             List<PreferTypeface> list = null;
-            if (additionalHint.UnicodeHint == UnicodeHint.Emoji)
+            if (unicodeRangeInfo == Unicode13RangeInfoList.Emoticons)
             {
                 list = _emojiPreferList._list;
             }
-            else if (_dics.TryGetValue(unicodeRangeInfo.Name, out PreferTypefaceList foundList))
+            else if (_dics.TryGetValue(unicodeRangeInfo.Name, out PreferredTypefaceList foundList))
             {
                 list = foundList._list;
             }
@@ -87,12 +110,20 @@ namespace PixelFarm.Drawing
                     //-------
                     if (p.InstalledTypeface != null)
                     {
-                        return p.InstalledTypeface;
+                        return new SelectedTypeface(p.InstalledTypeface);
                     }
                 }
             }
 
-            return base.Select(choices, unicodeRangeInfo, hintCodePoint, additionalHint);
+            //still not found
+            if (choices.Count > 0)
+            {
+                //choose default
+                return new SelectedTypeface(choices[0]);
+            }
+
+
+            return new SelectedTypeface();//empty
         }
 
         public class PreferTypeface
@@ -104,7 +135,7 @@ namespace PixelFarm.Drawing
         }
 
 
-        public class PreferTypefaceList
+        public class PreferredTypefaceList
         {
             internal List<PreferTypeface> _list = new List<PreferTypeface>();
             public void AddTypefaceName(string typefaceName)

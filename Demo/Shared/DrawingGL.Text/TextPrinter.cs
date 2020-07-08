@@ -44,6 +44,7 @@ namespace DrawingGL.Text
         public TextPrinter()
         {
             FontSizeInPoints = 14;
+            
             ScriptLang = new ScriptLang("latn");
 
             //
