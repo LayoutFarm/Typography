@@ -103,12 +103,12 @@ namespace SampleWinForms
 
         void DrawStringToMemBitmap(RequestFont reqFont, string textOutput, float x_pos, float y_pos, int repeatLines = 1)
         {
-          
+
             ResolvedFont resFont = _textService.ResolveFont(reqFont);
 
 
             PixelFarm.Drawing.VxsTextPrinter _selectedTextPrinter = _devVxsTextPrinter;
-             
+
             _painter.UseLcdEffectSubPixelRendering = true;
             _painter.FillColor = PixelFarm.Drawing.Color.Black;
 
@@ -120,8 +120,9 @@ namespace SampleWinForms
 
             _selectedTextPrinter.HintTechnique = HintTechnique.None;
             _selectedTextPrinter.EnableLigature = true;
-            _selectedTextPrinter.EnableMultiTypefaces = true;
             _selectedTextPrinter.SimulateSlant = false;
+
+            _selectedTextPrinter.EnableMultiTypefaces = true; //*** for auto typeface selection***
 
 
             _selectedTextPrinter.TextBaseline = PixelFarm.Drawing.TextBaseline.Top;
@@ -231,7 +232,21 @@ namespace SampleWinForms
             }
             {
                 RequestFont reqFont1 = new RequestFont("Source Sans Pro", 18);
+
+                //
+                //***TODO: please improve 1st loading time for CJK font***
+                //
+                textOutput = "😁こんにちは, 你好, 여보세요 abc 0123 ";
+
                 DrawStringToMemBitmap(reqFont1, textOutput, 100, 50);
+            }
+            {
+                RequestFont reqFont1 = new RequestFont("Source Sans Pro", 30);
+
+                //TODO: optimize 1st loading time for CJK font
+                textOutput = "شمس حب ";
+
+                DrawStringToMemBitmap(reqFont1, textOutput, 150, 100);
             }
             CopyMemBitmapToScreen();
         }
