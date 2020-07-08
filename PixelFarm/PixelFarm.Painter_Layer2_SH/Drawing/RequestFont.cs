@@ -104,6 +104,30 @@ namespace PixelFarm.Drawing
                 //path to typeface file may be relative path
                 return otherChoice;
             }
+
+
+            internal object _resolvedFont1;
+            internal object _resolvedFont2;
+
+            public static void SetResolvedFont1(Choice ch, object resolvedFont)
+            {
+                ch._resolvedFont1 = resolvedFont;
+            }
+            public static void SetResolvedFont2(Choice ch, object resolvedFont)
+            {
+                ch._resolvedFont2 = resolvedFont;
+            }
+            public static T GetResolvedFont1<T>(Choice ch)
+                where T : class
+            {
+                return ch._resolvedFont1 as T;
+            }
+            public static T GetResolvedFont2<T>(Choice ch)
+               where T : class
+            {
+                return ch._resolvedFont2 as T;
+            }
+
         }
 
         /// <summary>
