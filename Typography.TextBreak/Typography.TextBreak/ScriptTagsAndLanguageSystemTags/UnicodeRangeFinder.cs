@@ -19,6 +19,19 @@ namespace Typography.TextBreak
             s_registerSpanBreakInfo = new Dictionary<UnicodeRangeInfo, SpanBreakInfo>();
 
             //TODO: codegen here
+            RegisterSpanBreakInfo(new UnicodeRangeInfo[]
+            {
+                C0_Controls_and_Basic_Latin,
+                C1_Controls_and_Latin_1_Supplement,
+                Latin_Extended_Additional,
+                Latin_Extended_A,
+                Latin_Extended_B,
+                Latin_Extended_C,
+                Latin_Extended_D,
+                Latin_Extended_E,
+                Latin_Ligatures
+
+            }, ScriptTagDefs.Latin.Tag);
 
             RegisterSpanBreakInfo(Thai, ScriptTagDefs.Thai.Tag);
             //
@@ -80,7 +93,8 @@ namespace Typography.TextBreak
             {
                 return true;
             }
-            unicodeRangeInfo = null;
+            //we may found unicodeRange info
+            //but may not found register spanbreak info
             spanBreakInfo = null;
             return false;
         }

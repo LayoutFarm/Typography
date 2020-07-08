@@ -363,15 +363,10 @@ namespace SampleWinForms
             }
 
             {
-                //example2 
-                //we don't have Roboto-X, 
-                //the printer should switch back to use Asana Math
-
+                //example2  
 
                 //for Emoji=> our System default=> TwitterColorEmoji
-                //and in this case we want to specific that we want to use FireFoxColor Emoji instead
-
-
+                //and in this case we want to specific that we want to use FireFoxColor Emoji instead 
                 textOutput = "Hello! 2😁";
                 RequestFont reqFont1 = new RequestFont("Roboto", 20, PixelFarm.Drawing.FontStyle.Regular,
                    new[]
@@ -380,6 +375,19 @@ namespace SampleWinForms
                        new RequestFont.Choice("Firefox Emoji",20),
                    });
                 DrawStringToMemBitmap(reqFont1, textOutput, 0, 100);
+            }
+
+            {
+                //example3 
+                //use Droid Sans Fallback for CJK 
+
+                textOutput = "你好 Hello! 3 😁";
+                RequestFont reqFont1 = new RequestFont("Droid Sans Fallback", 20, PixelFarm.Drawing.FontStyle.Regular,
+                   new[]
+                   {
+                       new RequestFont.Choice("Asana Math",20)
+                   });
+                DrawStringToMemBitmap(reqFont1, textOutput, 0, 150);
             }
 
             CopyMemBitmapToScreen();
