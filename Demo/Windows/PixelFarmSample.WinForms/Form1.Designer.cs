@@ -42,6 +42,7 @@
             this.button3 = new System.Windows.Forms.Button();
             this.lstTextBaseline = new System.Windows.Forms.ListBox();
             this.cmdTestReloadGlyphs = new System.Windows.Forms.Button();
+            this.cmdTestFontReq = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // button1
@@ -171,11 +172,22 @@
             this.cmdTestReloadGlyphs.UseVisualStyleBackColor = true;
             this.cmdTestReloadGlyphs.Click += new System.EventHandler(this.cmdTestReloadGlyphs_Click);
             // 
+            // cmdTestFontReq
+            // 
+            this.cmdTestFontReq.Location = new System.Drawing.Point(1127, 302);
+            this.cmdTestFontReq.Name = "cmdTestFontReq";
+            this.cmdTestFontReq.Size = new System.Drawing.Size(133, 36);
+            this.cmdTestFontReq.TabIndex = 80;
+            this.cmdTestFontReq.Text = "Test FontRequest";
+            this.cmdTestFontReq.UseVisualStyleBackColor = true;
+            this.cmdTestFontReq.Click += new System.EventHandler(this.cmdTestFontReq_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1393, 857);
+            this.Controls.Add(this.cmdTestFontReq);
             this.Controls.Add(this.cmdTestReloadGlyphs);
             this.Controls.Add(this.lstTextBaseline);
             this.Controls.Add(this.button3);
@@ -213,6 +225,7 @@
         private System.Windows.Forms.Button button3;
         private System.Windows.Forms.ListBox lstTextBaseline;
         private System.Windows.Forms.Button cmdTestReloadGlyphs;
+        private System.Windows.Forms.Button cmdTestFontReq;
     }
 }
 

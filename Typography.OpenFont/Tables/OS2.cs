@@ -10,7 +10,7 @@ namespace Typography.OpenFont.Tables
     /// consists of a set of metrics and other data
     /// that are REQUIRED in OpenType fonts.
     /// </summary>
-    class OS2Table : TableEntry
+    public class OS2Table : TableEntry
     {
         public const string _N = "OS/2";
         public override string Name => _N;

@@ -42,6 +42,8 @@ namespace PixelFarm.Drawing
         Strikeout = 1 << 3,
         Others = 1 << 4
     }
+
+
     /// <summary>
     /// user-request font specification
     /// </summary>
@@ -50,65 +52,123 @@ namespace PixelFarm.Drawing
         //each platform/canvas has its own representation of this Font 
         //this is just a request for specficic font presentation at a time
         //----- 
-
-        public sealed class OtherChoice
+        public sealed class Choice
         {
             /// <summary>
             /// primary font size
             /// </summary>
             public Len Size { get; }
+            public float SizeInPoints { get; }
+
             /// <summary>
             /// font's face name
             /// </summary>
-            public string Name { get; }
-            public FontStyle Style { get; }
-            public float SizeInPoints { get; }
+            public string Name { get; private set; }
+            public FontStyle Style { get; private set; }
 
-            public OtherChoice(string facename, float fontSizeInPts, FontStyle style = FontStyle.Regular)
+            public bool FromTypefaceFile { get; private set; }
+            public string UserInputTypefaceFile { get; private set; }
+
+            public Choice(string facename, float fontSizeInPts, FontStyle style = FontStyle.Regular)
                 : this(facename, Len.Pt(fontSizeInPts), style)
             {
             }
-            public OtherChoice(string facename, Len fontSize, FontStyle style = FontStyle.Regular)
+            public Choice(string facename, Len fontSize, FontStyle style = FontStyle.Regular)
             {
                 Name = facename; //primary typeface name
                 Size = fontSize; //store user font size here 
+                SizeInPoints = fontSize.ToPoints();
                 Style = style;
+            }
+            private Choice(Len fontSize)
+            {
+                Size = fontSize; //store user font size here 
+                SizeInPoints = fontSize.ToPoints();
             }
 
             int _fontKey;
             public int GetFontKey() => (_fontKey != 0) ? _fontKey : (_fontKey = CalculateFontKey(Name, SizeInPoints, Style));
+
+
+            /// <summary>
+            /// create req font+ specific typeface path
+            /// </summary>
+            /// <param name="path">path to typeface file</param>
+            /// <returns></returns>
+            public static Choice FromFile(string path, Len len, Choice[] otherChoices = null)
+            {
+                //the system will search for the typeface file and try loading it 
+                Choice otherChoice = new Choice(len);
+                otherChoice.FromTypefaceFile = true;
+                otherChoice.UserInputTypefaceFile = path;
+                //path to typeface file may be relative path
+                return otherChoice;
+            }
+
+
+            internal object _resolvedFont1;
+            internal object _resolvedFont2;
+
+            public static void SetResolvedFont1(Choice ch, object resolvedFont)
+            {
+                ch._resolvedFont1 = resolvedFont;
+            }
+            public static void SetResolvedFont2(Choice ch, object resolvedFont)
+            {
+                ch._resolvedFont2 = resolvedFont;
+            }
+            public static T GetResolvedFont1<T>(Choice ch)
+                where T : class
+            {
+                return ch._resolvedFont1 as T;
+            }
+            public static T GetResolvedFont2<T>(Choice ch)
+               where T : class
+            {
+                return ch._resolvedFont2 as T;
+            }
+
         }
 
-
-        public Len Size { get; }
-        public string Name { get; }
-        public FontStyle Style { get; }
         /// <summary>
         /// emheight in point unit
         /// </summary>
         public float SizeInPoints { get; }
+        public Len Size { get; }
 
-        readonly OtherChoice[] _otherChoices;
+        public string Name { get; private set; }
+        public FontStyle Style { get; private set; }
 
-        public RequestFont(string facename, float fontSizeInPts, FontStyle style = FontStyle.Regular, OtherChoice[] otherChoices = null)
+        public bool FromTypefaceFile { get; private set; }
+        public string UserInputTypefaceFile { get; private set; }
+
+
+        Choice[] _otherChoices;
+
+        public RequestFont(string facename, float fontSizeInPts, FontStyle style = FontStyle.Regular, Choice[] otherChoices = null)
             : this(facename, Len.Pt(fontSizeInPts), style, otherChoices)
         {
+
         }
-        public RequestFont(string facename, Len fontSize, FontStyle style = FontStyle.Regular, OtherChoice[] otherChoices = null)
+        public RequestFont(string facename, Len fontSize, FontStyle style = FontStyle.Regular, Choice[] otherChoices = null)
         {
             Name = facename; //primary typeface name
             Size = fontSize; //store user font size here 
             SizeInPoints = fontSize.ToPoints();
             Style = style;
             _otherChoices = otherChoices;
-
         }
 
+        private RequestFont(Len fontSize)
+        {
+            Size = fontSize; //store user font size here 
+            SizeInPoints = fontSize.ToPoints();
+        }
+
+
         public int OtherChoicesCount => (_otherChoices != null) ? _otherChoices.Length : 0;
-        public OtherChoice GetOtherChoice(int index) => _otherChoices[index];
-
+        public Choice GetOtherChoice(int index) => _otherChoices[index];
         public static int CalculateTypefaceKey(string typefaceName) => InternalFontKey.RegisterFontName(typefaceName);
-
         public static int CalculateFontKey(string typefaceName, float fontSizeInPts, FontStyle style)
         {
             return InternalFontKey.CalculateGetHasCode(
@@ -154,6 +214,25 @@ namespace PixelFarm.Drawing
             return reqFont._resolvedFont2 as T;
         }
 
+
+
+        /// <summary>
+        /// create req font+ specific typeface path
+        /// </summary>
+        /// <param name="path">path to typeface file</param>
+        /// <returns></returns>
+        public static RequestFont FromFile(string path, Len len, Choice[] otherChoices = null)
+        {
+            //the system will search for the typeface file and try loading it 
+            RequestFont reqFont = new RequestFont(len);
+            reqFont.FromTypefaceFile = true;
+            reqFont.UserInputTypefaceFile = path;
+            reqFont._otherChoices = otherChoices;
+            //path to typeface file may be relative path
+            return reqFont;
+        }
+
+        public static RequestFont FromFile(string typefacePath, float sizeInPoints) => FromFile(typefacePath, Len.Pt(sizeInPoints));
 #if DEBUG
         public override string ToString()
         {

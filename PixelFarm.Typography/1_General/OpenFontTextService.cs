@@ -9,7 +9,7 @@ using Typography.TextLayout;
 using Typography.TextServices;
 using Typography.FontManagement;
 using Typography.TextBreak;
-
+using System.Net.NetworkInformation;
 
 namespace PixelFarm.Drawing
 {
@@ -322,21 +322,82 @@ namespace PixelFarm.Drawing
         /// <param name="selector"></param>
         /// <param name="found"></param>
         /// <returns></returns>
-        public bool TryGetAlternativeTypefaceFromCodepoint(int codepoint, AlternativeTypefaceSelector selector, out Typeface found)
+        public bool TryGetAlternativeTypefaceFromCodepoint(int codepoint, AlternativeTypefaceSelector selector, out Typeface found) => _installedTypefaceCollection.TryGetAlternativeTypefaceFromCodepoint(codepoint, selector, out found);
+
+        public ResolvedFont ResolveFont(RequestFont.Choice choice)
         {
-            if (_installedTypefaceCollection.TryGetAlternativeTypefaceFromCodepoint(codepoint, selector, out InstalledTypeface foundInstalledTypeface))
+            ResolvedFont resolvedFont = RequestFont.Choice.GetResolvedFont1<ResolvedFont>(choice);
+            if (resolvedFont != null) return resolvedFont;
+
+            Typeface typeface;
+            if (choice.FromTypefaceFile)
             {
-                found = _installedTypefaceCollection.ResolveTypeface(foundInstalledTypeface);
-                return true;
+                //this may not be loaded
+                //so check if we have that file or not
+                typeface = _installedTypefaceCollection.ResolveTypefaceFromFile(choice.UserInputTypefaceFile);
+                if (typeface != null)
+                {
+                    //found
+                    //TODO: handle FontStyle ***                    
+                    resolvedFont = new ResolvedFont(typeface, choice.SizeInPoints, FontStyle.Regular);
+                    RequestFont.Choice.SetResolvedFont1(choice, resolvedFont);
+                    return resolvedFont;
+                }
             }
-            found = null;
-            return false;
+
+            //cache level-2 (stored in this openfont service)
+            if (_resolvedTypefaceCache.TryGetValue(choice.GetFontKey(), out resolvedFont))
+            {
+                if (resolvedFont.Typeface == null)
+                {
+                    //this is 'not found' resovled font
+                    //so don't return it
+                    return null;
+                }
+                //----
+                //cache to level-1
+                RequestFont.Choice.SetResolvedFont1(choice, resolvedFont);
+                return resolvedFont;
+            }
+            //-----
+            //when not found
+            //find it 
+            if ((typeface = _installedTypefaceCollection.ResolveTypeface(choice.Name,
+                             PixelFarm.Drawing.FontStyleExtensions.ConvToInstalledFontStyle(choice.Style))) != null)
+            {
+                //NOT NULL=> found 
+                if (!_resolvedTypefaceCache.TryGetValue(choice.GetFontKey(), out resolvedFont))
+                {
+                    resolvedFont = new ResolvedFont(typeface, choice.SizeInPoints, choice.Style, choice.GetFontKey());
+
+                    //** cache it with otherChoice.GetFontKey()**
+                    _resolvedTypefaceCache.Add(choice.GetFontKey(), resolvedFont);
+                }
+                return resolvedFont;
+            }
+            return null;
         }
         public ResolvedFont ResolveFont(RequestFont font)
         {
             //cache level-1 (attached inside the request font)
             ResolvedFont resolvedFont = RequestFont.GetResolvedFont1<ResolvedFont>(font);
             if (resolvedFont != null) return resolvedFont;
+
+            Typeface typeface;
+            if (font.FromTypefaceFile)
+            {
+                //this may not be loaded
+                //so check if we have that file or not
+                typeface = _installedTypefaceCollection.ResolveTypefaceFromFile(font.UserInputTypefaceFile);
+                if (typeface != null)
+                {
+                    //found
+                    //TODO: handle FontStyle ***                    
+                    resolvedFont = new ResolvedFont(typeface, font.SizeInPoints, FontStyle.Regular);
+                    RequestFont.SetResolvedFont1(font, resolvedFont);
+                    return resolvedFont;
+                }
+            }
 
             //cache level-2 (stored in this openfont service)
             if (_resolvedTypefaceCache.TryGetValue(font.FontKey, out resolvedFont))
@@ -355,55 +416,47 @@ namespace PixelFarm.Drawing
             //-----
             //when not found
             //find it
-            RequestFont.OtherChoice otherChoice = null;
 
-            Typeface typeface;
-            if ((typeface = _installedTypefaceCollection.ResolveTypeface(font.Name, PixelFarm.Drawing.FontStyleExtensions.ConvToInstalledFontStyle(font.Style))) == null)
+            if ((typeface = _installedTypefaceCollection.ResolveTypeface(font.Name,
+                            PixelFarm.Drawing.FontStyleExtensions.ConvToInstalledFontStyle(font.Style))) == null)
             {
-                //not found!
-                //select other font?
+                //this come from other choices?
                 int otherChoiceCount;
                 if ((otherChoiceCount = font.OtherChoicesCount) > 0)
                 {
                     for (int i = 0; i < otherChoiceCount; ++i)
                     {
-                        otherChoice = font.GetOtherChoice(i);
-                        if ((typeface = _installedTypefaceCollection.ResolveTypeface(otherChoice.Name, PixelFarm.Drawing.FontStyleExtensions.ConvToInstalledFontStyle(otherChoice.Style))) != null)
+                        resolvedFont = ResolveFont(font.GetOtherChoice(i));
+                        if (resolvedFont != null)
                         {
-                            break;
+                            RequestFont.SetResolvedFont1(font, resolvedFont);
+                            return resolvedFont;
                         }
                     }
                 }
+
                 //still not found
                 if (typeface == null)
                 {
-                    //register this font key => not found
-                    _resolvedTypefaceCache.Add(font.FontKey, ResolvedFont.s_empty);
+
+                    //we don't cache it in central service 
+                    //open opportunity for another search
+                    //_resolvedTypefaceCache.Add(font.FontKey, ResolvedFont.s_empty);
                     return null;
                 }
-            }
-
-            //-----------
-            //Here, we found some typeface for the request,
-            //it may come from primary or other choice
-
-
-            if (otherChoice != null)
-            {
-                //this come from other choice
-                resolvedFont = new ResolvedFont(typeface, otherChoice.SizeInPoints, otherChoice.Style, otherChoice.GetFontKey());
+                return null;
             }
             else
             {
                 resolvedFont = new ResolvedFont(typeface, font.SizeInPoints, font.Style, font.FontKey);
+                //cache to level2
+                _resolvedTypefaceCache.Add(resolvedFont.FontKey, resolvedFont);
+                RequestFont.SetResolvedFont1(font, resolvedFont);
+                return resolvedFont;
             }
-            //cache to level2
-            _resolvedTypefaceCache.Add(resolvedFont.FontKey, resolvedFont);
-            //cache to level 1
-            RequestFont.SetResolvedFont1(font, resolvedFont);
-            return resolvedFont;
         }
-
+        
+        
         public TextServiceClient CreateNewServiceClient() => new TextServiceClient(this);
 
         static OpenFontTextService()
