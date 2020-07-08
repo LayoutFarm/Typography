@@ -18,9 +18,13 @@ namespace PixelFarm.Drawing
                     installedStyle = Typography.FontManagement.TypefaceStyle.Italic;
                     break;
                 case FontStyle.Bold | FontStyle.Italic:
-                    installedStyle = Typography.FontManagement.TypefaceStyle.Italic;
+                    installedStyle = Typography.FontManagement.TypefaceStyle.Italic;//??? WHY????
+                    break;
+                case FontStyle.Others:
+                    installedStyle = Typography.FontManagement.TypefaceStyle.Others;
                     break;
             }
+
             return installedStyle;
         }
     }

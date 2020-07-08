@@ -237,7 +237,10 @@ namespace PixelFarm.Drawing
                 if (_currentTypeface == value) return;
                 // 
                 _currentTypeface = value;
-                if (value == null) { return; }
+                if (value == null)
+                {
+                    return;
+                }
                 //
                 _colrTable = _currentTypeface.COLRTable;
                 _cpalTable = _currentTypeface.CPALTable;
@@ -551,10 +554,11 @@ namespace PixelFarm.Drawing
                 var snapToPx = new GlyphPlanSequenceSnapPixelScaleLayout(seq, startAt, len, scale);
                 while (snapToPx.Read())
                 {
-                    _painter.SetOrigin((float)Math.Round(left + snapToPx.ExactX) + 0.33f, (float)Math.Floor(baseLine + snapToPx.ExactY));
-
-                    //***
                     GlyphBitmap glyphBmp = GetGlyphBitmapFromSvg(snapToPx.CurrentGlyphIndex);
+                    //since we use svg=>bitmap glyph, so need to offset Y back.
+                    _painter.SetOrigin((float)Math.Round(left + snapToPx.ExactX) + 0.33f, (float)Math.Floor(baseLine + snapToPx.ExactY - (glyphBmp.Height + this.FontDescedingPx)));
+
+                    //***                    
                     //how to draw the image
                     //1. 
                     if (glyphBmp != null)
@@ -585,9 +589,10 @@ namespace PixelFarm.Drawing
                 var snapToPx = new GlyphPlanSequenceSnapPixelScaleLayout(seq, startAt, len, scale);
                 while (snapToPx.Read())
                 {
-                    _painter.SetOrigin((float)Math.Round(left + snapToPx.ExactX) + 0.33f, (float)Math.Floor(baseLine + snapToPx.ExactY));
-
                     GlyphBitmap glyphBmp = GetGlyphBitmapFromBitmapFont(snapToPx.CurrentGlyphIndex);
+                    //since we use svg=>bitmap glyph, so need to offset Y back.
+                    _painter.SetOrigin((float)Math.Round(left + snapToPx.ExactX) + 0.33f, (float)Math.Floor(baseLine + snapToPx.ExactY - (glyphBmp.Height + this.FontDescedingPx)));
+
                     //how to draw the image
                     if (glyphBmp != null)
                     {
@@ -758,7 +763,7 @@ namespace PixelFarm.Drawing
         {
 
 #if DEBUG
-            if (textBuffer.Length > 3)
+            if (textBuffer.Length > 2)
             {
 
             }
