@@ -91,9 +91,9 @@ namespace SampleWinForms
 
                 myAlternativeTypefaceSelector.SetPreferTypefaces(
                      new[]{Typography.TextBreak.Unicode13RangeInfoList.C0_Controls_and_Basic_Latin,
-                               Typography.TextBreak.Unicode13RangeInfoList.C1_Controls_and_Latin_1_Supplement,
-                               Typography.TextBreak.Unicode13RangeInfoList.Latin_Extended_A,
-                               Typography.TextBreak.Unicode13RangeInfoList.Latin_Extended_B,
+                           Typography.TextBreak.Unicode13RangeInfoList.C1_Controls_and_Latin_1_Supplement,
+                           Typography.TextBreak.Unicode13RangeInfoList.Latin_Extended_A,
+                           Typography.TextBreak.Unicode13RangeInfoList.Latin_Extended_B,
                      },
                     preferTypefaces);
             }
@@ -245,17 +245,29 @@ namespace SampleWinForms
             //{
             //    RequestFont reqFont1 = new RequestFont("Source Sans Pro", 18);
 
-            //    //
+            //    "Source Sans Pro" does not have arabic , CJK, and Emoji glyphs
+            //     so this will use AlternativeTypefaceSelector to select a proper typeface for
+            //     a specific unicode range 
+            //     eg. for Emoticon=> use TwitterColorEmoji (global settings)
+            //             CJK => use "Noto CJK" (global settings) 
+            //             Arabic => use "Noto Sans Arabic UI" 
+
+
+
             //    //***TODO: please improve 1st loading time for CJK font***
-            //    //
+
             //    textOutput = "😁こんにちは, 你好, 여보세요 abc 0123 ";
 
             //    DrawStringToMemBitmap(reqFont1, textOutput, 100, 50);
             //}
+
+
             {
                 RequestFont reqFont1 = new RequestFont("Source Sans Pro", 30);
 
-                //TODO: optimize 1st loading time for CJK font
+                //"Source Sans Pro" does not have arabic glyphs
+                //so this will switch to "Noto Sans Arabic UI" as described in AlternativeTypefaceSelector above.
+
                 textOutput = "شمس حب ";
 
                 DrawStringToMemBitmap(reqFont1, textOutput, 150, 100);
@@ -265,7 +277,6 @@ namespace SampleWinForms
                 //use Roboto 
                 RequestFont reqFont1 = new RequestFont("Roboto", 20);
 
-                //TODO: optimize 1st loading time for CJK font
                 textOutput = "hello Roboto";
 
                 DrawStringToMemBitmap(reqFont1, textOutput, 0, 150);
@@ -284,13 +295,14 @@ namespace SampleWinForms
             string textOutput = "Hello! 1";
 
             {
+                //example1 
                 //we have Roboto
                 RequestFont reqFont1 = new RequestFont("Roboto", 20);
                 DrawStringToMemBitmap(reqFont1, textOutput, 0, 30);
             }
 
             {
-                //example1 
+                //example2 
                 //we don't have Roboto-X, 
                 //the printer should switch back to use _defaultReqFont 
                 textOutput = "Hello! 2";
@@ -299,7 +311,7 @@ namespace SampleWinForms
             }
 
             {
-                //example2 
+                //example3 
                 //we don't have Roboto-X, 
                 //but we add alternative to RequestFont
                 //that if the system does not found Roboto-X
@@ -312,6 +324,13 @@ namespace SampleWinForms
                     });
 
                 DrawStringToMemBitmap(reqFont1, textOutput, 0, 150);
+            }
+            {
+                //example4 
+                //we use explicit typeface name for our req font
+                textOutput = "Hello! 4";
+                RequestFont reqFont1 = RequestFont.FromFile("Test/latinmodern-math.otf", 30);
+                DrawStringToMemBitmap(reqFont1, textOutput, 0, 200);
             }
 
             CopyMemBitmapToScreen();

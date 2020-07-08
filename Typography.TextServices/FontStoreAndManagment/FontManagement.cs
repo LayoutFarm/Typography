@@ -185,8 +185,34 @@ namespace Typography.FontManagement
 
     public class InstalledTypeface
     {
-        readonly PreviewFontInfo _previewFontInfo;
 
+        internal InstalledTypeface(Typeface typeface, TypefaceStyle style, string fontPath)
+        {
+
+            FontName = typeface.Name;
+            FontSubFamily = typeface.FontSubFamily;
+
+            NameEntry nameEntry = typeface.GetNameEntry();
+            OS2Table os2Table = typeface.GetOS2Table();
+
+            TypographicFamilyName = nameEntry.TypographicFamilyName;
+            TypographicFontSubFamily = nameEntry.TypographyicSubfamilyName;
+
+            FontPath = fontPath;
+
+            PostScriptName = typeface.PostScriptName;
+            UniqueFontIden = typeface.UniqueFontIden;
+#if DEBUG
+
+            if (string.IsNullOrEmpty(UniqueFontIden))
+            {
+
+            }
+#endif
+
+            Languages = typeface.Languages;
+            TypefaceStyle = style;
+        }
         internal InstalledTypeface(PreviewFontInfo previewFontInfo, TypefaceStyle style, string fontPath)
         {
             FontName = previewFontInfo.Name;
@@ -200,10 +226,7 @@ namespace Typography.FontManagement
             UniqueFontIden = previewFontInfo.UniqueFontIden;
 
 #if DEBUG
-            if (FontName.Contains("Robo"))
-            {
 
-            }
             if (string.IsNullOrEmpty(UniqueFontIden))
             {
 
@@ -213,7 +236,6 @@ namespace Typography.FontManagement
             Languages = previewFontInfo.Languages;
             TypefaceStyle = style;
 
-            _previewFontInfo = previewFontInfo;
         }
 
         public string FontName { get; internal set; }
@@ -237,7 +259,7 @@ namespace Typography.FontManagement
         /// check if this font has glyph for the given code point or not
         /// </summary>
         /// <returns></returns>
-        public bool ContainGlyphForUnicode(int codepoint) => _previewFontInfo.Languages.ContainGlyphForUnicode(codepoint);
+        public bool ContainGlyphForUnicode(int codepoint) => Languages.ContainGlyphForUnicode(codepoint);
 
         internal Typeface ResolvedTypeface;
 
@@ -402,6 +424,19 @@ namespace Typography.FontManagement
 
         public InstalledTypeface AddFontPreview(PreviewFontInfo previewFont, string srcPath)
         {
+            //replace?
+            if (_onlyFontNames.ContainsKey(previewFont.Name))
+            {
+                //duplicated??
+                //TODO: handle this
+                //eg. Asana.ttc includes Asana-Regular.ttf and Asana-Math.ttf
+                //and we may already have a Asana-math.ttf
+                //How to handle this...
+#if DEBUG
+                System.Diagnostics.Debug.WriteLine("Duplicated Typeface: ");//TODO:
+
+#endif
+            }
 
             _onlyFontNames[previewFont.Name] = true;
 
@@ -511,25 +546,23 @@ namespace Typography.FontManagement
             }
         }
 
-        bool Register(InstalledTypeface newTypeface)
+
+        internal Dictionary<string, InstalledTypeface> _installedTypefacesByFilenames = new Dictionary<string, InstalledTypeface>();
+        bool Register(InstalledTypeface instTypeface)
         {
-
-
-
             InstalledTypefaceGroup selectedFontGroup = null;
-
-            string fontSubFamUpperCaseName = newTypeface.TypographicFontSubFamily;
+            string fontSubFamUpperCaseName = instTypeface.TypographicFontSubFamily;
             bool use_typographicSubFam = true;
             if (fontSubFamUpperCaseName == null)
             {
                 //switch to FontSubFamily, this should not be null!
-                fontSubFamUpperCaseName = newTypeface.FontSubFamily;
+                fontSubFamUpperCaseName = instTypeface.FontSubFamily;
                 use_typographicSubFam = false;
             }
             fontSubFamUpperCaseName = fontSubFamUpperCaseName.ToUpper();
             //--------------
 
-            switch (newTypeface.TypefaceStyle)
+            switch (instTypeface.TypefaceStyle)
             {
                 default:
                     {
@@ -581,12 +614,12 @@ namespace Typography.FontManagement
             //------------------
             //for font management
             //we use 'typographic family name' if avaliable,            
-            string register_name = newTypeface.TypographicFamilyName;
+            string register_name = instTypeface.TypographicFamilyName;
             bool use_typographicFontFam = true;
             if (register_name == null)
             {
                 //switch to font name, this should not be null!
-                register_name = newTypeface.FontName;
+                register_name = instTypeface.FontName;
                 use_typographicFontFam = false;
             }
 
@@ -601,14 +634,14 @@ namespace Typography.FontManagement
                 //we let user to handle it        
                 if (_fontNameDuplicatedHandler != null)
                 {
-                    switch (_fontNameDuplicatedHandler(found, newTypeface))
+                    switch (_fontNameDuplicatedHandler(found, instTypeface))
                     {
                         default:
                             throw new NotSupportedException();
                         case FontNameDuplicatedDecision.Skip:
                             break;
                         case FontNameDuplicatedDecision.Replace:
-                            selectedFontGroup.Replace(register_name, newTypeface);
+                            selectedFontGroup.Replace(register_name, instTypeface);
                             register_result = true;
                             break;
                     }
@@ -616,33 +649,35 @@ namespace Typography.FontManagement
             }
             else
             {
-                selectedFontGroup.AddFont(register_name, newTypeface);
+                selectedFontGroup.AddFont(register_name, instTypeface);
                 register_result = true;
             }
 
             if (use_typographicFontFam &&
-                newTypeface.FontName != newTypeface.TypographicFamilyName &&
-                newTypeface.TypefaceStyle == TypefaceStyle.Regular)
+                instTypeface.FontName != instTypeface.TypographicFamilyName &&
+                instTypeface.TypefaceStyle == TypefaceStyle.Regular)
             {
                 //in this case, the code above register the typeface with TypographicFamilyName
                 //so we register this typeface with original name too
-                if (_otherFontNames.ContainsKey(newTypeface.FontName.ToUpper()))
+                if (_otherFontNames.ContainsKey(instTypeface.FontName.ToUpper()))
                 {
-                    System.Diagnostics.Debug.WriteLine("duplicated font name?:" + newTypeface.FontName.ToUpper());
+#if DEBUG
+                    System.Diagnostics.Debug.WriteLine("duplicated font name?:" + instTypeface.FontName.ToUpper());
+#endif
                 }
                 else
                 {
-                    _otherFontNames.Add(newTypeface.FontName.ToUpper(), newTypeface);
+                    _otherFontNames.Add(instTypeface.FontName.ToUpper(), instTypeface);
                 }
             }
 
             //register font
-            if (newTypeface.PostScriptName != null)
+            if (instTypeface.PostScriptName != null)
             {
-                string postScriptName = newTypeface.PostScriptName.ToUpper();
+                string postScriptName = instTypeface.PostScriptName.ToUpper();
                 if (!_postScriptNames.ContainsKey(postScriptName))
                 {
-                    _postScriptNames.Add(postScriptName, newTypeface);
+                    _postScriptNames.Add(postScriptName, instTypeface);
                 }
                 else
                 {
@@ -652,9 +687,14 @@ namespace Typography.FontManagement
                 }
             }
 
+            if (register_result && instTypeface.FontPath != null &&
+                !_installedTypefacesByFilenames.ContainsKey(instTypeface.FontPath)) //beware case-sensitive!
+            {
+                _installedTypefacesByFilenames.Add(instTypeface.FontPath, instTypeface);
+            }
             return register_result;
-
         }
+
         public InstalledTypeface GetFontByPostScriptName(string postScriptName)
         {
             _postScriptNames.TryGetValue(postScriptName.ToUpper(), out InstalledTypeface found);
@@ -1030,8 +1070,9 @@ namespace Typography.FontManagement
                     yield return OpenFontBitPosInfo.GetUnicodeRanges(i);
                 }
             }
-
         }
+
+
         public static Typeface ResolveTypeface(this InstalledTypefaceCollection fontCollection, string fontName, TypefaceStyle style)
         {
             InstalledTypeface inst = fontCollection.GetInstalledTypeface(fontName, InstalledTypefaceCollection.GetSubFam(style));
@@ -1074,6 +1115,49 @@ namespace Typography.FontManagement
                 Typography.TextServices.CRC32.CalculateCRC32(upperCaseName, 0, upperCaseName.Length));
 
             return typeface;
+
+        }
+
+        public static Typeface ResolveTypefaceFromFile(this InstalledTypefaceCollection fontCollection, string filename)
+        {
+            //from user input typeface filename
+
+            bool enable_absPath = false; //enable abs path or not
+#if DEBUG
+            enable_absPath = true;//in debug mode
+#endif
+            //TODO: review here again!!!
+            if (!fontCollection._installedTypefacesByFilenames.TryGetValue(filename, out InstalledTypeface found))
+            {
+                if (!enable_absPath && Path.IsPathRooted(filename))
+                {
+                    return null;//***
+                }
+
+                //search for a file
+                if (File.Exists(filename))
+                {
+                    //TODO: handle duplicated font!!
+                    //try read this             
+                    InstalledTypeface instTypeface;
+                    using (FileStream fs = new FileStream(filename, FileMode.Open))
+                    {
+                        OpenFontReader reader = new OpenFontReader();
+                        Typeface typeface = reader.Read(fs);
+                        //
+                        instTypeface = new InstalledTypeface(typeface, TypefaceStyle.Regular, filename);                        
+                        fontCollection._installedTypefacesByFilenames.Add(filename, instTypeface);
+                        return instTypeface.ResolvedTypeface = typeface;//assign  and return                         
+                    }
+                }
+
+            }
+            else
+            {
+                //found inst type
+                return ResolveTypeface(fontCollection, found);
+            }
+            return null;
 
         }
         //for Windows , how to find Windows' Font Directory from Windows Registry

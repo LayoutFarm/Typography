@@ -338,6 +338,22 @@ namespace PixelFarm.Drawing
             ResolvedFont resolvedFont = RequestFont.GetResolvedFont1<ResolvedFont>(font);
             if (resolvedFont != null) return resolvedFont;
 
+            Typeface typeface;
+            if (font.FromTypefaceFile)
+            {
+                //this may not be loaded
+                //so check if we have that file or not
+                typeface = _installedTypefaceCollection.ResolveTypefaceFromFile(font.UserInputTypefaceFile);
+                if (typeface != null)
+                {
+                    //found
+                    //TODO: handle FontStyle ***                    
+                    resolvedFont = new ResolvedFont(typeface, font.SizeInPoints, FontStyle.Regular);
+                    RequestFont.SetResolvedFont1(font, resolvedFont);
+                    return resolvedFont;
+                }
+            }
+
             //cache level-2 (stored in this openfont service)
             if (_resolvedTypefaceCache.TryGetValue(font.FontKey, out resolvedFont))
             {
@@ -357,7 +373,7 @@ namespace PixelFarm.Drawing
             //find it
             RequestFont.OtherChoice otherChoice = null;
 
-            Typeface typeface;
+
             if ((typeface = _installedTypefaceCollection.ResolveTypeface(font.Name, PixelFarm.Drawing.FontStyleExtensions.ConvToInstalledFontStyle(font.Style))) == null)
             {
                 //not found!
