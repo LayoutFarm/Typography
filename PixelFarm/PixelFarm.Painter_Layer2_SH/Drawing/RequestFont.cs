@@ -52,7 +52,7 @@ namespace PixelFarm.Drawing
         //each platform/canvas has its own representation of this Font 
         //this is just a request for specficic font presentation at a time
         //----- 
-        public sealed class OtherChoice
+        public sealed class Choice
         {
             /// <summary>
             /// primary font size
@@ -69,18 +69,18 @@ namespace PixelFarm.Drawing
             public bool FromTypefaceFile { get; private set; }
             public string UserInputTypefaceFile { get; private set; }
 
-            public OtherChoice(string facename, float fontSizeInPts, FontStyle style = FontStyle.Regular)
+            public Choice(string facename, float fontSizeInPts, FontStyle style = FontStyle.Regular)
                 : this(facename, Len.Pt(fontSizeInPts), style)
             {
             }
-            public OtherChoice(string facename, Len fontSize, FontStyle style = FontStyle.Regular)
+            public Choice(string facename, Len fontSize, FontStyle style = FontStyle.Regular)
             {
                 Name = facename; //primary typeface name
                 Size = fontSize; //store user font size here 
                 SizeInPoints = fontSize.ToPoints();
                 Style = style;
             }
-            private OtherChoice(Len fontSize)
+            private Choice(Len fontSize)
             {
                 Size = fontSize; //store user font size here 
                 SizeInPoints = fontSize.ToPoints();
@@ -95,10 +95,10 @@ namespace PixelFarm.Drawing
             /// </summary>
             /// <param name="path">path to typeface file</param>
             /// <returns></returns>
-            public static OtherChoice FromFile(string path, Len len, OtherChoice[] otherChoices = null)
+            public static Choice FromFile(string path, Len len, Choice[] otherChoices = null)
             {
                 //the system will search for the typeface file and try loading it 
-                OtherChoice otherChoice = new OtherChoice(len);
+                Choice otherChoice = new Choice(len);
                 otherChoice.FromTypefaceFile = true;
                 otherChoice.UserInputTypefaceFile = path;
                 //path to typeface file may be relative path
@@ -119,14 +119,14 @@ namespace PixelFarm.Drawing
         public string UserInputTypefaceFile { get; private set; }
 
 
-        OtherChoice[] _otherChoices;
+        Choice[] _otherChoices;
 
-        public RequestFont(string facename, float fontSizeInPts, FontStyle style = FontStyle.Regular, OtherChoice[] otherChoices = null)
+        public RequestFont(string facename, float fontSizeInPts, FontStyle style = FontStyle.Regular, Choice[] otherChoices = null)
             : this(facename, Len.Pt(fontSizeInPts), style, otherChoices)
         {
 
         }
-        public RequestFont(string facename, Len fontSize, FontStyle style = FontStyle.Regular, OtherChoice[] otherChoices = null)
+        public RequestFont(string facename, Len fontSize, FontStyle style = FontStyle.Regular, Choice[] otherChoices = null)
         {
             Name = facename; //primary typeface name
             Size = fontSize; //store user font size here 
@@ -143,7 +143,7 @@ namespace PixelFarm.Drawing
 
 
         public int OtherChoicesCount => (_otherChoices != null) ? _otherChoices.Length : 0;
-        public OtherChoice GetOtherChoice(int index) => _otherChoices[index];
+        public Choice GetOtherChoice(int index) => _otherChoices[index];
         public static int CalculateTypefaceKey(string typefaceName) => InternalFontKey.RegisterFontName(typefaceName);
         public static int CalculateFontKey(string typefaceName, float fontSizeInPts, FontStyle style)
         {
@@ -197,7 +197,7 @@ namespace PixelFarm.Drawing
         /// </summary>
         /// <param name="path">path to typeface file</param>
         /// <returns></returns>
-        public static RequestFont FromFile(string path, Len len, OtherChoice[] otherChoices = null)
+        public static RequestFont FromFile(string path, Len len, Choice[] otherChoices = null)
         {
             //the system will search for the typeface file and try loading it 
             RequestFont reqFont = new RequestFont(len);
