@@ -134,13 +134,17 @@ namespace SampleWinForms
             _devVxsTextPrinter.ScriptLang = _basicOptions.ScriptLang;
             _devVxsTextPrinter.PositionTechnique = Typography.TextLayout.PositionTechnique.OpenFont;
 
+
             //Alternative Typeface selector..
             var myAlternativeTypefaceSelector = new PixelFarm.Drawing.MyAlternativeTypefaceSelector();
-            _devVxsTextPrinter.AlternativeTypefaceSelector = myAlternativeTypefaceSelector;
             {
+                //arabic
+
+                //1. create prefer typeface list for arabic script
                 var preferTypefaces = new PixelFarm.Drawing.MyAlternativeTypefaceSelector.PreferTypefaceList();
                 preferTypefaces.AddTypefaceName("Noto Sans Arabic UI");
 
+                //2. set unicode ranges and prefered typeface list. 
                 myAlternativeTypefaceSelector.SetPreferTypefaces(
                      new[]{Typography.TextBreak.Unicode13RangeInfoList.Arabic,
                                Typography.TextBreak.Unicode13RangeInfoList.Arabic_Supplement,
@@ -148,6 +152,8 @@ namespace SampleWinForms
                     preferTypefaces);
             }
             {
+                //latin
+
                 var preferTypefaces = new PixelFarm.Drawing.MyAlternativeTypefaceSelector.PreferTypefaceList();
                 preferTypefaces.AddTypefaceName("Sarabun");
 
@@ -159,6 +165,8 @@ namespace SampleWinForms
                      },
                     preferTypefaces);
             }
+
+            _devVxsTextPrinter.AlternativeTypefaceSelector = myAlternativeTypefaceSelector;
         }
 
         void UpdateRenderOutput()
