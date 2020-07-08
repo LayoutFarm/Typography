@@ -7,7 +7,7 @@ namespace Typography.FontManagement
     class TypefaceStore
     {
 
-        Dictionary<InstalledTypeface, Typeface> _loadedTypefaces = new Dictionary<InstalledTypeface, Typeface>();
+        readonly Dictionary<InstalledTypeface, Typeface> _loadedTypefaces = new Dictionary<InstalledTypeface, Typeface>();
 #if DEBUG
         public TypefaceStore()
         {

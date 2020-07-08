@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
+using Typography.OpenFont;
 
 namespace SampleWinForms
 {
@@ -12,6 +13,12 @@ namespace SampleWinForms
         [STAThread]
         static void Main()
         {
+
+            //if you want DPI aware----
+            Win32DPI.SetProcessDPIAware();
+            Typeface.DefaultDpi = Win32DPI.GetDpiForSystem();
+            //--------------------------
+
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new Form1());
