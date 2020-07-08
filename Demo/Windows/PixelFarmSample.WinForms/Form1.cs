@@ -31,6 +31,11 @@ namespace SampleWinForms
         TypographyTest.GlyphRenderOptions _glyphRenderOptions;
         TypographyTest.ContourAnalysisOptions _contourAnalysisOpts;
 
+        bool _readyToRender;
+        PixelFarm.Drawing.OpenFontTextService _textService;
+        PixelFarm.Drawing.Color _grayColor = new PixelFarm.Drawing.Color(0xFF, 0x80, 0x80, 0x80);
+
+
         public Form1()
         {
             InitializeComponent();
@@ -107,10 +112,7 @@ namespace SampleWinForms
         }
         void RenderByGlyphName(string selectedGlyphName) => RenderByGlyphIndex(glyphNameListUserControl1.Typeface.GetGlyphIndexByName(selectedGlyphName));
 
-        bool _readyToRender;
-        PixelFarm.Drawing.OpenFontTextService _textService;
-        PixelFarm.Drawing.Color _grayColor = new PixelFarm.Drawing.Color(0xFF, 0x80, 0x80, 0x80);
-
+       
         void InitGraphics()
         {
             //INIT ONCE
@@ -675,6 +677,11 @@ namespace SampleWinForms
         private void cmdTestReloadGlyphs_Click(object sender, EventArgs e)
         {
             (new FormTestTrimmableFeature()).Show();
+        }
+
+        private void cmdTestFontReq_Click(object sender, EventArgs e)
+        {
+            (new FormTestFontRequest()).Show();
         }
     }
 }

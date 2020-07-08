@@ -36,12 +36,19 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FontAtlasBuilderHelper.cs" />
+    <Compile Include="FormTestFontRequest.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormTestFontRequest.Designer.cs">
+      <DependentUpon>FormTestFontRequest.cs</DependentUpon>
+    </Compile>
     <Compile Include="FormTestTrimmableFeature.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -87,6 +94,9 @@
       <DependentUpon>UIFontAtlasFileViewer.cs</DependentUpon>
     </Compile>
     <Compile Include="SimpleUtils.cs" />
+    <EmbeddedResource Include="FormTestFontRequest.resx">
+      <DependentUpon>FormTestFontRequest.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="FormTestTrimmableFeature.resx">
       <DependentUpon>FormTestTrimmableFeature.cs</DependentUpon>
     </EmbeddedResource>
