@@ -142,7 +142,6 @@ namespace PixelFarm.Drawing
         public bool FromTypefaceFile { get; private set; }
         public string UserInputTypefaceFile { get; private set; }
 
-
         Choice[] _otherChoices;
 
         public RequestFont(string facename, float fontSizeInPts, FontStyle style = FontStyle.Regular, Choice[] otherChoices = null)
