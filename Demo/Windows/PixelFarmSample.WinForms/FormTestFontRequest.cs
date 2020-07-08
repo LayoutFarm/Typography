@@ -40,8 +40,9 @@ namespace SampleWinForms
             {
                 InitGraphics();
             }
-
         }
+
+        PixelFarm.Drawing.MyAlternativeTypefaceSelector _myAlternativeTypefaceSelector;
         void InitGraphics()
         {
             //INIT ONCE
@@ -68,16 +69,16 @@ namespace SampleWinForms
             _devVxsTextPrinter.PositionTechnique = Typography.TextLayout.PositionTechnique.OpenFont;
 
             //Alternative Typeface selector..
-            var myAlternativeTypefaceSelector = new PixelFarm.Drawing.MyAlternativeTypefaceSelector();
+            _myAlternativeTypefaceSelector = new PixelFarm.Drawing.MyAlternativeTypefaceSelector();
             {
                 //arabic
 
                 //1. create prefer typeface list for arabic script
-                var preferTypefaces = new PixelFarm.Drawing.MyAlternativeTypefaceSelector.PreferTypefaceList();
+                var preferTypefaces = new PixelFarm.Drawing.MyAlternativeTypefaceSelector.PreferredTypefaceList();
                 preferTypefaces.AddTypefaceName("Noto Sans Arabic UI");
 
                 //2. set unicode ranges and prefered typeface list. 
-                myAlternativeTypefaceSelector.SetPreferTypefaces(
+                _myAlternativeTypefaceSelector.SetPreferredTypefaces(
                      new[]{Typography.TextBreak.Unicode13RangeInfoList.Arabic,
                                Typography.TextBreak.Unicode13RangeInfoList.Arabic_Supplement,
                                Typography.TextBreak.Unicode13RangeInfoList.Arabic_Extended_A},
@@ -86,10 +87,10 @@ namespace SampleWinForms
             {
                 //latin
 
-                var preferTypefaces = new PixelFarm.Drawing.MyAlternativeTypefaceSelector.PreferTypefaceList();
+                var preferTypefaces = new PixelFarm.Drawing.MyAlternativeTypefaceSelector.PreferredTypefaceList();
                 preferTypefaces.AddTypefaceName("Sarabun");
 
-                myAlternativeTypefaceSelector.SetPreferTypefaces(
+                _myAlternativeTypefaceSelector.SetPreferredTypefaces(
                      new[]{Typography.TextBreak.Unicode13RangeInfoList.C0_Controls_and_Basic_Latin,
                            Typography.TextBreak.Unicode13RangeInfoList.C1_Controls_and_Latin_1_Supplement,
                            Typography.TextBreak.Unicode13RangeInfoList.Latin_Extended_A,
@@ -98,8 +99,9 @@ namespace SampleWinForms
                     preferTypefaces);
             }
 
-            _devVxsTextPrinter.AlternativeTypefaceSelector = myAlternativeTypefaceSelector;
+            _devVxsTextPrinter.AlternativeTypefaceSelector = _myAlternativeTypefaceSelector;
         }
+
 
         void DrawStringToMemBitmap(RequestFont reqFont, string textOutput, float x_pos, float y_pos, int repeatLines = 1)
         {
@@ -115,8 +117,11 @@ namespace SampleWinForms
                 resolvedFont = new ResolvedFont(resolvedFont.Typeface, reqFont.SizeInPoints, _defaultReqFont.Style);
             }
 
-            PixelFarm.Drawing.VxsTextPrinter _selectedTextPrinter = _devVxsTextPrinter;
+            //check if reqFont has alternative or not
 
+            _myAlternativeTypefaceSelector.SetCurrentReqFont(reqFont, _textService);
+
+            PixelFarm.Drawing.VxsTextPrinter _selectedTextPrinter = _devVxsTextPrinter;
             _painter.UseLcdEffectSubPixelRendering = true;
             _painter.FillColor = PixelFarm.Drawing.Color.Black;
 
@@ -130,8 +135,7 @@ namespace SampleWinForms
             _selectedTextPrinter.EnableLigature = true;
             _selectedTextPrinter.SimulateSlant = false;
 
-            _selectedTextPrinter.EnableMultiTypefaces = true; //*** for auto typeface selection***
-
+            _selectedTextPrinter.EnableMultiTypefaces = true; //*** for auto typeface selection*** 
 
             _selectedTextPrinter.TextBaseline = PixelFarm.Drawing.TextBaseline.Alphabetic;
 
@@ -217,6 +221,8 @@ namespace SampleWinForms
 
             }
 
+            //reset
+            _myAlternativeTypefaceSelector.SetCurrentReqFont(null, null);
 
         }
 
@@ -320,7 +326,7 @@ namespace SampleWinForms
                 RequestFont reqFont1 = new RequestFont("Roboto-X", 20, PixelFarm.Drawing.FontStyle.Regular,
                     new[]
                     {
-                       new RequestFont.OtherChoice("Asana Math",20)
+                       new RequestFont.Choice("Asana Math",20)
                     });
 
                 DrawStringToMemBitmap(reqFont1, textOutput, 0, 150);
@@ -331,6 +337,49 @@ namespace SampleWinForms
                 textOutput = "Hello! 4";
                 RequestFont reqFont1 = RequestFont.FromFile("Test/latinmodern-math.otf", 30);
                 DrawStringToMemBitmap(reqFont1, textOutput, 0, 200);
+            }
+
+            CopyMemBitmapToScreen();
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            //clear previous draw
+            _painter.Clear(PixelFarm.Drawing.Color.White);
+
+            string textOutput = "Hello! 1";
+
+            {
+                //example1 
+                //we have Roboto
+
+                textOutput = "Hello! 1😁";
+                RequestFont reqFont1 = new RequestFont("Roboto", 20, PixelFarm.Drawing.FontStyle.Regular,
+                   new[]
+                   {
+                       new RequestFont.Choice("Asana Math",20)
+                   });
+                DrawStringToMemBitmap(reqFont1, textOutput, 0, 50);
+            }
+
+            {
+                //example2 
+                //we don't have Roboto-X, 
+                //the printer should switch back to use Asana Math
+
+
+                //for Emoji=> our System default=> TwitterColorEmoji
+                //and in this case we want to specific that we want to use FireFoxColor Emoji instead
+
+
+                //textOutput = "Hello! 2😁";
+                //RequestFont reqFont1 = new RequestFont("Roboto", 20, PixelFarm.Drawing.FontStyle.Regular,
+                //   new[]
+                //   {
+                //       new RequestFont.Choice("Asana Math",20),
+                //       new RequestFont.Choice("Firefox Emoji",20),
+                //   });
+                //DrawStringToMemBitmap(reqFont1, textOutput, 0, 100);
             }
 
             CopyMemBitmapToScreen();

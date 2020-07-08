@@ -143,11 +143,11 @@ namespace SampleWinForms
                 //arabic
 
                 //1. create prefer typeface list for arabic script
-                var preferTypefaces = new PixelFarm.Drawing.MyAlternativeTypefaceSelector.PreferTypefaceList();
+                var preferTypefaces = new PixelFarm.Drawing.MyAlternativeTypefaceSelector.PreferredTypefaceList();
                 preferTypefaces.AddTypefaceName("Noto Sans Arabic UI");
 
                 //2. set unicode ranges and prefered typeface list. 
-                myAlternativeTypefaceSelector.SetPreferTypefaces(
+                myAlternativeTypefaceSelector.SetPreferredTypefaces(
                      new[]{Typography.TextBreak.Unicode13RangeInfoList.Arabic,
                                Typography.TextBreak.Unicode13RangeInfoList.Arabic_Supplement,
                                Typography.TextBreak.Unicode13RangeInfoList.Arabic_Extended_A},
@@ -156,10 +156,10 @@ namespace SampleWinForms
             {
                 //latin
 
-                var preferTypefaces = new PixelFarm.Drawing.MyAlternativeTypefaceSelector.PreferTypefaceList();
+                var preferTypefaces = new PixelFarm.Drawing.MyAlternativeTypefaceSelector.PreferredTypefaceList();
                 preferTypefaces.AddTypefaceName("Sarabun");
 
-                myAlternativeTypefaceSelector.SetPreferTypefaces(
+                myAlternativeTypefaceSelector.SetPreferredTypefaces(
                      new[]{Typography.TextBreak.Unicode13RangeInfoList.C0_Controls_and_Basic_Latin,
                                Typography.TextBreak.Unicode13RangeInfoList.C1_Controls_and_Latin_1_Supplement,
                                Typography.TextBreak.Unicode13RangeInfoList.Latin_Extended_A,

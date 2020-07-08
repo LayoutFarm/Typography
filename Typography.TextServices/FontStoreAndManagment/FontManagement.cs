@@ -155,33 +155,35 @@ namespace Typography.FontManagement
 
     public abstract class AlternativeTypefaceSelector
     {
-        //TODO: review here
-        public enum UnicodeHint
-        {
-            Unknown,
-            Emoji,
-            Math,
-        }
-        public class AddtionalHint
-        {
-            public UnicodeHint UnicodeHint { get; set; }
-            public UnicodeRangeInfo UnicodeLangRange { get; set; }
-        }
 
 #if DEBUG
         public AlternativeTypefaceSelector() { }
 #endif
 
         public Typeface LatestTypeface { get; set; }
-        public virtual InstalledTypeface Select(List<InstalledTypeface> choices, UnicodeRangeInfo unicodeRangeInfo, int codepoint, AddtionalHint additionalHint)
+        public abstract SelectedTypeface Select(List<InstalledTypeface> choices, UnicodeRangeInfo unicodeRangeInfo, int codepoint);
+
+
+
+        public readonly struct SelectedTypeface
         {
-            if (choices.Count > 0)
+            public readonly InstalledTypeface InstalledTypeface;
+            public readonly Typeface Typeface;
+            public SelectedTypeface(InstalledTypeface installedTypeface)
             {
-                return choices[0];//temp
+                Typeface = null;
+                InstalledTypeface = installedTypeface;
             }
-            return null;
+            public SelectedTypeface(Typeface typeface)
+            {
+                Typeface = typeface;
+                InstalledTypeface = null;
+            }
+            public bool IsEmpty() => Typeface == null && InstalledTypeface == null;
         }
     }
+
+
 
     public class InstalledTypeface
     {
@@ -941,7 +943,7 @@ namespace Typography.FontManagement
         /// <param name="selector"></param>
         /// <param name="found"></param>
         /// <returns></returns>
-        public bool TryGetAlternativeTypefaceFromCodepoint(int codepoint, AlternativeTypefaceSelector selector, out InstalledTypeface selectedTypeface)
+        public bool TryGetAlternativeTypefaceFromCodepoint(int codepoint, AlternativeTypefaceSelector selector, out Typeface selectedTypeface)
         {
             //find a typeface that supported input char c
 
@@ -956,31 +958,47 @@ namespace Typography.FontManagement
                 }
             }
 
-            var additionHint = new AlternativeTypefaceSelector.AddtionalHint();
+
             //not found
             if (installedTypefaceList == null && codepoint >= UNICODE_EMOJI_START && codepoint <= UNICODE_EMOJI_END)
             {
+                unicodeRangeInfo = Unicode13RangeInfoList.Emoticons;
                 if (_emojiSupportedTypefaces.Count > 0)
                 {
                     installedTypefaceList = _emojiSupportedTypefaces;
-                    additionHint.UnicodeHint = AlternativeTypefaceSelector.UnicodeHint.Emoji;
                 }
             }
             //-------------
             if (installedTypefaceList != null)
             {
-                //select a prefer font
-
+                //select a prefer font 
                 if (selector != null)
                 {
-                    return (selectedTypeface = selector.Select(installedTypefaceList, unicodeRangeInfo, codepoint, additionHint)) != null;
+                    AlternativeTypefaceSelector.SelectedTypeface result = selector.Select(installedTypefaceList, unicodeRangeInfo, codepoint);
+                    if (result.InstalledTypeface != null)
+                    {
+                        selectedTypeface = this.ResolveTypeface(installedTypefaceList[0]);
+                        return selectedTypeface != null;
+                    }
+                    else if (result.Typeface != null)
+                    {
+                        selectedTypeface = result.Typeface;
+                        return true;
+                    }
+                    else
+                    {
+                        selectedTypeface = null;
+                        return false;
+                    }
                 }
                 else if (installedTypefaceList.Count > 0)
                 {
-                    selectedTypeface = installedTypefaceList[0];//default
-                    return true;
+                    InstalledTypeface instTypeface = installedTypefaceList[0];//default
+                    selectedTypeface = this.ResolveTypeface(installedTypefaceList[0]);
+                    return selectedTypeface != null;
                 }
             }
+
             selectedTypeface = null;
             return false;
         }
@@ -1145,7 +1163,7 @@ namespace Typography.FontManagement
                         OpenFontReader reader = new OpenFontReader();
                         Typeface typeface = reader.Read(fs);
                         //
-                        instTypeface = new InstalledTypeface(typeface, TypefaceStyle.Regular, filename);                        
+                        instTypeface = new InstalledTypeface(typeface, TypefaceStyle.Regular, filename);
                         fontCollection._installedTypefacesByFilenames.Add(filename, instTypeface);
                         return instTypeface.ResolvedTypeface = typeface;//assign  and return                         
                     }
