@@ -372,14 +372,14 @@ namespace SampleWinForms
                 //and in this case we want to specific that we want to use FireFoxColor Emoji instead
 
 
-                //textOutput = "Hello! 2😁";
-                //RequestFont reqFont1 = new RequestFont("Roboto", 20, PixelFarm.Drawing.FontStyle.Regular,
-                //   new[]
-                //   {
-                //       new RequestFont.Choice("Asana Math",20),
-                //       new RequestFont.Choice("Firefox Emoji",20),
-                //   });
-                //DrawStringToMemBitmap(reqFont1, textOutput, 0, 100);
+                textOutput = "Hello! 2😁";
+                RequestFont reqFont1 = new RequestFont("Roboto", 20, PixelFarm.Drawing.FontStyle.Regular,
+                   new[]
+                   {
+                       new RequestFont.Choice("Asana Math",20),
+                       new RequestFont.Choice("Firefox Emoji",20),
+                   });
+                DrawStringToMemBitmap(reqFont1, textOutput, 0, 100);
             }
 
             CopyMemBitmapToScreen();

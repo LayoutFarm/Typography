@@ -71,7 +71,6 @@ namespace PixelFarm.Drawing
                 }
             }
 
-
             List<PreferTypeface> list = null;
             if (unicodeRangeInfo == Unicode13RangeInfoList.Emoticons)
             {
@@ -115,6 +114,14 @@ namespace PixelFarm.Drawing
                     }
                 }
             }
+
+            //still not found
+            if (choices.Count > 0)
+            {
+                //choose default
+                return new SelectedTypeface(choices[0]);
+            }
+
 
             return new SelectedTypeface();//empty
         }
