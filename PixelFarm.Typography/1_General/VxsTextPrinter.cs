@@ -5,161 +5,17 @@ using PixelFarm.CpuBlit.BitmapAtlas;
 
 using Typography.Contours;
 using Typography.OpenFont;
-using Typography.OpenFont.Extensions;
-using Typography.OpenFont.Tables;
+using Typography.OpenFont.Extensions; 
 using Typography.TextLayout;
 using Typography.TextBreak;
-using Typography.FontManagement;
+using Typography.TextServices;
+using Typography.FontManagement; 
+
 using PixelFarm.CpuBlit;
 using PixelFarm.CpuBlit.VertexProcessing;
 
 namespace PixelFarm.Drawing
 {
-    public class MyAlternativeTypefaceSelector : AlternativeTypefaceSelector
-    {
-        readonly Dictionary<string, PreferredTypefaceList> _dics = new Dictionary<string, PreferredTypefaceList>();
-        PreferredTypefaceList _emojiPreferList = new PreferredTypefaceList();
-
-#if DEBUG
-        public MyAlternativeTypefaceSelector() { }
-#endif
-
-        public void SetPreferredTypefaces(UnicodeRangeInfo unicodeRangeInfo, PreferredTypefaceList typefaceNames)
-        {
-            _dics[unicodeRangeInfo.Name] = typefaceNames;
-        }
-        public void SetPreferredTypefaces(UnicodeRangeInfo[] unicodeRangeInfos, PreferredTypefaceList typefaceNames)
-        {
-            for (int i = 0; i < unicodeRangeInfos.Length; ++i)
-            {
-                _dics[unicodeRangeInfos[i].Name] = typefaceNames;
-            }
-
-        }
-        public void SetPerferredEmoji(PreferredTypefaceList typefaceNames)
-        {
-            _emojiPreferList = typefaceNames;
-        }
-
-        public PreferredTypefaceList GetPreferTypefaces(string scriptTag) => _dics.TryGetValue(scriptTag, out PreferredTypefaceList foundList) ? foundList : null;
-
-        RequestFont _reqFont;
-        OpenFontTextService _textService;
-        public void SetCurrentReqFont(RequestFont reqFont, OpenFontTextService textService)
-        {
-            _reqFont = reqFont;
-            _textService = textService;
-        }
-
-        public override SelectedTypeface Select(List<InstalledTypeface> choices, UnicodeRangeInfo unicodeRangeInfo, int hintCodePoint)
-        {
-            //request font may have hint for typeface 
-            if (_reqFont != null)
-            {
-                for (int i = 0; i < _reqFont.OtherChoicesCount; ++i)
-                {
-                    RequestFont.Choice choice = _reqFont.GetOtherChoice(i);
-                    ResolvedFont resolvedFont = _textService.ResolveFont(choice);
-                    //check if resolvedFont support specific unicodeRange info or not 
-                    Typeface typeface = resolvedFont.Typeface;
-                    ushort codepoint = typeface.GetGlyphIndex(unicodeRangeInfo.StarCodepoint);
-                    if (codepoint > 0)
-                    {
-                        //use this
-                        return new SelectedTypeface(typeface);
-                    }
-                }
-            }
-
-            List<PreferTypeface> list = null;
-            if (unicodeRangeInfo == Unicode13RangeInfoList.Emoticons)
-            {
-                list = _emojiPreferList._list;
-            }
-            else if (_dics.TryGetValue(unicodeRangeInfo.Name, out PreferredTypefaceList foundList))
-            {
-                list = foundList._list;
-            }
-
-            if (list != null)
-            {
-                int j = list.Count;
-                for (int i = 0; i < j; ++i)
-                {
-                    //select that first one
-                    PreferTypeface p = list[i];
-
-                    if (p.InstalledTypeface == null && !p.ResolvedInstalledTypeface)
-                    {
-                        //find
-                        int choice_count = choices.Count;
-
-                        for (int m = 0; m < choice_count; ++m)
-                        {
-                            InstalledTypeface instTypeface = choices[m];
-                            if (p.RequestTypefaceName == instTypeface.FontName)
-                            {
-                                //TODO: review here again
-                                p.InstalledTypeface = instTypeface;
-
-                                break;
-                            }
-                        }
-                        p.ResolvedInstalledTypeface = true;
-                    }
-                    //-------
-                    if (p.InstalledTypeface != null)
-                    {
-                        return new SelectedTypeface(p.InstalledTypeface);
-                    }
-                }
-            }
-
-            //still not found
-            if (choices.Count > 0)
-            {
-                //choose default
-                return new SelectedTypeface(choices[0]);
-            }
-
-
-            return new SelectedTypeface();//empty
-        }
-
-        public class PreferTypeface
-        {
-            public PreferTypeface(string reqTypefaceName) => RequestTypefaceName = reqTypefaceName;
-            public string RequestTypefaceName { get; }
-            public InstalledTypeface InstalledTypeface { get; internal set; }
-            internal bool ResolvedInstalledTypeface { get; set; }
-        }
-
-
-        public class PreferredTypefaceList
-        {
-            internal List<PreferTypeface> _list = new List<PreferTypeface>();
-            public void AddTypefaceName(string typefaceName)
-            {
-                _list.Add(new PreferTypeface(typefaceName));
-            }
-        }
-    }
-
-    public class SvgBmpBuilderReq
-    {
-        //input
-        public System.Text.StringBuilder SvgContent;
-        public float ExpectedWidth;
-        public Color DefaultBgColor = Color.White;
-        //output 
-        public MemBitmap Output;
-        public int BitmapXOffset;
-        public int BitmapYOffset;
-
-    }
-
-    public delegate void SvgBmpBuilderFunc(SvgBmpBuilderReq req);
-
 
 
     public class VxsTextPrinter : TextPrinterBase, ITextPrinter
@@ -776,15 +632,16 @@ namespace PixelFarm.Drawing
             int typefaceKey = TypefaceExtensions.GetCustomTypefaceKey(typeface);
             if (typefaceKey == 0)
             {
-                //calculate and cache
-                TypefaceExtensions.SetCustomTypefaceKey(typeface,
-                    typefaceKey = RequestFont.CalculateTypefaceKey(typeface.Name));
+                throw new System.NotSupportedException();
+                ////calculate and cache
+                //TypefaceExtensions.SetCustomTypefaceKey(typeface,
+                //    typefaceKey = RequestFont.CalculateTypefaceKey(typeface.Name));
             }
 
             int key = RequestFont.CalculateFontKey(typefaceKey, sizeInPoint, style);
             if (!_localResolvedFonts.TryGetValue(key, out ResolvedFont found))
             {
-                return _localResolvedFonts[key] = new ResolvedFont(typeface, sizeInPoint, style, key);
+                return _localResolvedFonts[key] = new ResolvedFont(typeface, sizeInPoint, key);
             }
             return found;
         }
@@ -1010,130 +867,5 @@ namespace PixelFarm.Drawing
         List<FormattedGlyphPlanSeq> _tmpGlyphPlanSeqs = new List<FormattedGlyphPlanSeq>();
     }
 
-    public class FormattedGlyphPlanSeqPool
-    {
-        Queue<FormattedGlyphPlanSeq> _pool = new Queue<FormattedGlyphPlanSeq>();
 
-        public FormattedGlyphPlanSeq GetFreeFmtGlyphPlanSeqs() => (_pool.Count > 0) ? _pool.Dequeue() : new FormattedGlyphPlanSeq();
-        public void ReleaseFmtGlyphPlanSeqs(FormattedGlyphPlanSeq seq)
-        {
-            seq.Reset();
-            _pool.Enqueue(seq);
-        }
-    }
-
-    public class FormattedGlyphPlanSeq
-    {
-        static readonly GlyphPlanSequence s_EmptyGlypgPlanSeq = new GlyphPlanSequence();
-
-        public GlyphPlanSequence Seq { get; private set; } = GlyphPlanSequence.Empty;
-
-        public ResolvedFont ResolvedFont { get; private set; }
-
-        /// <summary>
-        /// whitespace count at the end of this seq
-        /// </summary>
-        public ushort PostfixWhitespaceCount { get; set; }
-        /// <summary>
-        /// whitespace count at the begin of this seq
-        /// </summary>
-        public ushort PrefixWhitespaceCount { get; set; }
-
-        public bool ColorGlyphOnTransparentBG { get; set; }
-
-        public void SetData(GlyphPlanSequence seq, ResolvedFont resolvedFont)
-        {
-            Seq = seq;
-            ResolvedFont = resolvedFont;
-        }
-        public bool IsEmpty() => Seq.IsEmpty();
-        public void Reset()
-        {
-            Seq = s_EmptyGlypgPlanSeq;
-            ResolvedFont = null;
-            ColorGlyphOnTransparentBG = false;
-            PrefixWhitespaceCount = PostfixWhitespaceCount = 0;
-        }
-
-
-    }
-
-    public interface IMultiLayerGlyphTranslator : IGlyphTranslator
-    {
-        void HasColorInfo(int nsubLayer);//if 0 => no color info
-        void BeginSubGlyph(ushort glyphIndex);
-        void EndSubGlyph(ushort glyphIndex);
-        void SetFillColor(byte r, byte g, byte b, byte a);
-    }
-
-
-
-    static class MultiLayeGlyphTx
-    {
-        //experiment
-
-        /// <summary>
-        /// build a multi-layer glyph (eg. Emoji)
-        /// </summary>
-        /// <param name="builder"></param>
-        /// <param name="glyphIndex"></param>
-        /// <param name="sizeInPoints"></param>
-        /// <param name="tx"></param>
-        public static void BuildFromGlyphIndex(this GlyphOutlineBuilderBase builder, ushort glyphIndex, float sizeInPoints, IMultiLayerGlyphTranslator tx)
-        {
-            //1. current typeface support multilayer or not
-            if (builder.HasColorInfo)
-            {
-                Typeface typeface = builder.Typeface;
-                COLR colrTable = typeface.COLRTable;
-                CPAL cpalTable = typeface.CPALTable;
-
-                if (colrTable.LayerIndices.TryGetValue(glyphIndex, out ushort colorLayerStart))
-                {
-                    //has color information on this glyphIndex
-
-                    ushort colorLayerCount = colrTable.LayerCounts[glyphIndex];
-                    tx.HasColorInfo(colorLayerCount);
-
-
-                    for (int c = colorLayerStart; c < colorLayerStart + colorLayerCount; ++c)
-                    {
-                        ushort gIndex = colrTable.GlyphLayers[c];
-                        tx.BeginSubGlyph(gIndex);//BEGIN SUB GLYPH
-
-                        int palette = 0; // FIXME: assume palette 0 for now 
-                        cpalTable.GetColor(
-                            cpalTable.Palettes[palette] + colrTable.GlyphPalettes[c], //index
-                            out byte r, out byte g, out byte b, out byte a);
-
-                        tx.SetFillColor(r, g, b, a); //SET COLOR
-
-                        builder.BuildFromGlyphIndex(glyphIndex, sizeInPoints);
-
-                        builder.ReadShapes(tx);
-
-                        tx.EndSubGlyph(gIndex);//END SUB GLYPH
-                    }
-
-                }
-                else
-                {
-                    //build as normal glyph
-                    builder.BuildFromGlyphIndex(glyphIndex, sizeInPoints);
-
-                    tx.HasColorInfo(0);
-                    builder.ReadShapes(tx);
-                }
-            }
-            else
-            {
-                //build as normal glyph
-                builder.BuildFromGlyphIndex(glyphIndex, sizeInPoints);
-
-                tx.HasColorInfo(0);
-                builder.ReadShapes(tx);
-            }
-
-        }
-    }
 }

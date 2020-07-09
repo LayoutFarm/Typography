@@ -20,6 +20,8 @@ namespace SampleWinForms
             Typeface.DefaultDpi = Win32DPI.GetDpiForSystem();
             //--------------------------
 
+            OurOpenFontSystem.Setup();
+
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new Form1());

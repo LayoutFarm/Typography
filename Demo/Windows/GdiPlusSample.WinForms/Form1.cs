@@ -9,6 +9,7 @@ using Typography.Contours;
 using Typography.FontManagement;
 using Typography.OpenFont;
 using Typography.OpenFont.Extensions;
+using Typography.TextServices;
 
 namespace SampleWinForms
 {
@@ -17,9 +18,10 @@ namespace SampleWinForms
         Graphics _g;
         //for this sample code,
         //create text printer env for developer.
+
         DevGdiTextPrinter _currentTextPrinter = new DevGdiTextPrinter();
-        InstalledTypefaceCollection _installedFontCollection;
-        TypefaceStore _typefaceStore;
+        TextServiceClient _txtServiceClient;
+
         public Form1()
         {
             InitializeComponent();
@@ -49,24 +51,15 @@ namespace SampleWinForms
             lstHintList.SelectedIndexChanged += (s, e) => UpdateRenderOutput();
             //---------- 
             txtInputChar.TextChanged += (s, e) => UpdateRenderOutput();
-            //
-
-            //1. create font collection             
-            _installedFontCollection = new InstalledTypefaceCollection();
-            //2. set some essential handler
-            _installedFontCollection.SetFontNameDuplicatedHandler((f1, f2) => FontNameDuplicatedDecision.Skip);
-
-            _installedFontCollection.LoadFontsFromFolder("../../../TestFonts_Err");
-            _installedFontCollection.LoadFontsFromFolder("../../../TestFonts");
-            //installedFontCollection.LoadSystemFonts();
-
+            // 
             //---------- 
             //show result
             InstalledTypeface selectedFF = null;
             int selected_index = 0;
             int ffcount = 0;
             bool found = false;
-            foreach (InstalledTypeface ff in _installedFontCollection.GetInstalledFontIter())
+
+            foreach (InstalledTypeface ff in OurOpenFontSystem.GetInstalledTypefaceIter())
             {
                 if (!found && ff.FontName == "Source Sans Pro")
                 {
@@ -79,17 +72,28 @@ namespace SampleWinForms
             }
             //set default font for current text printer
             //
-            _typefaceStore = new TypefaceStore();
-            _typefaceStore.FontCollection = _installedFontCollection;
-            _installedFontCollection.UpdateUnicodeRanges();
-
+            _txtServiceClient = OurOpenFontSystem.CreateTextServiceClient();
+            _currentTextPrinter.SetTextServiceClient(_txtServiceClient);
             //set default font for current text printer
-            _currentTextPrinter.Typeface = _typefaceStore.GetTypeface(selectedFF);
+            _currentTextPrinter.Typeface = OurOpenFontSystem.ResolveTypeface(selectedFF);
+
+
+            //Alternative Typeface Selector
+            {
+                
+                MyAlternativeTypefaceSelector alternativeTypefaceSelector = new MyAlternativeTypefaceSelector();
+                PreferredTypefaceList preferredTypefaces = new PreferredTypefaceList();
+                preferredTypefaces.AddTypefaceName("Segoe UI Emoji");
+                alternativeTypefaceSelector.SetPerferredEmoji(preferredTypefaces);
+                
+                //set alternative typeface selector to printer
+                _currentTextPrinter.AlternativeTypefaceSelector = alternativeTypefaceSelector;
+            }
+
             //---------- 
 #if DEBUG
-            //test get font from typeface store
-
-            InstalledTypeface instFont = _installedFontCollection.GetFontByPostScriptName("SourceSansPro-Regular");
+            //test get font from typeface store 
+            InstalledTypeface instFont = OurOpenFontSystem.GetFontCollection().GetFontByPostScriptName("SourceSansPro-Regular");
 
 
 #endif
@@ -100,7 +104,7 @@ namespace SampleWinForms
             {
                 if (lstFontList.SelectedItem is InstalledTypeface ff)
                 {
-                    _currentTextPrinter.Typeface = _typefaceStore.GetTypeface(ff);
+                    _currentTextPrinter.Typeface = OurOpenFontSystem.ResolveTypeface(ff);
                     //sample text box 
                     UpdateRenderOutput();
                 }
@@ -124,6 +128,8 @@ namespace SampleWinForms
             lstFontSizes.SelectedIndex = 0;
             this.Text = "Gdi+ Sample";
             //------ 
+
+
         }
         void UpdateRenderOutput()
         {
@@ -148,6 +154,7 @@ namespace SampleWinForms
 
             _currentTextPrinter.FillBackground = this.chkFillBackground.Checked;
             _currentTextPrinter.DrawOutline = this.chkBorder.Checked;
+            _currentTextPrinter.EnableMultiTypefaces = this.chkEnableMultiTypefaces.Checked;
 
             //-----------------------  
             _currentTextPrinter.HintTechnique = (HintTechnique)lstHintList.SelectedItem;

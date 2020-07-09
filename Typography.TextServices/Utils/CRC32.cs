@@ -43,7 +43,7 @@ namespace Typography.TextServices
 
 
 
-    static class CRC32
+    public static class CRC32
     {
 
         /// <summary>

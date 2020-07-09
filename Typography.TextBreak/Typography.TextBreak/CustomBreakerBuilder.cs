@@ -25,12 +25,15 @@ namespace Typography.TextBreak
         [System.ThreadStatic]
         static DictionaryProvider s_dicProvider;
 
-
-
-
+        [System.ThreadStatic]
+        static bool s_dicInit;
         static void InitAllDics()
         {
             //
+            if (s_dicInit || s_dicProvider == null)
+            {
+                return;
+            }
 
             if (s_thaiDic == null)
             {
@@ -53,6 +56,8 @@ namespace Typography.TextBreak
                 s_enAbbrvDic = new CustomAbbrvDic();
                 s_enAbbrvDic.LoadSortedUniqueWordList(s_dicProvider.GetSortedUniqueWordList("abbrv-en"));
             }
+
+            s_dicInit = true;
         }
 
 
@@ -69,28 +74,29 @@ namespace Typography.TextBreak
 
         public static CustomBreaker NewCustomBreaker()
         {
-            if (s_thaiDic == null)
-            {
-                if (s_dicProvider == null)
-                {
-                    //no dictionary provider
-                    return null;
-                }
-                InitAllDics();
-            }
-            var breaker = new CustomBreaker();
+            InitAllDics();
 
-            breaker.EngBreakingEngine.EngCustomAbbrvDic = s_enAbbrvDic;//optional 
-            breaker.EngBreakingEngine.EnableCustomAbbrv = true;//optional 
-            // 
-            var thBreaker = new ThaiDictionaryBreakingEngine();
-            //thBreaker.DontMergeLastIncompleteWord = true;
-            thBreaker.SetDictionaryData(s_thaiDic);
-            breaker.AddBreakingEngine(thBreaker);
-            //
-            var laoBreak = new LaoDictionaryBreakingEngine();
-            laoBreak.SetDictionaryData(s_laoDic);
-            breaker.AddBreakingEngine(laoBreak);
+            var breaker = new CustomBreaker();
+            if (s_enAbbrvDic != null)
+            {
+                breaker.EngBreakingEngine.EngCustomAbbrvDic = s_enAbbrvDic;//optional 
+                breaker.EngBreakingEngine.EnableCustomAbbrv = true;//optional 
+            }
+
+            if (s_thaiDic != null)
+            {
+                var thBreaker = new ThaiDictionaryBreakingEngine();
+                //thBreaker.DontMergeLastIncompleteWord = true;
+                thBreaker.SetDictionaryData(s_thaiDic);
+                breaker.AddBreakingEngine(thBreaker);
+            }
+
+            if (s_laoDic != null)
+            {
+                var laoBreak = new LaoDictionaryBreakingEngine();
+                laoBreak.SetDictionaryData(s_laoDic);
+                breaker.AddBreakingEngine(laoBreak);
+            }
 
             //
             var bidiBreak = new TextBreak.BidiBreakEngine();

@@ -40,6 +40,7 @@
             this.cmdMeasureTextSpan = new System.Windows.Forms.Button();
             this.chkFlipY = new System.Windows.Forms.CheckBox();
             this.txtMsgInfo = new System.Windows.Forms.TextBox();
+            this.chkEnableMultiTypefaces = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // lstFontList
@@ -152,11 +153,24 @@
             this.txtMsgInfo.Size = new System.Drawing.Size(379, 178);
             this.txtMsgInfo.TabIndex = 39;
             // 
+            // chkEnableMultiTypefaces
+            // 
+            this.chkEnableMultiTypefaces.AutoSize = true;
+            this.chkEnableMultiTypefaces.Checked = true;
+            this.chkEnableMultiTypefaces.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkEnableMultiTypefaces.Location = new System.Drawing.Point(938, 12);
+            this.chkEnableMultiTypefaces.Name = "chkEnableMultiTypefaces";
+            this.chkEnableMultiTypefaces.Size = new System.Drawing.Size(134, 17);
+            this.chkEnableMultiTypefaces.TabIndex = 40;
+            this.chkEnableMultiTypefaces.Text = "Enable MultiTypefaces";
+            this.chkEnableMultiTypefaces.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1185, 750);
+            this.Controls.Add(this.chkEnableMultiTypefaces);
             this.Controls.Add(this.txtMsgInfo);
             this.Controls.Add(this.chkFlipY);
             this.Controls.Add(this.cmdMeasureTextSpan);
@@ -190,5 +204,6 @@
         private System.Windows.Forms.Button cmdMeasureTextSpan;
         private System.Windows.Forms.CheckBox chkFlipY;
         private System.Windows.Forms.TextBox txtMsgInfo;
+        private System.Windows.Forms.CheckBox chkEnableMultiTypefaces;
     }
 }

@@ -11,7 +11,7 @@
     <AssemblyName>PixelFarm.Typography</AssemblyName>
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-	  <LangVersion>8.0</LangVersion>
+    <LangVersion>8.0</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -56,26 +56,7 @@
   <ItemGroup>
     <Folder Include="Properties\" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="1_General\LineSegmentsAndWordVisitors.cs" />
-    <Compile Include="1_General\OpenFontTextService_Part2.cs" />
-    <Compile Include="1_General\ResolvedFonts.cs" />
-    <Compile Include="2_CpuBlit_BitmapAtlas\FontAtlasTextPrinter.cs" />
-    <Compile Include="2_CpuBlit_BitmapAtlas\GlyphBitmapStore.cs" />
-    <Compile Include="3_Typography_Contours\GlyphPathBuilder.cs" />
-    <Compile Include="3_Typography_Contours\GlyphTranslatorToVxs.cs" />
-    <Compile Include="3_Typography_Contours\GlyphMeshStore.cs" />
-    <Compile Include="1_General\OpenFontTextService.cs" />
-    <Compile Include="2_CpuBlit_BitmapAtlas\BitmapFontMx.cs" />
-    <Compile Include="2_CpuBlit_BitmapAtlas\GlyphTextureBitmapGenerator.cs" />
-    <Compile Include="1_General\VxsTextPrinter.cs" />
-    <Compile Include="2_CpuBlit_BitmapAtlas\AggGlyphTextureGen.cs" />
-    <Compile Include="1_General\FontStyleExtensions.cs" />
-    <Compile Include="3_Typography_Contours\GlyphMeshCollection.cs" />
-    <Compile Include="3_Typography_Contours\GlyphOutlineBuilderBase.cs" />
-    <Compile Include="3_Typography_Contours\TextPrinterBase.cs" />
-    <Compile Include="4_PixelFarm_Contours\GlyphOutlineAnalyzer.cs" />
-  </ItemGroup>
+  <Import Project="PixelFarm.Typography_SH.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
