@@ -46,10 +46,10 @@
       <Link>SH\LineSegmentsAndWordVisitors.cs</Link>
     </Compile>
     <Compile Include="..\..\..\PixelFarm.Typography\1_General\OpenFontTextService.cs">
-      <Link>SH\OpenFontTextService.cs</Link>
+      <Link>PixelFarm_Typography_TextServices\OpenFontTextService.cs</Link>
     </Compile>
     <Compile Include="..\..\..\PixelFarm.Typography\1_General\TextServiceClient.cs">
-      <Link>SH\TextServiceClient.cs</Link>
+      <Link>PixelFarm_Typography_TextServices\TextServiceClient.cs</Link>
     </Compile>
     <Compile Include="..\..\..\PixelFarm.Typography\3_Typography_Contours\GlyphMeshCollection.cs">
       <Link>GlyphPathBuilder\GlyphMeshCollection.cs</Link>
@@ -64,10 +64,10 @@
       <Link>GdiPlus\FormattedGlyphPlanSeq.cs</Link>
     </Compile>
     <Compile Include="..\..\..\PixelFarm.Typography\4_Typography01\MyAlternativeTypefaceSelector.cs">
-      <Link>SH\MyAlternativeTypefaceSelector.cs</Link>
+      <Link>PixelFarm_Typography_TextServices\MyAlternativeTypefaceSelector.cs</Link>
     </Compile>
     <Compile Include="..\..\..\PixelFarm.Typography\4_Typography01\ResolvedFonts.cs">
-      <Link>SH\ResolvedFonts.cs</Link>
+      <Link>PixelFarm_Typography_TextServices\ResolvedFonts.cs</Link>
     </Compile>
     <Compile Include="..\..\..\pixelfarm\pixelfarm.basicvisualelements_sh\BasicGeometries.cs">
       <Link>PixelFarm_Drawing_Ess\BasicGeometries.cs</Link>

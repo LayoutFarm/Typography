@@ -20,17 +20,17 @@
   <Import Project="..\..\..\Typography.TextBreak\Typography.TextBreak\Typography.TextBreak.projitems" Label="Shared" />
 
   <ItemGroup>
-    <Compile Include="..\..\..\Demo\Shared\GlyphOutlineBuilder\GlyphOutlineBuilder.cs" Link="GlyphPathBuilder\GlyphOutlineBuilder.cs" />
-    <Compile Include="..\..\..\Demo\Windows\PixelFarmSample.WinForms\IcuSimpleTextFileDictionaryProvider.cs" Link="IcuSimpleTextFileDictionaryProvider.cs" />
+    <Compile Include="..\..\..\Demo\Shared\GlyphOutlineBuilder\GlyphOutlineBuilder.cs" Link="PixelFarm_Typography_Contours\GlyphOutlineBuilder.cs" />
+    <Compile Include="..\..\..\Demo\Windows\PixelFarmSample.WinForms\IcuSimpleTextFileDictionaryProvider.cs" Link="PixelFarm_Typography_TextBreak\IcuSimpleTextFileDictionaryProvider.cs" />
     <Compile Include="..\..\..\PixelFarm.Typography\1_General\FontStyleExtensions.cs" Link="PixelFarm_Drawing_Ess\FontStyleExtensions.cs" />
-    <Compile Include="..\..\..\PixelFarm.Typography\1_General\LineSegmentsAndWordVisitors.cs" Link="LineSegmentsAndWordVisitors.cs" />
-    <Compile Include="..\..\..\PixelFarm.Typography\1_General\OpenFontTextService.cs" Link="OpenFontTextService.cs" />
-    <Compile Include="..\..\..\PixelFarm.Typography\1_General\TextServiceClient.cs" Link="TextServiceClient.cs" />
-    <Compile Include="..\..\..\PixelFarm.Typography\3_Typography_Contours\GlyphMeshCollection.cs" Link="GlyphPathBuilder\GlyphMeshCollection.cs" />
-    <Compile Include="..\..\..\PixelFarm.Typography\3_Typography_Contours\GlyphOutlineBuilderBase.cs" Link="GlyphPathBuilder\GlyphOutlineBuilderBase.cs" />
+    <Compile Include="..\..\..\PixelFarm.Typography\1_General\LineSegmentsAndWordVisitors.cs" Link="PixelFarm_Typography_TextBreak\LineSegmentsAndWordVisitors.cs" />
+    <Compile Include="..\..\..\PixelFarm.Typography\1_General\OpenFontTextService.cs" Link="PixelFarm_Typography_TextServices\OpenFontTextService.cs" />
+    <Compile Include="..\..\..\PixelFarm.Typography\1_General\TextServiceClient.cs" Link="PixelFarm_Typography_TextServices\TextServiceClient.cs" />
+    <Compile Include="..\..\..\PixelFarm.Typography\3_Typography_Contours\GlyphMeshCollection.cs" Link="PixelFarm_Typography_Contours\GlyphMeshCollection.cs" />
+    <Compile Include="..\..\..\PixelFarm.Typography\3_Typography_Contours\GlyphOutlineBuilderBase.cs" Link="PixelFarm_Typography_Contours\GlyphOutlineBuilderBase.cs" />
     <Compile Include="..\..\..\PixelFarm.Typography\3_Typography_Contours\TextPrinterBase.cs" Link="DevTextPrinter\TextPrinterBase.cs" />
-    <Compile Include="..\..\..\PixelFarm.Typography\4_Typography01\MyAlternativeTypefaceSelector.cs" Link="MyAlternativeTypefaceSelector.cs" />
-    <Compile Include="..\..\..\pixelfarm.typography\4_typography01\ResolvedFonts.cs" Link="ResolvedFonts.cs" />
+    <Compile Include="..\..\..\PixelFarm.Typography\4_Typography01\MyAlternativeTypefaceSelector.cs" Link="PixelFarm_Typography_TextServices\MyAlternativeTypefaceSelector.cs" />
+    <Compile Include="..\..\..\pixelfarm.typography\4_typography01\ResolvedFonts.cs" Link="PixelFarm_Typography_TextServices\ResolvedFonts.cs" />
     <Compile Include="..\..\..\PixelFarm\PixelFarm.BasicVisualElements_SH\BasicGeometries.cs" Link="PixelFarm_Drawing_Ess\BasicGeometries.cs" />
     <Compile Include="..\..\..\PixelFarm\PixelFarm.Painter_Layer2_SH\Basic\CRC32Calculator.cs" Link="PixelFarm_Drawing_Ess\CRC32Calculator.cs" />
     <Compile Include="..\..\..\PixelFarm\PixelFarm.Painter_Layer2_SH\Basic\LenAndLenUnit.cs" Link="PixelFarm_Drawing_Ess\LenAndLenUnit.cs" />
@@ -45,7 +45,9 @@
 
   <ItemGroup>
     <Folder Include="DevTextPrinter\" />
-    <Folder Include="GlyphPathBuilder\" />
+    <Folder Include="PixelFarm_Typography_Contours\" />
+    <Folder Include="PixelFarm_Typography_TextBreak\" />
+    <Folder Include="PixelFarm_Typography_TextServices\" />
     <Folder Include="PixelFarm_Drawing_Ess\" />
   </ItemGroup>
 
