@@ -67,7 +67,7 @@
             this.picOutput.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
             this.picOutput.Location = new System.Drawing.Point(331, 65);
             this.picOutput.Name = "picOutput";
-            this.picOutput.Size = new System.Drawing.Size(820, 600);
+            this.picOutput.Size = new System.Drawing.Size(1030, 600);
             this.picOutput.TabIndex = 77;
             this.picOutput.TabStop = false;
             // 
@@ -167,7 +167,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1163, 727);
+            this.ClientSize = new System.Drawing.Size(1484, 727);
             this.Controls.Add(this.cmdBuildAtlasFromAllGlyphs);
             this.Controls.Add(this.chkShowAtlasViewer);
             this.Controls.Add(this.cmbTextureKind);

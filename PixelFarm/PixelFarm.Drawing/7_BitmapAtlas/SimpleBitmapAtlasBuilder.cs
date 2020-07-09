@@ -12,7 +12,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
         public SimpleBitmapAtlasBuilder()
         {
             SpaceCompactOption = CompactOption.BinPack; //default
-            MaxAtlasWidth = 800;
+            MaxAtlasWidth = 1024;
         }
 
         public int MaxAtlasWidth { get; set; }
@@ -290,7 +290,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
 
             foreach (BitmapAtlasItemSource src in _items.Values)
             {
-                Rectangle area = src.Area; 
+                Rectangle area = src.Area;
 
                 atlas.AddAtlasItem(new AtlasItem(src.UniqueInt16Name)
                 {
