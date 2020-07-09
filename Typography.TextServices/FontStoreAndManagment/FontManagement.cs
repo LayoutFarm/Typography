@@ -56,7 +56,13 @@ namespace Typography.OpenFont
                 //default and others
                 {
                     ScriptTable.LangSysTable langSys = scTable.defaultLang;
-                    ScriptLang sclang = new ScriptLang(scTable.ScriptTagName, langSys.LangSysTagIdenString);
+                    uint langTag = 0;
+                    if (langSys != null)
+                    {
+                        //no lang sys
+                        langTag = langSys.langSysTagIden;
+                    }
+                    ScriptLang sclang = new ScriptLang(scTable.scriptTag, langTag);
                     string key = sclang.ToString();
                     if (!output.ContainsKey(key))
                     {
