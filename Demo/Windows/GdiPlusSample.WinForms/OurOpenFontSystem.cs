@@ -34,7 +34,7 @@ namespace SampleWinForms
             s_installedTypefaceCollection.LoadFontsFromFolder("../../../TestFonts");
             s_installedTypefaceCollection.UpdateUnicodeRanges();
 
-            s_textServices = new OpenFontTextService();
+            s_textServices = new OpenFontTextService(s_installedTypefaceCollection);
             //SKIP Woff,Woff2
             //Svg builder
         }
@@ -44,7 +44,7 @@ namespace SampleWinForms
             return s_textServices.CreateNewServiceClient();
         }
         public static Typeface ResolveTypeface(InstalledTypeface instTypeface)
-        {
+        {            
             return s_installedTypefaceCollection.ResolveTypeface(instTypeface);
         }
         public static IEnumerable<InstalledTypeface> GetInstalledTypefaceIter()
