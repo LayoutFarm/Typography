@@ -424,7 +424,7 @@ namespace SampleWinForms
 
                     //create an object that hold more information about GlyphPlanSequence
 
-                    FormattedGlyphPlanSeq formattedGlyphPlanSeq = new FormattedGlyphPlanSeq();
+                    FormattedGlyphPlanSeq formattedGlyphPlanSeq = _pool.GetFreeFmtGlyphPlanSeqs();
                     formattedGlyphPlanSeq.PrefixWhitespaceCount = (ushort)prefix_whitespaceCount;//***
                     prefix_whitespaceCount = 0;//reset 
 
@@ -482,10 +482,13 @@ namespace SampleWinForms
         {
             for (int i = _tmpGlyphPlanSeqs.Count - 1; i >= 0; --i)
             {
-
+                //release back to pool
+                _pool.ReleaseFmtGlyphPlanSeqs(_tmpGlyphPlanSeqs[i]);
             }
             _tmpGlyphPlanSeqs.Clear();
         }
+
+        readonly FormattedGlyphPlanSeqPool _pool = new FormattedGlyphPlanSeqPool();
 
     }
 }
