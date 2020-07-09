@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
@@ -21,9 +21,20 @@
 
   <ItemGroup>
     <Compile Include="..\..\..\Demo\Shared\GlyphOutlineBuilder\GlyphOutlineBuilder.cs" Link="GlyphPathBuilder\GlyphOutlineBuilder.cs" />
+    <Compile Include="..\..\..\Demo\Windows\PixelFarmSample.WinForms\IcuSimpleTextFileDictionaryProvider.cs" Link="IcuSimpleTextFileDictionaryProvider.cs" />
+    <Compile Include="..\..\..\PixelFarm.Typography\1_General\FontStyleExtensions.cs" Link="FontStyleExtensions.cs" />
+    <Compile Include="..\..\..\PixelFarm.Typography\1_General\LineSegmentsAndWordVisitors.cs" Link="LineSegmentsAndWordVisitors.cs" />
+    <Compile Include="..\..\..\PixelFarm.Typography\1_General\OpenFontTextService.cs" Link="OpenFontTextService.cs" />
+    <Compile Include="..\..\..\PixelFarm.Typography\1_General\TextServiceClient.cs" Link="TextServiceClient.cs" />
     <Compile Include="..\..\..\PixelFarm.Typography\3_Typography_Contours\GlyphMeshCollection.cs" Link="GlyphPathBuilder\GlyphMeshCollection.cs" />
     <Compile Include="..\..\..\PixelFarm.Typography\3_Typography_Contours\GlyphOutlineBuilderBase.cs" Link="GlyphPathBuilder\GlyphOutlineBuilderBase.cs" />
     <Compile Include="..\..\..\PixelFarm.Typography\3_Typography_Contours\TextPrinterBase.cs" Link="DevTextPrinter\TextPrinterBase.cs" />
+    <Compile Include="..\..\..\PixelFarm.Typography\4_Typography01\MyAlternativeTypefaceSelector.cs" Link="MyAlternativeTypefaceSelector.cs" />
+    <Compile Include="..\..\..\pixelfarm.typography\4_typography01\ResolvedFonts.cs" Link="ResolvedFonts.cs" />
+    <Compile Include="..\..\..\PixelFarm\PixelFarm.BasicVisualElements_SH\BasicGeometries.cs" Link="PixelFarm_Drawing_Ess\BasicGeometries.cs" />
+    <Compile Include="..\..\..\PixelFarm\PixelFarm.Painter_Layer2_SH\Basic\CRC32Calculator.cs" Link="PixelFarm_Drawing_Ess\CRC32Calculator.cs" />
+    <Compile Include="..\..\..\PixelFarm\PixelFarm.Painter_Layer2_SH\Basic\LenAndLenUnit.cs" Link="PixelFarm_Drawing_Ess\LenAndLenUnit.cs" />
+    <Compile Include="..\..\..\PixelFarm\PixelFarm.Painter_Layer2_SH\Drawing\RequestFont.cs" Link="PixelFarm_Drawing_Ess\RequestFont.cs" />
     <Compile Include="..\..\..\PixelFarm\PixelFarm.Painter_Layer2_SH\Drawing\TextBaseline.cs" Link="DevTextPrinter\TextBaseline.cs" />
   </ItemGroup>
 
@@ -35,6 +46,7 @@
   <ItemGroup>
     <Folder Include="DevTextPrinter\" />
     <Folder Include="GlyphPathBuilder\" />
+    <Folder Include="PixelFarm_Drawing_Ess\" />
   </ItemGroup>
 
 </Project>
