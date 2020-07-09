@@ -2,6 +2,8 @@
 
 using System.Collections.Generic;
 using PixelFarm.Drawing;
+using PixelFarm.Drawing.Internal;
+
 namespace PixelFarm.CpuBlit.BitmapAtlas
 {
     public class SimpleBitmapAtlasBuilder
@@ -12,7 +14,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
         public SimpleBitmapAtlasBuilder()
         {
             SpaceCompactOption = CompactOption.BinPack; //default
-            MaxAtlasWidth = 800;
+            MaxAtlasWidth = 1024;
         }
 
         public int MaxAtlasWidth { get; set; }
@@ -290,7 +292,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
 
             foreach (BitmapAtlasItemSource src in _items.Values)
             {
-                Rectangle area = src.Area; 
+                Rectangle area = src.Area;
 
                 atlas.AddAtlasItem(new AtlasItem(src.UniqueInt16Name)
                 {
@@ -317,21 +319,46 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
 
         static void CopyToDest(int[] srcPixels, int srcW, int srcH, int[] targetPixels, int targetX, int targetY, int totalTargetWidth)
         {
-            int srcIndex = 0;
+
+
+            //int srcIndex = 0;
+            //for (int r = 0; r < srcH; ++r)
+            //{
+            //    //for each row 
+            //    int targetP = ((targetY + r) * totalTargetWidth) + targetX;
+            //    for (int c = 0; c < srcW; ++c)
+            //    {
+            //        targetPixels[targetP] = srcPixels[srcIndex];
+            //        srcIndex++;
+            //        targetP++;
+            //    }
+            //}
+
             unsafe
             {
-
-                for (int r = 0; r < srcH; ++r)
+                fixed (int* target_ptr_head = &targetPixels[0])
+                fixed (int* src_ptr_head = &srcPixels[0])
                 {
-                    //for each row 
-                    int targetP = ((targetY + r) * totalTargetWidth) + targetX;
-                    for (int c = 0; c < srcW; ++c)
+                    int* sc_ptr = src_ptr_head;
+
+                    for (int r = 0; r < srcH; ++r)
                     {
-                        targetPixels[targetP] = srcPixels[srcIndex];
-                        srcIndex++;
-                        targetP++;
+                        //for each row 
+                        //int targetP = ((targetY + r) * totalTargetWidth) + targetX;
+                        int* targetP = target_ptr_head + ((targetY + r) * totalTargetWidth) + targetX;
+                        MemMx.memcpy((byte*)targetP, (byte*)sc_ptr, srcW * 4); 
+                        sc_ptr += srcW;
+
+                        //copy 
+                        //for (int c = 0; c < srcW; ++c)
+                        //{
+                        //    *targetP = *sc_ptr;
+                        //    sc_ptr++;
+                        //    targetP++;
+                        //}
                     }
                 }
+
             }
         }
     }

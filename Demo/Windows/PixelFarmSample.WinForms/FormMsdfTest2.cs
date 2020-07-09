@@ -417,7 +417,6 @@ namespace SampleWinForms
                 //resolve this font
 
                 SimpleBitmapAtlas fontAtlas = bmpFontMx.GetFontAtlas(resolvedFont, out MemBitmap fontBmp);
-                bmpFontMx.GetFontAtlas(resolvedFont, out fontBmp);
                 multisizeFontAtlasBuilder.AddSimpleAtlasFile(reqFont,
                     resolveFontTextureFile,
                     fontTextureImgFilename,
