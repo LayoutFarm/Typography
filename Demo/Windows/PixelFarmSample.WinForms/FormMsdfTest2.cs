@@ -7,7 +7,9 @@ using System.IO;
 using System.Windows.Forms;
 
 using Typography.OpenFont;
+using Typography.OpenFont.Extensions;
 using Typography.Contours;
+using Typography.TextServices;
 
 using PixelFarm.Drawing;
 using PixelFarm.Contours;
@@ -20,12 +22,12 @@ namespace SampleWinForms
 {
     public partial class FormMsdfTest2 : Form
     {
-        OpenFontTextService _textServices;
+        Typography.TextServices.OpenFontTextService _textServices;
         public FormMsdfTest2()
         {
             InitializeComponent();
             //
-            _textServices = new OpenFontTextService();
+            _textServices = new Typography.TextServices.OpenFontTextService();
 
         }
 

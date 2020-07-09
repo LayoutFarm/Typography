@@ -1,7 +1,7 @@
-﻿//Apache2, 2014-present, WinterDev
+﻿//MIT, 2020-present, WinterDev
 
-
-namespace PixelFarm.Drawing
+using PixelFarm.Drawing;
+namespace Typography.TextServices
 {
 
     partial class OpenFontTextService

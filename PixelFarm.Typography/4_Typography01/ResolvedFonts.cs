@@ -1,16 +1,51 @@
 ﻿//Apache2, 2014-present, WinterDev
 using System;
+using System.Collections.Generic;
+
 using Typography.OpenFont;
 using Typography.OpenFont.Extensions;
 
-
-namespace PixelFarm.Drawing
+namespace Typography.TextServices
 {
+    static class InternalFontKey
+    {
+        //only typeface name
+        static readonly Dictionary<string, int> s_registerFontNames = new Dictionary<string, int>();
+        static InternalFontKey()
+        {
+            RegisterFontName(""); //blank font name
+        }
+        public static int RegisterFontName(string fontName)
+        {
+            fontName = fontName.ToUpper();//***
+            if (!s_registerFontNames.TryGetValue(fontName, out int found))
+            {
+                char[] buff = fontName.ToCharArray();
+                int nameCrc32 = Typography.TextServices.CRC32.CalculateCRC32(buff, 0, buff.Length);
+                s_registerFontNames.Add(fontName, nameCrc32);
+                return nameCrc32;
+            }
+            return found;
+        }
+        public static int CalculateGetHasCode(int typefaceKey, float fontSize, int fontstyle)
+        {
+            //modified from https://stackoverflow.com/questions/1646807/quick-and-simple-hash-code-combinations
+            unchecked
+            {
+                int hash = 17;
+                hash = hash * 31 + typefaceKey.GetHashCode();
+                hash = hash * 31 + fontSize.GetHashCode();
+                hash = hash * 31 + fontstyle.GetHashCode();
+                return hash;
+            }
+        }
+    }
+
     public sealed class ResolvedFont
     {
         readonly float _px_scale;
         readonly int _ws;
-        public ResolvedFont(Typeface typeface, float sizeInPoints, FontStyle fontStyle, int fontKey)
+        public ResolvedFont(Typeface typeface, float sizeInPoints, int fontKey)
         {
             Typeface = typeface;
             if (Typeface != null)
@@ -20,11 +55,11 @@ namespace PixelFarm.Drawing
                 Name = typeface.Name;
             }
             SizeInPoints = sizeInPoints;
-            FontStyle = fontStyle;
+
             Typeface = typeface;
             FontKey = fontKey;
         }
-        public ResolvedFont(Typeface typeface, float sizeInPoints, FontStyle fontStyle)
+        public ResolvedFont(Typeface typeface, float sizeInPoints)
         {
             Typeface = typeface;
             if (Typeface != null)
@@ -34,9 +69,11 @@ namespace PixelFarm.Drawing
                 Name = typeface.Name;
             }
             SizeInPoints = sizeInPoints;
-            FontStyle = fontStyle;
+
             Typeface = typeface;
-            FontKey = RequestFont.CalculateFontKey(TypefaceExtensions.GetCustomTypefaceKey(typeface), sizeInPoints, fontStyle);
+            FontKey = InternalFontKey.CalculateGetHasCode(
+                TypefaceExtensions.GetCustomTypefaceKey(typeface),
+                sizeInPoints, 0);
         }
         public Typeface Typeface { get; }
 
@@ -65,7 +102,6 @@ namespace PixelFarm.Drawing
 #endif
 
         public float SizeInPoints { get; private set; }
-        public FontStyle FontStyle { get; private set; }
         public int FontKey { get; private set; }
         public string Name { get; }
     }

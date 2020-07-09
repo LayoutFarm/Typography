@@ -9,20 +9,18 @@ using Typography.Contours;
 using Typography.FontManagement;
 using Typography.OpenFont;
 using Typography.OpenFont.Extensions;
+using Typography.TextServices;
+
 namespace SampleWinForms
 {
     public partial class Form1 : Form
     {
-
-
-
-        Graphics g;
+        Graphics _g;
         //for this sample code,
         //create text printer env for developer.
-        DevGdiTextPrinter _currentTextPrinter = new DevGdiTextPrinter();
-        InstalledTypefaceCollection _installedFontCollection;
-        TypefaceStore _typefaceStore;
 
+        DevGdiTextPrinter _currentTextPrinter = new DevGdiTextPrinter();
+        TextServiceClient _txtServiceClient;
 
         public Form1()
         {
@@ -53,24 +51,15 @@ namespace SampleWinForms
             lstHintList.SelectedIndexChanged += (s, e) => UpdateRenderOutput();
             //---------- 
             txtInputChar.TextChanged += (s, e) => UpdateRenderOutput();
-            //
-
-            //1. create font collection             
-            _installedFontCollection = new InstalledTypefaceCollection();
-            //2. set some essential handler
-            _installedFontCollection.SetFontNameDuplicatedHandler((f1, f2) => FontNameDuplicatedDecision.Skip);
-
-            _installedFontCollection.LoadFontsFromFolder("../../../TestFonts_Err");
-            _installedFontCollection.LoadFontsFromFolder("../../../TestFonts");
-            //installedFontCollection.LoadSystemFonts();
-
+            // 
             //---------- 
             //show result
             InstalledTypeface selectedFF = null;
             int selected_index = 0;
             int ffcount = 0;
             bool found = false;
-            foreach (InstalledTypeface ff in _installedFontCollection.GetInstalledFontIter())
+
+            foreach (InstalledTypeface ff in OurOpenFontSystem.GetInstalledTypefaceIter())
             {
                 if (!found && ff.FontName == "Source Sans Pro")
                 {
@@ -81,14 +70,33 @@ namespace SampleWinForms
                 lstFontList.Items.Add(ff);
                 ffcount++;
             }
-
-            TypefaceStore store = new TypefaceStore();//caching loaded typeface/helper
             //set default font for current text printer
-            store.FontCollection = _installedFontCollection;
-            _typefaceStore = store;
-            _currentTextPrinter.Typeface = store.GetTypeface(selectedFF);
-            //---------- 
+            //
+            _txtServiceClient = OurOpenFontSystem.CreateTextServiceClient();
+            _currentTextPrinter.SetTextServiceClient(_txtServiceClient);
+            //set default font for current text printer
+            _currentTextPrinter.Typeface = OurOpenFontSystem.ResolveTypeface(selectedFF);
 
+
+            //Alternative Typeface Selector
+            {
+                
+                MyAlternativeTypefaceSelector alternativeTypefaceSelector = new MyAlternativeTypefaceSelector();
+                PreferredTypefaceList preferredTypefaces = new PreferredTypefaceList();
+                preferredTypefaces.AddTypefaceName("Segoe UI Emoji");
+                alternativeTypefaceSelector.SetPerferredEmoji(preferredTypefaces);
+                
+                //set alternative typeface selector to printer
+                _currentTextPrinter.AlternativeTypefaceSelector = alternativeTypefaceSelector;
+            }
+
+            //---------- 
+#if DEBUG
+            //test get font from typeface store 
+            InstalledTypeface instFont = OurOpenFontSystem.GetFontCollection().GetFontByPostScriptName("SourceSansPro-Regular");
+
+
+#endif
 
             if (selected_index < 0) { selected_index = 0; }
             lstFontList.SelectedIndex = selected_index;
@@ -96,7 +104,7 @@ namespace SampleWinForms
             {
                 if (lstFontList.SelectedItem is InstalledTypeface ff)
                 {
-                    _currentTextPrinter.Typeface = _typefaceStore.GetTypeface(ff);
+                    _currentTextPrinter.Typeface = OurOpenFontSystem.ResolveTypeface(ff);
                     //sample text box 
                     UpdateRenderOutput();
                 }
@@ -120,13 +128,15 @@ namespace SampleWinForms
             lstFontSizes.SelectedIndex = 0;
             this.Text = "Gdi+ Sample";
             //------ 
+
+
         }
         void UpdateRenderOutput()
         {
             //render glyph with gdi path
-            if (g == null)
+            if (_g == null)
             {
-                g = this.CreateGraphics();
+                _g = this.CreateGraphics();
             }
             if (string.IsNullOrEmpty(this.txtInputChar.Text))
             {
@@ -134,21 +144,22 @@ namespace SampleWinForms
             }
             //-----------------------  
             //set some props ...
-            g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
-            g.Clear(Color.White);
+            _g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
+            _g.Clear(Color.White);
             //credit:
             //http://stackoverflow.com/questions/1485745/flip-coordinates-when-drawing-to-control
-            g.ScaleTransform(1.0F, -1.0F);// Flip the Y-Axis 
-            g.TranslateTransform(0.0F, -(float)500);// Translate the drawing area accordingly   
+            _g.ScaleTransform(1.0F, -1.0F);// Flip the Y-Axis 
+            _g.TranslateTransform(0.0F, -(float)500);// Translate the drawing area accordingly   
 
 
             _currentTextPrinter.FillBackground = this.chkFillBackground.Checked;
             _currentTextPrinter.DrawOutline = this.chkBorder.Checked;
+            _currentTextPrinter.EnableMultiTypefaces = this.chkEnableMultiTypefaces.Checked;
 
             //-----------------------  
             _currentTextPrinter.HintTechnique = (HintTechnique)lstHintList.SelectedItem;
             _currentTextPrinter.PositionTechnique = (PositionTechnique)cmbPositionTech.SelectedItem;
-            _currentTextPrinter.TargetGraphics = g;
+            _currentTextPrinter.TargetGraphics = _g;
             //render at specific pos
             int lineSpacingPx = (int)System.Math.Ceiling(_currentTextPrinter.FontLineSpacingPx);
             float x_pos = 0, y_pos = y_pos = lineSpacingPx * 2; //start 1st line
@@ -171,8 +182,8 @@ namespace SampleWinForms
             //
             //-----------------------  
             //transform back
-            g.ScaleTransform(1.0F, -1.0F);// Flip the Y-Axis 
-            g.TranslateTransform(0.0F, -(float)500);// Translate the drawing area accordingly            
+            _g.ScaleTransform(1.0F, -1.0F);// Flip the Y-Axis 
+            _g.TranslateTransform(0.0F, -(float)500);// Translate the drawing area accordingly            
 
             //-----------------------   
         }
@@ -187,11 +198,12 @@ namespace SampleWinForms
 
 
             //set some Gdi+ props... 
-            g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
-            g.Clear(Color.White);
+            _g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
+            _g.Clear(Color.White);
 
-            Typeface typeface = _currentTextPrinter.Typeface;
-            typeface.UpdateAllCffGlyphBounds();
+            Typography.OpenFont.Typeface typeface = _currentTextPrinter.Typeface;
+            Typography.OpenFont.Extensions.TypefaceExtensions.UpdateAllCffGlyphBounds(typeface);
+
 
             float pxscale = typeface.CalculateScaleToPixelFromPointSize(_currentTextPrinter.FontSizeInPoints);
             int lineSpacing = (int)System.Math.Ceiling((double)typeface.CalculateLineSpacing(LineSpacingChoice.TypoMetric) * pxscale);
@@ -201,8 +213,8 @@ namespace SampleWinForms
             {
                 //credit:
                 //http://stackoverflow.com/questions/1485745/flip-coordinates-when-drawing-to-control
-                g.ScaleTransform(1.0F, -1.0F);// Flip the Y-Axis 
-                g.TranslateTransform(0.0F, -500);// Translate the drawing area accordingly   
+                _g.ScaleTransform(1.0F, -1.0F);// Flip the Y-Axis 
+                _g.TranslateTransform(0.0F, -500);// Translate the drawing area accordingly   
             }
 
 
@@ -220,7 +232,7 @@ namespace SampleWinForms
 
             //Example 1: this is a basic draw sample
             _currentTextPrinter.FillColor = Color.Black;
-            _currentTextPrinter.TargetGraphics = g;
+            _currentTextPrinter.TargetGraphics = _g;
             _currentTextPrinter.DrawString(
                 textBuffer,
                  0,
@@ -245,13 +257,17 @@ namespace SampleWinForms
                   x_pos,
                   y_pos
              );
-
+            //--------------------------------------------------
             //Example 3: MeasureString    
-            UnscaledGlyphPlanList glyphPlans = new UnscaledGlyphPlanList();
-            _currentTextPrinter.GlyphLayoutMan.GenerateUnscaledGlyphPlans(glyphPlans);
+
             MeasuredStringBox strBox = _currentTextPrinter.GlyphLayoutMan.LayoutAndMeasureString(
               textBuffer, 0, textBuffer.Length,
               _currentTextPrinter.FontSizeInPoints);
+
+            UnscaledGlyphPlanList glyphPlans = new UnscaledGlyphPlanList();
+            _currentTextPrinter.GlyphLayoutMan.GenerateUnscaledGlyphPlans(glyphPlans);
+
+
 
             int j = glyphPlans.Count;
             float backup_xpos = x_pos;
@@ -259,7 +275,6 @@ namespace SampleWinForms
             {
                 UnscaledGlyphPlan glyphPlan = glyphPlans[i];
                 Glyph glyph = typeface.GetGlyph(glyphPlan.glyphIndex);
-
                 //
                 Bounds b = glyph.Bounds;
                 //
@@ -270,25 +285,25 @@ namespace SampleWinForms
                 float ymax = b.YMax * pxscale;
                 //
                 float glyph_x = x_pos + glyphPlan.OffsetX;
-                g.DrawRectangle(Pens.Red, glyph_x + xmin, y_pos + ymin, xmax - xmin, ymax - ymin);
+                _g.DrawRectangle(Pens.Red, glyph_x + xmin, y_pos + ymin, xmax - xmin, ymax - ymin);
                 x_pos += glyphPlan.AdvanceX * pxscale;
             }
 
             x_pos = backup_xpos;
 
-            g.FillRectangle(Brushes.Red, new RectangleF(0, 0, 5, 5));//reference point(0,0)
-            g.FillRectangle(Brushes.Green, new RectangleF(x_pos, y_pos, 3, 3));
+            _g.FillRectangle(Brushes.Red, new RectangleF(0, 0, 5, 5));//reference point(0,0)
+            _g.FillRectangle(Brushes.Green, new RectangleF(x_pos, y_pos, 3, 3));
 
 
             float x_pos2 = x_pos + strBox.width + 10;
 
 
-            g.DrawRectangle(Pens.Black, x_pos, y_pos + strBox.DescendingInPx, strBox.width, strBox.ClipHeightInPx);
-            g.DrawRectangle(Pens.Red, x_pos, y_pos + strBox.DescendingInPx, strBox.width, strBox.LineSpaceInPx);
+            _g.DrawRectangle(Pens.Black, x_pos, y_pos + strBox.DescendingInPx, strBox.width, strBox.ClipHeightInPx);
+            _g.DrawRectangle(Pens.Red, x_pos, y_pos + strBox.DescendingInPx, strBox.width, strBox.LineSpaceInPx);
 
-            g.DrawLine(Pens.Blue, x_pos, y_pos, x_pos2, y_pos); //baseline
-            g.DrawLine(Pens.Green, x_pos, y_pos + strBox.DescendingInPx, x_pos2, y_pos + strBox.DescendingInPx);//descending
-            g.DrawLine(Pens.Magenta, x_pos, y_pos + strBox.AscendingInPx, x_pos2, y_pos + strBox.AscendingInPx);//ascending
+            _g.DrawLine(Pens.Blue, x_pos, y_pos, x_pos2, y_pos); //baseline
+            _g.DrawLine(Pens.Green, x_pos, y_pos + strBox.DescendingInPx, x_pos2, y_pos + strBox.DescendingInPx);//descending
+            _g.DrawLine(Pens.Magenta, x_pos, y_pos + strBox.AscendingInPx, x_pos2, y_pos + strBox.AscendingInPx);//ascending
 
 
             ////------------
@@ -306,8 +321,8 @@ namespace SampleWinForms
             //transform back
             if (flipY)
             {
-                g.ScaleTransform(1.0F, -1.0F);// Flip the Y-Axis 
-                g.TranslateTransform(0.0F, -500);// Translate the drawing area accordingly   
+                _g.ScaleTransform(1.0F, -1.0F);// Flip the Y-Axis 
+                _g.TranslateTransform(0.0F, -500);// Translate the drawing area accordingly   
             }
 
             //---------

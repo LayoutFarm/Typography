@@ -31,7 +31,6 @@ using System;
 using System.Collections.Generic;
 namespace PixelFarm.Drawing
 {
-
     [Flags]
     public enum FontStyle : byte
     {
@@ -42,13 +41,12 @@ namespace PixelFarm.Drawing
         Strikeout = 1 << 3,
         Others = 1 << 4
     }
-
-
     /// <summary>
     /// user-request font specification
     /// </summary>
     public sealed class RequestFont
-    {
+    { 
+
         //each platform/canvas has its own representation of this Font 
         //this is just a request for specficic font presentation at a time
         //----- 
@@ -142,7 +140,6 @@ namespace PixelFarm.Drawing
         public bool FromTypefaceFile { get; private set; }
         public string UserInputTypefaceFile { get; private set; }
 
-
         Choice[] _otherChoices;
 
         public RequestFont(string facename, float fontSizeInPts, FontStyle style = FontStyle.Regular, Choice[] otherChoices = null)
@@ -168,7 +165,7 @@ namespace PixelFarm.Drawing
 
         public int OtherChoicesCount => (_otherChoices != null) ? _otherChoices.Length : 0;
         public Choice GetOtherChoice(int index) => _otherChoices[index];
-        public static int CalculateTypefaceKey(string typefaceName) => InternalFontKey.RegisterFontName(typefaceName);
+      
         public static int CalculateFontKey(string typefaceName, float fontSizeInPts, FontStyle style)
         {
             return InternalFontKey.CalculateGetHasCode(
@@ -215,7 +212,7 @@ namespace PixelFarm.Drawing
         }
 
 
-
+        //------------------ 
         /// <summary>
         /// create req font+ specific typeface path
         /// </summary>
@@ -230,9 +227,12 @@ namespace PixelFarm.Drawing
             reqFont._otherChoices = otherChoices;
             //path to typeface file may be relative path
             return reqFont;
-        }
-
+        } 
         public static RequestFont FromFile(string typefacePath, float sizeInPoints) => FromFile(typefacePath, Len.Pt(sizeInPoints));
+
+        //------------------ 
+
+
 #if DEBUG
         public override string ToString()
         {
