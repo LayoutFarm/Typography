@@ -1,8 +1,7 @@
-﻿//MIT, 2014-present, WinterDev 
+﻿//MIT, 2014-present, WinterDev
 
 namespace PixelFarm.Drawing
 {
-   
 
     /// <summary>
     /// for printing a string to target canvas
@@ -11,10 +10,10 @@ namespace PixelFarm.Drawing
     {
         //
         TextBaseline TextBaseline { get; set; }
-        void DrawString(char[] text, int startAt, int len, double left, double top); 
-        void ChangeFont(RequestFont font);         
+        void DrawString(char[] text, int startAt, int len, double left, double top);
+        void ChangeFont(RequestFont font);
         void ChangeFillColor(Color fillColor);
-        void ChangeStrokeColor(Color strokColor); 
+        void ChangeStrokeColor(Color strokColor);
         void MeasureString(char[] buffer, int startAt, int len, out int w, out int h);
     }
 

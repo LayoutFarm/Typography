@@ -1,9 +1,9 @@
 ﻿//MIT, 2016-present, WinterDev, Sam Hocevar
 using System;
 using System.Collections.Generic;
-using Typography.TextBreak;
 
-namespace PixelFarm.Drawing
+
+namespace Typography.TextBreak
 {
     public interface ILineSegmentList
     {
@@ -31,8 +31,8 @@ namespace PixelFarm.Drawing
         readonly int _startAt;
         readonly ushort _len;
 
-        public readonly int StartAt => _startAt;
-        public readonly ushort Length => _len;
+        public int StartAt => _startAt;
+        public ushort Length => _len;
         public readonly WordKind WordKind;
         public readonly SpanBreakInfo BreakInfo;
 #if DEBUG
