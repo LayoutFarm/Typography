@@ -40,22 +40,22 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\..\..\PixelFarm.Typography\1_General\FontStyleExtensions.cs">
-      <Link>SH\FontStyleExtensions.cs</Link>
+      <Link>Drawing_Ess\FontStyleExtensions.cs</Link>
     </Compile>
     <Compile Include="..\..\..\PixelFarm.Typography\1_General\LineSegmentsAndWordVisitors.cs">
-      <Link>SH\LineSegmentsAndWordVisitors.cs</Link>
+      <Link>Ty_TextBreak\LineSegmentsAndWordVisitors.cs</Link>
     </Compile>
     <Compile Include="..\..\..\PixelFarm.Typography\1_General\OpenFontTextService.cs">
-      <Link>SH\OpenFontTextService.cs</Link>
+      <Link>Ty_TextServices\OpenFontTextService.cs</Link>
     </Compile>
     <Compile Include="..\..\..\PixelFarm.Typography\1_General\TextServiceClient.cs">
-      <Link>SH\TextServiceClient.cs</Link>
+      <Link>Ty_TextServices\TextServiceClient.cs</Link>
     </Compile>
     <Compile Include="..\..\..\PixelFarm.Typography\3_Typography_Contours\GlyphMeshCollection.cs">
-      <Link>GlyphPathBuilder\GlyphMeshCollection.cs</Link>
+      <Link>Ty_Contours\GlyphMeshCollection.cs</Link>
     </Compile>
     <Compile Include="..\..\..\PixelFarm.Typography\3_Typography_Contours\GlyphOutlineBuilderBase.cs">
-      <Link>GlyphPathBuilder\GlyphOutlineBuilderBase.cs</Link>
+      <Link>Ty_Contours\GlyphOutlineBuilderBase.cs</Link>
     </Compile>
     <Compile Include="..\..\..\PixelFarm.Typography\3_Typography_Contours\TextPrinterBase.cs">
       <Link>DevTextPrinter\TextPrinterBase.cs</Link>
@@ -64,31 +64,31 @@
       <Link>GdiPlus\FormattedGlyphPlanSeq.cs</Link>
     </Compile>
     <Compile Include="..\..\..\PixelFarm.Typography\4_Typography01\MyAlternativeTypefaceSelector.cs">
-      <Link>SH\MyAlternativeTypefaceSelector.cs</Link>
+      <Link>Ty_TextServices\MyAlternativeTypefaceSelector.cs</Link>
     </Compile>
     <Compile Include="..\..\..\PixelFarm.Typography\4_Typography01\ResolvedFonts.cs">
-      <Link>SH\ResolvedFonts.cs</Link>
+      <Link>Ty_TextServices\ResolvedFonts.cs</Link>
     </Compile>
     <Compile Include="..\..\..\pixelfarm\pixelfarm.basicvisualelements_sh\BasicGeometries.cs">
-      <Link>PixelFarm_Drawing_Ess\BasicGeometries.cs</Link>
+      <Link>Drawing_Ess\BasicGeometries.cs</Link>
     </Compile>
     <Compile Include="..\..\..\pixelfarm\pixelfarm.painter_layer2_sh\basic\CRC32Calculator.cs">
-      <Link>PixelFarm_Drawing_Ess\CRC32Calculator.cs</Link>
+      <Link>Drawing_Ess\CRC32Calculator.cs</Link>
     </Compile>
     <Compile Include="..\..\..\pixelfarm\pixelfarm.painter_layer2_sh\basic\LenAndLenUnit.cs">
-      <Link>PixelFarm_Drawing_Ess\LenAndLenUnit.cs</Link>
+      <Link>Drawing_Ess\LenAndLenUnit.cs</Link>
     </Compile>
     <Compile Include="..\..\..\pixelfarm\pixelfarm.painter_layer2_sh\drawing\RequestFont.cs">
-      <Link>PixelFarm_Drawing_Ess\RequestFont.cs</Link>
+      <Link>Drawing_Ess\RequestFont.cs</Link>
     </Compile>
     <Compile Include="..\..\..\PixelFarm\PixelFarm.Painter_Layer2_SH\Drawing\TextBaseline.cs">
       <Link>DevTextPrinter\TextBaseline.cs</Link>
     </Compile>
     <Compile Include="..\..\Shared\GlyphOutlineBuilder\GlyphOutlineBuilder.cs">
-      <Link>GlyphPathBuilder\GlyphOutlineBuilder.cs</Link>
+      <Link>Ty_Contours\GlyphOutlineBuilder.cs</Link>
     </Compile>
     <Compile Include="..\PixelFarmSample.WinForms\IcuSimpleTextFileDictionaryProvider.cs">
-      <Link>SH\IcuSimpleTextFileDictionaryProvider.cs</Link>
+      <Link>Ty_TextBreak\IcuSimpleTextFileDictionaryProvider.cs</Link>
     </Compile>
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
@@ -139,6 +139,7 @@
       <Name>Typography.TextServices</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
