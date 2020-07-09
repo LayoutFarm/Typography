@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 
 using Typography.OpenFont;
-using Typography.OpenFont.Extensions; 
+using Typography.OpenFont.Extensions;
 using Typography.FontManagement;
 
 using PixelFarm.Drawing;
@@ -21,26 +21,24 @@ namespace Typography.TextServices
 
         readonly InstalledTypefaceCollection _installedTypefaceCollection;
 
+        public OpenFontTextService(InstalledTypefaceCollection installedTypefaceCollection)
+        {
+            _installedTypefaceCollection = installedTypefaceCollection;
+            TrySetupCurrentScriptLang();
+        }
         public OpenFontTextService()
         {
 
-            //default, user can set this later
+            //default,
             _installedTypefaceCollection = InstalledTypefaceCollection.GetSharedTypefaceCollection(collection =>
             {
                 collection.SetFontNameDuplicatedHandler((f0, f1) => FontNameDuplicatedDecision.Skip);
             });
 
-            //create typography service
-            //you can implement this service on your own
-            //just see the code inside the service 
-            //script lang has a potentail effect on how the layout engine instance work.
-            //
-            //so try to set default script lang to the layout engine instance
-            //from current system default value...
-            //user can set this to other choices...
-            //eg. directly specific the script lang  
-
-
+            TrySetupCurrentScriptLang();
+        }
+        void TrySetupCurrentScriptLang()
+        {
             //set script-lang 
             ScriptLang scLang = DefaultScriptLang;
             //---------------
@@ -242,7 +240,7 @@ namespace Typography.TextServices
 
         static OpenFontTextService()
         {
-            
+
             CurrentEnv.CurrentOSName = (IsOnMac()) ?
                          CurrentOSName.Mac :
                          CurrentOSName.Windows;

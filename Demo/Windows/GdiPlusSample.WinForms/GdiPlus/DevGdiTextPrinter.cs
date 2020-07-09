@@ -290,6 +290,14 @@ namespace SampleWinForms
         int _latestAccumulateWidth;
         public override void DrawString(char[] textBuffer, int startAt, int len, float x, float y)
         {
+
+#if DEBUG
+            if (textBuffer.Length == 2)
+            {
+
+            }
+#endif
+
             _latestAccumulateWidth = 0;
             if (!EnableMultiTypefaces)
             {
