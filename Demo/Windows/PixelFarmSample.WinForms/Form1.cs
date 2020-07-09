@@ -32,7 +32,7 @@ namespace SampleWinForms
         TypographyTest.ContourAnalysisOptions _contourAnalysisOpts;
 
         bool _readyToRender;
-        PixelFarm.Drawing.OpenFontTextService _textService;
+        Typography.TextServices.OpenFontTextService _textService;
         PixelFarm.Drawing.Color _grayColor = new PixelFarm.Drawing.Color(0xFF, 0x80, 0x80, 0x80);
 
 
@@ -127,7 +127,7 @@ namespace SampleWinForms
             _painter.CurrentFont = new PixelFarm.Drawing.RequestFont("Source Sans Pro", 10);
 
 
-            _textService = new PixelFarm.Drawing.OpenFontTextService();
+            _textService = new Typography.TextServices.OpenFontTextService();
             _textService.LoadFontsFromFolder("../../../TestFonts");
             _textService.UpdateUnicodeRanges();
 
@@ -138,12 +138,12 @@ namespace SampleWinForms
 
 
             //Alternative Typeface selector..
-            var myAlternativeTypefaceSelector = new PixelFarm.Drawing.MyAlternativeTypefaceSelector();
+            var myAlternativeTypefaceSelector = new Typography.TextServices.MyAlternativeTypefaceSelector();
             {
                 //arabic
 
                 //1. create prefer typeface list for arabic script
-                var preferTypefaces = new PixelFarm.Drawing.MyAlternativeTypefaceSelector.PreferredTypefaceList();
+                var preferTypefaces = new Typography.TextServices.PreferredTypefaceList();
                 preferTypefaces.AddTypefaceName("Noto Sans Arabic UI");
 
                 //2. set unicode ranges and prefered typeface list. 
@@ -156,7 +156,7 @@ namespace SampleWinForms
             {
                 //latin
 
-                var preferTypefaces = new PixelFarm.Drawing.MyAlternativeTypefaceSelector.PreferredTypefaceList();
+                var preferTypefaces = new Typography.TextServices.PreferredTypefaceList();
                 preferTypefaces.AddTypefaceName("Sarabun");
 
                 myAlternativeTypefaceSelector.SetPreferredTypefaces(

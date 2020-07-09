@@ -48,17 +48,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\..\PixelFarm.Typography\4_Typography01\FormattedGlyphPlanSeq.cs">
+      <Link>GdiPlus\FormattedGlyphPlanSeq.cs</Link>
+    </Compile>
     <Compile Include="..\GdiPlusSample.WinForms\GdiPlus\DevGdiTextPrinter.cs">
       <Link>GdiPlus\DevGdiTextPrinter.cs</Link>
     </Compile>
     <Compile Include="..\GdiPlusSample.WinForms\GdiPlus\GlyphTranslatorToGdiPath.cs">
       <Link>GdiPlus\GlyphTranslatorToGdiPath.cs</Link>
     </Compile>
-    <Compile Include="..\GdiPlusSample.WinForms\GdiPlus\Win32Dpi.cs">
-      <Link>GdiPlus\Win32Dpi.cs</Link>
+    <Compile Include="..\GdiPlusSample.WinForms\OurOpenFontSystem.cs">
+      <Link>OurOpenFontSystem.cs</Link>
     </Compile>
-    <Compile Include="..\GdiPlusSample.WinForms\TypefaceStore.cs">
-      <Link>TypefaceStore.cs</Link>
+    <Compile Include="..\GdiPlusSample.WinForms\Win32Dpi.cs">
+      <Link>Win32Dpi.cs</Link>
     </Compile>
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
@@ -71,11 +74,6 @@
     <Service Include="{94E38DFF-614B-4cbd-B67C-F211BB35CE8B}" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Form1.resx">
-      <DependentUpon>Form1.cs</DependentUpon>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\..\..\Build\NetStandard\Typography.One\Typography.One.csproj">
       <Project>{95e23dee-0aaa-4f93-94dd-a18ab84625f9}</Project>
       <Name>Typography.One</Name>
@@ -84,6 +82,11 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Form1.resx">
+      <DependentUpon>Form1.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

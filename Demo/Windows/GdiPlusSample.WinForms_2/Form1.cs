@@ -9,20 +9,18 @@ using Typography.Contours;
 using Typography.FontManagement;
 using Typography.OpenFont;
 using Typography.OpenFont.Extensions;
+using Typography.TextServices;
+
 namespace SampleWinForms
 {
     public partial class Form1 : Form
     {
-
-
-
         Graphics _g;
         //for this sample code,
         //create text printer env for developer.
-        DevGdiTextPrinter _currentTextPrinter = new DevGdiTextPrinter();
-        InstalledTypefaceCollection _installedFontCollection;
-        TypefaceStore _typefaceStore;
 
+        DevGdiTextPrinter _currentTextPrinter = new DevGdiTextPrinter();
+        TextServiceClient _txtServiceClient;
 
         public Form1()
         {
@@ -53,24 +51,15 @@ namespace SampleWinForms
             lstHintList.SelectedIndexChanged += (s, e) => UpdateRenderOutput();
             //---------- 
             txtInputChar.TextChanged += (s, e) => UpdateRenderOutput();
-            //
-
-            //1. create font collection             
-            _installedFontCollection = new InstalledTypefaceCollection();
-            //2. set some essential handler
-            _installedFontCollection.SetFontNameDuplicatedHandler((f1, f2) => FontNameDuplicatedDecision.Skip);
-
-            _installedFontCollection.LoadFontsFromFolder("../../../TestFonts_Err");
-            _installedFontCollection.LoadFontsFromFolder("../../../TestFonts");
-            //installedFontCollection.LoadSystemFonts();
-
+            // 
             //---------- 
             //show result
             InstalledTypeface selectedFF = null;
             int selected_index = 0;
             int ffcount = 0;
             bool found = false;
-            foreach (InstalledTypeface ff in _installedFontCollection.GetInstalledFontIter())
+
+            foreach (InstalledTypeface ff in OurOpenFontSystem.GetInstalledTypefaceIter())
             {
                 if (!found && ff.FontName == "Source Sans Pro")
                 {
@@ -81,14 +70,33 @@ namespace SampleWinForms
                 lstFontList.Items.Add(ff);
                 ffcount++;
             }
-
-            TypefaceStore store = new TypefaceStore();//caching loaded typeface/helper
             //set default font for current text printer
-            store.FontCollection = _installedFontCollection;
-            _typefaceStore = store;
-            _currentTextPrinter.Typeface = store.GetTypeface(selectedFF);
-            //---------- 
+            //
+            _txtServiceClient = OurOpenFontSystem.CreateTextServiceClient();
+            _currentTextPrinter.SetTextServiceClient(_txtServiceClient);
+            //set default font for current text printer
+            _currentTextPrinter.Typeface = OurOpenFontSystem.ResolveTypeface(selectedFF);
 
+
+            //Alternative Typeface Selector
+            {
+                
+                MyAlternativeTypefaceSelector alternativeTypefaceSelector = new MyAlternativeTypefaceSelector();
+                PreferredTypefaceList preferredTypefaces = new PreferredTypefaceList();
+                preferredTypefaces.AddTypefaceName("Segoe UI Emoji");
+                alternativeTypefaceSelector.SetPerferredEmoji(preferredTypefaces);
+                
+                //set alternative typeface selector to printer
+                _currentTextPrinter.AlternativeTypefaceSelector = alternativeTypefaceSelector;
+            }
+
+            //---------- 
+#if DEBUG
+            //test get font from typeface store 
+            InstalledTypeface instFont = OurOpenFontSystem.GetFontCollection().GetFontByPostScriptName("SourceSansPro-Regular");
+
+
+#endif
 
             if (selected_index < 0) { selected_index = 0; }
             lstFontList.SelectedIndex = selected_index;
@@ -96,7 +104,7 @@ namespace SampleWinForms
             {
                 if (lstFontList.SelectedItem is InstalledTypeface ff)
                 {
-                    _currentTextPrinter.Typeface = _typefaceStore.GetTypeface(ff);
+                    _currentTextPrinter.Typeface = OurOpenFontSystem.ResolveTypeface(ff);
                     //sample text box 
                     UpdateRenderOutput();
                 }
@@ -120,6 +128,8 @@ namespace SampleWinForms
             lstFontSizes.SelectedIndex = 0;
             this.Text = "Gdi+ Sample";
             //------ 
+
+
         }
         void UpdateRenderOutput()
         {
@@ -144,6 +154,7 @@ namespace SampleWinForms
 
             _currentTextPrinter.FillBackground = this.chkFillBackground.Checked;
             _currentTextPrinter.DrawOutline = this.chkBorder.Checked;
+            _currentTextPrinter.EnableMultiTypefaces = this.chkEnableMultiTypefaces.Checked;
 
             //-----------------------  
             _currentTextPrinter.HintTechnique = (HintTechnique)lstHintList.SelectedItem;
@@ -190,8 +201,9 @@ namespace SampleWinForms
             _g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
             _g.Clear(Color.White);
 
-            Typeface typeface = _currentTextPrinter.Typeface;
-            typeface.UpdateAllCffGlyphBounds();
+            Typography.OpenFont.Typeface typeface = _currentTextPrinter.Typeface;
+            Typography.OpenFont.Extensions.TypefaceExtensions.UpdateAllCffGlyphBounds(typeface);
+
 
             float pxscale = typeface.CalculateScaleToPixelFromPointSize(_currentTextPrinter.FontSizeInPoints);
             int lineSpacing = (int)System.Math.Ceiling((double)typeface.CalculateLineSpacing(LineSpacingChoice.TypoMetric) * pxscale);
@@ -245,13 +257,17 @@ namespace SampleWinForms
                   x_pos,
                   y_pos
              );
-
+            //--------------------------------------------------
             //Example 3: MeasureString    
-            UnscaledGlyphPlanList glyphPlans = new UnscaledGlyphPlanList();
-            _currentTextPrinter.GlyphLayoutMan.GenerateUnscaledGlyphPlans(glyphPlans);
+
             MeasuredStringBox strBox = _currentTextPrinter.GlyphLayoutMan.LayoutAndMeasureString(
               textBuffer, 0, textBuffer.Length,
               _currentTextPrinter.FontSizeInPoints);
+
+            UnscaledGlyphPlanList glyphPlans = new UnscaledGlyphPlanList();
+            _currentTextPrinter.GlyphLayoutMan.GenerateUnscaledGlyphPlans(glyphPlans);
+
+
 
             int j = glyphPlans.Count;
             float backup_xpos = x_pos;
@@ -259,7 +275,6 @@ namespace SampleWinForms
             {
                 UnscaledGlyphPlan glyphPlan = glyphPlans[i];
                 Glyph glyph = typeface.GetGlyph(glyphPlan.glyphIndex);
-
                 //
                 Bounds b = glyph.Bounds;
                 //
