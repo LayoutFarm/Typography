@@ -22,7 +22,7 @@
   <ItemGroup>
     <Compile Include="..\..\..\Demo\Shared\GlyphOutlineBuilder\GlyphOutlineBuilder.cs" Link="GlyphPathBuilder\GlyphOutlineBuilder.cs" />
     <Compile Include="..\..\..\Demo\Windows\PixelFarmSample.WinForms\IcuSimpleTextFileDictionaryProvider.cs" Link="IcuSimpleTextFileDictionaryProvider.cs" />
-    <Compile Include="..\..\..\PixelFarm.Typography\1_General\FontStyleExtensions.cs" Link="FontStyleExtensions.cs" />
+    <Compile Include="..\..\..\PixelFarm.Typography\1_General\FontStyleExtensions.cs" Link="PixelFarm_Drawing_Ess\FontStyleExtensions.cs" />
     <Compile Include="..\..\..\PixelFarm.Typography\1_General\LineSegmentsAndWordVisitors.cs" Link="LineSegmentsAndWordVisitors.cs" />
     <Compile Include="..\..\..\PixelFarm.Typography\1_General\OpenFontTextService.cs" Link="OpenFontTextService.cs" />
     <Compile Include="..\..\..\PixelFarm.Typography\1_General\TextServiceClient.cs" Link="TextServiceClient.cs" />

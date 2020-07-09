@@ -40,7 +40,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\..\..\PixelFarm.Typography\1_General\FontStyleExtensions.cs">
-      <Link>SH\FontStyleExtensions.cs</Link>
+      <Link>PixelFarm_Drawing_Ess\FontStyleExtensions.cs</Link>
     </Compile>
     <Compile Include="..\..\..\PixelFarm.Typography\1_General\LineSegmentsAndWordVisitors.cs">
       <Link>SH\LineSegmentsAndWordVisitors.cs</Link>
