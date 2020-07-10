@@ -16,7 +16,7 @@ using PixelFarm.Drawing;
 
 namespace SampleWinForms
 {
-    public partial class FormTestFontRequest : Form
+    public partial class FormTestRequestFont : Form
     {
         Graphics _g;
         AggPainter _painter;
@@ -30,7 +30,7 @@ namespace SampleWinForms
         PixelFarm.Drawing.Color _grayColor = new PixelFarm.Drawing.Color(0xFF, 0x80, 0x80, 0x80);
         PixelFarm.Drawing.RequestFont _defaultReqFont;
 
-        public FormTestFontRequest()
+        public FormTestRequestFont()
         {
             InitializeComponent();
         }
@@ -138,7 +138,8 @@ namespace SampleWinForms
 
             _selectedTextPrinter.EnableMultiTypefaces = true; //*** for auto typeface selection*** 
 
-            _selectedTextPrinter.TextBaseline = PixelFarm.Drawing.TextBaseline.Alphabetic;
+            //_selectedTextPrinter.TextBaseline = PixelFarm.Drawing.TextBaseline.Alphabetic;
+            _selectedTextPrinter.TextBaseline = PixelFarm.Drawing.TextBaseline.Top;
 
             //test print 3 lines
             //#if DEBUG

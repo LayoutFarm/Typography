@@ -681,7 +681,7 @@ namespace SampleWinForms
 
         private void cmdTestFontReq_Click(object sender, EventArgs e)
         {
-            (new FormTestFontRequest()).Show();
+            (new FormTestRequestFont()).Show();
         }
     }
 }
