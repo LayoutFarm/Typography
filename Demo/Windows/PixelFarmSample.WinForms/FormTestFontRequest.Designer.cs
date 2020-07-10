@@ -1,6 +1,6 @@
 ﻿namespace SampleWinForms
 {
-    partial class FormTestFontRequest
+    partial class FormTestRequestFont
     {
         /// <summary>
         /// Required designer variable.

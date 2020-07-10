@@ -16,7 +16,7 @@ using PixelFarm.Drawing;
 
 namespace SampleWinForms
 {
-    public partial class FormTestFontRequest : Form
+    public partial class FormTestRequestFont : Form
     {
         Graphics _g;
         AggPainter _painter;
@@ -30,7 +30,7 @@ namespace SampleWinForms
         PixelFarm.Drawing.Color _grayColor = new PixelFarm.Drawing.Color(0xFF, 0x80, 0x80, 0x80);
         PixelFarm.Drawing.RequestFont _defaultReqFont;
 
-        public FormTestFontRequest()
+        public FormTestRequestFont()
         {
             InitializeComponent();
         }
@@ -127,8 +127,9 @@ namespace SampleWinForms
             _painter.FillColor = PixelFarm.Drawing.Color.Black;
 
             _selectedTextPrinter = _devVxsTextPrinter;
-            _selectedTextPrinter.Typeface = resolvedFont.Typeface;
+
             _selectedTextPrinter.FontSizeInPoints = resolvedFont.SizeInPoints;
+            _selectedTextPrinter.Typeface = resolvedFont.Typeface;
             _selectedTextPrinter.ScriptLang = new ScriptLang(ScriptTagDefs.Latin.Tag);
             _selectedTextPrinter.PositionTechnique = PositionTechnique.OpenFont;
 
@@ -138,7 +139,9 @@ namespace SampleWinForms
 
             _selectedTextPrinter.EnableMultiTypefaces = true; //*** for auto typeface selection*** 
 
-            _selectedTextPrinter.TextBaseline = PixelFarm.Drawing.TextBaseline.Alphabetic;
+            //_selectedTextPrinter.TextBaseline = PixelFarm.Drawing.TextBaseline.Alphabetic;
+            //_selectedTextPrinter.TextBaseline = PixelFarm.Drawing.TextBaseline.Bottom;
+            _selectedTextPrinter.TextBaseline = PixelFarm.Drawing.TextBaseline.Top;
 
             //test print 3 lines
             //#if DEBUG
@@ -243,10 +246,13 @@ namespace SampleWinForms
             _painter.Clear(PixelFarm.Drawing.Color.White);
 
             string textOutput = "Hello!";
+            string textOutput2 = "شمس حب ";
 
+            textOutput += textOutput2;
             {
-                RequestFont reqFont1 = new RequestFont("Source Sans Pro", 20);
-                DrawStringToMemBitmap(reqFont1, textOutput, 0, 30);
+                //RequestFont reqFont1 = new RequestFont("Source Sans Pro", 20);
+                RequestFont reqFont1 = new RequestFont("Droid Sans", 20);
+                DrawStringToMemBitmap(reqFont1, textOutput, 0, 50);
             }
 
             //{
@@ -269,16 +275,17 @@ namespace SampleWinForms
             //}
 
 
-            {
-                RequestFont reqFont1 = new RequestFont("Source Sans Pro", 30);
+            //{
+            //    RequestFont reqFont1 = new RequestFont("Source Sans Pro", 30);
 
-                //"Source Sans Pro" does not have arabic glyphs
-                //so this will switch to "Noto Sans Arabic UI" as described in AlternativeTypefaceSelector above.
+            //    //"Source Sans Pro" does not have arabic glyphs
+            //    //so this will switch to "Noto Sans Arabic UI" as described in AlternativeTypefaceSelector above.
 
-                textOutput = "شمس حب ";
+            //    textOutput = "شمس حب ";
 
-                DrawStringToMemBitmap(reqFont1, textOutput, 150, 100);
-            }
+            //    //DrawStringToMemBitmap(reqFont1, textOutput, 150, 100);
+            //    DrawStringToMemBitmap(reqFont1, textOutput, 0, 0);
+            //}
 
             {
                 //use Roboto 

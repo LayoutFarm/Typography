@@ -5,11 +5,11 @@ using PixelFarm.CpuBlit.BitmapAtlas;
 
 using Typography.Contours;
 using Typography.OpenFont;
-using Typography.OpenFont.Extensions; 
+using Typography.OpenFont.Extensions;
 using Typography.TextLayout;
 using Typography.TextBreak;
 using Typography.TextServices;
-using Typography.FontManagement; 
+using Typography.FontManagement;
 
 using PixelFarm.CpuBlit;
 using PixelFarm.CpuBlit.VertexProcessing;
@@ -92,9 +92,16 @@ namespace PixelFarm.Drawing
         protected override void OnFontSizeChanged()
         {
             //update some font metrics property   
+            if (_disableBaselineChange)
+            {
+                //eg. multi-typeface selection 
+                return;
+            }
+            //
             Typeface currentTypeface = _currentTypeface;
             if (currentTypeface != null)
             {
+
                 float pointToPixelScale = currentTypeface.CalculateScaleToPixelFromPointSize(this.FontSizeInPoints);
                 this.FontAscendingPx = currentTypeface.Ascender * pointToPixelScale;
                 this.FontDescedingPx = currentTypeface.Descender * pointToPixelScale;
@@ -114,6 +121,8 @@ namespace PixelFarm.Drawing
         Typography.OpenFont.Tables.COLR _colrTable;
         Typography.OpenFont.Tables.CPAL _cpalTable;
         bool _hasColorInfo;
+
+        bool _disableBaselineChange;
 
         public override Typeface Typeface
         {
@@ -811,9 +820,11 @@ namespace PixelFarm.Drawing
                     //restore latest script lang?
                 }
 
+                _disableBaselineChange = true;
                 if (needRightToLeftArr)
                 {
                     //special arr left-to-right
+
                     count = _tmpGlyphPlanSeqs.Count;//re-count
                     for (int i = count - 1; i >= 0; --i)
                     {
@@ -826,6 +837,7 @@ namespace PixelFarm.Drawing
 
                         xpos += _latestAccumulateWidth + (resolvedFont.WhitespaceWidth * formattedGlyphPlanSeq.PostfixWhitespaceCount);
                     }
+
                 }
                 else
                 {
@@ -839,14 +851,14 @@ namespace PixelFarm.Drawing
                         ResolvedFont resolvedFont = formattedGlyphPlanSeq.ResolvedFont;
                         Typeface = resolvedFont.Typeface;
 
-
-
                         DrawFromGlyphPlans(formattedGlyphPlanSeq.Seq, xpos + (resolvedFont.WhitespaceWidth * formattedGlyphPlanSeq.PrefixWhitespaceCount), y);
 
                         xpos += _latestAccumulateWidth + (resolvedFont.WhitespaceWidth * formattedGlyphPlanSeq.PostfixWhitespaceCount);
 
                     }
                 }
+                _disableBaselineChange = false;
+
                 ClearTempFormattedGlyphPlanSeq();
 
                 //restore prev typeface & settings
