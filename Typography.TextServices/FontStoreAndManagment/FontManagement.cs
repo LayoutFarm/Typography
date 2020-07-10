@@ -983,7 +983,7 @@ namespace Typography.FontManagement
                     AlternativeTypefaceSelector.SelectedTypeface result = selector.Select(installedTypefaceList, unicodeRangeInfo, codepoint);
                     if (result.InstalledTypeface != null)
                     {
-                        selectedTypeface = this.ResolveTypeface(installedTypefaceList[0]);
+                        selectedTypeface = this.ResolveTypeface(result.InstalledTypeface);
                         return selectedTypeface != null;
                     }
                     else if (result.Typeface != null)
