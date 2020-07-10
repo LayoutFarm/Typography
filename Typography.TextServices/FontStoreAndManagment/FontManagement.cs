@@ -1270,9 +1270,15 @@ namespace Typography.FontManagement
                     {
                         OpenFontReader reader = new OpenFontReader();
                         Typeface typeface = reader.Read(fs);
-                        //
+                        
+                        // 
+                        OpenFont.Extensions.TypefaceExtensions.SetCustomTypefaceKey(
+                            typeface,
+                            TinyCRC32Calculator.CalculateCrc32(typeface.Name.ToUpper()));
+
                         instTypeface = new InstalledTypeface(typeface, TypefaceStyle.Regular, filename);
                         fontCollection._installedTypefacesByFilenames.Add(filename, instTypeface);
+
                         return instTypeface.ResolvedTypeface = typeface;//assign  and return                         
                     }
                 }
