@@ -2,8 +2,6 @@
 using System;
 using System.Collections.Generic;
 using Typography.OpenFont;
-using Typography.FontManagement;
-using System.IO;
 
 namespace Typography.TextServices
 {
@@ -13,8 +11,8 @@ namespace Typography.TextServices
 
     public class TextServices
     {
-        //user can do text shaping by their own
-        //this class is optional
+        //user can do text-shaping by their own.
+        //this class is optional.
         //it provide cache for previous 'used/ wellknown' Word-glyphPlans for a specific font 
         // 
 
@@ -39,7 +37,7 @@ namespace Typography.TextServices
         {
             _scLang = _defaultScriptLang = scLang;
         }
-       
+
 
         public ScriptLang CurrentScriptLang
         {
@@ -90,7 +88,7 @@ namespace Typography.TextServices
             _glyphLayout.Typeface = typeface;
             _fontSizeInPts = fontSizeInPts;
         }
-       
+
         public GlyphPlanSequence GetUnscaledGlyphPlanSequence(TextBuffer buffer, int start, int len)
         {
             //under current typeface + scriptlang setting 

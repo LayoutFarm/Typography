@@ -16,7 +16,9 @@ namespace Typography.TextServices
         PreferredTypefaceList _emojiPreferList = new PreferredTypefaceList();
 
 #if DEBUG
-        public MyAlternativeTypefaceSelector() { }
+        public MyAlternativeTypefaceSelector()
+        {
+        }
 #endif
 
         public void SetPreferredTypefaces(UnicodeRangeInfo unicodeRangeInfo, PreferredTypefaceList typefaceNames)

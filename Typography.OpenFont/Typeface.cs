@@ -19,9 +19,20 @@ namespace Typography.OpenFont
         bool _hasTtfOutline;
         bool _hasCffData;
 
+#if DEBUG 
+        static int s_dbugTotalId;
+        public readonly int dbugId = ++s_dbugTotalId;
+#endif
+
         internal Typeface()
         {
             //blank typefaces 
+#if DEBUG
+            if (dbugId == 5)
+            {
+
+            }
+#endif
         }
 
         internal void SetTableEntryCollection(TableHeader[] headers) => _tblHeaders = headers;

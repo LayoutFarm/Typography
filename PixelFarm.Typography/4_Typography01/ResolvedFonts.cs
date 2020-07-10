@@ -20,8 +20,7 @@ namespace Typography.TextServices
             fontName = fontName.ToUpper();//***
             if (!s_registerFontNames.TryGetValue(fontName, out int found))
             {
-                char[] buff = fontName.ToCharArray();
-                int nameCrc32 = Typography.TextServices.CRC32.CalculateCRC32(buff, 0, buff.Length);
+                int nameCrc32 = Typography.FontManagement.TinyCRC32Calculator.CalculateCrc32(fontName);
                 s_registerFontNames.Add(fontName, nameCrc32);
                 return nameCrc32;
             }
@@ -40,6 +39,8 @@ namespace Typography.TextServices
             }
         }
     }
+
+
 
     public sealed class ResolvedFont
     {

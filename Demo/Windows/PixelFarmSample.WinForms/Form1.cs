@@ -679,9 +679,9 @@ namespace SampleWinForms
             (new FormTestTrimmableFeature()).Show();
         }
 
-        private void cmdTestFontReq_Click(object sender, EventArgs e)
+        private void cmdTestReqFonts_Click(object sender, EventArgs e)
         {
-            (new FormTestFontRequest()).Show();
+            (new FormTestRequestFont()).Show();
         }
     }
 }
