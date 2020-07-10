@@ -127,7 +127,7 @@ namespace SampleWinForms
             _painter.FillColor = PixelFarm.Drawing.Color.Black;
 
             _selectedTextPrinter = _devVxsTextPrinter;
-        
+
             _selectedTextPrinter.FontSizeInPoints = resolvedFont.SizeInPoints;
             _selectedTextPrinter.Typeface = resolvedFont.Typeface;
             _selectedTextPrinter.ScriptLang = new ScriptLang(ScriptTagDefs.Latin.Tag);
@@ -140,6 +140,7 @@ namespace SampleWinForms
             _selectedTextPrinter.EnableMultiTypefaces = true; //*** for auto typeface selection*** 
 
             //_selectedTextPrinter.TextBaseline = PixelFarm.Drawing.TextBaseline.Alphabetic;
+            //_selectedTextPrinter.TextBaseline = PixelFarm.Drawing.TextBaseline.Bottom;
             _selectedTextPrinter.TextBaseline = PixelFarm.Drawing.TextBaseline.Top;
 
             //test print 3 lines
@@ -251,7 +252,7 @@ namespace SampleWinForms
             {
                 //RequestFont reqFont1 = new RequestFont("Source Sans Pro", 20);
                 RequestFont reqFont1 = new RequestFont("Droid Sans", 20);
-                DrawStringToMemBitmap(reqFont1, textOutput, 0, 0);
+                DrawStringToMemBitmap(reqFont1, textOutput, 0, 50);
             }
 
             //{
