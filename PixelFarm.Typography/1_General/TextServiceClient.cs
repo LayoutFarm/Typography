@@ -11,7 +11,7 @@ using Typography.TextBreak;
 
 using PixelFarm.Drawing;
 
-namespace Typography.TextServices
+namespace Typography.Text
 {
     public class TextServiceClient : ITextService
     {

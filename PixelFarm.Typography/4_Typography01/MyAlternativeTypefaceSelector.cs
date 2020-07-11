@@ -8,7 +8,7 @@ using Typography.FontManagement;
 
 using PixelFarm.Drawing;
 
-namespace Typography.TextServices
+namespace Typography.Text
 {
     public class MyAlternativeTypefaceSelector : AlternativeTypefaceSelector
     {
@@ -21,6 +21,7 @@ namespace Typography.TextServices
         }
 #endif
 
+       
         public void SetPreferredTypefaces(UnicodeRangeInfo unicodeRangeInfo, PreferredTypefaceList typefaceNames)
         {
             _dics[unicodeRangeInfo.Name] = typefaceNames;
@@ -41,8 +42,8 @@ namespace Typography.TextServices
         public PreferredTypefaceList GetPreferTypefaces(string scriptTag) => _dics.TryGetValue(scriptTag, out PreferredTypefaceList foundList) ? foundList : null;
 
         RequestFont _reqFont;
-        Typography.TextServices.OpenFontTextService _textService;
-        public void SetCurrentReqFont(RequestFont reqFont, Typography.TextServices.OpenFontTextService textService)
+        Typography.Text.OpenFontTextService _textService;
+        public void SetCurrentReqFont(RequestFont reqFont, Typography.Text.OpenFontTextService textService)
         {
             _reqFont = reqFont;
             _textService = textService;
@@ -124,19 +125,5 @@ namespace Typography.TextServices
         }
 
     }
-    public class PreferTypeface
-    {
-        public PreferTypeface(string reqTypefaceName) => RequestTypefaceName = reqTypefaceName;
-        public string RequestTypefaceName { get; }
-        public InstalledTypeface InstalledTypeface { get; internal set; }
-        internal bool ResolvedInstalledTypeface { get; set; }
-    }
-    public class PreferredTypefaceList
-    {
-        internal List<PreferTypeface> _list = new List<PreferTypeface>();
-        public void AddTypefaceName(string typefaceName)
-        {
-            _list.Add(new PreferTypeface(typefaceName));
-        }
-    }
+   
 }

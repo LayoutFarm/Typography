@@ -7,7 +7,7 @@ using PixelFarm.Drawing;
 using PixelFarm.Platforms;
 using Typography.OpenFont;
 using Typography.OpenFont.Extensions;
-using Typography.TextServices;
+using Typography.Text;
 
 namespace PixelFarm.CpuBlit.BitmapAtlas
 {

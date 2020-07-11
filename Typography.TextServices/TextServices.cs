@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using Typography.OpenFont;
 
-namespace Typography.TextServices
+namespace Typography.Text
 {
     using Typography.TextBreak;
     using Typography.TextLayout;

@@ -28,7 +28,7 @@
 //from Ionic.Crc
 
 using System;
-namespace Typography.TextServices
+namespace Typography.Text
 {
     /// <summary>
     ///   Computes a CRC-32. The CRC-32 algorithm is parameterized - you

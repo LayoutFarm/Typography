@@ -7,7 +7,7 @@ using Typography.OpenFont;
 using Typography.OpenFont.Extensions;
 using Typography.Contours;
 using Typography.TextLayout;
-using Typography.TextServices;
+using Typography.Text;
 
 
 namespace PixelFarm.CpuBlit.BitmapAtlas
@@ -33,8 +33,8 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
         Typeface _currentTypeface;
         Color _fontColor;
 
-        Typography.TextServices.OpenFontTextService _textServices;
-        Typography.TextServices.TextServiceClient _txtClient;
+        Typography.Text.OpenFontTextService _textServices;
+        Typography.Text.TextServiceClient _txtClient;
         BitmapFontManager<MemBitmap> _bmpFontMx;
         SimpleBitmapAtlas _fontAtlas;
         public FontAtlasTextPrinter(AggPainter painter)
@@ -42,7 +42,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             _painter = painter;
 
             this.PositionTechnique = PositionTechnique.OpenFont;
-            _textServices = new Typography.TextServices.OpenFontTextService();
+            _textServices = new Typography.Text.OpenFontTextService();
             _txtClient = _textServices.CreateNewServiceClient();
             //2. 
             _bmpFontMx = new BitmapFontManager<MemBitmap>(

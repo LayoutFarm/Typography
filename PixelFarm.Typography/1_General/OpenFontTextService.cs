@@ -8,7 +8,7 @@ using Typography.FontManagement;
 
 using PixelFarm.Drawing;
 
-namespace Typography.TextServices
+namespace Typography.Text
 {
 
     public partial class OpenFontTextService

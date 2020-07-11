@@ -9,7 +9,7 @@ using Typography.Contours;
 using Typography.FontManagement;
 using Typography.OpenFont;
 using Typography.OpenFont.Extensions;
-using Typography.TextServices;
+using Typography.Text;
 
 namespace SampleWinForms
 {

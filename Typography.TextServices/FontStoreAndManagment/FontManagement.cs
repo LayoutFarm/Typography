@@ -189,7 +189,21 @@ namespace Typography.FontManagement
         }
     }
 
-
+    public class PreferTypeface
+    {
+        public PreferTypeface(string reqTypefaceName) => RequestTypefaceName = reqTypefaceName;
+        public string RequestTypefaceName { get; }
+        public InstalledTypeface InstalledTypeface { get; set; }
+        public bool ResolvedInstalledTypeface { get; set; }
+    }
+    public class PreferredTypefaceList
+    {
+        public List<PreferTypeface> _list = new List<PreferTypeface>();
+        public void AddTypefaceName(string typefaceName)
+        {
+            _list.Add(new PreferTypeface(typefaceName));
+        }
+    }
 
     public class InstalledTypeface
     {

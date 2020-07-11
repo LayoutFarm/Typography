@@ -9,7 +9,7 @@ using System.Windows.Forms;
 using Typography.OpenFont;
 using Typography.OpenFont.Extensions;
 using Typography.Contours;
-using Typography.TextServices;
+using Typography.Text;
 
 using PixelFarm.Drawing;
 using PixelFarm.Contours;
@@ -22,12 +22,12 @@ namespace SampleWinForms
 {
     public partial class FormMsdfTest2 : Form
     {
-        Typography.TextServices.OpenFontTextService _textServices;
+        Typography.Text.OpenFontTextService _textServices;
         public FormMsdfTest2()
         {
             InitializeComponent();
             //
-            _textServices = new Typography.TextServices.OpenFontTextService();
+            _textServices = new Typography.Text.OpenFontTextService();
 
         }
 

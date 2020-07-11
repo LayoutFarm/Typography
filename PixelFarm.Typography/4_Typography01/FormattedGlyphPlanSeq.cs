@@ -1,7 +1,7 @@
 ﻿//MIT, 2016-present, WinterDev, Sam Hocevar
 using System;
 using System.Collections.Generic;
-using Typography.TextServices;
+using Typography.Text;
 using Typography.TextLayout;
 
 namespace PixelFarm.Drawing

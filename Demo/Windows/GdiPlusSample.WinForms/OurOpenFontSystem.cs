@@ -1,7 +1,7 @@
 ﻿//MIT, 2016-present, WinterDev
 using System;
 using Typography.OpenFont;
-using Typography.TextServices;
+using Typography.Text;
 using Typography.FontManagement;
 using System.Collections.Generic;
 

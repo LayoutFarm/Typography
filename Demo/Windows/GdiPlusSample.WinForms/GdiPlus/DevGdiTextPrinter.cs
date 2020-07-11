@@ -11,7 +11,7 @@ using Typography.TextLayout;
 using Typography.Contours;
 using Typography.TextBreak;
 using Typography.FontManagement;
-using Typography.TextServices;
+using Typography.Text;
 
 using PixelFarm.Drawing;
 namespace SampleWinForms
@@ -262,7 +262,7 @@ namespace SampleWinForms
                 char[] upperCaseName = typeface.Name.ToUpper().ToCharArray();
                 Typography.OpenFont.Extensions.TypefaceExtensions.SetCustomTypefaceKey(
                     typeface,
-                    typefaceKey = Typography.TextServices.CRC32.CalculateCRC32(upperCaseName, 0, upperCaseName.Length));
+                    typefaceKey = Typography.Text.CRC32.CalculateCRC32(upperCaseName, 0, upperCaseName.Length));
 
             }
 

@@ -11,7 +11,7 @@ using Typography.OpenFont;
 using Typography.OpenFont.Extensions;
 using Typography.TextLayout;
 using Typography.Contours;
-using Typography.TextServices;
+using Typography.Text;
 using PixelFarm.Drawing;
 
 namespace SampleWinForms
@@ -26,7 +26,7 @@ namespace SampleWinForms
         PixelFarm.Drawing.VxsTextPrinter _devVxsTextPrinter = null;
 
         bool _readyToRender;
-        Typography.TextServices.OpenFontTextService _textService;
+        Typography.Text.OpenFontTextService _textService;
         PixelFarm.Drawing.Color _grayColor = new PixelFarm.Drawing.Color(0xFF, 0x80, 0x80, 0x80);
         PixelFarm.Drawing.RequestFont _defaultReqFont;
 
@@ -43,7 +43,7 @@ namespace SampleWinForms
             }
         }
 
-        Typography.TextServices.MyAlternativeTypefaceSelector _myAlternativeTypefaceSelector;
+        Typography.Text.MyAlternativeTypefaceSelector _myAlternativeTypefaceSelector;
         void InitGraphics()
         {
             //INIT ONCE
@@ -59,7 +59,7 @@ namespace SampleWinForms
             _painter.CurrentFont = _defaultReqFont;
 
 
-            _textService = new Typography.TextServices.OpenFontTextService();
+            _textService = new Typography.Text.OpenFontTextService();
             _textService.LoadFontsFromFolder("../../../TestFonts");
             _textService.UpdateUnicodeRanges();
 
@@ -70,12 +70,16 @@ namespace SampleWinForms
             _devVxsTextPrinter.PositionTechnique = Typography.TextLayout.PositionTechnique.OpenFont;
 
             //Alternative Typeface selector..
-            _myAlternativeTypefaceSelector = new Typography.TextServices.MyAlternativeTypefaceSelector();
+            _myAlternativeTypefaceSelector = new Typography.Text.MyAlternativeTypefaceSelector();
             {
-                //arabic
+                //------------
+                //TODO: review this again
+                //load from config?
+                //------------
 
+                //arabic
                 //1. create prefer typeface list for arabic script
-                var preferTypefaces = new Typography.TextServices.PreferredTypefaceList();
+                var preferTypefaces = new Typography.FontManagement.PreferredTypefaceList();
                 preferTypefaces.AddTypefaceName("Noto Sans Arabic UI");
 
                 //2. set unicode ranges and prefered typeface list. 
@@ -88,7 +92,7 @@ namespace SampleWinForms
             {
                 //latin
 
-                var preferTypefaces = new Typography.TextServices.PreferredTypefaceList();
+                var preferTypefaces = new Typography.FontManagement.PreferredTypefaceList();
                 preferTypefaces.AddTypefaceName("Sarabun");
 
                 _myAlternativeTypefaceSelector.SetPreferredTypefaces(

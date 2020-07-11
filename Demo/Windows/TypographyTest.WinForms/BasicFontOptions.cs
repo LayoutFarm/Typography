@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using Typography.OpenFont;
 using Typography.TextLayout;
-using Typography.TextServices;
+using Typography.Text;
 using Typography.FontManagement;
 
 namespace TypographyTest
@@ -29,7 +29,7 @@ namespace TypographyTest
         Typeface _selectedTypeface;
         bool _typefaceChanged = false;
 
-        Typography.TextServices.TextServices _textServices;
+        Typography.Text.TextServices _textServices;
         InstalledTypefaceCollection _installedTypefaces;
 
         public BasicFontOptions()

@@ -1,7 +1,7 @@
 ﻿//MIT, 2020-present, WinterDev
 
 using PixelFarm.Drawing;
-namespace Typography.TextServices
+namespace Typography.Text
 {
 
     partial class OpenFontTextService

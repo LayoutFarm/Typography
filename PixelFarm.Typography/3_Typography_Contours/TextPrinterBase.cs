@@ -1,8 +1,8 @@
 ﻿//MIT, 2016-present, WinterDev 
 using Typography.OpenFont;
 using Typography.TextLayout;
-
-namespace Typography.Contours
+using Typography.Contours;
+namespace Typography.Text
 {
 
     /// <summary>
