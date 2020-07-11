@@ -1,15 +1,17 @@
 ﻿//MIT, 2019-present, WinterDev 
 using System.IO;
 using System.Collections.Generic;
-using Typography.OpenFont;
+ 
 using Typography.OpenFont.IO;
 using Typography.OpenFont.Tables;
 using Typography.OpenFont.Trimmable;
 
 //see https://www.w3.org/TR/WOFF2/
 
-namespace Typography.WebFont
+namespace Typography.OpenFont.WebFont
 {
+    //NOTE: Web Font file structure is not part of 'Open Font Format'.     
+
     class Woff2Header
     {
         //WOFF2 Header
