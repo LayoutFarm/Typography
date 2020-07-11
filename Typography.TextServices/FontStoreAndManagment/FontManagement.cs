@@ -189,19 +189,22 @@ namespace Typography.FontManagement
         }
     }
 
-    public class PreferTypeface
+    public class PreferredTypeface
     {
-        public PreferTypeface(string reqTypefaceName) => RequestTypefaceName = reqTypefaceName;
+        public PreferredTypeface(string reqTypefaceName) => RequestTypefaceName = reqTypefaceName;
         public string RequestTypefaceName { get; }
         public InstalledTypeface InstalledTypeface { get; set; }
         public bool ResolvedInstalledTypeface { get; set; }
     }
-    public class PreferredTypefaceList
+    public class PreferredTypefaceList : List<PreferredTypeface>
     {
-        public List<PreferTypeface> _list = new List<PreferTypeface>();
+#if DEBUG
+        //TODO: review this again
+        public PreferredTypefaceList() { }
+#endif
         public void AddTypefaceName(string typefaceName)
         {
-            _list.Add(new PreferTypeface(typefaceName));
+            this.Add(new PreferredTypeface(typefaceName));
         }
     }
 
@@ -1284,7 +1287,7 @@ namespace Typography.FontManagement
                     {
                         OpenFontReader reader = new OpenFontReader();
                         Typeface typeface = reader.Read(fs);
-                        
+
                         // 
                         OpenFont.Extensions.TypefaceExtensions.SetCustomTypefaceKey(
                             typeface,

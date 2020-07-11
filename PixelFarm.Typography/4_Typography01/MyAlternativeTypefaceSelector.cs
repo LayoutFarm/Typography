@@ -69,14 +69,14 @@ namespace Typography.Text
                 }
             }
 
-            List<PreferTypeface> list = null;
+            List<PreferredTypeface> list = null;
             if (unicodeRangeInfo == Unicode13RangeInfoList.Emoticons)
             {
-                list = _emojiPreferList._list;
+                list = _emojiPreferList;
             }
             else if (_dics.TryGetValue(unicodeRangeInfo.Name, out PreferredTypefaceList foundList))
             {
-                list = foundList._list;
+                list = foundList;
             }
 
             if (list != null)
@@ -85,7 +85,7 @@ namespace Typography.Text
                 for (int i = 0; i < j; ++i)
                 {
                     //select that first one
-                    PreferTypeface p = list[i];
+                    PreferredTypeface p = list[i];
 
                     if (p.InstalledTypeface == null && !p.ResolvedInstalledTypeface)
                     {
