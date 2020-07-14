@@ -76,8 +76,8 @@ namespace Typography.TextLayout
         public static GlyphPlanSequence Empty = new GlyphPlanSequence();
         //
         readonly IUnscaledGlyphPlanList _glyphPlanList;
-        internal readonly int startAt;
-        internal readonly ushort len;
+        public readonly int startAt;
+        public readonly ushort len;
 
         bool _isRTL;
         public GlyphPlanSequence(IUnscaledGlyphPlanList glyphPlanList)
