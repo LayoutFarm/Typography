@@ -18,7 +18,7 @@ namespace SampleWinForms
             //user can skip this, and set it by app-manifest
             //but here I, set DPI-aware by API :)
             //-------
-
+             
 
             bool dpi_result = SetProcessDPIAware();
             Typeface.DefaultDpi = GetDpiForSystem();

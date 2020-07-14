@@ -7,7 +7,7 @@ using System.Text;
 
 
 using System.Windows.Forms;
-using Typography.Contours;
+using Typography.OpenFont.Contours;
 
 namespace TypographyTest.WinForms
 {

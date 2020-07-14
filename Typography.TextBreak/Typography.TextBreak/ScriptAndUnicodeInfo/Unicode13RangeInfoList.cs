@@ -1,4 +1,4 @@
-﻿//MIT, 2020, WinterDev
+﻿//MIT, 2020-present, WinterDev
 using System;
 using System.Collections.Generic;
 using Typography.OpenFont;

@@ -9,9 +9,10 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>GdiPlusSample.WinForms</RootNamespace>
     <AssemblyName>GdiPlusSample.WinForms</AssemblyName>
-    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <LangVersion>8.0</LangVersion>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -23,6 +24,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -32,6 +34,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -39,57 +42,6 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\..\PixelFarm.Typography\1_General\FontStyleExtensions.cs">
-      <Link>Drawing_Ess\FontStyleExtensions.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\PixelFarm.Typography\1_General\LineSegmentsAndWordVisitors.cs">
-      <Link>Ty_TextBreak\LineSegmentsAndWordVisitors.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\PixelFarm.Typography\1_General\OpenFontTextService.cs">
-      <Link>Ty_TextServices\OpenFontTextService.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\PixelFarm.Typography\1_General\TextServiceClient.cs">
-      <Link>Ty_TextServices\TextServiceClient.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\PixelFarm.Typography\3_Typography_Contours\GlyphMeshCollection.cs">
-      <Link>Ty_Contours\GlyphMeshCollection.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\PixelFarm.Typography\3_Typography_Contours\GlyphOutlineBuilderBase.cs">
-      <Link>Ty_Contours\GlyphOutlineBuilderBase.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\PixelFarm.Typography\3_Typography_Contours\TextPrinterBase.cs">
-      <Link>DevTextPrinter\TextPrinterBase.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\PixelFarm.Typography\4_Typography01\FormattedGlyphPlanSeq.cs">
-      <Link>GdiPlus\FormattedGlyphPlanSeq.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\PixelFarm.Typography\4_Typography01\MyAlternativeTypefaceSelector.cs">
-      <Link>Ty_TextServices\MyAlternativeTypefaceSelector.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\PixelFarm.Typography\4_Typography01\ResolvedFonts.cs">
-      <Link>Ty_TextServices\ResolvedFonts.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\pixelfarm\pixelfarm.basicvisualelements_sh\BasicGeometries.cs">
-      <Link>Drawing_Ess\BasicGeometries.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\pixelfarm\pixelfarm.painter_layer2_sh\basic\CRC32Calculator.cs">
-      <Link>Drawing_Ess\CRC32Calculator.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\pixelfarm\pixelfarm.painter_layer2_sh\basic\LenAndLenUnit.cs">
-      <Link>Drawing_Ess\LenAndLenUnit.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\pixelfarm\pixelfarm.painter_layer2_sh\drawing\RequestFont.cs">
-      <Link>Drawing_Ess\RequestFont.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\PixelFarm\PixelFarm.Painter_Layer2_SH\Drawing\TextBaseline.cs">
-      <Link>DevTextPrinter\TextBaseline.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Shared\GlyphOutlineBuilder\GlyphOutlineBuilder.cs">
-      <Link>Ty_Contours\GlyphOutlineBuilder.cs</Link>
-    </Compile>
-    <Compile Include="..\PixelFarmSample.WinForms\IcuSimpleTextFileDictionaryProvider.cs">
-      <Link>Ty_TextBreak\IcuSimpleTextFileDictionaryProvider.cs</Link>
-    </Compile>
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -115,6 +67,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <None Include="app.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -126,20 +79,11 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Build\N20\Typography.GlyphLayout\Typography.GlyphLayout.csproj">
-      <Project>{c6807d05-09be-4313-9f8b-bd2d51c55819}</Project>
-      <Name>Typography.GlyphLayout</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\Build\N20\Typography.OpenFont\Typography.OpenFont.csproj">
-      <Project>{f7d71e61-9342-4dd7-9afd-69045f2ec98b}</Project>
-      <Name>Typography.OpenFont</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\Build\N20\Typography.TextServices\Typography.TextServices.csproj">
-      <Project>{6b0e034b-0ebd-4907-ad7f-437de66d78d4}</Project>
-      <Name>Typography.TextServices</Name>
+    <ProjectReference Include="..\..\..\Build\NetStandard\Typography.One\Typography.One.csproj">
+      <Project>{95e23dee-0aaa-4f93-94dd-a18ab84625f9}</Project>
+      <Name>Typography.One</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

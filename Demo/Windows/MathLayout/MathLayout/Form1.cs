@@ -14,9 +14,8 @@ using LayoutFarm.MathLayout;
 using PixelFarm.CpuBlit.VertexProcessing;
 
 
-using Typography.OpenFont;
-using Typography.OpenFont.Tables;
-using Typography.Contours;
+using Typography.OpenFont; 
+using Typography.OpenFont.Contours;
 using Typography.TextLayout;
 
 namespace MathLayout

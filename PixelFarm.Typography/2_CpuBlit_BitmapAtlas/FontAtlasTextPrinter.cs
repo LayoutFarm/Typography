@@ -3,11 +3,9 @@ using System;
 
 using PixelFarm.Drawing;
 using PixelFarm.CpuBlit.PixelProcessing;
-using Typography.OpenFont;
-using Typography.OpenFont.Extensions;
-using Typography.Contours;
+using Typography.OpenFont; 
 using Typography.TextLayout;
-using Typography.TextServices;
+using Typography.Text;
 
 
 namespace PixelFarm.CpuBlit.BitmapAtlas
@@ -18,7 +16,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
         GreyscaleStencil,
         None,
     }
-    public sealed class FontAtlasTextPrinter : TextPrinterBase, IAggTextPrinter, IDisposable
+    public sealed class FontAtlasTextPrinter : AbstractTextSpanPrinter, IAggTextPrinter, IDisposable
     {
         PixelBlenderWithMask _maskPixelBlender = new PixelBlenderWithMask();
         PixelBlenderPerColorComponentWithMask _maskPixelBlenderPerCompo = new PixelBlenderPerColorComponentWithMask();
@@ -33,8 +31,8 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
         Typeface _currentTypeface;
         Color _fontColor;
 
-        Typography.TextServices.OpenFontTextService _textServices;
-        Typography.TextServices.TextServiceClient _txtClient;
+        Typography.Text.OpenFontTextService _textServices;
+        Typography.Text.TextServiceClient _txtClient;
         BitmapFontManager<MemBitmap> _bmpFontMx;
         SimpleBitmapAtlas _fontAtlas;
         public FontAtlasTextPrinter(AggPainter painter)
@@ -42,7 +40,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             _painter = painter;
 
             this.PositionTechnique = PositionTechnique.OpenFont;
-            _textServices = new Typography.TextServices.OpenFontTextService();
+            _textServices = new Typography.Text.OpenFontTextService();
             _txtClient = _textServices.CreateNewServiceClient();
             //2. 
             _bmpFontMx = new BitmapFontManager<MemBitmap>(
@@ -53,6 +51,16 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             //3.
             ChangeFont(painter.CurrentFont);
             SetupMaskPixelBlender(painter.Width, painter.Height);
+        }
+
+
+        PixelFarm.Drawing.TextBaseline IAggTextPrinter.TextBaseline
+        {
+            get => (PixelFarm.Drawing.TextBaseline)this.TextBaseline;
+            set
+            {
+                this.TextBaseline = (Typography.Text.TextBaseline)value;
+            }
         }
 
         public void Dispose()
@@ -86,21 +94,6 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
         {
             //TODO: ...
         }
-        protected override void OnFontSizeChanged()
-        {
-            //update some font metrics property   
-            Typeface currentTypeface = _currentTypeface;
-            if (currentTypeface != null)
-            {
-                float pointToPixelScale = currentTypeface.CalculateScaleToPixelFromPointSize(this.FontSizeInPoints);
-                this.FontAscendingPx = currentTypeface.Ascender * pointToPixelScale;
-                this.FontDescedingPx = currentTypeface.Descender * pointToPixelScale;
-                this.FontLineGapPx = currentTypeface.LineGap * pointToPixelScale;
-                this.FontLineSpacingPx = FontAscendingPx - FontDescedingPx + FontLineGapPx;
-            }
-
-        }
-        public override GlyphLayout GlyphLayoutMan => throw new NotSupportedException();
 
         public override Typeface Typeface
         {
@@ -164,7 +157,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
         }
         public void MeasureString(char[] buffer, int startAt, int len, out int w, out int h)
         {
-            var textBuffSpan = new TextBufferSpan(buffer, startAt, len);
+            var textBuffSpan = new Typography.Text.TextBufferSpan(buffer, startAt, len);
             Size s = _txtClient.MeasureString(textBuffSpan, _painter.CurrentFont);
             w = s.Width;
             h = s.Height;
@@ -308,7 +301,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
         public override void DrawString(char[] textBuffer, int startAt, int len, float x, float y)
         {
             //create temp buffer span that describe the part of a whole char buffer
-            var textBufferSpan = new TextBufferSpan(textBuffer, startAt, len);
+            var textBufferSpan = new Typography.Text.TextBufferSpan(textBuffer, startAt, len);
             //ask text service to parse user input char buffer and create a glyph-plan-sequence (list of glyph-plan) 
             //with specific request font      
             DrawFromGlyphPlans(_txtClient.CreateGlyphPlanSeq(textBufferSpan, _font), startAt, len, x, y);

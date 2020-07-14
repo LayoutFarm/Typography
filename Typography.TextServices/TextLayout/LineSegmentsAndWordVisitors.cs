@@ -1,9 +1,9 @@
 ﻿//MIT, 2016-present, WinterDev, Sam Hocevar
 using System;
 using System.Collections.Generic;
+using Typography.TextBreak;
 
-
-namespace Typography.TextBreak
+namespace Typography.TextLayout
 {
     public interface ILineSegmentList
     {
@@ -80,6 +80,9 @@ namespace Typography.TextBreak
     public class TextPrinterWordVisitor : WordVisitor
     {
         TextPrinterLineSegmentList<TextPrinterLineSegment> _lineSegs;
+#if DEBUG
+        public TextPrinterWordVisitor() { }
+#endif
         public void SetLineSegmentList(TextPrinterLineSegmentList<TextPrinterLineSegment> lineSegs)
         {
             _lineSegs = lineSegs;

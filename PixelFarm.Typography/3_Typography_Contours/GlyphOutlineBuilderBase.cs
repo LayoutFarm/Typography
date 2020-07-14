@@ -1,10 +1,9 @@
 ﻿//MIT, 2016-present, WinterDev
 
-using System;
-using Typography.OpenFont;
+using System; 
 using Typography.OpenFont.Trimmable;
 
-namespace Typography.Contours
+namespace Typography.OpenFont.Contours
 {
     //-----------------------------------
     //sample GlyphPathBuilder :
@@ -15,11 +14,12 @@ namespace Typography.Contours
     public abstract class GlyphOutlineBuilderBase
     {
         readonly Typeface _typeface;
-        TrueTypeInterpreter _trueTypeInterpreter;
+        
         protected GlyphPointF[] _outputGlyphPoints;
         protected ushort[] _outputContours;
 
         OpenFont.CFF.Cff1GlyphData _cffGlyphData;
+        TrueTypeInterpreter _trueTypeInterpreter;
 
         /// <summary>
         /// scale for converting latest glyph points to latest request font size
@@ -30,8 +30,9 @@ namespace Typography.Contours
         public GlyphOutlineBuilderBase(Typeface typeface)
         {
             _typeface = typeface;
-            this.UseTrueTypeInstructions = true;//default?
             _recentPixelScale = 1;
+
+            this.UseTrueTypeInstructions = true;//default?           
 
             if (typeface.IsCffFont)
             {

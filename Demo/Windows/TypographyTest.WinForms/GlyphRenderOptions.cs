@@ -1,6 +1,6 @@
 ﻿//MIT, 2017-present, WinterDev
 using System;
-using Typography.Contours;
+using Typography.OpenFont.Contours;
 namespace TypographyTest
 {
 
@@ -14,10 +14,7 @@ namespace TypographyTest
             HintTechnique = HintTechnique.None;
             FillBackground = true;
         }
-        public HintTechnique HintTechnique
-        {
-            get; set;
-        }
+        public HintTechnique HintTechnique { get; set; }
         public bool FillBackground { get; set; }
         public bool DrawBorder { get; set; }
 

@@ -8,7 +8,6 @@ using System.Collections.Generic;
 
 namespace Typography.TextBreak
 {
-
     public enum VisitorState
     {
         Init,
@@ -17,10 +16,8 @@ namespace Typography.TextBreak
         End,
     }
 
-
-
     public delegate void NewWordBreakHandlerDelegate(WordVisitor vistor);
-    //
+
     public class DelegateBaseWordVisitor : WordVisitor
     {
         readonly NewWordBreakHandlerDelegate _newWordBreakHandler;

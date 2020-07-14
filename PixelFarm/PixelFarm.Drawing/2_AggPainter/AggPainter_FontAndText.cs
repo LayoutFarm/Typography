@@ -5,7 +5,7 @@ using PixelFarm.Drawing;
 
 namespace PixelFarm.CpuBlit
 {
-    public interface IAggTextPrinter : ITextPrinter
+    public interface IAggTextPrinter
     {
         /// <summary>
         /// render from RenderVxFormattedString object to specific pos
@@ -16,6 +16,11 @@ namespace PixelFarm.CpuBlit
         void DrawString(AggRenderVxFormattedString renderVx, double left, double top);
         void PrepareStringForRenderVx(AggRenderVxFormattedString renderVx, char[] text, int startAt, int len);
         int CurrentLineSpaceHeight { get; }
+        void ChangeFont(RequestFont font);
+        void ChangeFillColor(Color fillColor);
+        void ChangeStrokeColor(Color strokColor);
+        TextBaseline TextBaseline { get; set; }
+        void DrawString(char[] text, int startAt, int len, double left, double top);
     }
 
     partial class AggPainter
@@ -65,15 +70,16 @@ namespace PixelFarm.CpuBlit
             {
                 if (_orientation == RenderSurfaceOriginKind.LeftBottom)
                 {
-                    _textPrinter.DrawString(text, x, y);
+                    char[] buffer = text.ToCharArray();
+                    _textPrinter.DrawString(buffer, 0, buffer.Length, x, y);
                 }
                 else
                 {
                     //from current point size 
                     //we need line height of current font size
                     //then we will start on 'base line'
-
-                    _textPrinter.DrawString(text, x, this.Height - y);
+                    char[] buffer = text.ToCharArray();
+                    _textPrinter.DrawString(buffer, 0, buffer.Length, x, this.Height - y);
                 }
 
             }

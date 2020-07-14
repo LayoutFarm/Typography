@@ -1,10 +1,12 @@
 ﻿//MIT, 2016-present, WinterDev
 
-
 using static Typography.TextBreak.Unicode13RangeInfoList;
 
 namespace Typography.OpenFont.Tables
 {
+    /// <summary>
+    /// OpenFont's bit position and unicode range
+    /// </summary>
     public readonly struct BitposAndAssciatedUnicodeRanges
     {
         public readonly int Bitpos;
@@ -40,7 +42,7 @@ namespace Typography.OpenFont.Tables
         public static readonly UnicodeRangeInfo None_Plane_0 = new UnicodeRangeInfo(0x10000, 0x10FFFF, "None Plane 0");
     }
 
-    public static class OpenFontBitPosInfo
+    static class OpenFontBitPosInfo
     {
         //from https://docs.microsoft.com/en-us/typography/opentype/spec/os2#ulunicoderange1-bits-031ulunicoderange2-bits-3263ulunicoderange3-bits-6495ulunicoderange4-bits-96127     
         //All available bits were exhausted as of Unicode 5.1. 

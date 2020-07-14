@@ -33,6 +33,30 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\PixelFarm\BackEnd.BurningMineCurve_SH\CubicBezier.cs">
+      <Link>PixelFarm\BackEnd.BurningMineCurve_SH\CubicBezier.cs</Link>
+    </Compile>
+    <Compile Include="..\..\PixelFarm\BackEnd.BurningMineCurve_SH\CurveBuilder.cs">
+      <Link>PixelFarm\BackEnd.BurningMineCurve_SH\CurveBuilder.cs</Link>
+    </Compile>
+    <Compile Include="..\..\PixelFarm\BackEnd.BurningMineCurve_SH\CurveFit.cs">
+      <Link>PixelFarm\BackEnd.BurningMineCurve_SH\CurveFit.cs</Link>
+    </Compile>
+    <Compile Include="..\..\PixelFarm\BackEnd.BurningMineCurve_SH\CurveFitBase.cs">
+      <Link>PixelFarm\BackEnd.BurningMineCurve_SH\CurveFitBase.cs</Link>
+    </Compile>
+    <Compile Include="..\..\PixelFarm\BackEnd.BurningMineCurve_SH\CurvePreprocess.cs">
+      <Link>PixelFarm\BackEnd.BurningMineCurve_SH\CurvePreprocess.cs</Link>
+    </Compile>
+    <Compile Include="..\..\PixelFarm\BackEnd.BurningMineCurve_SH\Spline.cs">
+      <Link>PixelFarm\BackEnd.BurningMineCurve_SH\Spline.cs</Link>
+    </Compile>
+    <Compile Include="..\..\PixelFarm\BackEnd.BurningMineCurve_SH\SplineBuilder.cs">
+      <Link>PixelFarm\BackEnd.BurningMineCurve_SH\SplineBuilder.cs</Link>
+    </Compile>
+    <Compile Include="..\..\PixelFarm\BackEnd.BurningMineCurve_SH\VectorHelper.cs">
+      <Link>PixelFarm\BackEnd.BurningMineCurve_SH\VectorHelper.cs</Link>
+    </Compile>
     <Compile Include="..\..\PixelFarm\BackEnd.Tesselate_SH\ActiveRegion.cs">
       <Link>PixelFarm\BackEnd.Tesselate_SH\ActiveRegion.cs</Link>
     </Compile>

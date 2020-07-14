@@ -110,7 +110,7 @@
   <Import Project="..\PixelFarm.Painter_Layer2_SH\PixelFarm.Painter_Layer2_SH.projitems" Label="Shared" />
   <Import Project="..\PixelFarm.CpuBlit_Layer1\PixelFarm.CpuBlit_Layer1_SH.projitems" Label="Shared" />
   <Import Project="..\PixelFarm.CpuBlit_Layer2\PixelFarm.CpuBlit_Layer2.projitems" Label="Shared" />
-  
+  <Import Project="..\BackEnd.BurningMineCurve_SH\BackEnd.BurningMineCurve_SH.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

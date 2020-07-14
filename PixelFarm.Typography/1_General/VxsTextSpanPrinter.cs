@@ -3,50 +3,44 @@ using System;
 using System.Collections.Generic;
 using PixelFarm.CpuBlit.BitmapAtlas;
 
-using Typography.Contours;
 using Typography.OpenFont;
+using Typography.OpenFont.Contours;
 using Typography.OpenFont.Extensions;
 using Typography.TextLayout;
-using Typography.TextBreak;
-using Typography.TextServices;
-using Typography.FontManagement;
+using Typography.Text;
 
 using PixelFarm.CpuBlit;
 using PixelFarm.CpuBlit.VertexProcessing;
 
+
 namespace PixelFarm.Drawing
 {
-
-
-    public class VxsTextPrinter : TextPrinterBase, ITextPrinter
+    public class VxsTextSpanPrinter : AbstractTextSpanPrinter
     {
 
-        TextServiceClient _txtClient;
+        Typeface _currentTypeface;
         /// <summary>
         /// target canvas
         /// </summary>
-        Painter _painter;
-        GlyphMeshStore _glyphMeshStore;
+        readonly Painter _painter;
+        readonly GlyphMeshStore _glyphMeshStore;
+        readonly GlyphBitmapStore _glyphBitmapStore;
+        readonly TextServiceClient _txtClient;
 
-        Typeface _currentTypeface;
-        GlyphBitmapStore _glyphBitmapStore;
-
-        public VxsTextPrinter(Painter painter, OpenFontTextService opentFontTextService)
+        public VxsTextSpanPrinter(Painter painter, TextServiceClient txtClient)
         {
+            _txtClient = txtClient;
             _painter = painter;
-            _glyphMeshStore = new GlyphMeshStore();
-            _glyphMeshStore.FlipGlyphUpward = true;
-            this.PositionTechnique = PositionTechnique.OpenFont;
-            //
-            _txtClient = opentFontTextService.CreateNewServiceClient();
-
-            ChangeFont(new RequestFont("Source Sans Pro", 10));
-
+            _glyphMeshStore = new GlyphMeshStore() { FlipGlyphUpward = true };
             _glyphBitmapStore = new GlyphBitmapStore();
-
         }
-        public AlternativeTypefaceSelector AlternativeTypefaceSelector { get; set; }
-
+        public AlternativeTypefaceSelector AlternativeTypefaceSelector
+        {
+            get => _txtClient.AlternativeTypefaceSelector;
+            set => _txtClient.AlternativeTypefaceSelector = value;
+        }
+        public HintTechnique HintTechnique { get; set; }
+        bool EnableColorGlyphBitmapCache { get; set; } = true;
 
         SvgBmpBuilderFunc _svgBmpBuilderFunc;
         public void SetSvgBmpBuilderFunc(SvgBmpBuilderFunc svgBmpBuilderFunc)
@@ -56,26 +50,6 @@ namespace PixelFarm.Drawing
 
         public AntialiasTechnique AntialiasTechnique { get; set; }
 
-
-        public void ChangeFont(RequestFont reqFont)
-        {
-            //we can resolve request font first 
-            //if not found then ask the service***
-
-
-            ResolvedFont resolvedFont = _txtClient.ResolveFont(reqFont);
-            if (resolvedFont != null)
-            {
-                this.Typeface = resolvedFont.Typeface;
-                //
-                this.FontSizeInPoints = reqFont.SizeInPoints;
-            }
-            else
-            {
-                throw new NotSupportedException();
-            }
-
-        }
         public void ChangeFillColor(Color fontColor)
         {
             //change font color
@@ -89,40 +63,9 @@ namespace PixelFarm.Drawing
 
         }
 
-        protected override void OnFontSizeChanged()
-        {
-            //update some font metrics property   
-            if (_disableBaselineChange)
-            {
-                //eg. multi-typeface selection 
-                return;
-            }
-            //
-            Typeface currentTypeface = _currentTypeface;
-            if (currentTypeface != null)
-            {
-
-                float pointToPixelScale = currentTypeface.CalculateScaleToPixelFromPointSize(this.FontSizeInPoints);
-                this.FontAscendingPx = currentTypeface.Ascender * pointToPixelScale;
-                this.FontDescedingPx = currentTypeface.Descender * pointToPixelScale;
-                this.FontLineGapPx = currentTypeface.LineGap * pointToPixelScale;
-                this.FontLineSpacingPx = FontAscendingPx - FontDescedingPx + FontLineGapPx;
-            }
-        }
-        public override GlyphLayout GlyphLayoutMan
-        {
-            get
-            {
-                //TODO: review here
-                throw new NotSupportedException();
-            }
-        }
-
         Typography.OpenFont.Tables.COLR _colrTable;
         Typography.OpenFont.Tables.CPAL _cpalTable;
         bool _hasColorInfo;
-
-        bool _disableBaselineChange;
 
         public override Typeface Typeface
         {
@@ -145,34 +88,24 @@ namespace PixelFarm.Drawing
                 OnFontSizeChanged();
             }
         }
-
-        //public void PrepareStringForRenderVx(RenderVxFormattedString renderVx, char[] text, int startAt, int len)
-        //{
-        //    UpdateGlyphLayoutSettings();
-        //}
-        //public void PrepareStringForRenderVx(RenderVxFormattedString renderVx)
-        //{
-        //    UpdateGlyphLayoutSettings();
-        //}
-
         public void UpdateGlyphLayoutSettings()
         {
             if (Typeface == null) return;
             //
             _glyphMeshStore.SetHintTechnique(this.HintTechnique);
-
-            _txtClient.CurrentScriptLang = this.ScriptLang;
         }
 
-        public void MeasureString(char[] buffer, int startAt, int len, out int w, out int h)
+        protected override void OnFontSizeChanged()
         {
-            UpdateGlyphLayoutSettings();
-            _glyphMeshStore.SetFont(_currentTypeface, this.FontSizeInPoints);
-            _glyphMeshStore.SimulateOblique = this.SimulateSlant;
-            var textBuffSpan = new TextBufferSpan(buffer, startAt, len);
-            Size s = _txtClient.MeasureString(textBuffSpan, _painter.CurrentFont);
-            w = s.Width;
-            h = s.Height;
+            if (Typeface != null)
+            {
+                float pointToPixelScale = Typeface.CalculateScaleToPixelFromPointSize(this.FontSizeInPoints);
+                this.FontAscendingPx = Typeface.Ascender * pointToPixelScale;
+                this.FontDescedingPx = Typeface.Descender * pointToPixelScale;
+                this.FontLineGapPx = Typeface.LineGap * pointToPixelScale;
+                this.FontLineSpacingPx = FontAscendingPx - FontDescedingPx + FontLineGapPx;
+            }
+            base.OnFontSizeChanged();
         }
         public void DrawString(RenderVxFormattedString renderVx, double left, double top)
         {
@@ -400,6 +333,7 @@ namespace PixelFarm.Drawing
             }
             return null;
         }
+
         public override void DrawFromGlyphPlans(GlyphPlanSequence seq, int startAt, int len, float left, float top)
         {
             _latestAccumulateWidth = 0;//reset
@@ -409,13 +343,13 @@ namespace PixelFarm.Drawing
             float baseLine = top;
             switch (TextBaseline)
             {
-                case TextBaseline.Alphabetic:
+                case Typography.Text.TextBaseline.Alphabetic:
 
                     break;
-                case TextBaseline.Top:
+                case Typography.Text.TextBaseline.Top:
                     baseLine += this.FontAscendingPx;
                     break;
-                case TextBaseline.Bottom:
+                case Typography.Text.TextBaseline.Bottom:
                     baseLine += this.FontDescedingPx;
                     break;
             }
@@ -432,8 +366,6 @@ namespace PixelFarm.Drawing
             _glyphMeshStore.SetFont(_currentTypeface, fontSizePoint);
             _glyphMeshStore.SimulateOblique = this.SimulateSlant;
             //---------------------------------------------------
-
-
 
             if (_currentTypeface.HasSvgTable())
             {
@@ -618,45 +550,9 @@ namespace PixelFarm.Drawing
             _painter.SetOrigin(ox, oy);
         }
 
-        bool EnableColorGlyphBitmapCache { get; set; } = true;
+        readonly FormattedGlyphPlanList _fmtGlyphPlans = new FormattedGlyphPlanList();
 
-        void ITextPrinter.DrawString(char[] textBuffer, int startAt, int len, double x, double y)
-        {
-            InnerDrawString(textBuffer, startAt, len, (float)x, (float)y);
-        }
         public override void DrawString(char[] textBuffer, int startAt, int len, float x, float y)
-        {
-            InnerDrawString(textBuffer, startAt, len, x, y);
-        }
-
-
-        readonly TextPrinterWordVisitor _textPrinterWordVisitor = new TextPrinterWordVisitor();
-        readonly TextPrinterLineSegmentList<TextPrinterLineSegment> _lineSegs = new TextPrinterLineSegmentList<TextPrinterLineSegment>();
-        readonly Dictionary<int, ResolvedFont> _localResolvedFonts = new Dictionary<int, ResolvedFont>();
-        ResolvedFont LocalResolveFont(Typeface typeface, float sizeInPoint, FontStyle style)
-        {
-            //find local resolved font cache
-
-            //check if we have a cache key or not
-            int typefaceKey = TypefaceExtensions.GetCustomTypefaceKey(typeface);
-            if (typefaceKey == 0)
-            {
-                throw new System.NotSupportedException();
-                ////calculate and cache
-                //TypefaceExtensions.SetCustomTypefaceKey(typeface,
-                //    typefaceKey = RequestFont.CalculateTypefaceKey(typeface.Name));
-            }
-
-            int key = RequestFont.CalculateFontKey(typefaceKey, sizeInPoint, style);
-            if (!_localResolvedFonts.TryGetValue(key, out ResolvedFont found))
-            {
-                return _localResolvedFonts[key] = new ResolvedFont(typeface, sizeInPoint, key);
-            }
-            return found;
-        }
-
-
-        void InnerDrawString(char[] textBuffer, int startAt, int len, float x, float y)
         {
 
 #if DEBUG
@@ -669,7 +565,7 @@ namespace PixelFarm.Drawing
             UpdateGlyphLayoutSettings();
             _latestAccumulateWidth = 0;
             //unscale layout, with design unit scale
-            var buffSpan = new TextBufferSpan(textBuffer, startAt, len);
+            var buffSpan = new Typography.Text.TextBufferSpan(textBuffer, startAt, len);
 
             float xpos = x;
             float ypos = y;
@@ -681,154 +577,24 @@ namespace PixelFarm.Drawing
             }
             else
             {
+                Typeface prevTypeface = Typeface;
 
                 //a single string may be broken into many glyph-plan-seq
                 //set segmentlist
+                _fmtGlyphPlans.Clear();
+                _txtClient.PrepareFormattedStringList(textBuffer, startAt, len, _fmtGlyphPlans);
 
-                _lineSegs.Clear();//clear before reuse
-                _textPrinterWordVisitor.SetLineSegmentList(_lineSegs);
-                _txtClient.BreakToLineSegments(buffSpan, _textPrinterWordVisitor);//***
-                _textPrinterWordVisitor.SetLineSegmentList(null);
-
-                ClearTempFormattedGlyphPlanSeq();
-
-                bool needRightToLeftArr = false;
-
-                Typeface defaultTypeface = _currentTypeface;
-                Typeface curTypeface = defaultTypeface;
-
-                FormattedGlyphPlanSeq latestFmtGlyphPlanSeq = null;
-                int prefix_whitespaceCount = 0;
-
-                int count = _lineSegs.Count;
-                for (int i = 0; i < count; ++i)
-                {
-                    //
-                    TextPrinterLineSegment line_seg = _lineSegs.GetLineSegment(i);
-                    SpanBreakInfo spBreakInfo = line_seg.BreakInfo;
-
-                    if (spBreakInfo.RightToLeft)
-                    {
-                        needRightToLeftArr = true;
-                    }
-
-
-                    if (line_seg.WordKind == WordKind.Whitespace)
-                    {
-                        if (latestFmtGlyphPlanSeq == null)
-                        {
-                            prefix_whitespaceCount += line_seg.Length;
-                        }
-                        else
-                        {
-                            latestFmtGlyphPlanSeq.PostfixWhitespaceCount += line_seg.Length;
-                        }
-                        continue; //***
-                    }
-
-
-
-
-                    //each line segment may have different unicode range 
-                    //and the current typeface may not support that range
-                    //so we need to ensure that we get a proper typeface,
-                    //if not => alternative typeface
-
-                    ushort sample_glyphIndex = 0;
-                    char sample_char = textBuffer[line_seg.StartAt];
-                    int codepoint = sample_char;
-
-                    if (line_seg.Length > 1 && line_seg.WordKind == WordKind.SurrogatePair)
-                    {
-                        sample_glyphIndex = curTypeface.GetGlyphIndex(codepoint = char.ConvertToUtf32(sample_char, textBuffer[line_seg.StartAt + 1]));
-                    }
-                    else
-                    {
-                        sample_glyphIndex = curTypeface.GetGlyphIndex(codepoint);
-                    }
-
-
-                    if (sample_glyphIndex == 0)
-                    {
-                        //not found then => find other typeface                    
-                        //we need more information about line seg layout
-
-                        if (AlternativeTypefaceSelector != null)
-                        {
-                            AlternativeTypefaceSelector.LatestTypeface = curTypeface;
-                        }
-
-                        if (_txtClient.TryGetAlternativeTypefaceFromCodepoint(codepoint, AlternativeTypefaceSelector, out Typeface alternative))
-                        {
-                            curTypeface = alternative;
-                        }
-                        else
-                        {
-#if DEBUG
-                            if (sample_char >= 0 && sample_char < 255)
-                            {
-
-
-                            }
-#endif
-                        }
-                    }
-
-
-
-                    //layout glyphs in each context
-
-                    TextBufferSpan buff = new TextBufferSpan(textBuffer, line_seg.StartAt, line_seg.Length);
-
-                    _txtClient.CurrentScriptLang = new ScriptLang(spBreakInfo.ScriptTag, spBreakInfo.LangTag);
-
-                    //in some text context (+typeface)=>user can disable gsub, gpos
-                    //this is an example                  
-
-                    if (line_seg.WordKind == WordKind.Tab || line_seg.WordKind == WordKind.Number ||
-                        (spBreakInfo.UnicodeRange == Unicode13RangeInfoList.C0_Controls_and_Basic_Latin))
-                    {
-                        _txtClient.EnableGpos = false;
-                        _txtClient.EnableGsub = false;
-                    }
-                    else
-                    {
-                        _txtClient.EnableGpos = true;
-                        _txtClient.EnableGsub = true;
-                    }
-
-
-                    GlyphPlanSequence seq = _txtClient.CreateGlyphPlanSeq(buff, curTypeface, FontSizeInPoints);
-
-                    seq.IsRightToLeft = spBreakInfo.RightToLeft;
-
-                    //create an object that hold more information about GlyphPlanSequence
-
-                    FormattedGlyphPlanSeq formattedGlyphPlanSeq = _pool.GetFreeFmtGlyphPlanSeqs();
-                    formattedGlyphPlanSeq.PrefixWhitespaceCount = (ushort)prefix_whitespaceCount;//***
-                    prefix_whitespaceCount = 0;//reset 
-
-                    //TODO: other style?... (bold, italic)  
-
-                    ResolvedFont foundResolvedFont = LocalResolveFont(curTypeface, FontSizeInPoints, FontStyle.Regular);//temp fix for regular
-                    formattedGlyphPlanSeq.SetData(seq, foundResolvedFont);
-
-                    _tmpGlyphPlanSeqs.Add(latestFmtGlyphPlanSeq = formattedGlyphPlanSeq);
-
-                    curTypeface = defaultTypeface;//switch back to default
-
-                    //restore latest script lang?
-                }
-
+                bool needRightToLeftArr = _fmtGlyphPlans.IsRightToLeftDirection;
                 _disableBaselineChange = true;
+
+                int count = _fmtGlyphPlans.Count;
+
                 if (needRightToLeftArr)
                 {
-                    //special arr left-to-right
-
-                    count = _tmpGlyphPlanSeqs.Count;//re-count
+                    //special arr left-to-right 
                     for (int i = count - 1; i >= 0; --i)
                     {
-                        FormattedGlyphPlanSeq formattedGlyphPlanSeq = _tmpGlyphPlanSeqs[i];
+                        FormattedGlyphPlanSeq formattedGlyphPlanSeq = _fmtGlyphPlans[i];
 
                         ResolvedFont resolvedFont = formattedGlyphPlanSeq.ResolvedFont;
                         Typeface = resolvedFont.Typeface;
@@ -841,11 +607,10 @@ namespace PixelFarm.Drawing
                 }
                 else
                 {
-                    count = _tmpGlyphPlanSeqs.Count;//re-count
 
                     for (int i = 0; i < count; ++i)
                     {
-                        FormattedGlyphPlanSeq formattedGlyphPlanSeq = _tmpGlyphPlanSeqs[i];
+                        FormattedGlyphPlanSeq formattedGlyphPlanSeq = _fmtGlyphPlans[i];
 
                         //change typeface                     
                         ResolvedFont resolvedFont = formattedGlyphPlanSeq.ResolvedFont;
@@ -859,24 +624,32 @@ namespace PixelFarm.Drawing
                 }
                 _disableBaselineChange = false;
 
-                ClearTempFormattedGlyphPlanSeq();
+                _fmtGlyphPlans.Clear();
 
                 //restore prev typeface & settings
-                Typeface = defaultTypeface;
+                Typeface = prevTypeface;
             }
         }
 
-        void ClearTempFormattedGlyphPlanSeq()
+        public void ChangeFont(RequestFont reqFont)
         {
-            for (int i = _tmpGlyphPlanSeqs.Count - 1; i >= 0; --i)
+            ResolvedFont resolvedFont = _txtClient.ResolveFont(reqFont);
+            if (resolvedFont != null)
             {
-                _pool.ReleaseFmtGlyphPlanSeqs(_tmpGlyphPlanSeqs[i]);
+                this.Typeface = resolvedFont.Typeface;
+                //
+                this.FontSizeInPoints = reqFont.SizeInPoints;
             }
-            _tmpGlyphPlanSeqs.Clear();
+            else
+            {
+                throw new NotSupportedException();
+            }
         }
 
-        FormattedGlyphPlanSeqPool _pool = new FormattedGlyphPlanSeqPool();
-        List<FormattedGlyphPlanSeq> _tmpGlyphPlanSeqs = new List<FormattedGlyphPlanSeq>();
+
+        bool _disableBaselineChange;
+
+
     }
 
 

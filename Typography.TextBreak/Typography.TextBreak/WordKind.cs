@@ -3,9 +3,6 @@
 
 namespace Typography.TextBreak
 {
-
-
-
     public enum WordKind : byte
     {
         Unknown,
@@ -22,7 +19,4 @@ namespace Typography.TextBreak
         TextIncomplete,
         Text,
     }
-
-
-
 }

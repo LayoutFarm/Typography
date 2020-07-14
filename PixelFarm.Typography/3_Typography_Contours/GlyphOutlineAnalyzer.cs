@@ -2,9 +2,9 @@
 using System;
 using System.Collections.Generic;
 using PixelFarm.CpuBlit.VertexProcessing;
-using Typography.OpenFont;
+using PixelFarm.Contours;
 
-namespace PixelFarm.Contours
+namespace Typography.OpenFont.Contours
 {
 
     //This is PixelFarm's AutoFit
@@ -16,11 +16,11 @@ namespace PixelFarm.Contours
 
         readonly ContourBuilder _contourBuilder = new ContourBuilder();
 
-        readonly Typography.Contours.GlyphTranslatorToContourBuilder _glyphTxToContourBuilder;
+        readonly GlyphTranslatorToContourBuilder _glyphTxToContourBuilder;
 
         public GlyphOutlineAnalyzer()
         {
-            _glyphTxToContourBuilder = new Typography.Contours.GlyphTranslatorToContourBuilder(_contourBuilder);
+            _glyphTxToContourBuilder = new GlyphTranslatorToContourBuilder(_contourBuilder);
         }
 
         /// <summary>

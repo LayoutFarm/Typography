@@ -5,17 +5,20 @@ using Typography.TextBreak;
 
 namespace Typography.OpenFont
 {
+    //https://docs.microsoft.com/en-us/typography/opentype/spec/os2#ulunicoderange1-bits-031ulunicoderange2-bits-3263ulunicoderange3-bits-6495ulunicoderange4-bits-96127     
+
     public class ScriptLangInfo
     {
         public readonly string fullname;
         public readonly string shortname;
-        public UnicodeRangeInfo[] unicodeLangs;
-        public ScriptLangInfo(string fullname, string shortname)
+        public readonly UnicodeRangeInfo[] unicodeLangs;
+        public ScriptLangInfo(string fullname, string shortname, UnicodeRangeInfo[] unicodeLangs = null)
         {
             this.fullname = fullname;
             this.shortname = shortname;
+            this.unicodeLangs = unicodeLangs;
         }
-        public ScriptLangInfo(ScriptTagDef tagDef, params UnicodeRangeInfo[] unicodeLangs)
+        public ScriptLangInfo(ScriptTagDef tagDef, UnicodeRangeInfo[] unicodeLangs)
         {
             fullname = tagDef.Name;
             shortname = TagUtils.TagToString(tagDef.Tag);
@@ -793,7 +796,6 @@ namespace Typography.OpenFont
 
     }
 
-
     static partial class ScriptTagDefs
     {
         //https://docs.microsoft.com/en-us/typography/opentype/spec/scripttags
@@ -966,9 +968,6 @@ Zanabazar_Square__Zanabazarin_Dörböljin_Useg__Xewtee_Dörböljin_Bicig__Horizo
 
     }
 
-
-
-
     public partial class ScriptLangs
     {
         //https://docs.microsoft.com/en-us/typography/opentype/spec/scripttags
@@ -1003,7 +1002,7 @@ Zanabazar_Square__Zanabazarin_Dörböljin_Useg__Xewtee_Dörböljin_Bicig__Horizo
                     //***
                     //Hiragana and Katakana 
                     //both have same short name "kana"                     
-                    return new ScriptLangInfo(fullname, shortname) { unicodeLangs = langRanges };
+                    return new ScriptLangInfo(fullname, shortname, langRanges);
                 }
                 else
                 {
@@ -1015,7 +1014,7 @@ Zanabazar_Square__Zanabazarin_Dörböljin_Useg__Xewtee_Dörböljin_Bicig__Horizo
             {
                 int internalName = s_registerNames.Count;
                 s_registerNames[shortname] = internalName;
-                var scriptLang = new ScriptLangInfo(fullname, shortname) { unicodeLangs = langRanges };
+                var scriptLang = new ScriptLangInfo(fullname, shortname, langRanges);
                 s_registeredScriptTags.Add(shortname, scriptLang);
                 //                 
                 s_registerScriptFromFullNames[fullname] = scriptLang;

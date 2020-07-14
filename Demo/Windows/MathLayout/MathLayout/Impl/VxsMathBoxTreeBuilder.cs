@@ -4,8 +4,9 @@ using PixelFarm.CpuBlit;
 using PixelFarm.CpuBlit.VertexProcessing;
 using PixelFarm.Drawing;
 using System;
-using Typography.Contours;
+
 using Typography.OpenFont;
+using Typography.OpenFont.Contours;
 
 namespace MathLayout
 {
