@@ -8,12 +8,4 @@
   <PropertyGroup Label="Configuration">
     <Import_RootNamespace>Typography.TextFlow</Import_RootNamespace>
   </PropertyGroup>
-  <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)Dom\EditableTextBlockLayoutEngine.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Dom\EditableTextLine.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Dom\IRun.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Dom\TextRun.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Simple\SmallLine.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TextLexer\TextLexer.cs" />
-  </ItemGroup>
 </Project>
