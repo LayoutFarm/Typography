@@ -14,7 +14,7 @@ using PixelFarm.Drawing;
 namespace Typography.Text
 {
 
-    public class TextServiceClient : ITextService
+    public class TextServiceClient
     {
         readonly OpenFontTextService _openFontTextService; //owner
         readonly VirtualTextSpanPrinter _p;
@@ -237,7 +237,7 @@ namespace Typography.Text
 
             _measureResult.Reset();
             _p.MeasureString(bufferSpan, _measureResult);
-            
+
             return new Size(_measureResult.Width, _measureResult.Height);
         }
         public void MeasureString(in Typography.Text.TextBufferSpan bufferSpan, RequestFont font, int limitWidth, out int charFit, out int charFitWidth)
@@ -260,7 +260,7 @@ namespace Typography.Text
             MeasureString(bufferSpan, font, limitWidth, out charFit, out charFitWidth);
         }
 
-        float ITextService.MeasureBlankLineHeight(RequestFont font)
+        public float MeasureBlankLineHeight(RequestFont font)
         {
             ResolvedFont resolvedFont = ResolveFont(font);
             return resolvedFont.LineSpacingInPixels;

@@ -319,16 +319,7 @@ namespace PixelFarm.Drawing
         public short minOffsetY;
         public short maxOffsetY;
     }
-
-
-    public interface ITextService
-    {
-        float MeasureWhitespace(RequestFont f);
-        float MeasureBlankLineHeight(RequestFont f);
-
-        Size MeasureString(in TextBufferSpan textBufferSpan, RequestFont font);
-        void MeasureString(in TextBufferSpan textBufferSpan, RequestFont font, int maxWidth, out int charFit, out int charFitWidth);
-    }
+     
 }
 
 
