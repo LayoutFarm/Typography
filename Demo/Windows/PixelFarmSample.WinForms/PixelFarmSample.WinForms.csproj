@@ -164,13 +164,13 @@
       <Project>{c6807d05-09be-4313-9f8b-bd2d51c55819}</Project>
       <Name>Typography.GlyphLayout</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\Build\N20\Typography.TextServices\Typography.TextServices.csproj">
-      <Project>{6b0e034b-0ebd-4907-ad7f-437de66d78d4}</Project>
-      <Name>Typography.TextServices</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\Build\N20\Typography.OpenFont\Typography.OpenFont.csproj">
       <Project>{29ed0dfe-373c-4e98-bd4b-43f8e5fb16f6}</Project>
       <Name>Typography.OpenFont</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Build\N20\Typography.TextServices\Typography.TextServices.csproj">
+      <Project>{6b0e034b-0ebd-4907-ad7f-437de66d78d4}</Project>
+      <Name>Typography.TextServices</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\Build\N20\Unpack\Unpack.csproj">
       <Project>{901a60ed-baef-45f6-8919-6e07ee6bad8d}</Project>

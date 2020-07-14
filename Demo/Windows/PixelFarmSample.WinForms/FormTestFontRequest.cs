@@ -3,14 +3,13 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 
-using System.IO;
+ 
 using System.Windows.Forms;
 
 using PixelFarm.CpuBlit;
-using Typography.OpenFont;
-using Typography.OpenFont.Extensions;
+using Typography.OpenFont; 
 using Typography.TextLayout;
-using Typography.Contours;
+using Typography.OpenFont.Contours;
 using Typography.Text;
 using PixelFarm.Drawing;
 
@@ -23,7 +22,7 @@ namespace SampleWinForms
         MemBitmap _destImg;
         Bitmap _winBmp;
 
-        PixelFarm.Drawing.VxsTextPrinter _devVxsTextPrinter = null;
+        PixelFarm.Drawing.VxsTextSpanPrinter _devVxsTextPrinter = null;
 
         bool _readyToRender;
         Typography.Text.OpenFontTextService _textService;
@@ -43,7 +42,7 @@ namespace SampleWinForms
             }
         }
 
-        Typography.Text.MyAlternativeTypefaceSelector _myAlternativeTypefaceSelector;
+        Typography.Text.AlternativeTypefaceSelector _myAlternativeTypefaceSelector;
         void InitGraphics()
         {
             //INIT ONCE
@@ -63,14 +62,14 @@ namespace SampleWinForms
             _textService.LoadFontsFromFolder("../../../TestFonts");
             _textService.UpdateUnicodeRanges();
 
-            _devVxsTextPrinter = new PixelFarm.Drawing.VxsTextPrinter(_painter, _textService);
+            _devVxsTextPrinter = new PixelFarm.Drawing.VxsTextSpanPrinter(_painter, _textService.CreateNewServiceClient());
             _devVxsTextPrinter.SetSvgBmpBuilderFunc(PaintLab.SvgBuilderHelper.ParseAndRenderSvg);
 
             _devVxsTextPrinter.ScriptLang = new ScriptLang(ScriptTagDefs.Latin.Tag);
             _devVxsTextPrinter.PositionTechnique = Typography.TextLayout.PositionTechnique.OpenFont;
 
             //Alternative Typeface selector..
-            _myAlternativeTypefaceSelector = new Typography.Text.MyAlternativeTypefaceSelector();
+            _myAlternativeTypefaceSelector = new Typography.Text.AlternativeTypefaceSelector();
             {
                 //------------
                 //TODO: review this again
@@ -126,7 +125,7 @@ namespace SampleWinForms
 
             _myAlternativeTypefaceSelector.SetCurrentReqFont(reqFont, _textService);
 
-            PixelFarm.Drawing.VxsTextPrinter _selectedTextPrinter = _devVxsTextPrinter;
+            PixelFarm.Drawing.VxsTextSpanPrinter _selectedTextPrinter = _devVxsTextPrinter;
             _painter.UseLcdEffectSubPixelRendering = true;
             _painter.FillColor = PixelFarm.Drawing.Color.Black;
 
@@ -145,7 +144,7 @@ namespace SampleWinForms
 
             //_selectedTextPrinter.TextBaseline = PixelFarm.Drawing.TextBaseline.Alphabetic;
             //_selectedTextPrinter.TextBaseline = PixelFarm.Drawing.TextBaseline.Bottom;
-            _selectedTextPrinter.TextBaseline = PixelFarm.Drawing.TextBaseline.Top;
+            _selectedTextPrinter.TextBaseline = (Typography.Text.TextBaseline)PixelFarm.Drawing.TextBaseline.Top;
 
             //test print 3 lines
             //#if DEBUG
@@ -178,9 +177,9 @@ namespace SampleWinForms
                     default:
                         {
                             System.Diagnostics.Debug.WriteLine("UNIMPLEMENTED" + _selectedTextPrinter.TextBaseline.ToString());
-                            goto case PixelFarm.Drawing.TextBaseline.Alphabetic;//
+                            goto case Typography.Text.TextBaseline.Alphabetic;//
                         }
-                    case PixelFarm.Drawing.TextBaseline.Alphabetic:
+                    case Typography.Text.TextBaseline.Alphabetic:
                         {
                             //alphabetic baseline
                             _painter.StrokeColor = _grayColor;
@@ -193,7 +192,7 @@ namespace SampleWinForms
 
                         }
                         break;
-                    case PixelFarm.Drawing.TextBaseline.Top:
+                    case Typography.Text.TextBaseline.Top:
                         {
                             //alphabetic baseline
                             _painter.StrokeColor = _grayColor;
@@ -207,7 +206,7 @@ namespace SampleWinForms
 
                         }
                         break;
-                    case PixelFarm.Drawing.TextBaseline.Bottom:
+                    case Typography.Text.TextBaseline.Bottom:
                         {
                             //alphabetic baseline
                             _painter.StrokeColor = _grayColor;

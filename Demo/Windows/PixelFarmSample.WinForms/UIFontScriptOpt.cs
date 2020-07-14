@@ -1,4 +1,4 @@
-﻿//MIT, 2020, WinterDev
+﻿//MIT, 2020-present, WinterDev
 using System;
 using System.Windows.Forms;
 using Typography.OpenFont;
@@ -11,9 +11,9 @@ namespace SampleWinForms
         {
             InitializeComponent();
 
-            this.cmbHintTech.Items.Add(Typography.Contours.HintTechnique.None);
-            this.cmbHintTech.Items.Add(Typography.Contours.HintTechnique.TrueTypeInstruction);
-            this.cmbHintTech.Items.Add(Typography.Contours.HintTechnique.TrueTypeInstruction_VerticalOnly);
+            this.cmbHintTech.Items.Add(Typography.OpenFont.Contours.HintTechnique.None);
+            this.cmbHintTech.Items.Add(Typography.OpenFont.Contours.HintTechnique.TrueTypeInstruction);
+            this.cmbHintTech.Items.Add(Typography.OpenFont.Contours.HintTechnique.TrueTypeInstruction_VerticalOnly);
             this.cmbHintTech.SelectedIndex = 0;
         }
 
@@ -22,7 +22,7 @@ namespace SampleWinForms
 
         }
         public bool Selected => chkSelected.Checked;
-        public Typography.Contours.HintTechnique HintTechnique => (Typography.Contours.HintTechnique)cmbHintTech.SelectedItem;
+        public Typography.OpenFont.Contours.HintTechnique HintTechnique => (Typography.OpenFont.Contours.HintTechnique)cmbHintTech.SelectedItem;
 
         ScriptLang _scLang;
         public ScriptLang ScriptLang

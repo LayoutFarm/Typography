@@ -11,8 +11,9 @@ using PixelFarm.CpuBlit.BitmapAtlas;
 using PixelFarm.Contours;
 
 using Typography.OpenFont;
+using Typography.OpenFont.Contours;
 using Typography.TextLayout;
-using Typography.Contours;
+
 
 namespace SampleWinForms
 {
@@ -23,8 +24,9 @@ namespace SampleWinForms
         MemBitmap _destImg;
         Bitmap _winBmp;
 
-        Typography.Text.TextPrinterBase _selectedTextPrinter = null;
-        PixelFarm.Drawing.VxsTextPrinter _devVxsTextPrinter = null;
+         
+        Typography.Text.AbstractTextSpanPrinter _selectedTextPrinter = null;
+        PixelFarm.Drawing.VxsTextSpanPrinter _devVxsTextPrinter = null;
 
         UI.DebugGlyphVisualizer _debugGlyphVisualizer = new UI.DebugGlyphVisualizer();
         TypographyTest.BasicFontOptions _basicOptions;
@@ -69,7 +71,15 @@ namespace SampleWinForms
             _selectedTextPrinter.ScriptLang = _basicOptions.ScriptLang;
             _selectedTextPrinter.PositionTechnique = _basicOptions.PositionTech;
 
-            _selectedTextPrinter.HintTechnique = _glyphRenderOptions.HintTechnique;
+
+            if (_selectedTextPrinter is PixelFarm.Drawing.VxsTextSpanPrinter vxsTextPrinter)
+            {
+                vxsTextPrinter.HintTechnique = _glyphRenderOptions.HintTechnique;
+            }
+            else
+            {
+
+            }
             _selectedTextPrinter.EnableLigature = _glyphRenderOptions.EnableLigature;
             _selectedTextPrinter.EnableMultiTypefaces = _basicOptions.EnableMultiTypefaces;
             //test print 3 lines
@@ -131,14 +141,14 @@ namespace SampleWinForms
             _textService.LoadFontsFromFolder("../../../TestFonts");
             _textService.UpdateUnicodeRanges();
 
-            _devVxsTextPrinter = new PixelFarm.Drawing.VxsTextPrinter(_painter, _textService);
+            _devVxsTextPrinter = new PixelFarm.Drawing.VxsTextSpanPrinter(_painter, _textService.CreateNewServiceClient());
             _devVxsTextPrinter.SetSvgBmpBuilderFunc(PaintLab.SvgBuilderHelper.ParseAndRenderSvg);
             _devVxsTextPrinter.ScriptLang = _basicOptions.ScriptLang;
             _devVxsTextPrinter.PositionTechnique = Typography.TextLayout.PositionTechnique.OpenFont;
 
 
             //Alternative Typeface selector..
-            var myAlternativeTypefaceSelector = new Typography.Text.MyAlternativeTypefaceSelector();
+            var myAlternativeTypefaceSelector = new Typography.Text.AlternativeTypefaceSelector();
             {
                 //TODO: review this again,
                 //load from config ?, settings?
@@ -222,13 +232,17 @@ namespace SampleWinForms
                         _selectedTextPrinter.ScriptLang = _basicOptions.ScriptLang;
                         _selectedTextPrinter.PositionTechnique = _basicOptions.PositionTech;
 
-                        _selectedTextPrinter.HintTechnique = _glyphRenderOptions.HintTechnique;
+
+                        if (_selectedTextPrinter is PixelFarm.Drawing.VxsTextSpanPrinter vxsTextPrinter)
+                        {
+                            vxsTextPrinter.HintTechnique = _glyphRenderOptions.HintTechnique;
+                        }
                         _selectedTextPrinter.EnableLigature = _glyphRenderOptions.EnableLigature;
                         _selectedTextPrinter.EnableMultiTypefaces = _basicOptions.EnableMultiTypefaces;
                         _selectedTextPrinter.SimulateSlant = _contourAnalysisOpts.SimulateSlant;
+                        _selectedTextPrinter.TextBaseline = (Typography.Text.TextBaseline)(int)lstTextBaseline.SelectedItem;
 
 
-                        _selectedTextPrinter.TextBaseline = (PixelFarm.Drawing.TextBaseline)lstTextBaseline.SelectedItem;
 
                         //test print 3 lines
 #if DEBUG
@@ -258,9 +272,9 @@ namespace SampleWinForms
                                 default:
                                     {
                                         System.Diagnostics.Debug.WriteLine("UNIMPLEMENTED" + _selectedTextPrinter.TextBaseline.ToString());
-                                        goto case PixelFarm.Drawing.TextBaseline.Alphabetic;//
+                                        goto case Typography.Text.TextBaseline.Alphabetic;//
                                     }
-                                case PixelFarm.Drawing.TextBaseline.Alphabetic:
+                                case Typography.Text.TextBaseline.Alphabetic:
                                     {
                                         //alphabetic baseline
                                         _painter.StrokeColor = _grayColor;
@@ -273,7 +287,7 @@ namespace SampleWinForms
 
                                     }
                                     break;
-                                case PixelFarm.Drawing.TextBaseline.Top:
+                                case Typography.Text.TextBaseline.Top:
                                     {
                                         //alphabetic baseline
                                         _painter.StrokeColor = _grayColor;
@@ -287,7 +301,7 @@ namespace SampleWinForms
 
                                     }
                                     break;
-                                case PixelFarm.Drawing.TextBaseline.Bottom:
+                                case Typography.Text.TextBaseline.Bottom:
                                     {
                                         //alphabetic baseline
                                         _painter.StrokeColor = _grayColor;
@@ -604,6 +618,7 @@ namespace SampleWinForms
 
         private void cmdMeasureString_Click(object sender, EventArgs e)
         {
+            //
 
             //How to measure user's string...
             //this demostrate step-by-step
