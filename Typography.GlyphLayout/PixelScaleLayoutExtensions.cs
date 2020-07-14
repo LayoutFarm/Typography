@@ -135,6 +135,7 @@ namespace Typography.TextLayout
             _end = start + len;
             _exactX = _exactY = 0;
             _currentGlyphIndex = 0;
+            _limitW = 0;
 
             if (_rightToLeft = glyphPlans.IsRightToLeft)
             {
@@ -192,14 +193,82 @@ namespace Typography.TextLayout
                 return true;
             }
         }
+
         public void ReadToEnd()
         {
             while (Read()) ;
         }
+
         public int AccumWidth => _accW;
         public int ExactX => _exactX;
         public int ExactY => _exactY;
 
+        int _limitW;
+        public void ReadWidthLimitWidth(int limitWidth)
+        {
+            _limitW = limitWidth;
+            while (ReadWidthLimitWidth()) ;
+        }
+        bool ReadWidthLimitWidth()
+        {
+            if (_rightToLeft)
+            {
+                if (_index < 0)
+                {
+                    return false;
+                }
+
+                //read current 
+                UnscaledGlyphPlan unscale = _seq[_index];
+
+                short scaled_advW = (short)Math.Round(unscale.AdvanceX * _pxscale);
+                short scaled_offsetX = (short)Math.Round(unscale.OffsetX * _pxscale);
+                short scaled_offsetY = (short)Math.Round(unscale.OffsetY * _pxscale);
+
+                if (_accW + scaled_advW > _limitW)
+                {
+                    //stop
+                    return false;
+                }
+
+                _exactX = _accW + scaled_offsetX;
+                _exactY = scaled_offsetY;
+                _accW += scaled_advW;
+
+                _currentGlyphIndex = unscale.glyphIndex;
+                _index--;
+                return true;
+            }
+            else
+            {
+
+                if (_index >= _end)
+                {
+                    return false;
+                }
+
+                //read current 
+                UnscaledGlyphPlan unscale = _seq[_index];
+
+                short scaled_advW = (short)Math.Round(unscale.AdvanceX * _pxscale);
+                short scaled_offsetX = (short)Math.Round(unscale.OffsetX * _pxscale);
+                short scaled_offsetY = (short)Math.Round(unscale.OffsetY * _pxscale);
+
+                if (_accW + scaled_advW > _limitW)
+                {
+                    //stop
+                    return false;
+                }
+
+                _exactX = _accW + scaled_offsetX;
+                _exactY = scaled_offsetY;
+                _accW += scaled_advW;
+
+                _currentGlyphIndex = unscale.glyphIndex;
+                _index++;
+                return true;
+            }
+        }
     }
     public static class PixelScaleLayoutExtensions
     {
