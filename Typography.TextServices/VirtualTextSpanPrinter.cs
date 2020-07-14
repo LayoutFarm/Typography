@@ -93,7 +93,7 @@ namespace Typography.Text
         float _orgY;
 
         int _latestAccumulateWidth;
-
+        int _latestCharIndex; //if we use limit width
 #if DEBUG
         int dbugExportCount = 0;
 #endif
@@ -133,10 +133,20 @@ namespace Typography.Text
                 len = seqLen;
             }
 
-            var snapToPx = new GlyphPlanSequenceSnapPixelScaleLayout(seq, startAt, len, scale);
-            snapToPx.ReadToEnd();
-            _latestAccumulateWidth = snapToPx.AccumWidth;
+            if (_limitWidth > 0)
+            {
+                var snapToPx = new GlyphPlanSequenceSnapPixelScaleLayout(seq, startAt, len, scale);
+                snapToPx.ReadWidthLimitWidth(_limitWidth);
 
+                _latestCharIndex = snapToPx.CurrentIndex;
+                _latestAccumulateWidth = snapToPx.AccumWidth;
+            }
+            else
+            {
+                var snapToPx = new GlyphPlanSequenceSnapPixelScaleLayout(seq, startAt, len, scale);
+                snapToPx.ReadToEnd();
+                _latestAccumulateWidth = snapToPx.AccumWidth;
+            }
         }
 
         public bool NeedRightToLeftArr { get; private set; }
@@ -505,13 +515,23 @@ namespace Typography.Text
         }
 
         readonly FormattedGlyphPlanList _fmtGlyphPlanList = new FormattedGlyphPlanList();
+        int _limitWidth;
+
         public void MeasureString(in Typography.Text.TextBufferSpan textBufferSpan, MeasureStringArgs args)
         {
             //TODO: review here again
 
             //draw string and measure result
             _latestAccumulateWidth = 0;
+
+            _limitWidth = args.LimitWidth;
+
             DrawString(textBufferSpan.GetRawCharBuffer(), textBufferSpan.start, textBufferSpan.len, 0, 0);
+
+            args.CharFitWidth = _latestAccumulateWidth;
+            args.CharFit = _latestCharIndex;
+
+            _limitWidth = -1;//reset
 
             float pxscale = _currentTypeface.CalculateScaleToPixelFromPointSize(FontSizeInPoints);
             args.Width = _latestAccumulateWidth;

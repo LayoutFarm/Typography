@@ -202,7 +202,7 @@ namespace Typography.Text
         }
 
 
-        readonly MeasureStringArgs _measureResult2 = new MeasureStringArgs();
+        readonly MeasureStringArgs _measureResult = new MeasureStringArgs();
         public Size MeasureString(in PixelFarm.Drawing.TextBufferSpan textBufferSpan, RequestFont font)
         {
             //TODO: review here
@@ -215,8 +215,11 @@ namespace Typography.Text
             Typeface typeface = _openFontTextService.ResolveFont(font).Typeface;
             _p.Typeface = typeface;
             _p.FontSizeInPoints = font.SizeInPoints;
-            _p.MeasureString(bufferSpan, _measureResult2);
-            return new Size(_measureResult2.Width, _measureResult2.Height);
+
+            _measureResult.Reset();
+            _p.MeasureString(bufferSpan, _measureResult);
+
+            return new Size(_measureResult.Width, _measureResult.Height);
         }
         public Size MeasureString(in PixelFarm.Drawing.TextBufferSpan textBufferSpan, ResolvedFont font)
         {
@@ -231,8 +234,11 @@ namespace Typography.Text
             _p.Typeface = typeface;
             _p.FontSizeInPoints = font.SizeInPoints;
             var bufferSpan = new Typography.Text.TextBufferSpan(textBufferSpan.GetRawCharBuffer(), textBufferSpan.start, textBufferSpan.len);
-            _p.MeasureString(bufferSpan, _measureResult2);
-            return new Size(_measureResult2.Width, _measureResult2.Height);
+
+            _measureResult.Reset();
+            _p.MeasureString(bufferSpan, _measureResult);
+            
+            return new Size(_measureResult.Width, _measureResult.Height);
         }
         public void MeasureString(in Typography.Text.TextBufferSpan bufferSpan, RequestFont font, int limitWidth, out int charFit, out int charFitWidth)
         {
@@ -241,11 +247,12 @@ namespace Typography.Text
             _p.Typeface = typeface;
             _p.FontSizeInPoints = font.SizeInPoints;
 
+            _measureResult.Reset();
+            _measureResult.LimitWidth = limitWidth;
+            _p.MeasureString(bufferSpan, _measureResult);
 
-            _p.MeasureString(bufferSpan, _measureResult2);
-
-            charFit = _measureResult2.CharFit;
-            charFitWidth = _measureResult2.CharFitWidth;
+            charFit = _measureResult.CharFit;
+            charFitWidth = _measureResult.CharFitWidth;
         }
         public void MeasureString(in PixelFarm.Drawing.TextBufferSpan textBufferSpan, RequestFont font, int limitWidth, out int charFit, out int charFitWidth)
         {
