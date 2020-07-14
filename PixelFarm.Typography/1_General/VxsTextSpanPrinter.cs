@@ -99,13 +99,15 @@ namespace PixelFarm.Drawing
         {
             if (Typeface != null)
             {
-                float pointToPixelScale = Typeface.CalculateScaleToPixelFromPointSize(this.FontSizeInPoints);
-                this.FontAscendingPx = Typeface.Ascender * pointToPixelScale;
-                this.FontDescedingPx = Typeface.Descender * pointToPixelScale;
-                this.FontLineGapPx = Typeface.LineGap * pointToPixelScale;
-                this.FontLineSpacingPx = FontAscendingPx - FontDescedingPx + FontLineGapPx;
+                _txtClient.SetCurrentFont(Typeface, FontSizeInPoints, this.PositionTechnique);
             }
-            base.OnFontSizeChanged();
+
+            if (!_renderingMultiTypefaceMode)
+            {
+                //during rendering phase, 
+                //skip change the baseline
+                base.OnFontSizeChanged();
+            }
         }
         public void DrawString(RenderVxFormattedString renderVx, double left, double top)
         {
@@ -551,6 +553,7 @@ namespace PixelFarm.Drawing
         }
 
         readonly FormattedGlyphPlanList _fmtGlyphPlans = new FormattedGlyphPlanList();
+        bool _renderingMultiTypefaceMode;
 
         public override void DrawString(char[] textBuffer, int startAt, int len, float x, float y)
         {
@@ -585,7 +588,8 @@ namespace PixelFarm.Drawing
                 _txtClient.PrepareFormattedStringList(textBuffer, startAt, len, _fmtGlyphPlans);
 
                 bool needRightToLeftArr = _fmtGlyphPlans.IsRightToLeftDirection;
-                _disableBaselineChange = true;
+
+                _renderingMultiTypefaceMode = true;
 
                 int count = _fmtGlyphPlans.Count;
 
@@ -622,7 +626,7 @@ namespace PixelFarm.Drawing
 
                     }
                 }
-                _disableBaselineChange = false;
+                _renderingMultiTypefaceMode = false;
 
                 _fmtGlyphPlans.Clear();
 
@@ -647,7 +651,7 @@ namespace PixelFarm.Drawing
         }
 
 
-        bool _disableBaselineChange;
+
 
 
     }
