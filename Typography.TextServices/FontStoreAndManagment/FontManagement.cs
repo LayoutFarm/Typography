@@ -6,164 +6,16 @@ using Typography.OpenFont;
 using Typography.OpenFont.Tables;
 using Typography.TextBreak;
 
-namespace Typography.OpenFont
-{
-    public static class TypefaceExtension3
-    {
-
-        internal static bool DoesSupportUnicode(Languages langs, int bitpos)
-        {
-            if (bitpos < 32)
-            {
-                //use range 1
-                return (langs.UnicodeRange1 & (1 << bitpos)) != 0;
-            }
-            else if (bitpos < 64)
-            {
-                return (langs.UnicodeRange2 & (1 << (bitpos - 32))) != 0;
-            }
-            else if (bitpos < 96)
-            {
-                return (langs.UnicodeRange3 & (1 << (bitpos - 64))) != 0;
-            }
-            else if (bitpos < 128)
-            {
-                return (langs.UnicodeRange4 & (1 << (bitpos - 96))) != 0;
-            }
-            else
-            {
-                throw new System.NotSupportedException();
-            }
-        }
-
-        public static void CollectScriptLang(this FontManagement.InstalledTypeface typeface, Dictionary<string, ScriptLang> output)
-        {
-            CollectScriptLang(typeface.Languages, output);
-        }
-        public static void CollectScriptLang(this Languages langs, Dictionary<string, ScriptLang> output)
-        {
-            CollectScriptTable(langs.GSUBScriptList, output);
-            CollectScriptTable(langs.GPOSScriptList, output);
-        }
-        static void CollectScriptTable(ScriptList scList, Dictionary<string, ScriptLang> output)
-        {
-            if (scList == null) { return; }
-            //
-            foreach (var kv in scList)
-            {
-
-                ScriptTable scTable = kv.Value;
-                //default and others
-                {
-                    ScriptTable.LangSysTable langSys = scTable.defaultLang;
-                    uint langTag = 0;
-                    if (langSys != null)
-                    {
-                        //no lang sys
-                        langTag = langSys.langSysTagIden;
-                    }
-                    ScriptLang sclang = new ScriptLang(scTable.scriptTag, langTag);
-                    string key = sclang.ToString();
-                    if (!output.ContainsKey(key))
-                    {
-                        output.Add(key, sclang);
-                    }
-                }
-                //
-                if (scTable.langSysTables != null && scTable.langSysTables.Length > 0)
-                {
-                    foreach (ScriptTable.LangSysTable langSys in scTable.langSysTables)
-                    {
-                        var pair = new ScriptLang(scTable.ScriptTagName, langSys.LangSysTagIdenString);
-                        string key = pair.ToString();
-                        if (!output.ContainsKey(key))
-                        {
-                            output.Add(key, pair);
-                        }
-                    }
-                }
-            }
-        }
-
-        /// <summary>
-        /// if the typeface support specific range or not
-        /// </summary>
-        /// <param name="previewFontInfo"></param>
-        /// <param name="range"></param>
-        /// <returns></returns>
-        public static bool DoesSupportUnicode(
-               this PreviewFontInfo previewFontInfo,
-               BitposAndAssciatedUnicodeRanges bitposAndAssocUnicodeRange)
-        {
-            return DoesSupportUnicode(previewFontInfo.Languages, bitposAndAssocUnicodeRange.Bitpos);
-        }
-        public static bool DoesSupportUnicode(
-            this Typeface typeface,
-            BitposAndAssciatedUnicodeRanges bitposAndAssocUnicodeRange)
-        {
-            return DoesSupportUnicode(typeface.Languages, bitposAndAssocUnicodeRange.Bitpos);
-        }
-
-        static UnicodeRangeInfo[] FilterOnlySelectedRange(UnicodeRangeInfo[] inputRanges, UnicodeRangeInfo[] userSpecificRanges)
-        {
-            List<UnicodeRangeInfo> selectedRanges = new List<UnicodeRangeInfo>();
-            foreach (UnicodeRangeInfo range in inputRanges)
-            {
-                int foundAt = System.Array.IndexOf(userSpecificRanges, range);
-                if (foundAt > 0)
-                {
-                    selectedRanges.Add(range);
-                }
-            }
-            return selectedRanges.ToArray();
-        }
-
-        public static void CollectAllAssociateGlyphIndex(this Typeface typeface, List<ushort> outputGlyphIndexList, ScriptLang scLang, UnicodeRangeInfo[] selectedRangs = null)
-        {
-            //-----------
-            //general glyph index in the unicode range
-
-            //if user dose not specific the unicode lanf bit ranges
-            //the we try to select it ourself. 
-
-            if (ScriptLangs.TryGetUnicodeLangRangesArray(scLang.GetScriptTagString(), out UnicodeRangeInfo[] unicodeLangRange))
-            {
-                //one lang may contains may ranges
-                if (selectedRangs != null)
-                {
-                    //select only in range 
-                    unicodeLangRange = FilterOnlySelectedRange(unicodeLangRange, selectedRangs);
-                }
-
-                foreach (UnicodeRangeInfo rng in unicodeLangRange)
-                {
-                    for (int codePoint = rng.StarCodepoint; codePoint <= rng.EndCodepoint; ++codePoint)
-                    {
-                        ushort glyphIndex = typeface.GetGlyphIndex(codePoint);
-                        if (glyphIndex > 0)
-                        {
-                            //add this glyph index
-                            outputGlyphIndexList.Add(glyphIndex);
-                        }
-                    }
-                }
-            }
-
-            typeface.CollectAdditionalGlyphIndices(outputGlyphIndexList, scLang);
-        }
-    }
-
-}
-
-
 namespace Typography.FontManagement
 {
-
-    public abstract class AlternativeTypefaceSelector
+    /// <summary>
+    /// AlternativeTypefaceSelector
+    /// </summary>
+    public abstract class AltTypefaceSelectorBase
     {
 
 #if DEBUG
-        public AlternativeTypefaceSelector() { }
+        public AltTypefaceSelectorBase() { }
 #endif
 
         public Typeface LatestTypeface { get; set; }
@@ -189,7 +41,24 @@ namespace Typography.FontManagement
         }
     }
 
-
+    public class PreferredTypeface
+    {
+        public PreferredTypeface(string reqTypefaceName) => RequestTypefaceName = reqTypefaceName;
+        public string RequestTypefaceName { get; }
+        public InstalledTypeface InstalledTypeface { get; set; }
+        public bool ResolvedInstalledTypeface { get; set; }
+    }
+    public class PreferredTypefaceList : List<PreferredTypeface>
+    {
+#if DEBUG
+        //TODO: review this again
+        public PreferredTypefaceList() { }
+#endif
+        public void AddTypefaceName(string typefaceName)
+        {
+            this.Add(new PreferredTypeface(typefaceName));
+        }
+    }
 
     public class InstalledTypeface
     {
@@ -260,8 +129,8 @@ namespace Typography.FontManagement
         public int ActualStreamOffset { get; internal set; }
 
         //TODO: UnicodeLangBits vs UnicodeLangBits5_1
-        public bool DoesSupportUnicode(BitposAndAssciatedUnicodeRanges bitposAndAssocUnicode) => TypefaceExtension3.DoesSupportUnicode(Languages, bitposAndAssocUnicode.Bitpos);
-        public bool DoesSupportUnicode(int bitpos) => TypefaceExtension3.DoesSupportUnicode(Languages, bitpos);
+        public bool DoesSupportUnicode(BitposAndAssciatedUnicodeRanges bitposAndAssocUnicode) => OpenFontUnicodeUtilExtensions.DoesSupportUnicode(Languages, bitposAndAssocUnicode.Bitpos);
+        public bool DoesSupportUnicode(int bitpos) => OpenFontUnicodeUtilExtensions.DoesSupportUnicode(Languages, bitpos);
 
         /// <summary>
         /// check if this font has glyph for the given code point or not
@@ -949,7 +818,7 @@ namespace Typography.FontManagement
         /// <param name="selector"></param>
         /// <param name="found"></param>
         /// <returns></returns>
-        public bool TryGetAlternativeTypefaceFromCodepoint(int codepoint, AlternativeTypefaceSelector selector, out Typeface selectedTypeface)
+        public bool TryGetAlternativeTypefaceFromCodepoint(int codepoint, AltTypefaceSelectorBase selector, out Typeface selectedTypeface)
         {
             //find a typeface that supported input char c
 
@@ -980,7 +849,7 @@ namespace Typography.FontManagement
                 //select a prefer font 
                 if (selector != null)
                 {
-                    AlternativeTypefaceSelector.SelectedTypeface result = selector.Select(installedTypefaceList, unicodeRangeInfo, codepoint);
+                    AltTypefaceSelectorBase.SelectedTypeface result = selector.Select(installedTypefaceList, unicodeRangeInfo, codepoint);
                     if (result.InstalledTypeface != null)
                     {
                         selectedTypeface = this.ResolveTypeface(result.InstalledTypeface);
@@ -1270,7 +1139,7 @@ namespace Typography.FontManagement
                     {
                         OpenFontReader reader = new OpenFontReader();
                         Typeface typeface = reader.Read(fs);
-                        
+
                         // 
                         OpenFont.Extensions.TypefaceExtensions.SetCustomTypefaceKey(
                             typeface,

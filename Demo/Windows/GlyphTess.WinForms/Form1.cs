@@ -7,12 +7,13 @@ using System.Windows.Forms;
 
 //
 using Typography.OpenFont;
-//
+using Typography.OpenFont.Contours;
+
 using DrawingGL;
 using DrawingGL.Text;
 //
 using Tesselate;
-using Typography.Contours;
+
 
 namespace Test_WinForm_TessGlyph
 {
@@ -87,7 +88,7 @@ namespace Test_WinForm_TessGlyph
                 var txToPath = new GlyphTranslatorToPath(); //translator
                 txToPath.SetOutput(writablePath);
 
-                var builder = new Typography.Contours.GlyphOutlineBuilder(typeface);
+                var builder = new GlyphOutlineBuilder(typeface);
                 builder.BuildFromGlyphIndex(typeface.GetGlyphIndex(selectedChar), 300, txToPath);
 
                 //------

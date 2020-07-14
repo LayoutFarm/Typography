@@ -8,15 +8,15 @@ using Typography.FontManagement;
 
 using PixelFarm.Drawing;
 
-namespace Typography.TextServices
+namespace Typography.Text
 {
-    public class MyAlternativeTypefaceSelector : AlternativeTypefaceSelector
+    public class AlternativeTypefaceSelector : AltTypefaceSelectorBase
     {
         readonly Dictionary<string, PreferredTypefaceList> _dics = new Dictionary<string, PreferredTypefaceList>();
         PreferredTypefaceList _emojiPreferList = new PreferredTypefaceList();
 
 #if DEBUG
-        public MyAlternativeTypefaceSelector()
+        public AlternativeTypefaceSelector()
         {
         }
 #endif
@@ -41,8 +41,8 @@ namespace Typography.TextServices
         public PreferredTypefaceList GetPreferTypefaces(string scriptTag) => _dics.TryGetValue(scriptTag, out PreferredTypefaceList foundList) ? foundList : null;
 
         RequestFont _reqFont;
-        Typography.TextServices.OpenFontTextService _textService;
-        public void SetCurrentReqFont(RequestFont reqFont, Typography.TextServices.OpenFontTextService textService)
+        Typography.Text.OpenFontTextService _textService;
+        public void SetCurrentReqFont(RequestFont reqFont, Typography.Text.OpenFontTextService textService)
         {
             _reqFont = reqFont;
             _textService = textService;
@@ -68,14 +68,14 @@ namespace Typography.TextServices
                 }
             }
 
-            List<PreferTypeface> list = null;
+            List<PreferredTypeface> list = null;
             if (unicodeRangeInfo == Unicode13RangeInfoList.Emoticons)
             {
-                list = _emojiPreferList._list;
+                list = _emojiPreferList;
             }
             else if (_dics.TryGetValue(unicodeRangeInfo.Name, out PreferredTypefaceList foundList))
             {
-                list = foundList._list;
+                list = foundList;
             }
 
             if (list != null)
@@ -84,7 +84,7 @@ namespace Typography.TextServices
                 for (int i = 0; i < j; ++i)
                 {
                     //select that first one
-                    PreferTypeface p = list[i];
+                    PreferredTypeface p = list[i];
 
                     if (p.InstalledTypeface == null && !p.ResolvedInstalledTypeface)
                     {
@@ -124,19 +124,5 @@ namespace Typography.TextServices
         }
 
     }
-    public class PreferTypeface
-    {
-        public PreferTypeface(string reqTypefaceName) => RequestTypefaceName = reqTypefaceName;
-        public string RequestTypefaceName { get; }
-        public InstalledTypeface InstalledTypeface { get; internal set; }
-        internal bool ResolvedInstalledTypeface { get; set; }
-    }
-    public class PreferredTypefaceList
-    {
-        internal List<PreferTypeface> _list = new List<PreferTypeface>();
-        public void AddTypefaceName(string typefaceName)
-        {
-            _list.Add(new PreferTypeface(typefaceName));
-        }
-    }
+
 }

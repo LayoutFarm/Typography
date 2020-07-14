@@ -1,19 +1,8 @@
 ﻿//MIT, 2020-present, WinterDev 
 using System;
-using System.Collections.Generic;
-using PixelFarm.CpuBlit.BitmapAtlas;
-
-using Typography.Contours;
 using Typography.OpenFont;
-using Typography.OpenFont.Extensions;
+using Typography.OpenFont.Contours;
 using Typography.OpenFont.Tables;
-using Typography.TextLayout;
-using Typography.TextBreak;
-using Typography.FontManagement;
-using Typography.TextServices;
-
-using PixelFarm.CpuBlit;
-using PixelFarm.CpuBlit.VertexProcessing;
 
 namespace PixelFarm.Drawing
 {

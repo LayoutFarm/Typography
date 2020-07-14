@@ -5,8 +5,9 @@ using PixelFarm.CpuBlit;
 using PixelFarm.VectorMath;
 using PixelFarm.Contours;
 
-using Typography.Contours;
 using Typography.OpenFont;
+using Typography.OpenFont.Contours;
+
 
 namespace SampleWinForms.UI
 {

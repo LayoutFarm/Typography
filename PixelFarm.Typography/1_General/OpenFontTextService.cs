@@ -8,7 +8,7 @@ using Typography.FontManagement;
 
 using PixelFarm.Drawing;
 
-namespace Typography.TextServices
+namespace Typography.Text
 {
 
     public partial class OpenFontTextService
@@ -52,6 +52,7 @@ namespace Typography.TextServices
                 throw new NotSupportedException();
             }
         }
+
 
         public void LoadSystemFonts() => _installedTypefaceCollection.LoadSystemFonts();
 
@@ -101,7 +102,7 @@ namespace Typography.TextServices
         /// <param name="selector"></param>
         /// <param name="found"></param>
         /// <returns></returns>
-        public bool TryGetAlternativeTypefaceFromCodepoint(int codepoint, AlternativeTypefaceSelector selector, out Typeface found) => _installedTypefaceCollection.TryGetAlternativeTypefaceFromCodepoint(codepoint, selector, out found);
+        public bool TryGetAlternativeTypefaceFromCodepoint(int codepoint, AltTypefaceSelectorBase selector, out Typeface found) => _installedTypefaceCollection.TryGetAlternativeTypefaceFromCodepoint(codepoint, selector, out found);
 
         public ResolvedFont ResolveFont(RequestFont.Choice choice)
         {

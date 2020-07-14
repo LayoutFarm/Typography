@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using Typography.OpenFont;
 using Typography.OpenFont.Extensions;
 
-namespace Typography.TextServices
+namespace Typography.Text
 {
     static class InternalFontKey
     {

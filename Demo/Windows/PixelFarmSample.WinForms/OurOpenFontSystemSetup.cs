@@ -3,7 +3,7 @@ using System;
 using System.IO;
 
 using PixelFarm.CpuBlit;
-using Typography.WebFont;
+using Typography.OpenFont.WebFont;
 using BrotliSharpLib;
 
 namespace SampleWinForms

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 using Typography.OpenFont;
 using Typography.OpenFont.Extensions;
-using Typography.Contours;
+using Typography.OpenFont.Contours;
 
 using PixelFarm.Drawing;
 using PixelFarm.CpuBlit.VertexProcessing;
@@ -107,6 +107,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                         );
                 }
             }
+
             for (int i = 0; i < j; ++i)
             {
                 GlyphTextureBuildDetail detail = details[i];

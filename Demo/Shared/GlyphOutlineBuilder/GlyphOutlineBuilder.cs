@@ -2,7 +2,7 @@
 
 
 
-namespace Typography.Contours
+namespace Typography.OpenFont.Contours
 {
     //-----------------------------------
     //sample GlyphPathBuilder :

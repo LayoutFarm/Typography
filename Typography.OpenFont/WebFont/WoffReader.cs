@@ -3,13 +3,14 @@
 
 using System;
 using System.IO;
-using Typography.OpenFont;
 using Typography.OpenFont.IO;
 using Typography.OpenFont.Tables;
 using Typography.OpenFont.Trimmable;
 
-namespace Typography.WebFont
+namespace Typography.OpenFont.WebFont
 {
+    //NOTE: Web Font file structure is not part of 'Open Font Format'.
+
     class WoffHeader
     {
         //WOFFHeader

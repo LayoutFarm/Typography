@@ -4,7 +4,7 @@ using System;
 using PixelFarm.CpuBlit.VertexProcessing;
 
 using PixelFarm.Drawing;
-using Typography.Contours;
+using Typography.OpenFont.Contours;
 
 namespace PixelFarm.CpuBlit.BitmapAtlas
 {
