@@ -124,7 +124,7 @@ namespace TypographyTest.WinForms
             //
             _options.InstalledTypeface = installedTypeface;
             _options.InvokeAttachEvents();
-            _txtTypefaceInfo.Text = "file: " + installedTypeface.FontPath + "\r\n" + "weight:" + installedTypeface.Weight;
+            _txtTypefaceInfo.Text = "file: " + installedTypeface.FontPath + "\r\n" + "weight:" + installedTypeface.WeightClass;
 
             //
             ShowSupportedScripts(installedTypeface);

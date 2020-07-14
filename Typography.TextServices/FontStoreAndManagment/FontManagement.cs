@@ -62,68 +62,43 @@ namespace Typography.FontManagement
 
     public class InstalledTypeface
     {
-
+        readonly NameEntry _nameEntry;
+        readonly OS2Table _os2Table;
         internal InstalledTypeface(Typeface typeface, TypefaceStyle style, string fontPath)
-        {
+            : this(typeface.GetNameEntry(),
+                  typeface.GetOS2Table(),
+                  style,
+                  typeface.Languages,
+                  fontPath)
+        { }
 
-            FontName = typeface.Name;
-            FontSubFamily = typeface.FontSubFamily;
-
-            NameEntry nameEntry = typeface.GetNameEntry();
-            OS2Table os2Table = typeface.GetOS2Table();
-
-            TypographicFamilyName = nameEntry.TypographicFamilyName;
-            TypographicFontSubFamily = nameEntry.TypographyicSubfamilyName;
-
-            FontPath = fontPath;
-
-            PostScriptName = typeface.PostScriptName;
-            UniqueFontIden = typeface.UniqueFontIden;
-#if DEBUG
-
-            if (string.IsNullOrEmpty(UniqueFontIden))
-            {
-
-            }
-#endif
-
-            Languages = typeface.Languages;
-            TypefaceStyle = style;
-        }
         internal InstalledTypeface(PreviewFontInfo previewFontInfo, TypefaceStyle style, string fontPath)
+            : this(previewFontInfo.NameEntry,
+                  previewFontInfo.OS2Table,
+                  style,
+                  previewFontInfo.Languages, fontPath)
+        { }
+
+        private InstalledTypeface(NameEntry nameTable, OS2Table os2Table, TypefaceStyle style, Languages languages, string fontPath)
         {
-            FontName = previewFontInfo.Name;
-            FontSubFamily = previewFontInfo.SubFamilyName;
-            TypographicFamilyName = previewFontInfo.TypographicFamilyName;
-            TypographicFontSubFamily = previewFontInfo.TypographicSubFamilyName;
-            Weight = previewFontInfo.Weight;
+            _nameEntry = nameTable;
+            _os2Table = os2Table;
             FontPath = fontPath;
-
-            PostScriptName = previewFontInfo.PostScriptName;
-            UniqueFontIden = previewFontInfo.UniqueFontIden;
-
-#if DEBUG
-
-            if (string.IsNullOrEmpty(UniqueFontIden))
-            {
-
-            }
-#endif
-
-            Languages = previewFontInfo.Languages;
+            Languages = languages;
             TypefaceStyle = style;
-
         }
-
-        public string FontName { get; internal set; }
-        public string FontSubFamily { get; internal set; }
-        public string TypographicFamilyName { get; internal set; }
-        public string TypographicFontSubFamily { get; internal set; }
-        public string PostScriptName { get; internal set; }
-        public string UniqueFontIden { get; internal set; }
-
         public TypefaceStyle TypefaceStyle { get; internal set; }
-        public ushort Weight { get; internal set; }
+
+        public string FontName => _nameEntry.FontName;
+        public string FontSubFamily => _nameEntry.FontSubFamily;
+
+        public string TypographicFamilyName => _nameEntry.TypographicFamilyName;
+        public string TypographicFontSubFamily => _nameEntry.TypographyicSubfamilyName;
+        public string PostScriptName => _nameEntry.PostScriptName;
+        public string UniqueFontIden => _nameEntry.UniqueFontIden;
+        public ushort WeightClass => _os2Table.usWeightClass;
+        public ushort WidthClass => _os2Table.usWidthClass;
+
         public Languages Languages { get; }
         public string FontPath { get; internal set; }
         public int ActualStreamOffset { get; internal set; }
@@ -143,7 +118,7 @@ namespace Typography.FontManagement
 #if DEBUG
         public override string ToString()
         {
-            return FontName + " " + FontSubFamily;
+            return FontName + " (" + FontSubFamily + ")";
         }
 #endif
     }
@@ -226,6 +201,9 @@ namespace Typography.FontManagement
 
         }
 
+
+
+
         /// <summary>
         /// map from font subfam to internal group name
         /// </summary>
@@ -238,6 +216,23 @@ namespace Typography.FontManagement
 
         readonly Dictionary<string, InstalledTypeface> _otherFontNames = new Dictionary<string, InstalledTypeface>();
         readonly Dictionary<string, InstalledTypeface> _postScriptNames = new Dictionary<string, InstalledTypeface>();
+
+        //----------
+        //common weight classes
+        internal readonly List<InstalledTypeface> _weight100_Thin = new List<InstalledTypeface>();
+        internal readonly List<InstalledTypeface> _weight200_Extralight = new List<InstalledTypeface>(); //Extra-light (Ultra-light)
+        internal readonly List<InstalledTypeface> _weight300_Light = new List<InstalledTypeface>();
+        internal readonly List<InstalledTypeface> _weight400_Normal = new List<InstalledTypeface>();
+        internal readonly List<InstalledTypeface> _weight500_Medium = new List<InstalledTypeface>();
+        internal readonly List<InstalledTypeface> _weight600_SemiBold = new List<InstalledTypeface>(); //Semi-bold (Demi-bold)
+        internal readonly List<InstalledTypeface> _weight700_Bold = new List<InstalledTypeface>(); //Semi-bold (Demi-bold)
+        internal readonly List<InstalledTypeface> _weight800_ExtraBold = new List<InstalledTypeface>(); //Extra-bold (Ultra-bold)
+        internal readonly List<InstalledTypeface> _weight900_Black = new List<InstalledTypeface>(); //Black (Heavy)
+
+        //and others
+        internal readonly List<InstalledTypeface> _otherWeightClassTypefaces = new List<InstalledTypeface>();
+        //----------
+
 
         FontNameDuplicatedHandler _fontNameDuplicatedHandler;
         FontNotFoundHandler _fontNotFoundHandler;
@@ -275,14 +270,11 @@ namespace Typography.FontManagement
             }
             return s_intalledTypefaces;
         }
-        public static void SetAsSharedTypefaceCollection(InstalledTypefaceCollection installedTypefaceCollection)
-        {
-            s_intalledTypefaces = installedTypefaceCollection;
-        }
-        public static InstalledTypefaceCollection GetSharedTypefaceCollection()
-        {
-            return s_intalledTypefaces;
-        }
+
+        public static void SetAsSharedTypefaceCollection(InstalledTypefaceCollection installedTypefaceCollection) => s_intalledTypefaces = installedTypefaceCollection;
+
+        public static InstalledTypefaceCollection GetSharedTypefaceCollection() => s_intalledTypefaces;
+
         InstalledTypefaceGroup CreateCreateNewGroup(TypefaceStyle installedFontStyle, params string[] names)
         {
             //create font group
@@ -379,6 +371,7 @@ namespace Typography.FontManagement
 
             return Register(installedTypeface) ? installedTypeface : null;
         }
+
         public bool AddFontStreamSource(IFontStreamSource src)
         {
             //preview data of font
@@ -425,6 +418,7 @@ namespace Typography.FontManagement
 
 
         internal Dictionary<string, InstalledTypeface> _installedTypefacesByFilenames = new Dictionary<string, InstalledTypeface>();
+
         bool Register(InstalledTypeface instTypeface)
         {
             InstalledTypefaceGroup selectedFontGroup = null;
@@ -548,7 +542,7 @@ namespace Typography.FontManagement
                 }
             }
 
-            //register font
+
             if (instTypeface.PostScriptName != null)
             {
                 string postScriptName = instTypeface.PostScriptName.ToUpper();
@@ -563,6 +557,26 @@ namespace Typography.FontManagement
 #endif
                 }
             }
+
+
+
+            switch (instTypeface.WeightClass)
+            {
+                default: _otherWeightClassTypefaces.Add(instTypeface); break;
+                case 100: _weight100_Thin.Add(instTypeface); break;
+                case 200: _weight200_Extralight.Add(instTypeface); break;
+                case 300: _weight300_Light.Add(instTypeface); break;
+                case 400: _weight400_Normal.Add(instTypeface); break;
+                case 500: _weight500_Medium.Add(instTypeface); break;
+                case 600: _weight600_SemiBold.Add(instTypeface); break;
+                case 700: _weight700_Bold.Add(instTypeface); break;
+                case 800: _weight800_ExtraBold.Add(instTypeface); break;
+                case 900: _weight900_Black.Add(instTypeface); break;
+            }
+
+
+
+
 
             if (register_result && instTypeface.FontPath != null &&
                 !_installedTypefacesByFilenames.ContainsKey(instTypeface.FontPath)) //beware case-sensitive!
@@ -634,7 +648,7 @@ namespace Typography.FontManagement
         {
             //not auto resolve
             InstalledTypefaceGroup selectedFontGroup;
-            InstalledTypeface _found;
+
             switch (wellknownSubFam)
             {
                 default: return null;
@@ -643,9 +657,9 @@ namespace Typography.FontManagement
                 case TypefaceStyle.Italic: selectedFontGroup = _italic; break;
                 case (TypefaceStyle.Bold | TypefaceStyle.Italic): selectedFontGroup = _bold_italic; break;
             }
-            if (selectedFontGroup.TryGetValue(fontName.ToUpper(), out _found))
+            if (selectedFontGroup.TryGetValue(fontName.ToUpper(), out InstalledTypeface found))
             {
-                return _found;
+                return found;
             }
             //------------------------------------------- 
             //not found then ...
@@ -677,11 +691,11 @@ namespace Typography.FontManagement
             //    }
             //}
 
-            if (_found == null && _fontNotFoundHandler != null)
+            if (found == null && _fontNotFoundHandler != null)
             {
                 return _fontNotFoundHandler(this, fontName, GetSubFam(wellknownSubFam));
             }
-            return _found;
+            return found;
         }
 
         internal static string GetSubFam(TypefaceStyle typefaceStyle)
