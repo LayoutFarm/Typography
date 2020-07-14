@@ -4,13 +4,12 @@ using System;
 using System.Collections.Generic;
 using PixelFarm.Contours;
 
-using Typography.OpenFont;
 
-namespace Typography.Contours
+namespace Typography.OpenFont.Contours
 {
     public class GlyphTranslatorToContourBuilder : IGlyphTranslator
     {
-        IContourBuilder _b;
+        readonly IContourBuilder _b;
 
         public GlyphTranslatorToContourBuilder(IContourBuilder b) => _b = b;
 
@@ -51,8 +50,8 @@ namespace Typography.Contours
 
     public class GlyphOutlineBuilder : GlyphOutlineBuilderBase
     {
-        GlyphOutlineAnalyzer _fitShapeAnalyzer = new GlyphOutlineAnalyzer();
-        Dictionary<ushort, DynamicOutline> _fitOutlineCollection = new Dictionary<ushort, DynamicOutline>();
+        readonly GlyphOutlineAnalyzer _fitShapeAnalyzer = new GlyphOutlineAnalyzer();
+        readonly Dictionary<ushort, DynamicOutline> _fitOutlineCollection = new Dictionary<ushort, DynamicOutline>();
         DynamicOutline _latestDynamicOutline;
 
         public GlyphOutlineBuilder(Typeface typeface)

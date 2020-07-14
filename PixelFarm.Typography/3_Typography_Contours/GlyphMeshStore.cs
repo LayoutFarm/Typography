@@ -6,9 +6,8 @@ using System.Collections.Generic;
 using PixelFarm.Drawing;
 using PixelFarm.Contours;
 using PixelFarm.CpuBlit;
-using Typography.OpenFont;
 
-namespace Typography.Contours
+namespace Typography.OpenFont.Contours
 {
     public struct GlyphControlParameters
     {
@@ -46,11 +45,11 @@ namespace Typography.Contours
         /// <summary>
         /// store typeface and its builder
         /// </summary>
-        Dictionary<Typeface, GlyphOutlineBuilder> _cacheGlyphOutlineBuilders = new Dictionary<Typeface, GlyphOutlineBuilder>();
+        readonly Dictionary<Typeface, GlyphOutlineBuilder> _cacheGlyphOutlineBuilders = new Dictionary<Typeface, GlyphOutlineBuilder>();
         /// <summary>
         /// glyph mesh data for specific condition
         /// </summary>
-        GlyphMeshCollection<GlyphMeshData> _hintGlyphCollection = new GlyphMeshCollection<GlyphMeshData>();
+        readonly GlyphMeshCollection<GlyphMeshData> _hintGlyphCollection = new GlyphMeshCollection<GlyphMeshData>();
 
         GlyphOutlineBuilder _currentGlyphBuilder;
         Typeface _currentTypeface;
@@ -58,7 +57,7 @@ namespace Typography.Contours
         HintTechnique _currentHintTech;
 
 
-        GlyphTranslatorToVxs _tovxs = new GlyphTranslatorToVxs();
+        readonly GlyphTranslatorToVxs _tovxs = new GlyphTranslatorToVxs();
 
         static readonly AffineMat s_flipY;
 

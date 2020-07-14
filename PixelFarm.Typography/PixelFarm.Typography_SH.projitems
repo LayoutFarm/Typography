@@ -10,13 +10,12 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)1_General\FontStyleExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)1_General\LineSegmentsAndWordVisitors.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)1_General\MultiLayerGlyphTx.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)1_General\OpenFontTextService.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)1_General\OpenFontTextService_Part2.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)1_General\SvgBmpBuilderReq.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)1_General\TextServiceClient.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)1_General\VxsTextPrinter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)1_General\VxsTextSpanPrinter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)2_CpuBlit_BitmapAtlas\AggGlyphTextureGen.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)2_CpuBlit_BitmapAtlas\BitmapFontMx.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)2_CpuBlit_BitmapAtlas\FontAtlasTextPrinter.cs" />
@@ -27,10 +26,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)3_Typography_Contours\GlyphOutlineBuilderBase.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)3_Typography_Contours\GlyphPathBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)3_Typography_Contours\GlyphTranslatorToVxs.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)3_Typography_Contours\TextPrinterBase.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)4_Typography01\FormattedGlyphPlanSeq.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)4_Typography01\MyAlternativeTypefaceSelector.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)4_Typography01\ResolvedFonts.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)5_PixelFarm_Contours\GlyphOutlineAnalyzer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)1_General\AlternativeTypefaceSelector.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)3_Typography_Contours\GlyphOutlineAnalyzer.cs" />
   </ItemGroup>
 </Project>

@@ -1,7 +1,7 @@
 ﻿//MIT, 2020-present, WinterDev 
 using System;
-using Typography.Contours;
 using Typography.OpenFont;
+using Typography.OpenFont.Contours;
 using Typography.OpenFont.Tables;
 
 namespace PixelFarm.Drawing

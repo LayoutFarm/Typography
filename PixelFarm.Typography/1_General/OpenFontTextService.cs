@@ -53,6 +53,7 @@ namespace Typography.Text
             }
         }
 
+
         public void LoadSystemFonts() => _installedTypefaceCollection.LoadSystemFonts();
 
         public void LoadFontsFromFolder(string folder) => _installedTypefaceCollection.LoadFontsFromFolder(folder);
@@ -101,7 +102,7 @@ namespace Typography.Text
         /// <param name="selector"></param>
         /// <param name="found"></param>
         /// <returns></returns>
-        public bool TryGetAlternativeTypefaceFromCodepoint(int codepoint, AlternativeTypefaceSelector selector, out Typeface found) => _installedTypefaceCollection.TryGetAlternativeTypefaceFromCodepoint(codepoint, selector, out found);
+        public bool TryGetAlternativeTypefaceFromCodepoint(int codepoint, AltTypefaceSelectorBase selector, out Typeface found) => _installedTypefaceCollection.TryGetAlternativeTypefaceFromCodepoint(codepoint, selector, out found);
 
         public ResolvedFont ResolveFont(RequestFont.Choice choice)
         {

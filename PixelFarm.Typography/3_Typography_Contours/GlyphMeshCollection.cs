@@ -1,20 +1,15 @@
 ﻿//MIT, 2016-present, WinterDev
 using System.Collections.Generic;
-using Typography.OpenFont;
-
-namespace Typography.Contours
+namespace Typography.OpenFont.Contours
 {
-
-    //see also: PixelFarm's  class HintedVxsGlyphCollection 
-
-    //TODO: review this class name again 
 
     public class GlyphMeshCollection<T>
     {
         //hint glyph collection        
         //per typeface
         Dictionary<ushort, T> _currentGlyphDic = null;
-        Dictionary<GlyphKey, Dictionary<ushort, T>> _registerGlyphCollection = new Dictionary<GlyphKey, Dictionary<ushort, T>>();
+        readonly Dictionary<GlyphKey, Dictionary<ushort, T>> _registerGlyphCollection = new Dictionary<GlyphKey, Dictionary<ushort, T>>();
+        readonly List<GlyphKey> _tempKeys = new List<GlyphKey>();
 
         public void SetCacheInfo(Typeface typeface, float sizeInPts, HintTechnique hintTech)
         {
@@ -29,21 +24,16 @@ namespace Typography.Contours
                 _registerGlyphCollection.Add(key, _currentGlyphDic);
             }
         }
-        public bool TryGetCacheGlyph(ushort glyphIndex, out T vxs)
-        {
-            return _currentGlyphDic.TryGetValue(glyphIndex, out vxs);
-        }
-        public void RegisterCachedGlyph(ushort glyphIndex, T vxs)
-        {
-            _currentGlyphDic[glyphIndex] = vxs;
-        }
+        public bool TryGetCacheGlyph(ushort glyphIndex, out T vxs) => _currentGlyphDic.TryGetValue(glyphIndex, out vxs);
+
+        public void RegisterCachedGlyph(ushort glyphIndex, T vxs) => _currentGlyphDic[glyphIndex] = vxs;
+
         public void ClearAll()
         {
             _currentGlyphDic = null;
             _registerGlyphCollection.Clear();
         }
 
-        List<GlyphKey> _tempKeys = new List<GlyphKey>();
 
         public void Clear(Typeface typeface)
         {

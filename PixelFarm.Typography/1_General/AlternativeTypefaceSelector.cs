@@ -10,18 +10,17 @@ using PixelFarm.Drawing;
 
 namespace Typography.Text
 {
-    public class MyAlternativeTypefaceSelector : AlternativeTypefaceSelector
+    public class AlternativeTypefaceSelector : AltTypefaceSelectorBase
     {
         readonly Dictionary<string, PreferredTypefaceList> _dics = new Dictionary<string, PreferredTypefaceList>();
         PreferredTypefaceList _emojiPreferList = new PreferredTypefaceList();
 
 #if DEBUG
-        public MyAlternativeTypefaceSelector()
+        public AlternativeTypefaceSelector()
         {
         }
 #endif
 
-       
         public void SetPreferredTypefaces(UnicodeRangeInfo unicodeRangeInfo, PreferredTypefaceList typefaceNames)
         {
             _dics[unicodeRangeInfo.Name] = typefaceNames;
@@ -125,5 +124,5 @@ namespace Typography.Text
         }
 
     }
-   
+
 }

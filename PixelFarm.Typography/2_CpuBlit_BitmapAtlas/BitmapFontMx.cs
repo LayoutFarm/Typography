@@ -51,8 +51,8 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             if (s_default == null)
             {
                 SetDefaultDetails(new GlyphTextureBuildDetail[] {
-                    new GlyphTextureBuildDetail{ ScriptLang= new ScriptLang(ScriptTagDefs.Latin.Tag),   HintTechnique = Typography.Contours.HintTechnique.TrueTypeInstruction_VerticalOnly },
-                    new GlyphTextureBuildDetail{ ScriptLang= new ScriptLang(ScriptTagDefs.Thai.Tag),  HintTechnique = Typography.Contours.HintTechnique.None},
+                    new GlyphTextureBuildDetail{ ScriptLang= new ScriptLang(ScriptTagDefs.Latin.Tag),   HintTechnique = Typography.OpenFont.Contours.HintTechnique.TrueTypeInstruction_VerticalOnly },
+                    new GlyphTextureBuildDetail{ ScriptLang= new ScriptLang(ScriptTagDefs.Thai.Tag),  HintTechnique = Typography.OpenFont.Contours.HintTechnique.None},
                 });
             }
             //

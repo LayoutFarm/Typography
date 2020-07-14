@@ -31,6 +31,14 @@
     <DefineConstants> TRACE; PIXEL_FARM; PIXEL_FARM_NET20;</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="..\..\PixelFarm\BackEnd.BurningMineCurve_SH\CubicBezier.cs" Link="PixelFarm\BackEnd.BurningMineCurve_SH\CubicBezier.cs" />
+    <Compile Include="..\..\PixelFarm\BackEnd.BurningMineCurve_SH\CurveBuilder.cs" Link="PixelFarm\BackEnd.BurningMineCurve_SH\CurveBuilder.cs" />
+    <Compile Include="..\..\PixelFarm\BackEnd.BurningMineCurve_SH\CurveFit.cs" Link="PixelFarm\BackEnd.BurningMineCurve_SH\CurveFit.cs" />
+    <Compile Include="..\..\PixelFarm\BackEnd.BurningMineCurve_SH\CurveFitBase.cs" Link="PixelFarm\BackEnd.BurningMineCurve_SH\CurveFitBase.cs" />
+    <Compile Include="..\..\PixelFarm\BackEnd.BurningMineCurve_SH\CurvePreprocess.cs" Link="PixelFarm\BackEnd.BurningMineCurve_SH\CurvePreprocess.cs" />
+    <Compile Include="..\..\PixelFarm\BackEnd.BurningMineCurve_SH\Spline.cs" Link="PixelFarm\BackEnd.BurningMineCurve_SH\Spline.cs" />
+    <Compile Include="..\..\PixelFarm\BackEnd.BurningMineCurve_SH\SplineBuilder.cs" Link="PixelFarm\BackEnd.BurningMineCurve_SH\SplineBuilder.cs" />
+    <Compile Include="..\..\PixelFarm\BackEnd.BurningMineCurve_SH\VectorHelper.cs" Link="PixelFarm\BackEnd.BurningMineCurve_SH\VectorHelper.cs" />
     <Compile Include="..\..\PixelFarm\BackEnd.Tesselate_SH\ActiveRegion.cs" Link="PixelFarm\BackEnd.Tesselate_SH\ActiveRegion.cs" />
     <Compile Include="..\..\PixelFarm\BackEnd.Tesselate_SH\ContourVertex.cs" Link="PixelFarm\BackEnd.Tesselate_SH\ContourVertex.cs" />
     <Compile Include="..\..\PixelFarm\BackEnd.Tesselate_SH\Dictionary.cs" Link="PixelFarm\BackEnd.Tesselate_SH\Dictionary.cs" />
@@ -263,6 +271,7 @@
     <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_BitmapAtlas\SimpleBitmapAtlasBuilder.cs" Link="PixelFarm\PixelFarm.Drawing\7_BitmapAtlas\SimpleBitmapAtlasBuilder.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="PixelFarm\BackEnd.BurningMineCurve_SH" />
     <Folder Include="PixelFarm\BackEnd.Tesselate_SH" />
     <Folder Include="PixelFarm\BackEnd.Triangulation\Delaunay" />
     <Folder Include="PixelFarm\BackEnd.Triangulation" />

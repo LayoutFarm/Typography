@@ -4,9 +4,9 @@ using PixelFarm.CpuBlit;
 using PixelFarm.CpuBlit.VertexProcessing;
 using PixelFarm.Drawing;
 
-using Typography.OpenFont;
 
-namespace Typography.Contours
+
+namespace Typography.OpenFont.Contours
 {
 
     //this is PixelFarm version ***
@@ -16,8 +16,8 @@ namespace Typography.Contours
     /// </summary>
     public class GlyphTranslatorToVxs : IGlyphTranslator
     {
-        PathWriter _pw = new PathWriter();
-        VertexStore _vxs = new VertexStore();
+        readonly PathWriter _pw = new PathWriter();
+        readonly VertexStore _vxs = new VertexStore();
         public GlyphTranslatorToVxs()
         {
             _pw.BindVxs(_vxs);
@@ -32,7 +32,6 @@ namespace Typography.Contours
 #endif
         public void BeginRead(int contourCount)
         {
-
             _pw.Clear();
         }
         public void EndRead()
@@ -72,7 +71,7 @@ namespace Typography.Contours
                 output.AppendVertexStore(_vxs);
             }
             else
-            { 
+            {
                 AffineMat.GetScaleMat(scale).TransformToVxs(_vxs, output);
             }
         }
