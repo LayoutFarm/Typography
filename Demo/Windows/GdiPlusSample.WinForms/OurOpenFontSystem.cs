@@ -38,13 +38,16 @@ namespace SampleWinForms
             //SKIP Woff,Woff2
             //Svg builder
         }
+
+        public static OpenFontTextService OpenFontTextService => s_textServices;
+
         public static TextServiceClient CreateTextServiceClient()
         {
             if (!s_isInit) { throw new NotSupportedException(); }
             return s_textServices.CreateNewServiceClient();
         }
         public static Typeface ResolveTypeface(InstalledTypeface instTypeface)
-        {            
+        {
             return s_installedTypefaceCollection.ResolveTypeface(instTypeface);
         }
         public static IEnumerable<InstalledTypeface> GetInstalledTypefaceIter()
