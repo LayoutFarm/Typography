@@ -39,6 +39,35 @@ namespace Typography.OpenFont.Extensions
         public static CurrentOSName CurrentOSName;
     }
 
+    public enum OS2WidthClass : byte
+    {
+        //from https://docs.microsoft.com/en-us/typography/opentype/spec/os2#uswidthclass 
+
+        //
+        //Value 	Description 	C Definition 	        % of normal
+        //1 	Ultra-condensed 	FWIDTH_ULTRA_CONDENSED 	50
+        //2 	Extra-condensed 	FWIDTH_EXTRA_CONDENSED 	62.5
+        //3 	Condensed 	        FWIDTH_CONDENSED 	    75
+        //4 	Semi-condensed 	    FWIDTH_SEMI_CONDENSED 	87.5
+        //5 	Medium (normal) 	FWIDTH_NORMAL 	        100
+        //6 	Semi-expanded 	    FWIDTH_SEMI_EXPANDED 	112.5
+        //7 	Expanded 	        FWIDTH_EXPANDED 	    125
+        //8 	Extra-expanded 	    FWIDTH_EXTRA_EXPANDED 	150
+        //9 	Ultra-expanded      FWIDTH_ULTRA_EXPANDED 	200
+
+        Unknown,//@prepare's => my custom
+        UltraCondensed,
+        ExtraCondensed,
+        Condensed,
+        SemiCondensed,
+        Medium = 5,
+        Normal = 5,
+        SemiExpanded = 6,
+        Expanded = 7,
+        ExtraExpanded = 8,
+        UltraExpanded = 9
+    }
+
     public static partial class TypefaceExtensions
     {
 
@@ -60,12 +89,10 @@ namespace Typography.OpenFont.Extensions
 
             return ((typeface.OS2Table.fsSelection >> 7) & 1) != 0;
         }
-        public static TranslatedOS2FontStyle TranslatedOS2FontStyle(this Typeface typeface)
-        {
-            return TranslatedOS2FontStyle(typeface.OS2Table);
-        }
 
-        internal static TranslatedOS2FontStyle TranslatedOS2FontStyle(OS2Table os2Table)
+        public static TranslatedOS2FontStyle TranslateOS2FontStyle(this Typeface typeface) => TranslateOS2FontStyle(typeface.OS2Table);
+
+        internal static TranslatedOS2FontStyle TranslateOS2FontStyle(OS2Table os2Table)
         {
             //@prepare's note, please note:=> this is not real value, this is 'translated' value from OS2.fsSelection 
 
@@ -107,6 +134,18 @@ namespace Typography.OpenFont.Extensions
             }
 
             return result;
+        }
+
+        public static OS2WidthClass TranslateOS2WidthClass(ushort os2Weight)
+        {
+            if (os2Weight >= (ushort)OS2WidthClass.UltraExpanded)
+            {
+                return OS2WidthClass.Unknown;
+            }
+            else
+            {
+                return (OS2WidthClass)os2Weight;
+            }
         }
 
 

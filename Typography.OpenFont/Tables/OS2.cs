@@ -25,7 +25,18 @@ namespace Typography.OpenFont.Tables
         public ushort version;          //0-5
         public short xAvgCharWidth;     //just average, not recommend to use.
         public ushort usWeightClass;    //visual weight (degree of blackness or thickness of strokes), 0-1000
-        public ushort usWidthClass;     //A relative change from the normal aspect ratio (width to height ratio)
+
+
+
+        public ushort usWidthClass;     //A relative change from the normal aspect ratio (width to height ratio), 
+                                        //as specified by a font designer for the glyphs in a font.
+                                        //Although every glyph in a font may have a different numeric aspect ratio, 
+                                        //each glyph in a font of normal width is considered to have a relative aspect ratio of one.
+                                        //When a new type style is created of a different width class (either by a font designer or by some automated means)
+                                        //the relative aspect ratio of the characters in the new font is some percentage greater or less than those same characters in the normal 
+                                        //font — it is this difference that this parameter specifies. 
+
+
         public ushort fsType;           //Type flags., embedding licensing rights for the font
 
         //int16 	ySubscriptXSize 	 
