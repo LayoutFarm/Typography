@@ -3,7 +3,7 @@ namespace Typography.TextBreak
 {
     public class BreakingParameters
     {
-
+        //TODO:
     }
 
 }
