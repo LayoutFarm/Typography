@@ -43,15 +43,16 @@ namespace PixelFarm.Drawing
         Others = 1 << 4
     }
 
+
+
     /// <summary>
     /// user-request font specification
     /// </summary>
     public sealed class RequestFont
     {
+        //This is just a request for specific font presentation at a time
 
-        //each platform/canvas has its own representation of this Font 
-        //this is just a request for specficic font presentation at a time
-        //----- 
+
         public sealed class Choice
         {
             /// <summary>
