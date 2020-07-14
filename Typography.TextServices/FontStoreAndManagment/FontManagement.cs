@@ -559,24 +559,8 @@ namespace Typography.FontManagement
             }
 
 
-
-            switch (instTypeface.WeightClass)
-            {
-                default: _otherWeightClassTypefaces.Add(instTypeface); break;
-                case 100: _weight100_Thin.Add(instTypeface); break;
-                case 200: _weight200_Extralight.Add(instTypeface); break;
-                case 300: _weight300_Light.Add(instTypeface); break;
-                case 400: _weight400_Normal.Add(instTypeface); break;
-                case 500: _weight500_Medium.Add(instTypeface); break;
-                case 600: _weight600_SemiBold.Add(instTypeface); break;
-                case 700: _weight700_Bold.Add(instTypeface); break;
-                case 800: _weight800_ExtraBold.Add(instTypeface); break;
-                case 900: _weight900_Black.Add(instTypeface); break;
-            }
-
-
-
-
+            GetInstalledTypefaceByWeightClass(instTypeface.WeightClass).Add(instTypeface);
+             
 
             if (register_result && instTypeface.FontPath != null &&
                 !_installedTypefacesByFilenames.ContainsKey(instTypeface.FontPath)) //beware case-sensitive!
@@ -750,6 +734,27 @@ namespace Typography.FontManagement
                     yield return found;
                 }
             }
+        }
+
+        List<InstalledTypeface> GetInstalledTypefaceByWeightClass(ushort weightClass)
+        {
+            switch (weightClass)
+            {
+                default: return _otherWeightClassTypefaces;
+                case 100: return _weight100_Thin;
+                case 200: return _weight200_Extralight;
+                case 300: return _weight300_Light;
+                case 400: return _weight400_Normal;
+                case 500: return _weight500_Medium;
+                case 600: return _weight600_SemiBold;
+                case 700: return _weight700_Bold;
+                case 800: return _weight800_ExtraBold;
+                case 900: return _weight900_Black;
+            }
+        }
+        public IEnumerable<InstalledTypeface> GetInstalledTypefaceIterByWeightClassIter(ushort weightClass)
+        {
+            return GetInstalledTypefaceByWeightClass(weightClass);
         }
 
         readonly Dictionary<UnicodeRangeInfo, List<InstalledTypeface>> _registerWithUnicodeRangeDic = new Dictionary<UnicodeRangeInfo, List<InstalledTypeface>>();
