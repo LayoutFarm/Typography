@@ -285,7 +285,7 @@ namespace Typography.Text
         }
         readonly Dictionary<int, ResolvedFont> _localResolvedFonts = new Dictionary<int, ResolvedFont>();
 
-        public ResolvedFont LocalResolveFont(Typeface typeface, float sizeInPoint, OldFontStyle style = OldFontStyle.Regular)
+        public ResolvedFont LocalResolveFont(Typeface typeface, float sizeInPoint, CssFontStyle style = CssFontStyle.Regular)
         {
             //find local resolved font cache
 

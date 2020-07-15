@@ -39,8 +39,7 @@ namespace TypographyTest
             this.RenderChoice = RenderChoice.RenderWithTextPrinterAndMiniAgg;
            
             _installedTypefaces = new InstalledTypefaceCollection();
-            _installedTypefaces.SetFontNameDuplicatedHandler(
-                (f0, f1) => FontNameDuplicatedDecision.Skip);
+            
 
         }
         public RenderChoice RenderChoice { get; set; }

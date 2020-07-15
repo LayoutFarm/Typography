@@ -25,16 +25,17 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                 SetupDefaults();
             }
             //
-            OldFontStyle fontStyle = reqFont.Style;
+            CssFontStyle fontStyle = reqFont.Style;
             float sizeInPt = reqFont.SizeInPoints;
+            if (forAnyStyle)
+            {
+                throw new NotSupportedException();
+            }
             if (forAnySize)
             {
                 sizeInPt = 0;
-            }
-            if (forAnyStyle)
-            {
-                fontStyle = OldFontStyle.Regular | OldFontStyle.Bold | OldFontStyle.Italic;
-            }
+            } 
+
             int fontKey = RequestFont.CalculateFontKey(reqFont.Name.ToLower(), sizeInPt, fontStyle);
             s_registerDetails[fontKey] = details;
         }

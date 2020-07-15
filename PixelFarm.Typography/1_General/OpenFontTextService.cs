@@ -32,7 +32,7 @@ namespace Typography.Text
             //default,
             _installedTypefaceCollection = InstalledTypefaceCollection.GetSharedTypefaceCollection(collection =>
             {
-                collection.SetFontNameDuplicatedHandler((f0, f1) => FontNameDuplicatedDecision.Skip);
+                 
             });
 
             TrySetupCurrentScriptLang();

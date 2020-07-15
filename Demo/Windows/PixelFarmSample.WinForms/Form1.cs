@@ -24,7 +24,7 @@ namespace SampleWinForms
         MemBitmap _destImg;
         Bitmap _winBmp;
 
-         
+
         Typography.Text.AbstractTextSpanPrinter _selectedTextPrinter = null;
         PixelFarm.Drawing.VxsTextSpanPrinter _devVxsTextPrinter = null;
 
@@ -518,27 +518,25 @@ namespace SampleWinForms
                 //
                 if (_devVxsTextPrinter != null)
                 {
-                    PixelFarm.Drawing.OldFontStyle fontstyle = PixelFarm.Drawing.OldFontStyle.Regular;
+
+                    PixelFarm.Drawing.CssFontStyle fontstyle = PixelFarm.Drawing.CssFontStyle.Regular; //***
+
                     switch (_basicOptions.SelectedTypefaceStyle)
                     {
                         case Typography.FontManagement.TypefaceStyle.Regular:
-                            fontstyle = PixelFarm.Drawing.OldFontStyle.Regular;
-                            break;
-                        case Typography.FontManagement.TypefaceStyle.Bold:
-                            fontstyle = PixelFarm.Drawing.OldFontStyle.Bold;
+                            fontstyle = PixelFarm.Drawing.CssFontStyle.Regular;
                             break;
                         case Typography.FontManagement.TypefaceStyle.Italic:
-                            fontstyle = PixelFarm.Drawing.OldFontStyle.Italic;
+                            fontstyle = PixelFarm.Drawing.CssFontStyle.Italic;
                             break;
                         case Typography.FontManagement.TypefaceStyle.Others:
-                            fontstyle = PixelFarm.Drawing.OldFontStyle.Others;
+                            throw new NotSupportedException();
                             break;
                     }
                     _devVxsTextPrinter.Typeface = e.SelectedTypeface;
                     var reqFont = new PixelFarm.Drawing.RequestFont(
                         e.SelectedTypeface.Name,
-                        _basicOptions.FontSizeInPoints,
-                        fontstyle);
+                        _basicOptions.FontSizeInPoints);
                     _devVxsTextPrinter.ChangeFont(reqFont);
                     _painter.CurrentFont = reqFont;
                 }

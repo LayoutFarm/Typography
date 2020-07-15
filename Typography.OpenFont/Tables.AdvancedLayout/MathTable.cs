@@ -1150,8 +1150,10 @@ namespace Typography.OpenFont.Tables
             ushort[] vertGlyphConstructions = Utils.ReadUInt16Array(reader, vertGlyphCount);
             ushort[] horizonGlyphConstructions = Utils.ReadUInt16Array(reader, horizGlyphCount);
             //
-
-            _mathVariantsTable.vertCoverage = CoverageTable.CreateFrom(reader, beginAt + vertGlyphCoverageOffset);
+            if (vertGlyphCoverageOffset > 0)
+            {
+                _mathVariantsTable.vertCoverage = CoverageTable.CreateFrom(reader, beginAt + vertGlyphCoverageOffset);
+            }
             if (horizGlyphCoverageOffset > 0)
             {
                 //may be null?, eg. found in font Linux Libertine Regular (https://sourceforge.net/projects/linuxlibertine/)

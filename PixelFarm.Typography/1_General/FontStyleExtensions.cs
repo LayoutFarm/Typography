@@ -5,27 +5,14 @@ namespace PixelFarm.Drawing
 {
     static class FontStyleExtensions
     {
-        public static Typography.FontManagement.TypefaceStyle ConvToInstalledFontStyle(this OldFontStyle style)
+        public static Typography.FontManagement.TypefaceStyle ConvToInstalledFontStyle(this CssFontStyle style)
         {
-            Typography.FontManagement.TypefaceStyle installedStyle = Typography.FontManagement.TypefaceStyle.Regular;//regular
             switch (style)
             {
-                default: break;
-                case OldFontStyle.Bold:
-                    installedStyle = Typography.FontManagement.TypefaceStyle.Bold;
-                    break;
-                case OldFontStyle.Italic:
-                    installedStyle = Typography.FontManagement.TypefaceStyle.Italic;
-                    break;
-                case OldFontStyle.Bold | OldFontStyle.Italic:
-                    installedStyle = Typography.FontManagement.TypefaceStyle.Italic;//??? WHY????
-                    break;
-                case OldFontStyle.Others:
-                    installedStyle = Typography.FontManagement.TypefaceStyle.Others;
-                    break;
+                default: return Typography.FontManagement.TypefaceStyle.Others;
+                case CssFontStyle.Regular: return Typography.FontManagement.TypefaceStyle.Regular;
+                case CssFontStyle.Italic: return Typography.FontManagement.TypefaceStyle.Italic;
             }
-
-            return installedStyle;
         }
     }
 
