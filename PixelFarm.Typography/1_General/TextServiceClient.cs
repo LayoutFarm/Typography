@@ -14,7 +14,7 @@ using PixelFarm.Drawing;
 namespace Typography.Text
 {
 
-    public class TextServiceClient : ITextService
+    public class TextServiceClient 
     {
         readonly OpenFontTextService _openFontTextService; //owner
         readonly VirtualTextSpanPrinter _p;
