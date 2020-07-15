@@ -202,6 +202,16 @@ namespace PixelFarm.Drawing
 
             //see https://www.w3.org/TR/css-fonts-3/ 
 
+
+
+            //<family-name>
+            //    The name of a font family of choice such as Helvetica or Verdana in the previous example. 
+            //<generic-family>
+            //    The following generic family keywords are defined: ‘serif’, ‘sans-serif’, ‘cursive’, ‘fantasy’, and ‘monospace’.
+            //    These keywords can be used as a general fallback mechanism when an author's desired font choices are not available.
+            //    As keywords, they must not be quoted.
+            //    Authors are encouraged to append a generic font family as a last alternative for improved robustness. 
+
             Size = fontSize; //store user font size here 
             SizeInPoints = fontSize.ToPoints();
 
@@ -410,7 +420,4 @@ namespace PixelFarm.Drawing
         public short minOffsetY;
         public short maxOffsetY;
     }
-
 }
-
-
