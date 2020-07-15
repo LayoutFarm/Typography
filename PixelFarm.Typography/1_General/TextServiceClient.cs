@@ -24,11 +24,12 @@ namespace Typography.Text
             _openFontTextService = openFontTextService;
             _p = new VirtualTextSpanPrinter();
             _p.BuiltInAlternativeTypefaceSelector = (int codepoint, AltTypefaceSelectorBase userSelector, out Typeface typeface) => _openFontTextService.TryGetAlternativeTypefaceFromCodepoint(codepoint, userSelector, out typeface);
+            _p.PositionTechnique = PositionTechnique.OpenFont;
         }
         public ScriptLang CurrentScriptLang
         {
-            get => _p.CurrentScriptLang;
-            set => _p.CurrentScriptLang = value;
+            get => _p.ScriptLang;
+            set => _p.ScriptLang = value;
         }
         public void EnableGsubGpos(bool value)
         {
@@ -165,20 +166,15 @@ namespace Typography.Text
             }
             return 0;
         }
-        public void SetCurrentFont(Typeface typeface, float sizeInPts, PositionTechnique posTech)
+        public void SetCurrentFont(Typeface typeface, float sizeInPts, ScriptLang sclang)
         {
+            _p.ScriptLang = sclang;
             _p.Typeface = typeface;
             _p.FontSizeInPoints = sizeInPts;
-            _p.PositionTechnique = posTech;
+             
             _p.UpdateGlyphLayoutSettings();
         }
-        public void SetCurrentFont(Typeface typeface, float sizeInPts, ScriptLang sclang, PositionTechnique posTech)
-        {
-            _p.Typeface = typeface;
-            _p.FontSizeInPoints = sizeInPts;
-            _p.PositionTechnique = posTech;
-            _p.UpdateGlyphLayoutSettings();
-        }
+      
         public void CreateGlyphPlanSeq(in Typography.Text.TextBufferSpan textBufferSpan, IUnscaledGlyphPlanList unscaledList)
         {
             _p.CreateGlyphPlanSeq(textBufferSpan, unscaledList);
