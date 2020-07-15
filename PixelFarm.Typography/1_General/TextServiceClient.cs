@@ -171,7 +171,7 @@ namespace Typography.Text
             _p.ScriptLang = sclang;
             _p.Typeface = typeface;
             _p.FontSizeInPoints = sizeInPts;
-             
+            
             _p.UpdateGlyphLayoutSettings();
         }
       

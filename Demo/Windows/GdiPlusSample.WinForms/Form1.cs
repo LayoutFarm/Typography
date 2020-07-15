@@ -80,9 +80,9 @@ namespace SampleWinForms
             //set default font for current text printer
             //
             _txtServiceClient = OurOpenFontSystem.CreateTextServiceClient(); 
-            _currentTextPrinter = new DevGdiTextPrinter();
+            _currentTextPrinter = new DevGdiTextPrinter(_txtServiceClient);
             _currentTextPrinter.ScriptLang = new ScriptLang(ScriptTagDefs.Thai.Tag);
-            _currentTextPrinter.SetTextServiceClient(_txtServiceClient);
+             
 
             //set default font for current text printer
             _currentTextPrinter.Typeface = OurOpenFontSystem.ResolveTypeface(selectedFF);
