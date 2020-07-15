@@ -79,7 +79,7 @@ namespace SampleWinForms
         }
         protected override void OnFontSizeChanged()
         {
-            _txtClient.SetCurrentFont(_currentTypeface, this.FontSizeInPoints, PositionTechnique.OpenFont);
+            _txtClient.SetCurrentFont(_currentTypeface, this.FontSizeInPoints, ScriptLang);
             base.OnFontSizeChanged();
         }
 
@@ -92,7 +92,7 @@ namespace SampleWinForms
 
         public void UpdateGlyphLayoutSettings()
         {
-            _txtClient.SetCurrentFont(this.Typeface, this.FontSizeInPoints, ScriptLang, this.PositionTechnique);
+            _txtClient.SetCurrentFont(this.Typeface, this.FontSizeInPoints, ScriptLang);
         }
         void UpdateVisualOutputSettings()
         {
