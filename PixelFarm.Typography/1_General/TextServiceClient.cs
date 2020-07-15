@@ -237,7 +237,7 @@ namespace Typography.Text
 
             _measureResult.Reset();
             _p.MeasureString(bufferSpan, _measureResult);
-            
+
             return new Size(_measureResult.Width, _measureResult.Height);
         }
         public void MeasureString(in Typography.Text.TextBufferSpan bufferSpan, RequestFont font, int limitWidth, out int charFit, out int charFitWidth)
@@ -260,12 +260,12 @@ namespace Typography.Text
             MeasureString(bufferSpan, font, limitWidth, out charFit, out charFitWidth);
         }
 
-        float ITextService.MeasureBlankLineHeight(RequestFont font)
+        public float MeasureBlankLineHeight(RequestFont font)
         {
             ResolvedFont resolvedFont = ResolveFont(font);
             return resolvedFont.LineSpacingInPixels;
         }
-        public bool SupportsWordBreak => true;
+       
 
         public void BreakToLineSegments(in TextBufferSpan textBufferSpan, WordVisitor wordVisitor)
         {
