@@ -14,8 +14,6 @@ using Typography.OpenFont.Contours;
 using Typography.Text;
 using Typography.TextLayout;
 
-using PixelFarm.Drawing;
-
 
 namespace SampleWinForms
 {
@@ -26,8 +24,7 @@ namespace SampleWinForms
         //create text printer env for developer.
 
 
-        DevGdiTextPrinter _currentTextPrinter;
-        TextServiceClient _txtServiceClient;
+        readonly DevGdiTextPrinter _currentTextPrinter;
 
         public Form1()
         {
@@ -79,13 +76,12 @@ namespace SampleWinForms
             }
             //set default font for current text printer
             //
-            _txtServiceClient = OurOpenFontSystem.CreateTextServiceClient(); 
-            _currentTextPrinter = new DevGdiTextPrinter(_txtServiceClient);
-            _currentTextPrinter.ScriptLang = new ScriptLang(ScriptTagDefs.Thai.Tag);
-             
 
-            //set default font for current text printer
-            _currentTextPrinter.Typeface = OurOpenFontSystem.ResolveTypeface(selectedFF);
+            _currentTextPrinter = new DevGdiTextPrinter(OurOpenFontSystem.CreateTextServiceClient())
+            {
+                ScriptLang = new ScriptLang(ScriptTagDefs.Latin.Tag),
+                Typeface = OurOpenFontSystem.ResolveTypeface(selectedFF)
+            };
 
 
             //Alternative Typeface Selector
