@@ -265,7 +265,6 @@ namespace Typography.Text
             ResolvedFont resolvedFont = ResolveFont(font);
             return resolvedFont.LineSpacingInPixels;
         }
-        public bool SupportsWordBreak => true;
 
         public void BreakToLineSegments(in TextBufferSpan textBufferSpan, WordVisitor wordVisitor)
         {
