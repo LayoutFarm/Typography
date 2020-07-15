@@ -5,25 +5,47 @@ namespace PixelFarm.Drawing
 {
     static class FontStyleExtensions
     {
-        public static Typography.FontManagement.TypefaceStyle ConvToInstalledFontStyle(this FontStyle style)
+        public static Typography.FontManagement.TypefaceStyle ConvToInstalledFontStyle(this OldFontStyle style)
         {
             Typography.FontManagement.TypefaceStyle installedStyle = Typography.FontManagement.TypefaceStyle.Regular;//regular
             switch (style)
             {
                 default: break;
-                case FontStyle.Bold:
+                case OldFontStyle.Bold:
                     installedStyle = Typography.FontManagement.TypefaceStyle.Bold;
                     break;
-                case FontStyle.Italic:
+                case OldFontStyle.Italic:
                     installedStyle = Typography.FontManagement.TypefaceStyle.Italic;
                     break;
-                case FontStyle.Bold | FontStyle.Italic:
+                case OldFontStyle.Bold | OldFontStyle.Italic:
                     installedStyle = Typography.FontManagement.TypefaceStyle.Italic;//??? WHY????
                     break;
-                case FontStyle.Others:
+                case OldFontStyle.Others:
                     installedStyle = Typography.FontManagement.TypefaceStyle.Others;
                     break;
             }
+
+            return installedStyle;
+        }
+        public static Typography.FontManagement.TypefaceStyle ConvToInstalledFontStyle(this NewCssFontStyle style)
+        {
+            Typography.FontManagement.TypefaceStyle installedStyle = Typography.FontManagement.TypefaceStyle.Regular;//regular
+            //switch (style)
+            //{
+            //    default: break;
+            //    case OldFontStyle.Bold:
+            //        installedStyle = Typography.FontManagement.TypefaceStyle.Bold;
+            //        break;
+            //    case OldFontStyle.Italic:
+            //        installedStyle = Typography.FontManagement.TypefaceStyle.Italic;
+            //        break;
+            //    case OldFontStyle.Bold | OldFontStyle.Italic:
+            //        installedStyle = Typography.FontManagement.TypefaceStyle.Italic;//??? WHY????
+            //        break;
+            //    case OldFontStyle.Others:
+            //        installedStyle = Typography.FontManagement.TypefaceStyle.Others;
+            //        break;
+            //}
 
             return installedStyle;
         }
