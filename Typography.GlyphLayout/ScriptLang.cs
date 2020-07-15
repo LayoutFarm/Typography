@@ -2,7 +2,7 @@
 using System;
 namespace Typography.OpenFont
 {
-     
+
     /// <summary>
     /// script tag and lang_feature tag request for GSUB, GPOS
     /// </summary>
@@ -63,6 +63,7 @@ namespace Typography.OpenFont
             Array.Reverse(bytes);
             return System.Text.Encoding.UTF8.GetString(bytes, 0, bytes.Length);
         }
+        
 
         public string GetScriptTagString() => TagToString(this.scriptTag);
         public string GetLangTagString() => TagToString(this.sysLangTag);

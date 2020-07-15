@@ -29,17 +29,14 @@ namespace TypographyTest
         Typeface _selectedTypeface;
         bool _typefaceChanged = false;
 
-       
-        InstalledTypefaceCollection _installedTypefaces;
+        readonly InstalledTypefaceCollection _installedTypefaces = new InstalledTypefaceCollection();
 
         public BasicFontOptions()
         {
             SelectedTypefaceStyle = TypefaceStyle.Regular;
             FontSizeInPoints = 10;
             this.RenderChoice = RenderChoice.RenderWithTextPrinterAndMiniAgg;
-           
-            _installedTypefaces = new InstalledTypefaceCollection();
-            
+
 
         }
         public RenderChoice RenderChoice { get; set; }
@@ -97,7 +94,19 @@ namespace TypographyTest
 
 
         public float FontSizeInPoints { get; set; }
-        public Typography.OpenFont.ScriptLang ScriptLang { get; set; }
+
+        bool _scriptLangChanged;
+        ScriptLang _scLang;
+        public ScriptLang ScriptLang
+        {
+            get => _scLang;
+            set
+            {
+
+                _scriptLangChanged = (_scLang.scriptTag != value.scriptTag || _scLang.sysLangTag != value.sysLangTag);
+                _scLang = value;
+            }
+        }
         public TypefaceStyle SelectedTypefaceStyle { get; set; }
 
         public InstalledTypeface InstalledTypeface
@@ -125,7 +134,7 @@ namespace TypographyTest
 
         public void InvokeAttachEvents()
         {
-            if (TypefaceChanged != null && _typefaceChanged)
+            if (TypefaceChanged != null && (_typefaceChanged || _scriptLangChanged))
             {
                 TypefaceChanged(this, new TypefaceChangedEventArgs(_selectedTypeface));
             }
