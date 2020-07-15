@@ -25,8 +25,8 @@ namespace SampleWinForms
         //for this sample code,
         //create text printer env for developer.
 
-      
-        DevGdiTextPrinter _currentTextPrinter = new DevGdiTextPrinter();
+
+        DevGdiTextPrinter _currentTextPrinter;
         TextServiceClient _txtServiceClient;
 
         public Form1()
@@ -35,7 +35,7 @@ namespace SampleWinForms
 
             //choose Thai script for 'complex script' testing.
             //you can change this to test other script.
-            _currentTextPrinter.ScriptLang = new ScriptLang(ScriptTagDefs.Thai.Tag);
+
             //----------
             button1.Click += (s, e) => UpdateRenderOutput();
             //simple load test fonts from local test dir
@@ -79,8 +79,11 @@ namespace SampleWinForms
             }
             //set default font for current text printer
             //
-            _txtServiceClient = OurOpenFontSystem.CreateTextServiceClient();
+            _txtServiceClient = OurOpenFontSystem.CreateTextServiceClient(); 
+            _currentTextPrinter = new DevGdiTextPrinter();
+            _currentTextPrinter.ScriptLang = new ScriptLang(ScriptTagDefs.Thai.Tag);
             _currentTextPrinter.SetTextServiceClient(_txtServiceClient);
+
             //set default font for current text printer
             _currentTextPrinter.Typeface = OurOpenFontSystem.ResolveTypeface(selectedFF);
 

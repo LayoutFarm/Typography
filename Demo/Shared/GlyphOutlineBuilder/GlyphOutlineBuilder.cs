@@ -10,6 +10,6 @@ namespace Typography.OpenFont.Contours
     //-----------------------------------
     public class GlyphOutlineBuilder : GlyphOutlineBuilderBase
     {
-        public GlyphOutlineBuilder(Typography.OpenFont.Typeface typeface) : base(typeface) { }
+        public GlyphOutlineBuilder(Typeface typeface) : base(typeface) { }
     }
 }

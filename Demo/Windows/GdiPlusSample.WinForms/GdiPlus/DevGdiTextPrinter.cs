@@ -16,18 +16,20 @@ namespace SampleWinForms
     /// <summary>
     /// developer's version, Gdi+ text-span printer
     /// </summary>
-    partial class DevGdiTextPrinter : AbstractTextSpanPrinter
+    sealed partial class DevGdiTextPrinter : AbstractTextSpanPrinter
     {
         Typeface _currentTypeface;
         GlyphOutlineBuilder _currentGlyphPathBuilder;
-        GlyphTranslatorToGdiPath _txToGdiPath;
+
         TextServiceClient _txtClient;
 
+        readonly GlyphTranslatorToGdiPath _txToGdiPath = new GlyphTranslatorToGdiPath();
         readonly SolidBrush _fillBrush = new SolidBrush(Color.Black);
         readonly Pen _outlinePen = new Pen(Color.Green);
-        //
-        //for optimization
+
         readonly GlyphMeshCollection<GraphicsPath> _glyphMeshCollections = new GlyphMeshCollection<GraphicsPath>();
+        readonly Dictionary<Typeface, GlyphOutlineBuilder> _cacheGlyphOutlineBuilders = new Dictionary<Typeface, GlyphOutlineBuilder>();
+        readonly UnscaledGlyphPlanList _reusableUnscaledGlyphPlanList = new UnscaledGlyphPlanList();
 
         public DevGdiTextPrinter()
         {
@@ -35,7 +37,7 @@ namespace SampleWinForms
             FillColor = Color.Black;
             OutlineColor = Color.Green;
         }
-        //----------------------------
+
 
         public void SetTextServiceClient(TextServiceClient txtClient)
         {
@@ -69,10 +71,14 @@ namespace SampleWinForms
                 //--------------------------------
 
                 //2. glyph builder
-                _currentGlyphPathBuilder = new GlyphOutlineBuilder(_currentTypeface);
-                //for gdi path***
-                //3. glyph reader,output as Gdi+ GraphicsPath
-                _txToGdiPath = new GlyphTranslatorToGdiPath();
+                if (!_cacheGlyphOutlineBuilders.TryGetValue(value, out _currentGlyphPathBuilder))
+                {
+                    //not found,
+                    //create a new one
+                    _currentGlyphPathBuilder = new GlyphOutlineBuilder(_currentTypeface);
+                    _cacheGlyphOutlineBuilders.Add(value, _currentGlyphPathBuilder);
+                }
+
                 //4.
                 OnFontSizeChanged();
             }
@@ -82,18 +88,17 @@ namespace SampleWinForms
             _txtClient.SetCurrentFont(_currentTypeface, this.FontSizeInPoints, ScriptLang);
             base.OnFontSizeChanged();
         }
-
+        public void UpdateGlyphLayoutSettings()
+        {
+            _txtClient.SetCurrentFont(this.Typeface, this.FontSizeInPoints, ScriptLang);
+        }
         public bool EnableColorGlyph { get; set; } = true;
         public Color FillColor { get; set; }
         public Color OutlineColor { get; set; }
         public Graphics TargetGraphics { get; set; }
 
-        readonly UnscaledGlyphPlanList _reusableUnscaledGlyphPlanList = new UnscaledGlyphPlanList();
 
-        public void UpdateGlyphLayoutSettings()
-        {
-            _txtClient.SetCurrentFont(this.Typeface, this.FontSizeInPoints, ScriptLang);
-        }
+
         void UpdateVisualOutputSettings()
         {
             _currentGlyphPathBuilder.SetHintTechnique(this.HintTechnique);
