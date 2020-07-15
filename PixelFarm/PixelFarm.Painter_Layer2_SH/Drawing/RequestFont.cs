@@ -30,7 +30,7 @@
 using System;
 using System.Collections.Generic;
 namespace PixelFarm.Drawing
-{ 
+{
     public enum CssFontStyle
     {
         //https://www.w3.org/TR/css-fonts-3/#propdef-font-style
@@ -40,7 +40,7 @@ namespace PixelFarm.Drawing
     }
 
 
-    public enum RequestFontWeight
+    public enum RequestFontWeight : ushort
     {
         Custom = 0, //my extension
 
@@ -60,7 +60,8 @@ namespace PixelFarm.Drawing
         Black = 900,
         Heavy = 900,//=Black
     }
-    public enum RequestFontWidthClass
+
+    public enum RequestFontWidthClass : ushort
     {
         Custom = 0,//my extension
 
