@@ -30,21 +30,7 @@
 using System;
 using System.Collections.Generic;
 namespace PixelFarm.Drawing
-{
-
-    [Flags]
-    public enum OldFontStyle : byte
-    {
-        Regular = 0,
-        Bold = 1,
-        Italic = 1 << 1,
-        Underline = 1 << 2,
-        Strikeout = 1 << 3,
-        Others = 1 << 4
-    }
-
-
-
+{ 
     public enum CssFontStyle
     {
         //https://www.w3.org/TR/css-fonts-3/#propdef-font-style
