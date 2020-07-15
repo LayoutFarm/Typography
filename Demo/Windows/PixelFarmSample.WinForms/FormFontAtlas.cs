@@ -223,7 +223,7 @@ namespace SampleWinForms
             PixelFarm.Drawing.RequestFont reqFont = new PixelFarm.Drawing.RequestFont(
                 typeface.Name,
                 fontSizeInPoints,
-                PixelFarm.Drawing.FontStyle.Regular
+                PixelFarm.Drawing.OldFontStyle.Regular
                 );
 
 

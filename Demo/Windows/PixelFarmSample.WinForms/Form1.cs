@@ -518,20 +518,20 @@ namespace SampleWinForms
                 //
                 if (_devVxsTextPrinter != null)
                 {
-                    PixelFarm.Drawing.FontStyle fontstyle = PixelFarm.Drawing.FontStyle.Regular;
+                    PixelFarm.Drawing.OldFontStyle fontstyle = PixelFarm.Drawing.OldFontStyle.Regular;
                     switch (_basicOptions.SelectedTypefaceStyle)
                     {
                         case Typography.FontManagement.TypefaceStyle.Regular:
-                            fontstyle = PixelFarm.Drawing.FontStyle.Regular;
+                            fontstyle = PixelFarm.Drawing.OldFontStyle.Regular;
                             break;
                         case Typography.FontManagement.TypefaceStyle.Bold:
-                            fontstyle = PixelFarm.Drawing.FontStyle.Bold;
+                            fontstyle = PixelFarm.Drawing.OldFontStyle.Bold;
                             break;
                         case Typography.FontManagement.TypefaceStyle.Italic:
-                            fontstyle = PixelFarm.Drawing.FontStyle.Italic;
+                            fontstyle = PixelFarm.Drawing.OldFontStyle.Italic;
                             break;
                         case Typography.FontManagement.TypefaceStyle.Others:
-                            fontstyle = PixelFarm.Drawing.FontStyle.Others;
+                            fontstyle = PixelFarm.Drawing.OldFontStyle.Others;
                             break;
                     }
                     _devVxsTextPrinter.Typeface = e.SelectedTypeface;

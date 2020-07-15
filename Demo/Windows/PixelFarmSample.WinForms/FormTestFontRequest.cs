@@ -334,7 +334,7 @@ namespace SampleWinForms
                 //that if the system does not found Roboto-X
                 //then should use alternative Asana Math
                 textOutput = "Hello! 3";
-                RequestFont reqFont1 = new RequestFont("Roboto-X", 20, PixelFarm.Drawing.FontStyle.Regular,
+                RequestFont reqFont1 = new RequestFont("Roboto-X", 20, PixelFarm.Drawing.OldFontStyle.Regular,
                     new[]
                     {
                        new RequestFont.Choice("Asana Math",20)
@@ -365,7 +365,7 @@ namespace SampleWinForms
                 //we have Roboto
 
                 textOutput = "Hello! 1😁";
-                RequestFont reqFont1 = new RequestFont("Roboto", 20, PixelFarm.Drawing.FontStyle.Regular,
+                RequestFont reqFont1 = new RequestFont("Roboto", 20, PixelFarm.Drawing.OldFontStyle.Regular,
                    new[]
                    {
                        new RequestFont.Choice("Asana Math",20)
@@ -379,7 +379,7 @@ namespace SampleWinForms
                 //for Emoji=> our System default=> TwitterColorEmoji
                 //and in this case we want to specific that we want to use FireFoxColor Emoji instead 
                 textOutput = "Hello! 2😁";
-                RequestFont reqFont1 = new RequestFont("Roboto", 20, PixelFarm.Drawing.FontStyle.Regular,
+                RequestFont reqFont1 = new RequestFont("Roboto", 20, PixelFarm.Drawing.OldFontStyle.Regular,
                    new[]
                    {
                        new RequestFont.Choice("Asana Math",20),
@@ -393,7 +393,7 @@ namespace SampleWinForms
                 //use Droid Sans Fallback for CJK 
 
                 textOutput = "你好 Hello! 3 😁";
-                RequestFont reqFont1 = new RequestFont("Droid Sans Fallback", 20, PixelFarm.Drawing.FontStyle.Regular,
+                RequestFont reqFont1 = new RequestFont("Droid Sans Fallback", 20, PixelFarm.Drawing.OldFontStyle.Regular,
                    new[]
                    {
                        new RequestFont.Choice("Asana Math",20)
