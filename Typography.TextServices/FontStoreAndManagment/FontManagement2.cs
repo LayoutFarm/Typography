@@ -11,6 +11,7 @@ namespace Typography.FontManagement
 {
     partial class InstalledTypefaceCollection
     {
+        static InstalledTypefaceCollection s_intalledTypefaces;
         //----------
         //common weight classes
         internal readonly List<InstalledTypeface> _weight100_Thin = new List<InstalledTypeface>();
@@ -107,7 +108,13 @@ namespace Typography.FontManagement
 
             return Register(installedTypeface) ? installedTypeface : null;
         }
-
+        public IEnumerable<InstalledTypeface> GetInstalledFontIter()
+        {
+            foreach (InstalledTypeface f in _all3.Values)
+            {
+                yield return f;
+            }
+        }
         readonly Dictionary<UnicodeRangeInfo, List<InstalledTypeface>> _registerWithUnicodeRangeDic = new Dictionary<UnicodeRangeInfo, List<InstalledTypeface>>();
         readonly List<InstalledTypeface> _emojiSupportedTypefaces = new List<InstalledTypeface>();
         readonly List<InstalledTypeface> _mathTypefaces = new List<InstalledTypeface>();
