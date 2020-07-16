@@ -11,6 +11,7 @@
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)AbstractTextSpanPrinter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FontStoreAndManagment\FontManagement.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FontStoreAndManagment\FontManagement2.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FontStoreAndManagment\OpenFontBitPosInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FontStoreAndManagment\OpenFontUnicodeUtilExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TextLayout\FormattedGlyphPlanSeq.cs" />
