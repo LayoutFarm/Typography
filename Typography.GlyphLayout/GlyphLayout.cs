@@ -232,15 +232,15 @@ namespace Typography.TextLayout
     public class GlyphLayout
     {
 
-        GlyphLayoutPlanCollection _layoutPlanCollection = new GlyphLayoutPlanCollection();
+        readonly GlyphLayoutPlanCollection _layoutPlanCollection = new GlyphLayoutPlanCollection();
         Typeface _typeface;
         ScriptLang _scriptLang;
         GlyphSubstitution _gsub;
         GlyphSetPosition _gpos;
         bool _needPlanUpdate;
 
-        GlyphIndexList _inputGlyphs = new GlyphIndexList();//reusable input glyph
-        GlyphPosStream _glyphPositions = new GlyphPosStream();
+        readonly GlyphIndexList _inputGlyphs = new GlyphIndexList();//reusable input glyph
+        readonly GlyphPosStream _glyphPositions = new GlyphPosStream();
 
         readonly static ScriptLang s_latin = new ScriptLang("latn");
         readonly static ScriptLang s_math = new ScriptLang("math");

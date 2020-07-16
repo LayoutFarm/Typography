@@ -32,7 +32,8 @@ namespace PixelFarm.Drawing
             _txtClient = txtClient;
             _painter = painter;
             _glyphMeshStore = new GlyphMeshStore() { FlipGlyphUpward = true };
-            _glyphBitmapStore = new GlyphBitmapStore();
+            _glyphBitmapStore = new GlyphBitmapStore(); 
+           
         }
         public AlternativeTypefaceSelector AlternativeTypefaceSelector
         {
@@ -99,7 +100,7 @@ namespace PixelFarm.Drawing
         {
             if (Typeface != null)
             {
-                _txtClient.SetCurrentFont(Typeface, FontSizeInPoints, this.PositionTechnique);
+                _txtClient.SetCurrentFont(Typeface, FontSizeInPoints, this.ScriptLang);
             }
 
             if (!_renderingMultiTypefaceMode)

@@ -96,21 +96,24 @@ namespace TypographyTest.WinForms
             {
                 InstalledTypefaceCollection typefaceCollection = _options.InstallTypefaceCollection;
                 lstFontNameList.Items.Clear();
-                foreach (string fontName in typefaceCollection.GetFontNameIter())
+
+                foreach (InstalledTypefaceCollection.InstalledTypefaceGroup instGroup in typefaceCollection.GetInstalledTypefaceGroupIter())
                 {
-                    lstFontNameList.Items.Add(fontName);
+                    lstFontNameList.Items.Add(instGroup);
                 }
+
             }
             //
             lstFontNameList.Click += delegate
             {
                 lstFontStyle.Items.Clear();
 
-                if (lstFontNameList.SelectedItem is string fontName)
+                if (lstFontNameList.SelectedItem is InstalledTypefaceCollection.InstalledTypefaceGroup instGroup)
                 {
-                    foreach (InstalledTypeface installedTypeface in _options.InstallTypefaceCollection.GetInstalledTypefaceIter(fontName))
+                    int memberCount = instGroup.Count;
+                    foreach (InstalledTypeface instTypeface in instGroup.GetMemberIter())
                     {
-                        lstFontStyle.Items.Add(installedTypeface);
+                        lstFontStyle.Items.Add(instTypeface);
                     }
                 }
             };
@@ -124,13 +127,13 @@ namespace TypographyTest.WinForms
             //
             _options.InstalledTypeface = installedTypeface;
             _options.InvokeAttachEvents();
-            _txtTypefaceInfo.Text = "file: " + installedTypeface.FontPath + "\r\n" + "weight:" + installedTypeface.Weight;
+            _txtTypefaceInfo.Text = "file: " + installedTypeface.FontPath + "\r\n" + "weight:" + installedTypeface.WeightClass;
 
             //
             ShowSupportedScripts(installedTypeface);
         }
 
-      
+
         void ShowSupportedScripts(InstalledTypeface installedTypeface)
         {
             //show supported lang
@@ -138,7 +141,7 @@ namespace TypographyTest.WinForms
             lstScriptLangs.Items.Clear();
 
             Dictionary<string, ScriptLang> dic = new Dictionary<string, ScriptLang>();
-            installedTypeface.CollectScriptLang(dic); 
+            installedTypeface.CollectScriptLang(dic);
             foreach (var kv in dic)
             {
                 ScriptLang s = kv.Value;

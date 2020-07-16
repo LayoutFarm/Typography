@@ -22,79 +22,7 @@ namespace Typography.OpenFont
     }
 
 
-    public class PreviewFontInfo
-    {
-        public readonly string Name;
-        public readonly string SubFamilyName;
-        public readonly string TypographicFamilyName;
-        public readonly string TypographicSubFamilyName;
-        public readonly Extensions.TranslatedOS2FontStyle OS2TranslatedStyle;
-        public readonly ushort Weight;
-        readonly PreviewFontInfo[] _ttcfMembers;
-
-
-        internal PreviewFontInfo(string fontName, string fontSubFam,
-            string tFamilyName, string tSubFamilyName,
-            ushort weight,
-            Languages langs,
-            Extensions.TranslatedOS2FontStyle os2TranslatedStyle = Extensions.TranslatedOS2FontStyle.UNSET)
-        {
-            Name = fontName;
-            SubFamilyName = fontSubFam;
-            TypographicFamilyName = tFamilyName;
-            TypographicSubFamilyName = tSubFamilyName;
-
-#if DEBUG
-            //please note that some fontName != typographicFontName
-            //this may effect how to search a font
-            if (fontName != tFamilyName && tFamilyName != null)
-            {
-
-            }
-            if (fontSubFam != tSubFamilyName && tSubFamilyName != null)
-            {
-
-            }
-#endif
-            Weight = weight;
-            OS2TranslatedStyle = os2TranslatedStyle;
-            Languages = langs;
-        }
-        internal PreviewFontInfo(string fontName, PreviewFontInfo[] ttcfMembers)
-        {
-            Name = fontName;
-            SubFamilyName = "";
-            _ttcfMembers = ttcfMembers;
-            Languages = new Languages();
-        }
-        public int ActualStreamOffset { get; internal set; }
-        public bool IsWebFont { get; internal set; }
-        public bool IsFontCollection => _ttcfMembers != null;
-
-        public string PostScriptName { get; internal set; }
-        public string UniqueFontIden { get; internal set; }
-        public string VersionString { get; internal set; }
-        public Languages Languages { get; }
-
-        /// <summary>
-        /// get font collection's member count
-        /// </summary>
-        public int MemberCount => _ttcfMembers.Length;
-        /// <summary>
-        /// get font collection's member
-        /// </summary>
-        /// <param name="index"></param>
-        /// <returns></returns>
-        public PreviewFontInfo GetMember(int index) => _ttcfMembers[index];
-#if DEBUG
-        public override string ToString()
-        {
-            return (IsFontCollection) ? Name : Name + ", " + SubFamilyName + ", " + OS2TranslatedStyle;
-        }
-#endif
-    }
-
-
+  
     static class KnownFontFiles
     {
         public static bool IsTtcf(ushort u1, ushort u2)
@@ -287,7 +215,7 @@ namespace Typography.OpenFont
 
         internal bool Read(Typeface typeface, RestoreTicket ticket, Stream stream, int streamStartOffset = 0, ReadFlags readFlags = ReadFlags.Full)
         {
-             
+
             if (streamStartOffset > 0)
             {
                 //eg. for ttc
@@ -416,18 +344,9 @@ namespace Typography.OpenFont
             langs.Update(os2Table, metaTable, cmap, gsub, gpos);
 
             return new PreviewFontInfo(
-              nameEntry.FontName,
-              nameEntry.FontSubFamily,
-              nameEntry.TypographicFamilyName,
-              nameEntry.TypographyicSubfamilyName,
-              os2Table.usWeightClass,
-              langs,
-              Extensions.TypefaceExtensions.TranslatedOS2FontStyle(os2Table))
-            {
-                PostScriptName = nameEntry.PostScriptName,
-                UniqueFontIden = nameEntry.UniqueFontIden,
-                VersionString = nameEntry.VersionString
-            };
+              nameEntry,
+              os2Table,
+              langs);
         }
 
         bool ReadTableEntryCollectionOnRestoreMode(Typeface typeface, RestoreTicket ticket, TableEntryCollection tables, BinaryReader input)

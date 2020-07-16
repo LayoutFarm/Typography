@@ -15,9 +15,9 @@
 
   <Import Project="..\..\..\Unpack_SH\Unpack_SH.projitems" Label="Shared" />
 
-  <Import Project="..\..\..\Typography.TextServices\Typography.TextServices.projitems" Label="Shared" />
-
   <Import Project="..\..\..\Typography.TextBreak\Typography.TextBreak\Typography.TextBreak.projitems" Label="Shared" />
+
+  <Import Project="..\..\..\Typography.TextServices\Typography.TextServices.projitems" Label="Shared" />
 
   <ItemGroup>
     <Compile Include="..\..\..\Demo\Shared\GlyphOutlineBuilder\GlyphOutlineBuilder.cs" Link="Ty_Contours\GlyphOutlineBuilder.cs" />

@@ -24,7 +24,7 @@ namespace SampleWinForms
         MemBitmap _destImg;
         Bitmap _winBmp;
 
-         
+
         Typography.Text.AbstractTextSpanPrinter _selectedTextPrinter = null;
         PixelFarm.Drawing.VxsTextSpanPrinter _devVxsTextPrinter = null;
 
@@ -145,7 +145,7 @@ namespace SampleWinForms
             _devVxsTextPrinter.SetSvgBmpBuilderFunc(PaintLab.SvgBuilderHelper.ParseAndRenderSvg);
             _devVxsTextPrinter.ScriptLang = _basicOptions.ScriptLang;
             _devVxsTextPrinter.PositionTechnique = Typography.TextLayout.PositionTechnique.OpenFont;
-
+            _devVxsTextPrinter.Typeface = _textService.ResolveFont(_painter.CurrentFont).Typeface;
 
             //Alternative Typeface selector..
             var myAlternativeTypefaceSelector = new Typography.Text.AlternativeTypefaceSelector();
@@ -518,27 +518,24 @@ namespace SampleWinForms
                 //
                 if (_devVxsTextPrinter != null)
                 {
-                    PixelFarm.Drawing.FontStyle fontstyle = PixelFarm.Drawing.FontStyle.Regular;
+                    PixelFarm.Drawing.NewCssFontStyle fontstyle = PixelFarm.Drawing.NewCssFontStyle.Regular;
+                    ushort fontWeight = (ushort)PixelFarm.Drawing.RequestFontWeight.Normal;
+
                     switch (_basicOptions.SelectedTypefaceStyle)
                     {
-                        case Typography.FontManagement.TypefaceStyle.Regular:
-                            fontstyle = PixelFarm.Drawing.FontStyle.Regular;
-                            break;
-                        case Typography.FontManagement.TypefaceStyle.Bold:
-                            fontstyle = PixelFarm.Drawing.FontStyle.Bold;
-                            break;
                         case Typography.FontManagement.TypefaceStyle.Italic:
-                            fontstyle = PixelFarm.Drawing.FontStyle.Italic;
-                            break;
-                        case Typography.FontManagement.TypefaceStyle.Others:
-                            fontstyle = PixelFarm.Drawing.FontStyle.Others;
+                            fontstyle = PixelFarm.Drawing.NewCssFontStyle.Italic;
                             break;
                     }
+
                     _devVxsTextPrinter.Typeface = e.SelectedTypeface;
+
                     var reqFont = new PixelFarm.Drawing.RequestFont(
                         e.SelectedTypeface.Name,
                         _basicOptions.FontSizeInPoints,
+                        fontWeight,
                         fontstyle);
+
                     _devVxsTextPrinter.ChangeFont(reqFont);
                     _painter.CurrentFont = reqFont;
                 }
