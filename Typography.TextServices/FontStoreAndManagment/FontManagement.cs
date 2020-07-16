@@ -170,6 +170,7 @@ namespace Typography.FontManagement
     public interface IInstalledTypefaceProvider
     {
         InstalledTypeface GetInstalledTypeface(string fontName, TypefaceStyle style);
+        InstalledTypeface GetInstalledTypeface(string fontName, TypefaceStyle style, ushort weight);
     }
 
     public class InstalledTypefaceCollection : IInstalledTypefaceProvider
@@ -560,7 +561,7 @@ namespace Typography.FontManagement
 
 
             GetInstalledTypefaceByWeightClass(instTypeface.WeightClass).Add(instTypeface);
-             
+
 
             if (register_result && instTypeface.FontPath != null &&
                 !_installedTypefacesByFilenames.ContainsKey(instTypeface.FontPath)) //beware case-sensitive!
@@ -574,6 +575,10 @@ namespace Typography.FontManagement
         {
             _postScriptNames.TryGetValue(postScriptName.ToUpper(), out InstalledTypeface found);
             return found;
+        }
+        public InstalledTypeface GetInstalledTypeface(string fontName, string subFamName, ushort weight)
+        {
+            return GetInstalledTypeface(fontName, subFamName);
         }
         public InstalledTypeface GetInstalledTypeface(string fontName, string subFamName)
         {
@@ -627,7 +632,10 @@ namespace Typography.FontManagement
 
             return null; //not found
         }
-
+        public InstalledTypeface GetInstalledTypeface(string fontName, TypefaceStyle wellknownSubFam, ushort weight)
+        {
+            return GetInstalledTypeface(fontName, wellknownSubFam);
+        }
         public InstalledTypeface GetInstalledTypeface(string fontName, TypefaceStyle wellknownSubFam)
         {
             //not auto resolve
