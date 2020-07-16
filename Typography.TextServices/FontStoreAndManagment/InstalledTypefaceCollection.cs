@@ -69,6 +69,17 @@ namespace Typography.FontManagement
                 throw new NotSupportedException();
             }
 
+            public IEnumerable<InstalledTypeface> GetMemberIter()
+            {
+                yield return _first;
+                if (_others != null)
+                {
+                    for (int i = 0; i < _others.Count; ++i)
+                    {
+                        yield return _others[i];
+                    }
+                }
+            }
 #if DEBUG
             public override string ToString()
             {

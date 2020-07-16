@@ -101,7 +101,7 @@ namespace TypographyTest.WinForms
                 {
                     lstFontNameList.Items.Add(instGroup);
                 }
-                
+
             }
             //
             lstFontNameList.Click += delegate
@@ -110,10 +110,11 @@ namespace TypographyTest.WinForms
 
                 if (lstFontNameList.SelectedItem is InstalledTypefaceCollection.InstalledTypefaceGroup instGroup)
                 {
-                    //foreach (InstalledTypeface installedTypeface in _options.InstallTypefaceCollection.GetInstalledTypefaceIter(fontName))
-                    //{
-                    //    lstFontStyle.Items.Add(installedTypeface);
-                    //}
+                    int memberCount = instGroup.Count;
+                    foreach (InstalledTypeface instTypeface in instGroup.GetMemberIter())
+                    {
+                        lstFontStyle.Items.Add(instTypeface);
+                    }
                 }
             };
             //
