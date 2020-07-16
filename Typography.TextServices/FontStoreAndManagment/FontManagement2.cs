@@ -98,22 +98,7 @@ namespace Typography.FontManagement
         }
         public InstalledTypeface AddFontPreview(PreviewFontInfo previewFont, string srcPath)
         {
-            //replace?
-            string upper = previewFont.Name.ToUpper();
-            if (_onlyFontNames.ContainsKey(upper))
-            {
-                //duplicated??
-                //TODO: handle this
-                //eg. Asana.ttc includes Asana-Regular.ttf and Asana-Math.ttf
-                //and we may already have a Asana-math.ttf
-                //How to handle this...
-#if DEBUG
-                System.Diagnostics.Debug.WriteLine("Duplicated Typeface: ");//TODO:
 
-#endif
-            }
-
-            _onlyFontNames[upper] = true;
             InstalledTypeface installedTypeface = new InstalledTypeface(
                 previewFont,
                 srcPath)
@@ -123,6 +108,161 @@ namespace Typography.FontManagement
             return Register(installedTypeface) ? installedTypeface : null;
         }
 
+        readonly Dictionary<UnicodeRangeInfo, List<InstalledTypeface>> _registerWithUnicodeRangeDic = new Dictionary<UnicodeRangeInfo, List<InstalledTypeface>>();
+        readonly List<InstalledTypeface> _emojiSupportedTypefaces = new List<InstalledTypeface>();
+        readonly List<InstalledTypeface> _mathTypefaces = new List<InstalledTypeface>();
+
+        //unicode 13:
+        //https://unicode.org/emoji/charts/full-emoji-list.html
+        //emoji start at U+1F600 	
+        const int UNICODE_EMOJI_START = 0x1F600; //"😁" //first emoji
+        const int UNICODE_EMOJI_END = 0x1F64F;
+
+        //https://www.unicode.org/charts/PDF/U1D400.pdf
+        const int UNICODE_MATH_ALPHANUM_EXAMPLE = 0x1D400; //1D400–1D7FF;
+        List<InstalledTypeface> GetInstalledTypefaceByWeightClass(ushort weightClass)
+        {
+            switch (weightClass)
+            {
+                default: return _otherWeightClassTypefaces;
+                case 100: return _weight100_Thin;
+                case 200: return _weight200_Extralight;
+                case 300: return _weight300_Light;
+                case 400: return _weight400_Normal;
+                case 500: return _weight500_Medium;
+                case 600: return _weight600_SemiBold;
+                case 700: return _weight700_Bold;
+                case 800: return _weight800_ExtraBold;
+                case 900: return _weight900_Black;
+            }
+        }
+
+        public IEnumerable<InstalledTypeface> GetInstalledTypefaceIterByWeightClassIter(ushort weightClass)
+        {
+            return GetInstalledTypefaceByWeightClass(weightClass);
+        }
+
+        List<InstalledTypeface> GetExisitingOrCreateNewListForUnicodeRange(UnicodeRangeInfo range)
+        {
+            if (!_registerWithUnicodeRangeDic.TryGetValue(range, out List<InstalledTypeface> found))
+            {
+                found = new List<InstalledTypeface>();
+                _registerWithUnicodeRangeDic.Add(range, found);
+            }
+            return found;
+        }
+        public void UpdateUnicodeRanges()
+        {
+
+            _registerWithUnicodeRangeDic.Clear();
+            _emojiSupportedTypefaces.Clear();
+            _mathTypefaces.Clear();
+
+            foreach (InstalledTypeface instFont in GetInstalledFontIter())
+            {
+                foreach (BitposAndAssciatedUnicodeRanges bitposAndAssocUnicodeRanges in instFont.GetSupportedUnicodeLangIter())
+                {
+                    foreach (UnicodeRangeInfo range in bitposAndAssocUnicodeRanges.Ranges)
+                    {
+
+                        List<InstalledTypeface> typefaceList = GetExisitingOrCreateNewListForUnicodeRange(range);
+                        typefaceList.Add(instFont);
+                        //----------------
+                        //sub range
+                        if (range == BitposAndAssciatedUnicodeRanges.None_Plane_0)
+                        {
+                            //special search
+                            //TODO: review here again
+                            foreach (UnicodeRangeInfo rng in Unicode13RangeInfoList.GetNonePlane0Iter())
+                            {
+                                if (instFont.ContainGlyphForUnicode(rng.StarCodepoint))
+                                {
+                                    typefaceList = GetExisitingOrCreateNewListForUnicodeRange(rng);
+                                    typefaceList.Add(instFont);
+                                }
+                            }
+                            if (instFont.ContainGlyphForUnicode(UNICODE_EMOJI_START))
+                            {
+                                _emojiSupportedTypefaces.Add(instFont);
+                            }
+                            if (instFont.ContainGlyphForUnicode(UNICODE_MATH_ALPHANUM_EXAMPLE))
+                            {
+                                _mathTypefaces.Add(instFont);
+                            }
+                        }
+                    }
+                }
+            }
+            //------
+            //select perfer unicode font
+
+        }
+        /// <summary>
+        /// get alternative typeface from a given unicode codepoint
+        /// </summary>
+        /// <param name="codepoint"></param>
+        /// <param name="selector"></param>
+        /// <param name="found"></param>
+        /// <returns></returns>
+        public bool TryGetAlternativeTypefaceFromCodepoint(int codepoint, AltTypefaceSelectorBase selector, out Typeface selectedTypeface)
+        {
+            //find a typeface that supported input char c
+
+            List<InstalledTypeface> installedTypefaceList = null;
+            if (ScriptLangs.TryGetUnicodeRangeInfo(codepoint, out UnicodeRangeInfo unicodeRangeInfo))
+            {
+                if (_registerWithUnicodeRangeDic.TryGetValue(unicodeRangeInfo, out List<InstalledTypeface> typefaceList) &&
+                    typefaceList.Count > 0)
+                {
+                    //select a proper typeface                        
+                    installedTypefaceList = typefaceList;
+                }
+            }
+
+
+            //not found
+            if (installedTypefaceList == null && codepoint >= UNICODE_EMOJI_START && codepoint <= UNICODE_EMOJI_END)
+            {
+                unicodeRangeInfo = Unicode13RangeInfoList.Emoticons;
+                if (_emojiSupportedTypefaces.Count > 0)
+                {
+                    installedTypefaceList = _emojiSupportedTypefaces;
+                }
+            }
+            //-------------
+            if (installedTypefaceList != null)
+            {
+                //select a prefer font 
+                if (selector != null)
+                {
+                    AltTypefaceSelectorBase.SelectedTypeface result = selector.Select(installedTypefaceList, unicodeRangeInfo, codepoint);
+                    if (result.InstalledTypeface != null)
+                    {
+                        selectedTypeface = this.ResolveTypeface(result.InstalledTypeface);
+                        return selectedTypeface != null;
+                    }
+                    else if (result.Typeface != null)
+                    {
+                        selectedTypeface = result.Typeface;
+                        return true;
+                    }
+                    else
+                    {
+                        selectedTypeface = null;
+                        return false;
+                    }
+                }
+                else if (installedTypefaceList.Count > 0)
+                {
+                    InstalledTypeface instTypeface = installedTypefaceList[0];//default
+                    selectedTypeface = this.ResolveTypeface(installedTypefaceList[0]);
+                    return selectedTypeface != null;
+                }
+            }
+
+            selectedTypeface = null;
+            return false;
+        }
 
     }
     [Flags]
@@ -480,7 +620,7 @@ namespace Typography.FontManagement
 
         public static Typeface ResolveTypeface(this InstalledTypefaceCollection fontCollection, string fontName, TypefaceStyle style, ushort weight)
         {
-            InstalledTypeface inst = fontCollection.GetInstalledTypeface(fontName, InstalledTypefaceCollection.GetSubFam(style), weight);
+            InstalledTypeface inst = fontCollection.GetInstalledTypeface(fontName, style/*InstalledTypefaceCollection.GetSubFam(style)*/, weight);
             return (inst != null) ? fontCollection.ResolveTypeface(inst) : null;
         }
         public static Typeface ResolveTypeface(this InstalledTypefaceCollection fontCollection, InstalledTypeface installedFont)

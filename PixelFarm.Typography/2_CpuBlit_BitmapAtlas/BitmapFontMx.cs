@@ -25,7 +25,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                 SetupDefaults();
             }
             //
-            OldFontStyle fontStyle = reqFont.Style;
+            NewCssFontStyle fontStyle = reqFont.NewStyle;
             float sizeInPt = reqFont.SizeInPoints;
             if (forAnySize)
             {
@@ -33,7 +33,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             }
             if (forAnyStyle)
             {
-                fontStyle = OldFontStyle.Regular | OldFontStyle.Bold | OldFontStyle.Italic;
+                //fontStyle = OldFontStyle.Regular | OldFontStyle.Bold | OldFontStyle.Italic;
             }
             int fontKey = RequestFont.CalculateFontKey(reqFont.Name.ToLower(), sizeInPt, fontStyle);
             s_registerDetails[fontKey] = details;
