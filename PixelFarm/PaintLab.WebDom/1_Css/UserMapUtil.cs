@@ -26,7 +26,7 @@ namespace LayoutFarm.WebDom
         static readonly ValueMap<CssBorderStyle> _cssBorderStyleMap = new ValueMap<CssBorderStyle>();
         static readonly ValueMap<CssEmptyCell> _cssEmptyCellMap = new ValueMap<CssEmptyCell>();
         static readonly ValueMap<CssFloat> _cssFloatMap = new ValueMap<CssFloat>();
-        static readonly ValueMap<LayoutFarm.Css.CssFontStyle> _cssFontStyleMap = new ValueMap<LayoutFarm.Css.CssFontStyle>();
+        static readonly ValueMap<CssFontStyle> _cssFontStyleMap = new ValueMap<CssFontStyle>();
         static readonly ValueMap<CssFontVariant> _cssFontVariantMap = new ValueMap<CssFontVariant>();
         static readonly ValueMap<CssFontWeight> _cssFontWeightMap = new ValueMap<CssFontWeight>();
         static readonly ValueMap<CssListStylePosition> _cssListStylePositionMap = new ValueMap<CssListStylePosition>();
@@ -56,7 +56,7 @@ namespace LayoutFarm.WebDom
         }
         public static bool IsFontStyle(string value)
         {
-            return _cssFontStyleMap.GetValueFromString(value, LayoutFarm.Css.CssFontStyle.Unknown) != LayoutFarm.Css.CssFontStyle.Unknown;
+            return _cssFontStyleMap.GetValueFromString(value, CssFontStyle.Unknown) != CssFontStyle.Unknown;
         }
         public static bool IsFontWeight(string value)
         {
@@ -325,16 +325,16 @@ namespace LayoutFarm.WebDom
         {
             return string.Concat("#", color.R.ToString("X"), color.G.ToString("X"), color.B.ToString("X"));
         }
-        public static string ToCssStringValue(this LayoutFarm.Css.CssFontStyle fontstyle)
+        public static string ToCssStringValue(this CssFontStyle fontstyle)
         {
             return _cssFontStyleMap.GetStringFromValue(fontstyle);
         }
-        public static LayoutFarm.Css.CssFontStyle GetFontStyle(WebDom.CssCodeValueExpression value)
+        public static CssFontStyle GetFontStyle(WebDom.CssCodeValueExpression value)
         {
-            return (LayoutFarm.Css.CssFontStyle)EvaluateIntPropertyValueFromString(
+            return (CssFontStyle)EvaluateIntPropertyValueFromString(
               _cssFontStyleMap,
               WebDom.CssValueEvaluatedAs.FontStyle,
-              LayoutFarm.Css.CssFontStyle.Normal,
+              CssFontStyle.Normal,
               value);
         }
         public static string ToCssStringValue(this CssFontVariant fontVariant)

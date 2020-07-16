@@ -14,6 +14,8 @@ using Typography.OpenFont.Contours;
 using Typography.Text;
 using Typography.TextLayout;
 
+using PixelFarm.Drawing;
+
 
 namespace SampleWinForms
 {
@@ -24,7 +26,8 @@ namespace SampleWinForms
         //create text printer env for developer.
 
 
-        readonly DevGdiTextPrinter _currentTextPrinter;
+        DevGdiTextPrinter _currentTextPrinter;
+        TextServiceClient _txtServiceClient;
 
         public Form1()
         {
@@ -32,6 +35,12 @@ namespace SampleWinForms
 
             //choose Thai script for 'complex script' testing.
             //you can change this to test other script.
+
+
+            _txtServiceClient = OurOpenFontSystem.CreateTextServiceClient();
+            _currentTextPrinter = new DevGdiTextPrinter(_txtServiceClient);
+            _currentTextPrinter.ScriptLang = new ScriptLang(ScriptTagDefs.Latin.Tag);
+
 
             //----------
             button1.Click += (s, e) => UpdateRenderOutput();
@@ -76,12 +85,9 @@ namespace SampleWinForms
             }
             //set default font for current text printer
             //
-
-            _currentTextPrinter = new DevGdiTextPrinter(OurOpenFontSystem.CreateTextServiceClient())
-            {
-                ScriptLang = new ScriptLang(ScriptTagDefs.Latin.Tag),
-                Typeface = OurOpenFontSystem.ResolveTypeface(selectedFF)
-            };
+          
+            //set default font for current text printer
+            _currentTextPrinter.Typeface = OurOpenFontSystem.ResolveTypeface(selectedFF);
 
 
             //Alternative Typeface Selector
@@ -99,7 +105,7 @@ namespace SampleWinForms
             //---------- 
 #if DEBUG
             //test get font from typeface store 
-            InstalledTypeface instFont = OurOpenFontSystem.GetFontCollection().GetFontByPostScriptName("SourceSansPro-Regular");
+            //InstalledTypeface instFont = OurOpenFontSystem.GetFontCollection().GetFontByPostScriptName("SourceSansPro-Regular");
 
 
 #endif

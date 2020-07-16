@@ -335,7 +335,7 @@ namespace SampleWinForms
                 //then should use alternative Asana Math
                 textOutput = "Hello! 3";
                 RequestFont reqFont1 = new RequestFont("Roboto-X", 20);
-                reqFont1.AddOtherChoices(new[] { new RequestFont.Choice("Asana Math", 20) });
+                reqFont1.AddOtherChoices(new RequestFont.Choice("Asana Math", 20));
 
                 DrawStringToMemBitmap(reqFont1, textOutput, 0, 150);
             }
@@ -364,6 +364,7 @@ namespace SampleWinForms
                 textOutput = "Hello! 1😁";
                 RequestFont reqFont1 = new RequestFont("Roboto", 20);
                 reqFont1.AddOtherChoices(new RequestFont.Choice("Asana Math", 20));
+
                 DrawStringToMemBitmap(reqFont1, textOutput, 0, 50);
             }
 
@@ -373,11 +374,8 @@ namespace SampleWinForms
                 //for Emoji=> our System default=> TwitterColorEmoji
                 //and in this case we want to specific that we want to use FireFoxColor Emoji instead 
                 textOutput = "Hello! 2😁";
-
                 RequestFont reqFont1 = new RequestFont("Roboto", 20);
-                reqFont1.AddOtherChoices(new RequestFont.Choice("Asana Math", 20),
-                                         new RequestFont.Choice("Firefox Emoji", 20));
-
+                reqFont1.AddOtherChoices(new RequestFont.Choice("Asana Math", 20), new RequestFont.Choice("Firefox Emoji", 20));
 
                 DrawStringToMemBitmap(reqFont1, textOutput, 0, 100);
             }
@@ -398,22 +396,20 @@ namespace SampleWinForms
 
         private void button4_Click(object sender, EventArgs e)
         {
+            //use css style   ,//see https://www.w3.org/TR/css-fonts-3/     
+
+
             //clear previous draw
+
             _painter.Clear(PixelFarm.Drawing.Color.White);
-
-
-            //Test: css style for font family name***
-            //we can use css style for font-family name (more than 1 family)
-
 
             string textOutput = "Hello! 1";
 
             {
                 //example1 
                 //we have Roboto
-
                 textOutput = "Hello! 1😁";
-                RequestFont reqFont1 = new RequestFont("Roboto, Asana Math", 20);
+                RequestFont reqFont1 = new RequestFont("Roboto, Asana Math", 20); //use css style   ,//see https://www.w3.org/TR/css-fonts-3/             
                 DrawStringToMemBitmap(reqFont1, textOutput, 0, 50);
             }
 
@@ -423,7 +419,6 @@ namespace SampleWinForms
                 //for Emoji=> our System default=> TwitterColorEmoji
                 //and in this case we want to specific that we want to use FireFoxColor Emoji instead 
                 textOutput = "Hello! 2😁";
-
                 RequestFont reqFont1 = new RequestFont("Roboto,Asana Math,Firefox Emoji", 20);
                 DrawStringToMemBitmap(reqFont1, textOutput, 0, 100);
             }

@@ -3,12 +3,33 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Typography.OpenFont;
-using Typography.OpenFont.Extensions;
 using Typography.OpenFont.Tables;
-using Typography.TextBreak;
+
 
 namespace Typography.FontManagement
 {
+    [Flags]
+    public enum TypefaceStyle
+    {
+        Others = 0,
+        Regular = 1,
+        Italic = 1 << 1,
+    }
+
+    public delegate FontNameDuplicatedDecision FontNameDuplicatedHandler(InstalledTypeface existing, InstalledTypeface newAddedFont);
+
+    public enum FontNameDuplicatedDecision
+    {
+        /// <summary>
+        /// use existing, skip latest font
+        /// </summary>
+        Skip,
+        /// <summary>
+        /// replace with existing with the new one
+        /// </summary>
+        Replace
+    }
+
     /// <summary>
     /// AlternativeTypefaceSelector
     /// </summary>
@@ -49,6 +70,7 @@ namespace Typography.FontManagement
         public InstalledTypeface InstalledTypeface { get; set; }
         public bool ResolvedInstalledTypeface { get; set; }
     }
+
     public class PreferredTypefaceList : List<PreferredTypeface>
     {
 #if DEBUG
@@ -61,177 +83,23 @@ namespace Typography.FontManagement
         }
     }
 
-    public class InstalledTypeface
-    {
-        readonly NameEntry _nameEntry;
-        readonly OS2Table _os2Table;
-        internal InstalledTypeface(Typeface typeface, string fontPath)
-            : this(typeface.GetNameEntry(),
-                  typeface.GetOS2Table(),
-                  typeface.Languages,
-                  fontPath)
-        { }
-
-        internal InstalledTypeface(PreviewFontInfo previewFontInfo, string fontPath)
-            : this(previewFontInfo.NameEntry,
-                  previewFontInfo.OS2Table,
-                  previewFontInfo.Languages, fontPath)
-        {
-        }
-
-        private InstalledTypeface(NameEntry nameTable, OS2Table os2Table, Languages languages, string fontPath)
-        {
-            _nameEntry = nameTable;
-            _os2Table = os2Table;
-            FontPath = fontPath;
-            Languages = languages;
-
-            var fsSelection = new OS2FsSelection(os2Table.fsSelection);
-            TypefaceStyle = fsSelection.IsItalic ? TypefaceStyle.Italic : TypefaceStyle.Regular;
-
-            //
-            //TypefaceStyle typefaceStyle = TypefaceStyle.Regular;//default
-            //OpenFont.Extensions.OS2FsSelection os2FsSelection = previewFont.OS2FsSelection;
-            //css font style
-
-            //            if (os2FsSelection.IsItalic || os2FsSelection.IsOblique)
-            //            {
-            //                typefaceStyle = TypefaceStyle.Italic;
-            //            }
-
-            //            //fs select hint this is bold
-            //            //1. bold from os2FsSelect
-            //            ushort weightClass = 0;
-            //            if (os2FsSelection.IsBold)
-            //            {
-            //                //2. should be 700
-            //                if (previewFont.WeightClass != 700)
-            //                {
-            //                    //????
-            //                }
-            //                weightClass = 700;
-            //            }
-
-
-
-            //            //---------------
-            //            //some font subfam="Bold Italic" but OS2TranslatedStyle is only Italic
-            //            //so we should check the subfam name too!
-            //            //---------------
-
-            //            string[] fontSubFamUpperCaseName_splits = previewFont.SubFamilyName.ToUpper().Split(' ');
-
-            //            for (int i = 0; i < fontSubFamUpperCaseName_splits.Length; ++i)
-            //            {
-            //                string splited = fontSubFamUpperCaseName_splits[i];
-            //                switch (splited)
-            //                {
-            //                    case "REGULAR":
-            //                    case "NORMAL":
-            //                        {
-            //                            if (weightClass != 0)
-            //                            {
-            //                                //
-            //                            }
-            //                            weightClass = 400;
-            //                        }
-            //                        break;
-            //                    case "BOLD":
-            //                        {
-            //                            if (weightClass != 700)
-            //                            {
-            //                                //???
-
-            //                            }
-            //                            weightClass = 700;
-            //                        }
-            //                        break;
-            //                    case "LIGHT":
-            //                        {
-            //                            if (weightClass != 0)
-            //                            {
-            //                                //???
-
-            //                            }
-            //                            weightClass = 300;
-            //                        }
-            //                        break;
-            //                    case "ITALIC":
-            //                        {
-            //                            if (typefaceStyle != TypefaceStyle.Italic)
-            //                            {
-            //                                //???
-            //                            }
-            //                            typefaceStyle = TypefaceStyle.Italic;
-            //                        }
-            //                        break;
-            //                    case "COLOR":
-            //                        {
-            //                            typefaceStyle = TypefaceStyle.Others;
-            //                        }
-            //                        break;
-            //                }
-            //            }
-
-
-            //#if DEBUG
-            //            if (typefaceStyle == TypefaceStyle.Others)
-            //            {
-
-            //            }
-            //#endif
-        }
-
-
-        public TypefaceStyle TypefaceStyle { get; }
-
-        public string FontName => _nameEntry.FontName;
-        public string FontSubFamily => _nameEntry.FontSubFamily;
-
-        public string TypographicFamilyName => _nameEntry.TypographicFamilyName;
-        public string TypographicFontSubFamily => _nameEntry.TypographyicSubfamilyName;
-        public string PostScriptName => _nameEntry.PostScriptName;
-        public string UniqueFontIden => _nameEntry.UniqueFontIden;
-        public ushort WeightClass => _os2Table.usWeightClass;
-        public ushort WidthClass => _os2Table.usWidthClass;
-
-        public Languages Languages { get; }
-        public string FontPath { get; internal set; }
-        public int ActualStreamOffset { get; internal set; }
-
-        //TODO: UnicodeLangBits vs UnicodeLangBits5_1
-        public bool DoesSupportUnicode(BitposAndAssciatedUnicodeRanges bitposAndAssocUnicode) => OpenFontUnicodeUtilExtensions.DoesSupportUnicode(Languages, bitposAndAssocUnicode.Bitpos);
-        public bool DoesSupportUnicode(int bitpos) => OpenFontUnicodeUtilExtensions.DoesSupportUnicode(Languages, bitpos);
-
-        /// <summary>
-        /// check if this font has glyph for the given code point or not
-        /// </summary>
-        /// <returns></returns>
-        public bool ContainGlyphForUnicode(int codepoint) => Languages.ContainGlyphForUnicode(codepoint);
-
-        internal Typeface ResolvedTypeface;
-
-#if DEBUG
-        public override string ToString()
-        {
-            return FontName + " (" + FontSubFamily + ")";
-        }
-#endif
-    }
-
-    [Flags]
-    public enum TypefaceStyle
-    {
-        Others = 0,
-        Regular = 1,
-        Italic = 1 << 1,
-    }
-
     public interface IFontStreamSource
     {
         Stream ReadFontStream();
         string PathName { get; }
     }
+
+    public interface IInstalledTypefaceProvider
+    {
+        InstalledTypeface GetInstalledTypeface(string fontName, TypefaceStyle style, ushort weight);
+    }
+
+    public delegate InstalledTypeface FontNotFoundHandler(InstalledTypefaceCollection typefaceCollection,
+        string fontName,
+        TypefaceStyle style,
+        ushort weightClass,
+        InstalledTypeface available,
+        List<InstalledTypeface> availableList);
 
     public class FontFileStreamProvider : IFontStreamSource
     {
@@ -247,488 +115,8 @@ namespace Typography.FontManagement
         }
     }
 
+
     public delegate void FirstInitFontCollectionDelegate(InstalledTypefaceCollection typefaceCollection);
-    public delegate InstalledTypeface FontNotFoundHandler(InstalledTypefaceCollection typefaceCollection,
-        string fontName,
-        TypefaceStyle style,
-        ushort weightClass,
-        InstalledTypeface available,
-        List<InstalledTypeface> availableList);
-
-    public interface IInstalledTypefaceProvider
-    {
-        InstalledTypeface GetInstalledTypeface(string fontName, TypefaceStyle style, ushort weightClass);
-    }
-
-    public class InstalledTypefaceCollection : IInstalledTypefaceProvider
-    {
-        class InstalledTypefaceGroup
-        {
-            public readonly Dictionary<string, InstalledTypeface> _members = new Dictionary<string, InstalledTypeface>();
-            public Dictionary<string, List<InstalledTypeface>> _dupRegNames;//** may be font-group
-
-
-            void AddThisToDuplicatedTypeface(string registerName, InstalledTypeface instTypeface)
-            {
-                if (_dupRegNames == null) { _dupRegNames = new Dictionary<string, List<InstalledTypeface>>(); }
-                //
-                if (!_dupRegNames.TryGetValue(registerName, out List<InstalledTypeface> duplist))
-                {
-                    _dupRegNames.Add(registerName, new List<InstalledTypeface>() { instTypeface });
-                    return;
-                }
-                duplist.Add(instTypeface);
-            }
-
-            public void AddFont(string registerName, InstalledTypeface instTypeface)
-            {
-                if (_dupRegNames != null && _dupRegNames.TryGetValue(registerName, out List<InstalledTypeface> foundDupList))
-                {
-                    foundDupList.Add(instTypeface);
-                    return;
-                }
-
-                if (_members.TryGetValue(registerName, out InstalledTypeface found))
-                {
-                    //found=> this is duplicated name=> move this to duplicate 
-
-                    _members.Remove(registerName);
-
-                    AddThisToDuplicatedTypeface(registerName, found);
-                    AddThisToDuplicatedTypeface(registerName, instTypeface);
-                }
-                else
-                {
-                    //
-                    _members.Add(registerName, instTypeface);
-                }
-
-
-            }
-            public int TryGetValue(string registerName, out InstalledTypeface found, out List<InstalledTypeface> foundList)
-            {
-                if (_dupRegNames != null && _dupRegNames.TryGetValue(registerName, out foundList))
-                {
-                    //select only 1=> how??
-                    //TODO: add handle to user selection
-                    //NOW: use the last one
-                    found = null;
-                    return foundList.Count;
-                }
-
-                if (_members.TryGetValue(registerName, out found))
-                {
-                    foundList = null;
-                    return 1;
-                }
-                foundList = null;
-                return 0;
-            }
-#if DEBUG
-            public string dbugGroupName;
-            public override string ToString()
-            {
-                return dbugGroupName;
-            }
-#endif
-
-        }
-
-        FontNotFoundHandler _fontNotFoundHandler;
-        //----------
-
-        readonly InstalledTypefaceGroup _registerTypefaces = new InstalledTypefaceGroup();
-        readonly InstalledTypefaceGroup _registerTypefacesByPostscriptName = new InstalledTypefaceGroup();
-
-        //classified by ...
-        //1. width class
-        //in this version we supports only regular width-class
-        //TODO: classified by width-class
-
-        //2. style : regular, italic, others
-        readonly List<InstalledTypeface> _regular = new List<InstalledTypeface>();
-        readonly List<InstalledTypeface> _italic1 = new List<InstalledTypeface>();
-        readonly List<InstalledTypeface> _others1 = new List<InstalledTypeface>();
-
-        //----------
-        //3. weight class
-        internal readonly List<InstalledTypeface> _weight100_Thin = new List<InstalledTypeface>();
-        internal readonly List<InstalledTypeface> _weight200_Extralight = new List<InstalledTypeface>(); //Extra-light (Ultra-light)
-        internal readonly List<InstalledTypeface> _weight300_Light = new List<InstalledTypeface>();
-        internal readonly List<InstalledTypeface> _weight400_Normal = new List<InstalledTypeface>();
-        internal readonly List<InstalledTypeface> _weight500_Medium = new List<InstalledTypeface>();
-        internal readonly List<InstalledTypeface> _weight600_SemiBold = new List<InstalledTypeface>(); //Semi-bold (Demi-bold)
-        internal readonly List<InstalledTypeface> _weight700_Bold = new List<InstalledTypeface>(); //Semi-bold (Demi-bold)
-        internal readonly List<InstalledTypeface> _weight800_ExtraBold = new List<InstalledTypeface>(); //Extra-bold (Ultra-bold)
-        internal readonly List<InstalledTypeface> _weight900_Black = new List<InstalledTypeface>(); //Black (Heavy)
-        //and other weight
-        internal readonly List<InstalledTypeface> _otherWeightClassTypefaces = new List<InstalledTypeface>();
-
-        //classified by file path (if available)
-        internal Dictionary<string, InstalledTypeface> _installedTypefacesByFilenames = new Dictionary<string, InstalledTypeface>();
-
-        //---------- 
-        static InstalledTypefaceCollection s_intalledTypefaces;
-
-
-#if DEBUG
-        readonly Dictionary<string, PreviewFontInfo> dbug_uniqueNames = new Dictionary<string, PreviewFontInfo>();
-        readonly List<PreviewFontInfo> dbugAll = new List<PreviewFontInfo>();
-#endif
-
-
-        public InstalledTypefaceCollection()
-        {
-        }
-
-        public void SetFontNotFoundHandler(FontNotFoundHandler fontNotFoundHandler) => _fontNotFoundHandler = fontNotFoundHandler;
-
-        public static InstalledTypefaceCollection GetSharedTypefaceCollection(FirstInitFontCollectionDelegate initdel)
-        {
-            if (s_intalledTypefaces == null)
-            {
-                //first time
-                s_intalledTypefaces = new InstalledTypefaceCollection();
-                initdel(s_intalledTypefaces);
-            }
-            return s_intalledTypefaces;
-        }
-
-        public static void SetAsSharedTypefaceCollection(InstalledTypefaceCollection installedTypefaceCollection) => s_intalledTypefaces = installedTypefaceCollection;
-
-        public static InstalledTypefaceCollection GetSharedTypefaceCollection() => s_intalledTypefaces;
-
-        public InstalledTypeface AddFontPreview(PreviewFontInfo previewFont, string srcPath)
-        {
-
-#if DEBUG
-            {
-                string upper_fontname = previewFont.Name.ToUpper();
-
-                if (!dbug_uniqueNames.TryGetValue(upper_fontname, out PreviewFontInfo found))
-                {
-                    //found, check if duplicated or not
-                    dbug_uniqueNames.Add(upper_fontname, previewFont);
-                }
-                dbugAll.Add(previewFont);
-            }
-#endif
-
-            InstalledTypeface installedTypeface = new InstalledTypeface(
-                previewFont,
-                srcPath)
-            { ActualStreamOffset = previewFont.ActualStreamOffset };
-
-            return Register(installedTypeface) ? installedTypeface : null;
-        }
-
-        public bool AddFontStreamSource(IFontStreamSource src)
-        {
-            //preview data of font
-            try
-            {
-                using (Stream stream = src.ReadFontStream())
-                {
-                    var reader = new OpenFontReader();
-                    PreviewFontInfo previewFont = reader.ReadPreview(stream);
-                    if (previewFont == null || string.IsNullOrEmpty(previewFont.Name))
-                    {
-                        //err!
-                        return false;
-                    }
-                    if (previewFont.IsFontCollection)
-                    {
-                        int mbCount = previewFont.MemberCount;
-                        bool totalResult = true;
-                        for (int i = 0; i < mbCount; ++i)
-                        {
-                            //extract and each members
-                            InstalledTypeface instTypeface = AddFontPreview(previewFont.GetMember(i), src.PathName);
-                            if (instTypeface == null)
-                            {
-                                totalResult = false;
-                            }
-
-                        }
-                        return totalResult;
-                    }
-                    else
-                    {
-                        return AddFontPreview(previewFont, src.PathName) != null;
-                    }
-
-                }
-            }
-            catch (IOException)
-            {
-                //TODO review here again
-                return false;
-            }
-        }
-
-        bool Register(InstalledTypeface instTypeface)
-        {
-            //1. classified by name
-            string typefaceName = instTypeface.FontName.ToUpper();
-            if (typefaceName != null)
-            {
-                _registerTypefaces.AddFont(typefaceName, instTypeface);
-            }
-            string typographyFontFam = instTypeface.TypographicFamilyName?.ToUpper();
-            if (typographyFontFam != null && typographyFontFam != typefaceName)
-            {
-                _registerTypefaces.AddFont(typographyFontFam, instTypeface);
-            }
-            string postScriptName = instTypeface.PostScriptName?.ToUpper();
-            if (postScriptName != null)
-            {
-                _registerTypefacesByPostscriptName.AddFont(postScriptName, instTypeface);
-                //
-                if (postScriptName != typefaceName)
-                {
-                    _registerTypefaces.AddFont(postScriptName, instTypeface);
-                }
-            }
-
-            //2. by style
-            if (instTypeface.TypefaceStyle == TypefaceStyle.Italic)
-            {
-                _italic1.Add(instTypeface);
-            }
-            else
-            {
-                _regular.Add(instTypeface);
-            }
-
-            //3. by weight
-            GetInstalledTypefaceByWeightClass(instTypeface.WeightClass).Add(instTypeface);
-
-            _allTypefaces.Add(instTypeface);
-            return true;
-        }
-
-
-        //by postscript font name
-
-        public InstalledTypeface GetFontByPostScriptName(string postScriptName)
-        {
-            switch (_registerTypefacesByPostscriptName.TryGetValue(
-                postScriptName.ToUpper(),
-                out InstalledTypeface found1,
-                out List<InstalledTypeface> foundList))
-            {
-                case 0: return null;
-                case 1: return found1;
-                default: return foundList[foundList.Count - 1];
-            }
-        }
-        public InstalledTypeface GetInstalledTypeface(string fontName, TypefaceStyle style, ushort weightClass)
-        {
-            //https://www.w3.org/TR/css-fonts-3/#font-matching-algorithm
-            //User agents must match these names case insensitively, using the "Default Caseless Matching" algorithm outlined in the Unicode specification
-
-            string upperCaseFontName = fontName.ToUpper().Trim();
-
-            switch (_registerTypefaces.TryGetValue(
-               upperCaseFontName,
-               out InstalledTypeface found1,
-               out List<InstalledTypeface> foundList))
-            {
-                case 0: return _fontNotFoundHandler?.Invoke(this, upperCaseFontName, style, weightClass, null, null);
-                case 1:
-                    {
-                        if (found1.TypefaceStyle == style && found1.WeightClass == weightClass)
-                        {
-                            return found1;
-                        }
-                        return _fontNotFoundHandler?.Invoke(this, upperCaseFontName, style, weightClass, found1, foundList);
-                    }
-                default:
-                    {
-                        for (int i = foundList.Count - 1; i >= 0; --i)
-                        {
-                            found1 = foundList[i];
-                            if (found1.TypefaceStyle == style &&
-                                found1.WeightClass == weightClass)
-                            {
-                                return found1;
-                            }
-                        }
-                        return _fontNotFoundHandler?.Invoke(this, upperCaseFontName, style, weightClass, found1, foundList);
-                    }
-            }
-        }
-
-        readonly List<InstalledTypeface> _allTypefaces = new List<InstalledTypeface>();
-
-        public IEnumerable<InstalledTypeface> GetInstalledFontIter()
-        {
-            foreach (InstalledTypeface f in _allTypefaces)
-            {
-                yield return f;
-            }
-        }
-        List<InstalledTypeface> GetInstalledTypefaceByWeightClass(ushort weightClass)
-        {
-            switch (weightClass)
-            {
-                default: return _otherWeightClassTypefaces;
-                case 100: return _weight100_Thin;
-                case 200: return _weight200_Extralight;
-                case 300: return _weight300_Light;
-                case 400: return _weight400_Normal;
-                case 500: return _weight500_Medium;
-                case 600: return _weight600_SemiBold;
-                case 700: return _weight700_Bold;
-                case 800: return _weight800_ExtraBold;
-                case 900: return _weight900_Black;
-            }
-        }
-        public IEnumerable<InstalledTypeface> GetInstalledTypefaceIterByWeightClassIter(ushort weightClass)
-        {
-            return GetInstalledTypefaceByWeightClass(weightClass);
-        }
-
-        readonly Dictionary<UnicodeRangeInfo, List<InstalledTypeface>> _registerWithUnicodeRangeDic = new Dictionary<UnicodeRangeInfo, List<InstalledTypeface>>();
-        readonly List<InstalledTypeface> _emojiSupportedTypefaces = new List<InstalledTypeface>();
-        readonly List<InstalledTypeface> _mathTypefaces = new List<InstalledTypeface>();
-
-        //unicode 13:
-        //https://unicode.org/emoji/charts/full-emoji-list.html
-        //emoji start at U+1F600 	
-        const int UNICODE_EMOJI_START = 0x1F600; //"😁" //first emoji
-        const int UNICODE_EMOJI_END = 0x1F64F;
-
-        //https://www.unicode.org/charts/PDF/U1D400.pdf
-        const int UNICODE_MATH_ALPHANUM_EXAMPLE = 0x1D400; //1D400–1D7FF;
-
-
-
-        List<InstalledTypeface> GetExisitingOrCreateNewListForUnicodeRange(UnicodeRangeInfo range)
-        {
-            if (!_registerWithUnicodeRangeDic.TryGetValue(range, out List<InstalledTypeface> found))
-            {
-                found = new List<InstalledTypeface>();
-                _registerWithUnicodeRangeDic.Add(range, found);
-            }
-            return found;
-        }
-        public void UpdateUnicodeRanges()
-        {
-
-            _registerWithUnicodeRangeDic.Clear();
-            _emojiSupportedTypefaces.Clear();
-            _mathTypefaces.Clear();
-
-            foreach (InstalledTypeface instFont in GetInstalledFontIter())
-            {
-                foreach (BitposAndAssciatedUnicodeRanges bitposAndAssocUnicodeRanges in instFont.GetSupportedUnicodeLangIter())
-                {
-                    foreach (UnicodeRangeInfo range in bitposAndAssocUnicodeRanges.Ranges)
-                    {
-
-                        List<InstalledTypeface> typefaceList = GetExisitingOrCreateNewListForUnicodeRange(range);
-                        typefaceList.Add(instFont);
-                        //----------------
-                        //sub range
-                        if (range == BitposAndAssciatedUnicodeRanges.None_Plane_0)
-                        {
-                            //special search
-                            //TODO: review here again
-                            foreach (UnicodeRangeInfo rng in Unicode13RangeInfoList.GetNonePlane0Iter())
-                            {
-                                if (instFont.ContainGlyphForUnicode(rng.StarCodepoint))
-                                {
-                                    typefaceList = GetExisitingOrCreateNewListForUnicodeRange(rng);
-                                    typefaceList.Add(instFont);
-                                }
-                            }
-                            if (instFont.ContainGlyphForUnicode(UNICODE_EMOJI_START))
-                            {
-                                _emojiSupportedTypefaces.Add(instFont);
-                            }
-                            if (instFont.ContainGlyphForUnicode(UNICODE_MATH_ALPHANUM_EXAMPLE))
-                            {
-                                _mathTypefaces.Add(instFont);
-                            }
-                        }
-                    }
-                }
-            }
-            //------
-            //select perfer unicode font
-
-        }
-
-
-        /// <summary>
-        /// get alternative typeface from a given unicode codepoint
-        /// </summary>
-        /// <param name="codepoint"></param>
-        /// <param name="selector"></param>
-        /// <param name="found"></param>
-        /// <returns></returns>
-        public bool TryGetAlternativeTypefaceFromCodepoint(int codepoint, AltTypefaceSelectorBase selector, out Typeface selectedTypeface)
-        {
-            //find a typeface that supported input char c
-
-            List<InstalledTypeface> installedTypefaceList = null;
-            if (ScriptLangs.TryGetUnicodeRangeInfo(codepoint, out UnicodeRangeInfo unicodeRangeInfo))
-            {
-                if (_registerWithUnicodeRangeDic.TryGetValue(unicodeRangeInfo, out List<InstalledTypeface> typefaceList) &&
-                    typefaceList.Count > 0)
-                {
-                    //select a proper typeface                        
-                    installedTypefaceList = typefaceList;
-                }
-            }
-
-
-            //not found
-            if (installedTypefaceList == null && codepoint >= UNICODE_EMOJI_START && codepoint <= UNICODE_EMOJI_END)
-            {
-                unicodeRangeInfo = Unicode13RangeInfoList.Emoticons;
-                if (_emojiSupportedTypefaces.Count > 0)
-                {
-                    installedTypefaceList = _emojiSupportedTypefaces;
-                }
-            }
-            //-------------
-            if (installedTypefaceList != null)
-            {
-                //select a prefer font 
-                if (selector != null)
-                {
-                    AltTypefaceSelectorBase.SelectedTypeface result = selector.Select(installedTypefaceList, unicodeRangeInfo, codepoint);
-                    if (result.InstalledTypeface != null)
-                    {
-                        selectedTypeface = this.ResolveTypeface(result.InstalledTypeface);
-                        return selectedTypeface != null;
-                    }
-                    else if (result.Typeface != null)
-                    {
-                        selectedTypeface = result.Typeface;
-                        return true;
-                    }
-                    else
-                    {
-                        selectedTypeface = null;
-                        return false;
-                    }
-                }
-                else if (installedTypefaceList.Count > 0)
-                {
-                    //InstalledTypeface instTypeface = installedTypefaceList[0];//default
-                    selectedTypeface = this.ResolveTypeface(installedTypefaceList[0]);
-                    return selectedTypeface != null;
-                }
-            }
-
-            selectedTypeface = null;
-            return false;
-        }
-
-    }
 
     public readonly struct TinyCRC32Calculator
     {
@@ -833,6 +221,7 @@ namespace Typography.FontManagement
 
         public static int CalculateCrc32(byte[] buffer) => SlurpBlock(buffer, 0, buffer.Length);
     }
+
     public static class InstalledTypefaceCollectionExtensions
     {
 
@@ -918,9 +307,10 @@ namespace Typography.FontManagement
             }
         }
 
-        public static Typeface ResolveTypeface(this InstalledTypefaceCollection fontCollection, string fontName, TypefaceStyle style)
+
+        public static Typeface ResolveTypeface(this InstalledTypefaceCollection fontCollection, string fontName, TypefaceStyle style, ushort weight)
         {
-            InstalledTypeface inst = fontCollection.GetInstalledTypeface(fontName, style, 400);//regular
+            InstalledTypeface inst = fontCollection.GetInstalledTypeface(fontName, style/*InstalledTypefaceCollection.GetSubFam(style)*/, weight);
             return (inst != null) ? fontCollection.ResolveTypeface(inst) : null;
         }
         public static Typeface ResolveTypeface(this InstalledTypefaceCollection fontCollection, InstalledTypeface installedFont)

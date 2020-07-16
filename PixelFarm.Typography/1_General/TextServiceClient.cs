@@ -24,7 +24,6 @@ namespace Typography.Text
             _openFontTextService = openFontTextService;
             _p = new VirtualTextSpanPrinter();
             _p.BuiltInAlternativeTypefaceSelector = (int codepoint, AltTypefaceSelectorBase userSelector, out Typeface typeface) => _openFontTextService.TryGetAlternativeTypefaceFromCodepoint(codepoint, userSelector, out typeface);
-            _p.PositionTechnique = PositionTechnique.OpenFont;
         }
         public ScriptLang CurrentScriptLang
         {
@@ -171,10 +170,18 @@ namespace Typography.Text
             _p.ScriptLang = sclang;
             _p.Typeface = typeface;
             _p.FontSizeInPoints = sizeInPts;
-            
+
             _p.UpdateGlyphLayoutSettings();
         }
-      
+        public void SetCurrentFont(Typeface typeface, float sizeInPts, ScriptLang sclang, PositionTechnique posTech)
+        {
+            _p.ScriptLang = sclang;
+            _p.PositionTechnique = posTech;
+            _p.Typeface = typeface;
+            _p.FontSizeInPoints = sizeInPts;
+
+            _p.UpdateGlyphLayoutSettings();
+        }
         public void CreateGlyphPlanSeq(in Typography.Text.TextBufferSpan textBufferSpan, IUnscaledGlyphPlanList unscaledList)
         {
             _p.CreateGlyphPlanSeq(textBufferSpan, unscaledList);
@@ -262,6 +269,7 @@ namespace Typography.Text
             return resolvedFont.LineSpacingInPixels;
         }
 
+
         public void BreakToLineSegments(in TextBufferSpan textBufferSpan, WordVisitor wordVisitor)
         {
             //a text buffer span is separated into multiple line segment list  
@@ -281,7 +289,7 @@ namespace Typography.Text
         }
         readonly Dictionary<int, ResolvedFont> _localResolvedFonts = new Dictionary<int, ResolvedFont>();
 
-        public ResolvedFont LocalResolveFont(Typeface typeface, float sizeInPoint, CssFontStyle style = CssFontStyle.Regular)
+        public ResolvedFont LocalResolveFont(Typeface typeface, float sizeInPoint, NewCssFontStyle style =  NewCssFontStyle.Regular)
         {
             //find local resolved font cache
 

@@ -29,7 +29,7 @@ namespace SampleWinForms
             //1. create font collection             
             s_installedTypefaceCollection = new InstalledTypefaceCollection();
             //2. set some essential handler
-            
+            s_installedTypefaceCollection.SetFontNameDuplicatedHandler((f1, f2) => FontNameDuplicatedDecision.Skip);
             s_installedTypefaceCollection.LoadFontsFromFolder("../../../TestFonts_Err");
             s_installedTypefaceCollection.LoadFontsFromFolder("../../../TestFonts");
             s_installedTypefaceCollection.UpdateUnicodeRanges();

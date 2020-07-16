@@ -145,7 +145,7 @@ namespace SampleWinForms
             _devVxsTextPrinter.SetSvgBmpBuilderFunc(PaintLab.SvgBuilderHelper.ParseAndRenderSvg);
             _devVxsTextPrinter.ScriptLang = _basicOptions.ScriptLang;
             _devVxsTextPrinter.PositionTechnique = Typography.TextLayout.PositionTechnique.OpenFont;
-
+            _devVxsTextPrinter.Typeface = _textService.ResolveFont(_painter.CurrentFont).Typeface;
 
             //Alternative Typeface selector..
             var myAlternativeTypefaceSelector = new Typography.Text.AlternativeTypefaceSelector();
@@ -518,25 +518,24 @@ namespace SampleWinForms
                 //
                 if (_devVxsTextPrinter != null)
                 {
-
-                    PixelFarm.Drawing.CssFontStyle fontstyle = PixelFarm.Drawing.CssFontStyle.Regular; //***
+                    PixelFarm.Drawing.NewCssFontStyle fontstyle = PixelFarm.Drawing.NewCssFontStyle.Regular;
+                    ushort fontWeight = (ushort)PixelFarm.Drawing.RequestFontWeight.Normal;
 
                     switch (_basicOptions.SelectedTypefaceStyle)
                     {
-                        case Typography.FontManagement.TypefaceStyle.Regular:
-                            fontstyle = PixelFarm.Drawing.CssFontStyle.Regular;
-                            break;
                         case Typography.FontManagement.TypefaceStyle.Italic:
-                            fontstyle = PixelFarm.Drawing.CssFontStyle.Italic;
-                            break;
-                        case Typography.FontManagement.TypefaceStyle.Others:
-                            throw new NotSupportedException();
+                            fontstyle = PixelFarm.Drawing.NewCssFontStyle.Italic;
                             break;
                     }
+
                     _devVxsTextPrinter.Typeface = e.SelectedTypeface;
+
                     var reqFont = new PixelFarm.Drawing.RequestFont(
                         e.SelectedTypeface.Name,
-                        _basicOptions.FontSizeInPoints);
+                        _basicOptions.FontSizeInPoints,
+                        fontWeight,
+                        fontstyle);
+
                     _devVxsTextPrinter.ChangeFont(reqFont);
                     _painter.CurrentFont = reqFont;
                 }
