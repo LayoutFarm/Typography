@@ -78,8 +78,10 @@ namespace Typography.FontManagement
         }
 
 
+        readonly Dictionary<string, InstalledTypefaceGroup> _regNames = new Dictionary<string, InstalledTypefaceGroup>();
 
-        readonly Dictionary<string, InstalledTypefaceGroup> _typefaceGroups = new Dictionary<string, InstalledTypefaceGroup>();
+        //others
+        readonly Dictionary<string, InstalledTypefaceGroup> _otherNames = new Dictionary<string, InstalledTypefaceGroup>();
 
         readonly Dictionary<string, InstalledTypeface> _all3 = new Dictionary<string, InstalledTypeface>();
 
@@ -99,7 +101,10 @@ namespace Typography.FontManagement
                 //switch to font name, this should not be null!
                 register_name = instTypeface.FontName;
             }
-            register_name = register_name.ToUpper() + "," + instTypeface.TypefaceStyle + "," + instTypeface.WeightClass; //***   
+
+            string reg_name_only = register_name.ToUpper();
+
+            register_name = reg_name_only + "," + instTypeface.TypefaceStyle + "," + instTypeface.WeightClass; //***   
             bool register_result = false;
             if (_all3.TryGetValue(register_name, out InstalledTypeface found))
             {
@@ -136,27 +141,41 @@ namespace Typography.FontManagement
             //[B]---------------------------------------
             //register other names...
 
-            string fontName = instTypeface.FontName.ToUpper();//MUST not be null
 
-            //-----
-            if (!_typefaceGroups.TryGetValue(fontName, out InstalledTypefaceGroup found1))
+
+            if (!_regNames.TryGetValue(reg_name_only, out InstalledTypefaceGroup regNameGroup))
             {
-                found1 = new InstalledTypefaceGroup(fontName, instTypeface);
-                _typefaceGroups.Add(fontName, found1);
+                regNameGroup = new InstalledTypefaceGroup(reg_name_only, instTypeface);
+                _regNames.Add(reg_name_only, regNameGroup);
             }
             else
             {
-                found1.AddInstalledTypeface(instTypeface);
+                regNameGroup.AddInstalledTypeface(instTypeface);
+            }
+
+
+            string fontName = instTypeface.FontName.ToUpper();
+            if (fontName != null && fontName != reg_name_only)
+            {
+                if (!_otherNames.TryGetValue(fontName, out InstalledTypefaceGroup found2))
+                {
+                    found2 = new InstalledTypefaceGroup(fontName, instTypeface);
+                    _otherNames.Add(fontName, found2);
+                }
+                else
+                {
+                    found2.AddInstalledTypeface(instTypeface);
+                }
             }
 
             //-----
             string typographicName = instTypeface.TypographicFamilyName?.ToUpper();
-            if (typographicName != null && typographicName != fontName)
+            if (typographicName != null && typographicName != reg_name_only && typographicName != fontName)
             {
-                if (!_typefaceGroups.TryGetValue(typographicName, out InstalledTypefaceGroup found2))
+                if (!_otherNames.TryGetValue(typographicName, out InstalledTypefaceGroup found2))
                 {
                     found2 = new InstalledTypefaceGroup(typographicName, instTypeface);
-                    _typefaceGroups.Add(typographicName, found2);
+                    _otherNames.Add(typographicName, found2);
                 }
                 else
                 {
@@ -167,10 +186,10 @@ namespace Typography.FontManagement
             string postScriptName = instTypeface.PostScriptName?.ToUpper();
             if (postScriptName != null && postScriptName != fontName && postScriptName != typographicName)
             {
-                if (!_typefaceGroups.TryGetValue(postScriptName, out InstalledTypefaceGroup found2))
+                if (!_otherNames.TryGetValue(postScriptName, out InstalledTypefaceGroup found2))
                 {
                     found2 = new InstalledTypefaceGroup(postScriptName, instTypeface);
-                    _typefaceGroups.Add(postScriptName, found2);
+                    _otherNames.Add(postScriptName, found2);
                 }
                 else
                 {
@@ -200,7 +219,29 @@ namespace Typography.FontManagement
 
             _candidates.Clear();
             string upper = fontName.Trim().ToUpper();
-            if (_typefaceGroups.TryGetValue(upper, out InstalledTypefaceGroup found))
+
+            if (_regNames.TryGetValue(upper, out InstalledTypefaceGroup found))
+            {
+                found.CollectCandidateFont(wellknownSubFam, weight, _candidates);
+
+                if (_candidates.Count == 1)
+                {
+                    //select most proper***
+                    //the last one              
+                    return _candidates[0];
+                }
+                else if (_candidates.Count > 1)
+                {
+                    //TODO: 
+                    //more than 1,
+                    //TODO: ask user for most proper one
+
+                    return _candidates[_candidates.Count - 1];
+                }
+            }
+
+
+            if (_otherNames.TryGetValue(upper, out found))
             {
                 found.CollectCandidateFont(wellknownSubFam, weight, _candidates);
 
@@ -221,6 +262,15 @@ namespace Typography.FontManagement
             }
             return _fontNotFoundHandler?.Invoke(this, upper, wellknownSubFam, weight, null, null);
         }
+
+        public IEnumerable<InstalledTypefaceGroup> GetInstalledTypefaceGroupIter()
+        {
+            foreach (InstalledTypefaceGroup g in _regNames.Values)
+            {
+                yield return g;
+            }
+        }
+
     }
 
 

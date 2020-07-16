@@ -96,22 +96,24 @@ namespace TypographyTest.WinForms
             {
                 InstalledTypefaceCollection typefaceCollection = _options.InstallTypefaceCollection;
                 lstFontNameList.Items.Clear();
-                foreach (string fontName in typefaceCollection.GetFontNameIter())
+
+                foreach (InstalledTypefaceCollection.InstalledTypefaceGroup instGroup in typefaceCollection.GetInstalledTypefaceGroupIter())
                 {
-                    lstFontNameList.Items.Add(fontName);
+                    lstFontNameList.Items.Add(instGroup);
                 }
+                
             }
             //
             lstFontNameList.Click += delegate
             {
                 lstFontStyle.Items.Clear();
 
-                if (lstFontNameList.SelectedItem is string fontName)
+                if (lstFontNameList.SelectedItem is InstalledTypefaceCollection.InstalledTypefaceGroup instGroup)
                 {
-                    foreach (InstalledTypeface installedTypeface in _options.InstallTypefaceCollection.GetInstalledTypefaceIter(fontName))
-                    {
-                        lstFontStyle.Items.Add(installedTypeface);
-                    }
+                    //foreach (InstalledTypeface installedTypeface in _options.InstallTypefaceCollection.GetInstalledTypefaceIter(fontName))
+                    //{
+                    //    lstFontStyle.Items.Add(installedTypeface);
+                    //}
                 }
             };
             //
@@ -130,7 +132,7 @@ namespace TypographyTest.WinForms
             ShowSupportedScripts(installedTypeface);
         }
 
-      
+
         void ShowSupportedScripts(InstalledTypeface installedTypeface)
         {
             //show supported lang
@@ -138,7 +140,7 @@ namespace TypographyTest.WinForms
             lstScriptLangs.Items.Clear();
 
             Dictionary<string, ScriptLang> dic = new Dictionary<string, ScriptLang>();
-            installedTypeface.CollectScriptLang(dic); 
+            installedTypeface.CollectScriptLang(dic);
             foreach (var kv in dic)
             {
                 ScriptLang s = kv.Value;

@@ -6,6 +6,7 @@ using Typography.OpenFont;
 using Typography.TextLayout;
 using Typography.Text;
 using Typography.FontManagement;
+using PixelFarm.Drawing;
 
 namespace TypographyTest
 {
@@ -29,7 +30,7 @@ namespace TypographyTest
         Typeface _selectedTypeface;
         bool _typefaceChanged = false;
 
-       
+
         InstalledTypefaceCollection _installedTypefaces;
 
         public BasicFontOptions()
@@ -37,7 +38,7 @@ namespace TypographyTest
             SelectedTypefaceStyle = TypefaceStyle.Regular;
             FontSizeInPoints = 10;
             this.RenderChoice = RenderChoice.RenderWithTextPrinterAndMiniAgg;
-           
+
             _installedTypefaces = new InstalledTypefaceCollection();
             _installedTypefaces.SetFontNameDuplicatedHandler(
                 (f0, f1) => FontNameDuplicatedDecision.Skip);
@@ -113,7 +114,7 @@ namespace TypographyTest
 
                 //TODO: review here again
                 SelectedTypefaceStyle = _instTypeface.TypefaceStyle;
-                Typeface selected_typeface = _installedTypefaces.ResolveTypeface(value.FontName, _instTypeface.TypefaceStyle);// TypefaceStyle.Regular);
+                Typeface selected_typeface = _installedTypefaces.ResolveTypeface(value.FontName, _instTypeface.TypefaceStyle, (ushort)RequestFontWeight.Normal);
                 if (selected_typeface != _selectedTypeface)
                 {
                     _typefaceChanged = true;

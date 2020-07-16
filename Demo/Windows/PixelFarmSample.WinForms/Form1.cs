@@ -145,7 +145,7 @@ namespace SampleWinForms
             _devVxsTextPrinter.SetSvgBmpBuilderFunc(PaintLab.SvgBuilderHelper.ParseAndRenderSvg);
             _devVxsTextPrinter.ScriptLang = _basicOptions.ScriptLang;
             _devVxsTextPrinter.PositionTechnique = Typography.TextLayout.PositionTechnique.OpenFont;
-
+            _devVxsTextPrinter.Typeface = _textService.ResolveFont(_painter.CurrentFont).Typeface;
 
             //Alternative Typeface selector..
             var myAlternativeTypefaceSelector = new Typography.Text.AlternativeTypefaceSelector();
