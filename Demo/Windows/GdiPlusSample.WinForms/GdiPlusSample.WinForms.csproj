@@ -48,7 +48,7 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
-    <Compile Include="GdiPlus\DevGdiTextPrinter.cs" />
+    <Compile Include="GdiPlus\DevGdiTextSpanPrinter.cs" />
     <Compile Include="GdiPlus\GlyphTranslatorToGdiPath.cs" />
     <Compile Include="OurOpenFontSystem.cs" />
     <Compile Include="Win32Dpi.cs" />
