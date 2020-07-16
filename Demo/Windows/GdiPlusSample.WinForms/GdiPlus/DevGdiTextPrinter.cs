@@ -21,7 +21,7 @@ namespace SampleWinForms
         Typeface _currentTypeface;
         GlyphOutlineBuilder _currentGlyphPathBuilder;
         GlyphTranslatorToGdiPath _txToGdiPath;
-        TextServiceClient _txtClient;
+        readonly TextServiceClient _txtClient;
 
         readonly SolidBrush _fillBrush = new SolidBrush(Color.Black);
         readonly Pen _outlinePen = new Pen(Color.Green);
@@ -29,18 +29,14 @@ namespace SampleWinForms
         //for optimization
         readonly GlyphMeshCollection<GraphicsPath> _glyphMeshCollections = new GlyphMeshCollection<GraphicsPath>();
 
-        public DevGdiTextPrinter()
+        public DevGdiTextPrinter(TextServiceClient txtClient)
         {
+            _txtClient = txtClient;
             FillBackground = true;
             FillColor = Color.Black;
             OutlineColor = Color.Green;
         }
-        //----------------------------
 
-        public void SetTextServiceClient(TextServiceClient txtClient)
-        {
-            _txtClient = txtClient;
-        }
         public HintTechnique HintTechnique { get; set; }
         public AlternativeTypefaceSelector AlternativeTypefaceSelector
         {
