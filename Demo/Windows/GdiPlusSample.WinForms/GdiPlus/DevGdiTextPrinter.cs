@@ -79,7 +79,7 @@ namespace SampleWinForms
         }
         protected override void OnFontSizeChanged()
         {
-            _txtClient.SetCurrentFont(_currentTypeface, this.FontSizeInPoints, PositionTechnique.OpenFont);
+            _txtClient.SetCurrentFont(_currentTypeface, this.FontSizeInPoints, ScriptLang);
             base.OnFontSizeChanged();
         }
 

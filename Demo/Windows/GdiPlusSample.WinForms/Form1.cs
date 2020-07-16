@@ -100,7 +100,7 @@ namespace SampleWinForms
             //---------- 
 #if DEBUG
             //test get font from typeface store 
-            InstalledTypeface instFont = OurOpenFontSystem.GetFontCollection().GetFontByPostScriptName("SourceSansPro-Regular");
+            //InstalledTypeface instFont = OurOpenFontSystem.GetFontCollection().GetFontByPostScriptName("SourceSansPro-Regular");
 
 
 #endif

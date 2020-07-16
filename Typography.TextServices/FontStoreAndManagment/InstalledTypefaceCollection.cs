@@ -1,11 +1,15 @@
 ﻿//MIT, 2016-present, WinterDev 
 using System;
+using System.IO;
 using System.Collections.Generic;
-
-
+using Typography.OpenFont;
+using Typography.OpenFont.Tables;
+using Typography.TextLayout;
+using Typography.TextBreak;
+using Typography.Text;
 namespace Typography.FontManagement
 {
-   
+
     //=======
     //[PART1]
     public partial class InstalledTypefaceCollection : IInstalledTypefaceProvider
@@ -73,7 +77,7 @@ namespace Typography.FontManagement
 #endif
         }
 
-         
+
 
         readonly Dictionary<string, InstalledTypefaceGroup> _typefaceGroups = new Dictionary<string, InstalledTypefaceGroup>();
 
