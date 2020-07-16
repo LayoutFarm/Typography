@@ -3,79 +3,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Typography.OpenFont;
-using Typography.OpenFont.Extensions;
 using Typography.OpenFont.Tables;
 using Typography.TextBreak;
 
 namespace Typography.FontManagement
 {
-
-
-
-    public class InstalledTypeface
-    {
-        readonly NameEntry _nameEntry;
-        readonly OS2Table _os2Table;
-        internal InstalledTypeface(Typeface typeface, string fontPath)
-            : this(typeface.GetNameEntry(),
-                  typeface.GetOS2Table(),
-                  typeface.Languages,
-                  fontPath)
-        { }
-
-        internal InstalledTypeface(PreviewFontInfo previewFontInfo, string fontPath)
-            : this(previewFontInfo.NameEntry,
-                  previewFontInfo.OS2Table,
-                  previewFontInfo.Languages, fontPath)
-        { }
-
-        private InstalledTypeface(NameEntry nameTable, OS2Table os2Table, Languages languages, string fontPath)
-        {
-            _nameEntry = nameTable;
-            _os2Table = os2Table;
-            FontPath = fontPath;
-            Languages = languages;
-
-            var fsSelection = new OS2FsSelection(os2Table.fsSelection);
-            TypefaceStyle = fsSelection.IsItalic ? TypefaceStyle.Italic : TypefaceStyle.Regular;
-
-
-        }
-        public TypefaceStyle TypefaceStyle { get; internal set; }
-
-        public string FontName => _nameEntry.FontName;
-        public string FontSubFamily => _nameEntry.FontSubFamily;
-
-        public string TypographicFamilyName => _nameEntry.TypographicFamilyName;
-        public string TypographicFontSubFamily => _nameEntry.TypographyicSubfamilyName;
-        public string PostScriptName => _nameEntry.PostScriptName;
-        public string UniqueFontIden => _nameEntry.UniqueFontIden;
-        public ushort WeightClass => _os2Table.usWeightClass;
-        public ushort WidthClass => _os2Table.usWidthClass;
-
-        public Languages Languages { get; }
-        public string FontPath { get; internal set; }
-        public int ActualStreamOffset { get; internal set; }
-
-        //TODO: UnicodeLangBits vs UnicodeLangBits5_1
-        public bool DoesSupportUnicode(BitposAndAssciatedUnicodeRanges bitposAndAssocUnicode) => OpenFontUnicodeUtilExtensions.DoesSupportUnicode(Languages, bitposAndAssocUnicode.Bitpos);
-        public bool DoesSupportUnicode(int bitpos) => OpenFontUnicodeUtilExtensions.DoesSupportUnicode(Languages, bitpos);
-
-        /// <summary>
-        /// check if this font has glyph for the given code point or not
-        /// </summary>
-        /// <returns></returns>
-        public bool ContainGlyphForUnicode(int codepoint) => Languages.ContainGlyphForUnicode(codepoint);
-
-        internal Typeface ResolvedTypeface;
-
-#if DEBUG
-        public override string ToString()
-        {
-            return FontName + " (" + FontSubFamily + ")";
-        }
-#endif
-    }
     [Flags]
     public enum TypefaceStyle
     {
@@ -84,10 +16,6 @@ namespace Typography.FontManagement
         Bold = 1 << 2,
         Italic = 1 << 3,
     }
-
-
-
-
 
 
     public class InstalledTypefaceCollection : IInstalledTypefaceProvider
@@ -226,60 +154,6 @@ namespace Typography.FontManagement
             }
 
             _onlyFontNames[previewFont.Name] = true;
-
-            TypefaceStyle typefaceStyle = TypefaceStyle.Others; //init
-            switch (previewFont.OS2TranslatedStyle)
-            {
-                case OpenFont.Extensions.TranslatedOS2FontStyle.BOLD:
-                    typefaceStyle = TypefaceStyle.Bold;
-                    break;
-                case OpenFont.Extensions.TranslatedOS2FontStyle.ITALIC:
-                case OpenFont.Extensions.TranslatedOS2FontStyle.OBLIQUE:
-                    typefaceStyle = TypefaceStyle.Italic;
-                    break;
-                case OpenFont.Extensions.TranslatedOS2FontStyle.REGULAR:
-                    typefaceStyle = TypefaceStyle.Regular;
-                    break;
-                case (OpenFont.Extensions.TranslatedOS2FontStyle.BOLD | OpenFont.Extensions.TranslatedOS2FontStyle.ITALIC):
-                    typefaceStyle = TypefaceStyle.Bold | TypefaceStyle.Italic;
-                    break;
-            }
-            //---------------
-            //some font subfam="Bold Italic" but OS2TranslatedStyle is only Italic
-            //so we should check the subfam name too!
-            string[] fontSubFamUpperCaseName_split = previewFont.SubFamilyName.ToUpper().Split(' ');
-            if (fontSubFamUpperCaseName_split.Length > 1)
-            {
-                if (typefaceStyle != (TypefaceStyle.Bold | TypefaceStyle.Italic))
-                {
-                    //translate more
-                    if ((fontSubFamUpperCaseName_split[0] == "BOLD" && fontSubFamUpperCaseName_split[1] == "ITALIC") ||
-                        (fontSubFamUpperCaseName_split[0] == "ITALIC" && fontSubFamUpperCaseName_split[1] == "BOLD"))
-                    {
-                        typefaceStyle = TypefaceStyle.Bold | TypefaceStyle.Italic;
-                    }
-                }
-            }
-            else
-            {
-                //=1
-                switch (fontSubFamUpperCaseName_split[0])
-                {
-                    case "REGULAR": typefaceStyle = TypefaceStyle.Regular; break;
-                    case "BOLD": typefaceStyle = TypefaceStyle.Bold; break;
-                    case "ITALIC": typefaceStyle = TypefaceStyle.Italic; break;
-                    case "COLOR": typefaceStyle = TypefaceStyle.Others; break;
-                    case "LIGHT": typefaceStyle = TypefaceStyle.Others; break;
-                }
-            }
-
-#if DEBUG
-            if (typefaceStyle == TypefaceStyle.Others)
-            {
-
-            }
-#endif
-
             InstalledTypeface installedTypeface = new InstalledTypeface(
                 previewFont,
                 srcPath)
