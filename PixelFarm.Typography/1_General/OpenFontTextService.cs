@@ -32,7 +32,7 @@ namespace Typography.Text
             //default,
             _installedTypefaceCollection = InstalledTypefaceCollection.GetSharedTypefaceCollection(collection =>
             {
-                collection.SetFontNameDuplicatedHandler((f0, f1) => FontNameDuplicatedDecision.Skip);
+                //collection.SetFontNameDuplicatedHandler((f0, f1) => FontNameDuplicatedDecision.Skip);
             });
 
             TrySetupCurrentScriptLang();
@@ -198,7 +198,7 @@ namespace Typography.Text
             //find it
 
             if ((typeface = _installedTypefaceCollection.ResolveTypeface(font.Name,
-                            PixelFarm.Drawing.FontStyleExtensions.ConvToInstalledFontStyle(font.Style))) == null)
+                            PixelFarm.Drawing.FontStyleExtensions.ConvToInstalledFontStyle(font.NewStyle))) == null)
             {
                 //this come from other choices?
                 int otherChoiceCount;
