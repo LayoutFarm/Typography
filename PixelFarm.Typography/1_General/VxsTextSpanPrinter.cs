@@ -99,7 +99,7 @@ namespace PixelFarm.Drawing
         {
             if (Typeface != null)
             {
-                _txtClient.SetCurrentFont(Typeface, FontSizeInPoints, this.PositionTechnique);
+                _txtClient.SetCurrentFont(Typeface, FontSizeInPoints, this.ScriptLang);
             }
 
             if (!_renderingMultiTypefaceMode)

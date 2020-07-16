@@ -17,17 +17,14 @@ namespace Typography.Text
         public delegate bool SelectTypefaceDelegate(int codepoint, AltTypefaceSelectorBase userSelector, out Typeface found);
 
 
-        readonly GlyphPlanCache _glyphPlanCache;
-        readonly GlyphLayout _glyphLayout;//for glyph layout
+        readonly GlyphPlanCache _glyphPlanCache = new GlyphPlanCache();
+        readonly GlyphLayout _glyphLayout = new GlyphLayout();//for glyph layout
 
         Typeface _currentTypeface;
         CustomBreaker _textBreaker; //text break        
 
         public VirtualTextSpanPrinter()
-        {
-
-            _glyphPlanCache = new GlyphPlanCache();
-            _glyphLayout = new GlyphLayout();
+        {            
 
             this.PositionTechnique = PositionTechnique.OpenFont;
             FontSizeInPoints = 14;// 
@@ -35,11 +32,16 @@ namespace Typography.Text
         public AltTypefaceSelectorBase AlternativeTypefaceSelector { get; set; }
         public SelectTypefaceDelegate BuiltInAlternativeTypefaceSelector { get; set; }
 
-        public ScriptLang CurrentScriptLang
+        public override ScriptLang ScriptLang
         {
-            get => _glyphLayout.ScriptLang;
-            set => _glyphLayout.ScriptLang = value;
+            get => base.ScriptLang;
+            set
+            {
+                _glyphLayout.ScriptLang = value;
+                base.ScriptLang = value;
+            }
         }
+
         public void EnableGsubGpos(bool value)
         {
             _glyphLayout.EnableGpos = value;

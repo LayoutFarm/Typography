@@ -14,7 +14,7 @@ using PixelFarm.Drawing;
 namespace Typography.Text
 {
 
-    public class TextServiceClient 
+    public class TextServiceClient
     {
         readonly OpenFontTextService _openFontTextService; //owner
         readonly VirtualTextSpanPrinter _p;
@@ -27,8 +27,8 @@ namespace Typography.Text
         }
         public ScriptLang CurrentScriptLang
         {
-            get => _p.CurrentScriptLang;
-            set => _p.CurrentScriptLang = value;
+            get => _p.ScriptLang;
+            set => _p.ScriptLang = value;
         }
         public void EnableGsubGpos(bool value)
         {
@@ -165,18 +165,21 @@ namespace Typography.Text
             }
             return 0;
         }
-        public void SetCurrentFont(Typeface typeface, float sizeInPts, PositionTechnique posTech)
+        public void SetCurrentFont(Typeface typeface, float sizeInPts, ScriptLang sclang)
         {
+            _p.ScriptLang = sclang;
             _p.Typeface = typeface;
             _p.FontSizeInPoints = sizeInPts;
-            _p.PositionTechnique = posTech;
+
             _p.UpdateGlyphLayoutSettings();
         }
         public void SetCurrentFont(Typeface typeface, float sizeInPts, ScriptLang sclang, PositionTechnique posTech)
         {
+            _p.ScriptLang = sclang;
+            _p.PositionTechnique = posTech;
             _p.Typeface = typeface;
             _p.FontSizeInPoints = sizeInPts;
-            _p.PositionTechnique = posTech;
+
             _p.UpdateGlyphLayoutSettings();
         }
         public void CreateGlyphPlanSeq(in Typography.Text.TextBufferSpan textBufferSpan, IUnscaledGlyphPlanList unscaledList)
@@ -265,7 +268,7 @@ namespace Typography.Text
             ResolvedFont resolvedFont = ResolveFont(font);
             return resolvedFont.LineSpacingInPixels;
         }
-       
+
 
         public void BreakToLineSegments(in TextBufferSpan textBufferSpan, WordVisitor wordVisitor)
         {
