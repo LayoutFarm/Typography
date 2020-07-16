@@ -11,6 +11,7 @@ namespace Typography.OpenFont
         public readonly string Name;
         public readonly string SubFamilyName;
         public readonly Extensions.TranslatedOS2FontStyle OS2TranslatedStyle;
+        public readonly Extensions.OS2FsSelection OS2FsSelection;
 
         readonly PreviewFontInfo[] _ttcfMembers;
 
@@ -30,6 +31,7 @@ namespace Typography.OpenFont
             Name = nameEntry.FontName;
             SubFamilyName = nameEntry.FontSubFamily;
             OS2TranslatedStyle = Extensions.TypefaceExtensions.TranslateOS2FontStyle(os2Table);
+            OS2FsSelection = Extensions.TypefaceExtensions.TranslateOS2FsSelection(os2Table);
         }
         internal PreviewFontInfo(string fontName, PreviewFontInfo[] ttcfMembers)
         {
