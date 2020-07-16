@@ -33,7 +33,7 @@ namespace PixelFarm.Drawing
 {
 
 
-    public enum NewCssFontStyle
+    public enum RequestFontStyle
     {
         //https://www.w3.org/TR/css-fonts-3/#propdef-font-style
         Regular,
@@ -102,16 +102,16 @@ namespace PixelFarm.Drawing
             /// font's face name
             /// </summary>
             public string Name { get; private set; }
-            public NewCssFontStyle Style { get; private set; }
+            public RequestFontStyle Style { get; private set; }
 
             public bool FromTypefaceFile { get; private set; }
             public string UserInputTypefaceFile { get; private set; }
 
-            public Choice(string facename, float fontSizeInPts, NewCssFontStyle style = NewCssFontStyle.Regular)
+            public Choice(string facename, float fontSizeInPts, RequestFontStyle style = RequestFontStyle.Regular)
                 : this(facename, Len.Pt(fontSizeInPts), style)
             {
             }
-            public Choice(string facename, Len fontSize, NewCssFontStyle style = NewCssFontStyle.Regular)
+            public Choice(string facename, Len fontSize, RequestFontStyle style = RequestFontStyle.Regular)
             {
                 Name = facename; //primary typeface name
                 Size = fontSize; //store user font size here 
@@ -180,19 +180,19 @@ namespace PixelFarm.Drawing
 
 
 
-        public NewCssFontStyle NewStyle { get; private set; }
+        public RequestFontStyle NewStyle { get; private set; }
         public bool FromTypefaceFile { get; private set; }
         public string UserInputTypefaceFile { get; private set; }
 
         List<Choice> _otherChoices;
 
-        public RequestFont(string fontFamily, float fontSizeInPts, ushort fontWeight = 400, NewCssFontStyle cssFontStyle = NewCssFontStyle.Regular)
+        public RequestFont(string fontFamily, float fontSizeInPts, ushort fontWeight = 400, RequestFontStyle cssFontStyle = RequestFontStyle.Regular)
             : this(fontFamily, Len.Pt(fontSizeInPts), fontWeight, cssFontStyle)
         {
 
         }
       
-        public RequestFont(string fontFamily, Len fontSize, ushort fontWeight = 400, NewCssFontStyle cssFontStyle = NewCssFontStyle.Regular)
+        public RequestFont(string fontFamily, Len fontSize, ushort fontWeight = 400, RequestFontStyle cssFontStyle = RequestFontStyle.Regular)
         {
             //ctor of the RequestFont supports CSS's style font-family
             //font-family: Red/Black, sans-serif;
@@ -276,14 +276,14 @@ namespace PixelFarm.Drawing
         public int OtherChoicesCount => (_otherChoices != null) ? _otherChoices.Count : 0;
         public Choice GetOtherChoice(int index) => _otherChoices[index];
 
-        public static int CalculateFontKey(string typefaceName, float fontSizeInPts, NewCssFontStyle style)
+        public static int CalculateFontKey(string typefaceName, float fontSizeInPts, RequestFontStyle style)
         {
             return InternalFontKey.CalculateGetHasCode(
                 InternalFontKey.RegisterFontName(typefaceName),
                 fontSizeInPts,
                 style.GetHashCode());
         }
-        public static int CalculateFontKey(int typefaceFontKey, float fontSizeInPts, NewCssFontStyle style)
+        public static int CalculateFontKey(int typefaceFontKey, float fontSizeInPts, RequestFontStyle style)
         {
             return InternalFontKey.CalculateGetHasCode(
                 typefaceFontKey,

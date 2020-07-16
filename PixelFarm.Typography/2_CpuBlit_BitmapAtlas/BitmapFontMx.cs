@@ -25,7 +25,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                 SetupDefaults();
             }
             //
-            NewCssFontStyle fontStyle = reqFont.NewStyle;
+            RequestFontStyle fontStyle = reqFont.Style;
             float sizeInPt = reqFont.SizeInPoints;
             if (forAnySize)
             {

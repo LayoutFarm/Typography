@@ -199,7 +199,7 @@ namespace Typography.Text
             //find it
 
             if ((typeface = _installedTypefaceCollection.ResolveTypeface(font.Name,
-                            PixelFarm.Drawing.FontStyleExtensions.ConvToInstalledFontStyle(font.NewStyle),
+                            PixelFarm.Drawing.FontStyleExtensions.ConvToInstalledFontStyle(font.Style),
                             font.WeightClass)) == null)
             {
                 //this come from other choices?
