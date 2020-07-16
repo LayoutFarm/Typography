@@ -26,7 +26,7 @@ namespace SampleWinForms
         //create text printer env for developer.
 
 
-        DevGdiTextPrinter _currentTextPrinter;
+        DevGdiTextSpanPrinter _currentTextPrinter;
         TextServiceClient _txtServiceClient;
 
         public Form1()
@@ -38,7 +38,7 @@ namespace SampleWinForms
 
 
             _txtServiceClient = OurOpenFontSystem.CreateTextServiceClient();
-            _currentTextPrinter = new DevGdiTextPrinter(_txtServiceClient);
+            _currentTextPrinter = new DevGdiTextSpanPrinter(_txtServiceClient);
             _currentTextPrinter.ScriptLang = new ScriptLang(ScriptTagDefs.Latin.Tag);
 
 

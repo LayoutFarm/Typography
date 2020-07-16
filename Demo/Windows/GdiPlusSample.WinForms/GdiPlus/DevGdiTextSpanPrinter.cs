@@ -16,7 +16,7 @@ namespace SampleWinForms
     /// <summary>
     /// developer's version, Gdi+ text-span printer
     /// </summary>
-    partial class DevGdiTextPrinter : AbstractTextSpanPrinter
+    partial class DevGdiTextSpanPrinter : AbstractTextSpanPrinter
     {
         Typeface _currentTypeface;
         GlyphOutlineBuilder _currentGlyphPathBuilder;
@@ -29,7 +29,7 @@ namespace SampleWinForms
         //for optimization
         readonly GlyphMeshCollection<GraphicsPath> _glyphMeshCollections = new GlyphMeshCollection<GraphicsPath>();
 
-        public DevGdiTextPrinter(TextServiceClient txtClient)
+        public DevGdiTextSpanPrinter(TextServiceClient txtClient)
         {
             _txtClient = txtClient;
             FillBackground = true;
