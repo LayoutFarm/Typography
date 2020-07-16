@@ -18,6 +18,37 @@ namespace Typography.OpenFont.Extensions
         Mac,
         Others
     }
+    public readonly struct OS2FsSelection
+    {
+        //Bit # 	macStyle bit 	C definition 	Description
+        //0         bit 1           ITALIC          Font contains italic or oblique characters, otherwise they are upright.
+        //1                         UNDERSCORE      Characters are underscored.
+        //2                         NEGATIVE        Characters have their foreground and background reversed.
+        //3                         OUTLINED        Outline(hollow) characters, otherwise they are solid.
+        //4                         STRIKEOUT       Characters are overstruck.
+        //5         bit 0           BOLD            Characters are emboldened.
+        //6                         REGULAR         Characters are in the standard weight / style for the font.
+        //7                         USE_TYPO_METRICS    If set, it is strongly recommended to use OS / 2.sTypoAscender - OS / 2.sTypoDescender + OS / 2.sTypoLineGap as a value for default line spacing for this font.
+        //8                         WWS             The font has ‘name’ table strings consistent with a weight / width / slope family without requiring use of ‘name’ IDs 21 and 22. (Please see more detailed description below.)
+        //9                         OBLIQUE         Font contains oblique characters.
+        readonly ushort _fsSelection;
+        public OS2FsSelection(ushort fsSelection)
+        {
+            _fsSelection = fsSelection;
+        }
+        public bool IsItalic => (_fsSelection & 0x1) != 0;
+        public bool IsUnderScore => ((_fsSelection >> 1) & 0x1) != 0;
+        public bool IsNegative => ((_fsSelection >> 2) & 0x1) != 0;
+        public bool IsOutline => ((_fsSelection >> 3) & 0x1) != 0;
+        public bool IsStrikeOut => ((_fsSelection >> 4) & 0x1) != 0;
+        public bool IsBold => ((_fsSelection >> 5) & 0x1) != 0;
+        public bool IsRegular => ((_fsSelection >> 6) & 0x1) != 0;
+        public bool USE_TYPO_METRICS => ((_fsSelection >> 7) & 0x1) != 0;
+        public bool WWS => ((_fsSelection >> 8) & 0x1) != 0;
+        public bool IsOblique => ((_fsSelection >> 9) & 0x1) != 0;
+
+    }
+
 
 
     [System.Flags]
@@ -37,6 +68,35 @@ namespace Typography.OpenFont.Extensions
     public static class CurrentEnv
     {
         public static CurrentOSName CurrentOSName;
+    }
+
+    public enum OS2WidthClass : byte
+    {
+        //from https://docs.microsoft.com/en-us/typography/opentype/spec/os2#uswidthclass 
+
+        //
+        //Value 	Description 	C Definition 	        % of normal
+        //1 	Ultra-condensed 	FWIDTH_ULTRA_CONDENSED 	50
+        //2 	Extra-condensed 	FWIDTH_EXTRA_CONDENSED 	62.5
+        //3 	Condensed 	        FWIDTH_CONDENSED 	    75
+        //4 	Semi-condensed 	    FWIDTH_SEMI_CONDENSED 	87.5
+        //5 	Medium (normal) 	FWIDTH_NORMAL 	        100
+        //6 	Semi-expanded 	    FWIDTH_SEMI_EXPANDED 	112.5
+        //7 	Expanded 	        FWIDTH_EXPANDED 	    125
+        //8 	Extra-expanded 	    FWIDTH_EXTRA_EXPANDED 	150
+        //9 	Ultra-expanded      FWIDTH_ULTRA_EXPANDED 	200
+
+        Unknown,//@prepare's => my custom
+        UltraCondensed,
+        ExtraCondensed,
+        Condensed,
+        SemiCondensed,
+        Medium = 5,
+        Normal = 5,
+        SemiExpanded = 6,
+        Expanded = 7,
+        ExtraExpanded = 8,
+        UltraExpanded = 9
     }
 
     public static partial class TypefaceExtensions
@@ -60,12 +120,10 @@ namespace Typography.OpenFont.Extensions
 
             return ((typeface.OS2Table.fsSelection >> 7) & 1) != 0;
         }
-        public static TranslatedOS2FontStyle TranslatedOS2FontStyle(this Typeface typeface)
-        {
-            return TranslatedOS2FontStyle(typeface.OS2Table);
-        }
 
-        internal static TranslatedOS2FontStyle TranslatedOS2FontStyle(OS2Table os2Table)
+        public static TranslatedOS2FontStyle TranslateOS2FontStyle(this Typeface typeface) => TranslateOS2FontStyle(typeface.OS2Table);
+
+        internal static TranslatedOS2FontStyle TranslateOS2FontStyle(OS2Table os2Table)
         {
             //@prepare's note, please note:=> this is not real value, this is 'translated' value from OS2.fsSelection 
 
@@ -107,6 +165,22 @@ namespace Typography.OpenFont.Extensions
             }
 
             return result;
+        }
+
+        internal static OS2FsSelection TranslateOS2FsSelection(OS2Table os2Table) => new OS2FsSelection(os2Table.fsSelection);
+
+
+
+        public static OS2WidthClass TranslateOS2WidthClass(ushort os2Weight)
+        {
+            if (os2Weight >= (ushort)OS2WidthClass.UltraExpanded)
+            {
+                return OS2WidthClass.Unknown;
+            }
+            else
+            {
+                return (OS2WidthClass)os2Weight;
+            }
         }
 
 

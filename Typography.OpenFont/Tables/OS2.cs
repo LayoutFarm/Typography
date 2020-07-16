@@ -25,7 +25,50 @@ namespace Typography.OpenFont.Tables
         public ushort version;          //0-5
         public short xAvgCharWidth;     //just average, not recommend to use.
         public ushort usWeightClass;    //visual weight (degree of blackness or thickness of strokes), 0-1000
-        public ushort usWidthClass;     //A relative change from the normal aspect ratio (width to height ratio)
+
+        //usWeightClass:
+        //Value Description 	C Definition (from windows.h)
+        //100 	Thin 	        FW_THIN
+        //200 	Extra-light     FW_EXTRALIGHT
+        //      (Ultra-light) 
+        //300 	Light 	        FW_LIGHT
+        //400 	Normal  	    FW_NORMAL
+        //      (Regular)
+        //500 	Medium 	        FW_MEDIUM
+        //600 	Semi-bold   	FW_SEMIBOLD
+        //      (Demi-bold)
+        //700 	Bold 	        FW_BOLD
+        //800 	Extra-bold  	FW_EXTRABOLD
+        //      (Ultra-bold)
+        //900 	Black (Heavy) 	FW_BLACK
+
+        public ushort usWidthClass;     //A relative change from the normal aspect ratio (width to height ratio), 
+                                        //as specified by a font designer for the glyphs in a font.
+                                        //Although every glyph in a font may have a different numeric aspect ratio, 
+                                        //each glyph in a font of normal width is considered to have a relative aspect ratio of one.
+                                        //When a new type style is created of a different width class (either by a font designer or by some automated means)
+                                        //the relative aspect ratio of the characters in the new font is some percentage greater or less than those same characters in the normal 
+                                        //font — it is this difference that this parameter specifies. 
+
+        //usWidthClass
+        //Value Description 	    C Definition 	        % of normal
+        //1 	Ultra-condensed 	FWIDTH_ULTRA_CONDENSED 	50
+        //2 	Extra-condensed 	FWIDTH_EXTRA_CONDENSED 	62.5
+        //3 	Condensed 	        FWIDTH_CONDENSED 	    75
+        //4 	Semi-condensed 	    FWIDTH_SEMI_CONDENSED 	87.5
+        //5 	Medium (normal) 	FWIDTH_NORMAL 	        100
+        //6 	Semi-expanded 	    FWIDTH_SEMI_EXPANDED 	112.5
+        //7 	Expanded 	        FWIDTH_EXPANDED 	    125
+        //8 	Extra-expanded 	    FWIDTH_EXTRA_EXPANDED 	150
+        //9 	Ultra-expanded      FWIDTH_ULTRA_EXPANDED 	200
+
+
+
+
+
+
+
+
         public ushort fsType;           //Type flags., embedding licensing rights for the font
 
         //int16 	ySubscriptXSize 	 

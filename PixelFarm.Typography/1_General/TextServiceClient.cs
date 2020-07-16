@@ -14,7 +14,7 @@ using PixelFarm.Drawing;
 namespace Typography.Text
 {
 
-    public class TextServiceClient : ITextService
+    public class TextServiceClient
     {
         readonly OpenFontTextService _openFontTextService; //owner
         readonly VirtualTextSpanPrinter _p;
@@ -27,8 +27,8 @@ namespace Typography.Text
         }
         public ScriptLang CurrentScriptLang
         {
-            get => _p.CurrentScriptLang;
-            set => _p.CurrentScriptLang = value;
+            get => _p.ScriptLang;
+            set => _p.ScriptLang = value;
         }
         public void EnableGsubGpos(bool value)
         {
@@ -165,18 +165,21 @@ namespace Typography.Text
             }
             return 0;
         }
-        public void SetCurrentFont(Typeface typeface, float sizeInPts, PositionTechnique posTech)
+        public void SetCurrentFont(Typeface typeface, float sizeInPts, ScriptLang sclang)
         {
+            _p.ScriptLang = sclang;
             _p.Typeface = typeface;
             _p.FontSizeInPoints = sizeInPts;
-            _p.PositionTechnique = posTech;
+
             _p.UpdateGlyphLayoutSettings();
         }
         public void SetCurrentFont(Typeface typeface, float sizeInPts, ScriptLang sclang, PositionTechnique posTech)
         {
+            _p.ScriptLang = sclang;
+            _p.PositionTechnique = posTech;
             _p.Typeface = typeface;
             _p.FontSizeInPoints = sizeInPts;
-            _p.PositionTechnique = posTech;
+
             _p.UpdateGlyphLayoutSettings();
         }
         public void CreateGlyphPlanSeq(in Typography.Text.TextBufferSpan textBufferSpan, IUnscaledGlyphPlanList unscaledList)
@@ -237,7 +240,7 @@ namespace Typography.Text
 
             _measureResult.Reset();
             _p.MeasureString(bufferSpan, _measureResult);
-            
+
             return new Size(_measureResult.Width, _measureResult.Height);
         }
         public void MeasureString(in Typography.Text.TextBufferSpan bufferSpan, RequestFont font, int limitWidth, out int charFit, out int charFitWidth)
@@ -260,12 +263,12 @@ namespace Typography.Text
             MeasureString(bufferSpan, font, limitWidth, out charFit, out charFitWidth);
         }
 
-        float ITextService.MeasureBlankLineHeight(RequestFont font)
+        public float MeasureBlankLineHeight(RequestFont font)
         {
             ResolvedFont resolvedFont = ResolveFont(font);
             return resolvedFont.LineSpacingInPixels;
         }
-        public bool SupportsWordBreak => true;
+
 
         public void BreakToLineSegments(in TextBufferSpan textBufferSpan, WordVisitor wordVisitor)
         {
@@ -286,7 +289,7 @@ namespace Typography.Text
         }
         readonly Dictionary<int, ResolvedFont> _localResolvedFonts = new Dictionary<int, ResolvedFont>();
 
-        public ResolvedFont LocalResolveFont(Typeface typeface, float sizeInPoint, FontStyle style = FontStyle.Regular)
+        public ResolvedFont LocalResolveFont(Typeface typeface, float sizeInPoint, NewCssFontStyle style =  NewCssFontStyle.Regular)
         {
             //find local resolved font cache
 

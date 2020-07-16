@@ -3,7 +3,6 @@ using System;
 using Typography.OpenFont;
 using Typography.OpenFont.Extensions;
 using Typography.TextLayout;
-using Typography.FontManagement;
 
 namespace Typography.Text
 {
@@ -19,7 +18,7 @@ namespace Typography.Text
 
         public TextBaseline TextBaseline { get; set; }
         public abstract Typeface Typeface { get; set; }
-        
+
 
         public bool FillBackground { get; set; }
         public bool DrawOutline { get; set; }
@@ -67,7 +66,7 @@ namespace Typography.Text
                 this.FontLineSpacingPx = FontAscendingPx - FontDescedingPx + FontLineGapPx;
             }
         }
-        public ScriptLang ScriptLang { get; set; }
+        public virtual ScriptLang ScriptLang { get; set; }
         public PositionTechnique PositionTechnique { get; set; }
         public bool EnableLigature { get; set; }
         public bool EnableMultiTypefaces { get; set; }

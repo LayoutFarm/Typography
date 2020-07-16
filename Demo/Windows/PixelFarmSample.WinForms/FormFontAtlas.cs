@@ -222,8 +222,7 @@ namespace SampleWinForms
             //create request font, indeed we need its 'FontKey'
             PixelFarm.Drawing.RequestFont reqFont = new PixelFarm.Drawing.RequestFont(
                 typeface.Name,
-                fontSizeInPoints,
-                PixelFarm.Drawing.FontStyle.Regular
+                fontSizeInPoints
                 );
 
 
