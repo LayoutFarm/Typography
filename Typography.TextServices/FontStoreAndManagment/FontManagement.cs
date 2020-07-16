@@ -8,17 +8,10 @@ using Typography.TextBreak;
 
 namespace Typography.FontManagement
 {
-    [Flags]
-    public enum TypefaceStyle
-    {
-        Others = 0,
-        Regular = 1,
-
-        Italic = 1 << 3,
-    }
 
 
-    public class InstalledTypefaceCollection : IInstalledTypefaceProvider
+
+    public partial class InstalledTypefaceCollection : IInstalledTypefaceProvider
     {
         class InstalledTypefaceGroup
         {
@@ -47,9 +40,6 @@ namespace Typography.FontManagement
 
         }
 
-
-
-
         /// <summary>
         /// map from font subfam to internal group name
         /// </summary>
@@ -63,59 +53,15 @@ namespace Typography.FontManagement
         readonly Dictionary<string, InstalledTypeface> _otherFontNames = new Dictionary<string, InstalledTypeface>();
         readonly Dictionary<string, InstalledTypeface> _postScriptNames = new Dictionary<string, InstalledTypeface>();
 
-        //----------
-        //common weight classes
-        internal readonly List<InstalledTypeface> _weight100_Thin = new List<InstalledTypeface>();
-        internal readonly List<InstalledTypeface> _weight200_Extralight = new List<InstalledTypeface>(); //Extra-light (Ultra-light)
-        internal readonly List<InstalledTypeface> _weight300_Light = new List<InstalledTypeface>();
-        internal readonly List<InstalledTypeface> _weight400_Normal = new List<InstalledTypeface>();
-        internal readonly List<InstalledTypeface> _weight500_Medium = new List<InstalledTypeface>();
-        internal readonly List<InstalledTypeface> _weight600_SemiBold = new List<InstalledTypeface>(); //Semi-bold (Demi-bold)
-        internal readonly List<InstalledTypeface> _weight700_Bold = new List<InstalledTypeface>(); //Semi-bold (Demi-bold)
-        internal readonly List<InstalledTypeface> _weight800_ExtraBold = new List<InstalledTypeface>(); //Extra-bold (Ultra-bold)
-        internal readonly List<InstalledTypeface> _weight900_Black = new List<InstalledTypeface>(); //Black (Heavy)
-
-        //and others
-        internal readonly List<InstalledTypeface> _otherWeightClassTypefaces = new List<InstalledTypeface>();
-        //----------
-
-
-        FontNameDuplicatedHandler _fontNameDuplicatedHandler;
-        FontNotFoundHandler _fontNotFoundHandler;
+        static InstalledTypefaceCollection s_intalledTypefaces;
 
         public InstalledTypefaceCollection()
         {
-
             //-----------------------------------------------------
             //init wellknown subfam 
             _regular = CreateCreateNewGroup(TypefaceStyle.Regular, "regular", "normal");
             _italic = CreateCreateNewGroup(TypefaceStyle.Italic, "Italic", "italique");
-
         }
-        public void SetFontNameDuplicatedHandler(FontNameDuplicatedHandler handler)
-        {
-            _fontNameDuplicatedHandler = handler;
-        }
-        public void SetFontNotFoundHandler(FontNotFoundHandler fontNotFoundHandler)
-        {
-            _fontNotFoundHandler = fontNotFoundHandler;
-        }
-
-        static InstalledTypefaceCollection s_intalledTypefaces;
-        public static InstalledTypefaceCollection GetSharedTypefaceCollection(FirstInitFontCollectionDelegate initdel)
-        {
-            if (s_intalledTypefaces == null)
-            {
-                //first time
-                s_intalledTypefaces = new InstalledTypefaceCollection();
-                initdel(s_intalledTypefaces);
-            }
-            return s_intalledTypefaces;
-        }
-
-        public static void SetAsSharedTypefaceCollection(InstalledTypefaceCollection installedTypefaceCollection) => s_intalledTypefaces = installedTypefaceCollection;
-
-        public static InstalledTypefaceCollection GetSharedTypefaceCollection() => s_intalledTypefaces;
 
         InstalledTypefaceGroup CreateCreateNewGroup(TypefaceStyle installedFontStyle, params string[] names)
         {
@@ -133,78 +79,8 @@ namespace Typography.FontManagement
             return fontGroup;
         }
 
-        public InstalledTypeface AddFontPreview(PreviewFontInfo previewFont, string srcPath)
-        {
-            //replace?
-            if (_onlyFontNames.ContainsKey(previewFont.Name))
-            {
-                //duplicated??
-                //TODO: handle this
-                //eg. Asana.ttc includes Asana-Regular.ttf and Asana-Math.ttf
-                //and we may already have a Asana-math.ttf
-                //How to handle this...
-#if DEBUG
-                System.Diagnostics.Debug.WriteLine("Duplicated Typeface: ");//TODO:
+     
 
-#endif
-            }
-
-            _onlyFontNames[previewFont.Name] = true;
-            InstalledTypeface installedTypeface = new InstalledTypeface(
-                previewFont,
-                srcPath)
-            { ActualStreamOffset = previewFont.ActualStreamOffset };
-
-
-            return Register(installedTypeface) ? installedTypeface : null;
-        }
-
-        public bool AddFontStreamSource(IFontStreamSource src)
-        {
-            //preview data of font
-            try
-            {
-                using (Stream stream = src.ReadFontStream())
-                {
-                    var reader = new OpenFontReader();
-                    PreviewFontInfo previewFont = reader.ReadPreview(stream);
-                    if (previewFont == null || string.IsNullOrEmpty(previewFont.Name))
-                    {
-                        //err!
-                        return false;
-                    }
-                    if (previewFont.IsFontCollection)
-                    {
-                        int mbCount = previewFont.MemberCount;
-                        bool totalResult = true;
-                        for (int i = 0; i < mbCount; ++i)
-                        {
-                            //extract and each members
-                            InstalledTypeface instTypeface = AddFontPreview(previewFont.GetMember(i), src.PathName);
-                            if (instTypeface == null)
-                            {
-                                totalResult = false;
-                            }
-
-                        }
-                        return totalResult;
-                    }
-                    else
-                    {
-                        return AddFontPreview(previewFont, src.PathName) != null;
-                    }
-
-                }
-            }
-            catch (IOException)
-            {
-                //TODO review here again
-                return false;
-            }
-        }
-
-
-        internal Dictionary<string, InstalledTypeface> _installedTypefacesByFilenames = new Dictionary<string, InstalledTypeface>();
 
         bool Register(InstalledTypeface instTypeface)
         {
@@ -357,11 +233,8 @@ namespace Typography.FontManagement
             _postScriptNames.TryGetValue(postScriptName.ToUpper(), out InstalledTypeface found);
             return found;
         }
+       
         public InstalledTypeface GetInstalledTypeface(string fontName, string subFamName, ushort weight)
-        {
-            return GetInstalledTypeface(fontName, subFamName);
-        }
-        public InstalledTypeface GetInstalledTypeface(string fontName, string subFamName)
         {
             string upperCaseFontName = fontName.ToUpper();
             string upperCaseSubFamName = subFamName.ToUpper();

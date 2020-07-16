@@ -9,6 +9,129 @@ using Typography.TextBreak;
 
 namespace Typography.FontManagement
 {
+    partial class InstalledTypefaceCollection
+    {
+        //----------
+        //common weight classes
+        internal readonly List<InstalledTypeface> _weight100_Thin = new List<InstalledTypeface>();
+        internal readonly List<InstalledTypeface> _weight200_Extralight = new List<InstalledTypeface>(); //Extra-light (Ultra-light)
+        internal readonly List<InstalledTypeface> _weight300_Light = new List<InstalledTypeface>();
+        internal readonly List<InstalledTypeface> _weight400_Normal = new List<InstalledTypeface>();
+        internal readonly List<InstalledTypeface> _weight500_Medium = new List<InstalledTypeface>();
+        internal readonly List<InstalledTypeface> _weight600_SemiBold = new List<InstalledTypeface>(); //Semi-bold (Demi-bold)
+        internal readonly List<InstalledTypeface> _weight700_Bold = new List<InstalledTypeface>(); //Semi-bold (Demi-bold)
+        internal readonly List<InstalledTypeface> _weight800_ExtraBold = new List<InstalledTypeface>(); //Extra-bold (Ultra-bold)
+        internal readonly List<InstalledTypeface> _weight900_Black = new List<InstalledTypeface>(); //Black (Heavy)
+
+        //and others
+        internal readonly List<InstalledTypeface> _otherWeightClassTypefaces = new List<InstalledTypeface>();
+        //----------
+        internal Dictionary<string, InstalledTypeface> _installedTypefacesByFilenames = new Dictionary<string, InstalledTypeface>();
+
+
+        FontNameDuplicatedHandler _fontNameDuplicatedHandler;
+        FontNotFoundHandler _fontNotFoundHandler;
+
+        public void SetFontNameDuplicatedHandler(FontNameDuplicatedHandler handler)
+        {
+            _fontNameDuplicatedHandler = handler;
+        }
+        public void SetFontNotFoundHandler(FontNotFoundHandler fontNotFoundHandler)
+        {
+            _fontNotFoundHandler = fontNotFoundHandler;
+        }
+        public static InstalledTypefaceCollection GetSharedTypefaceCollection(FirstInitFontCollectionDelegate initdel)
+        {
+            if (s_intalledTypefaces == null)
+            {
+                //first time
+                s_intalledTypefaces = new InstalledTypefaceCollection();
+                initdel(s_intalledTypefaces);
+            }
+            return s_intalledTypefaces;
+        }
+        public static void SetAsSharedTypefaceCollection(InstalledTypefaceCollection installedTypefaceCollection) => s_intalledTypefaces = installedTypefaceCollection;
+
+        public static InstalledTypefaceCollection GetSharedTypefaceCollection() => s_intalledTypefaces;
+        public bool AddFontStreamSource(IFontStreamSource src)
+        {
+            //preview data of font
+            try
+            {
+                using (Stream stream = src.ReadFontStream())
+                {
+                    var reader = new OpenFontReader();
+                    PreviewFontInfo previewFont = reader.ReadPreview(stream);
+                    if (previewFont == null || string.IsNullOrEmpty(previewFont.Name))
+                    {
+                        //err!
+                        return false;
+                    }
+                    if (previewFont.IsFontCollection)
+                    {
+                        int mbCount = previewFont.MemberCount;
+                        bool totalResult = true;
+                        for (int i = 0; i < mbCount; ++i)
+                        {
+                            //extract and each members
+                            InstalledTypeface instTypeface = AddFontPreview(previewFont.GetMember(i), src.PathName);
+                            if (instTypeface == null)
+                            {
+                                totalResult = false;
+                            }
+
+                        }
+                        return totalResult;
+                    }
+                    else
+                    {
+                        return AddFontPreview(previewFont, src.PathName) != null;
+                    }
+
+                }
+            }
+            catch (IOException)
+            {
+                //TODO review here again
+                return false;
+            }
+        }
+        public InstalledTypeface AddFontPreview(PreviewFontInfo previewFont, string srcPath)
+        {
+            //replace?
+            string upper = previewFont.Name.ToUpper();
+            if (_onlyFontNames.ContainsKey(upper))
+            {
+                //duplicated??
+                //TODO: handle this
+                //eg. Asana.ttc includes Asana-Regular.ttf and Asana-Math.ttf
+                //and we may already have a Asana-math.ttf
+                //How to handle this...
+#if DEBUG
+                System.Diagnostics.Debug.WriteLine("Duplicated Typeface: ");//TODO:
+
+#endif
+            }
+
+            _onlyFontNames[upper] = true;
+            InstalledTypeface installedTypeface = new InstalledTypeface(
+                previewFont,
+                srcPath)
+            { ActualStreamOffset = previewFont.ActualStreamOffset };
+
+
+            return Register(installedTypeface) ? installedTypeface : null;
+        }
+
+
+    }
+    [Flags]
+    public enum TypefaceStyle
+    {
+        Others = 0,
+        Regular = 1,
+        Italic = 1 << 1,
+    }
     public class InstalledTypeface
     {
         readonly NameEntry _nameEntry;
@@ -355,9 +478,9 @@ namespace Typography.FontManagement
         }
 
 
-        public static Typeface ResolveTypeface(this InstalledTypefaceCollection fontCollection, string fontName, TypefaceStyle style)
+        public static Typeface ResolveTypeface(this InstalledTypefaceCollection fontCollection, string fontName, TypefaceStyle style, ushort weight)
         {
-            InstalledTypeface inst = fontCollection.GetInstalledTypeface(fontName, InstalledTypefaceCollection.GetSubFam(style));
+            InstalledTypeface inst = fontCollection.GetInstalledTypeface(fontName, InstalledTypefaceCollection.GetSubFam(style), weight);
             return (inst != null) ? fontCollection.ResolveTypeface(inst) : null;
         }
         public static Typeface ResolveTypeface(this InstalledTypefaceCollection fontCollection, InstalledTypeface installedFont)

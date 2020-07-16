@@ -143,7 +143,8 @@ namespace Typography.Text
             //when not found
             //find it 
             if ((typeface = _installedTypefaceCollection.ResolveTypeface(choice.Name,
-                             PixelFarm.Drawing.FontStyleExtensions.ConvToInstalledFontStyle(choice.Style))) != null)
+                             PixelFarm.Drawing.FontStyleExtensions.ConvToInstalledFontStyle(choice.Style),
+                             choice.WeightClass)) != null)
             {
                 //NOT NULL=> found 
                 if (!_resolvedTypefaceCache.TryGetValue(choice.GetFontKey(), out resolvedFont))
@@ -198,7 +199,8 @@ namespace Typography.Text
             //find it
 
             if ((typeface = _installedTypefaceCollection.ResolveTypeface(font.Name,
-                            PixelFarm.Drawing.FontStyleExtensions.ConvToInstalledFontStyle(font.NewStyle))) == null)
+                            PixelFarm.Drawing.FontStyleExtensions.ConvToInstalledFontStyle(font.NewStyle),
+                            font.WeightClass)) == null)
             {
                 //this come from other choices?
                 int otherChoiceCount;
