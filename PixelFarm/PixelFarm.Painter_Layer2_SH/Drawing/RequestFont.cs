@@ -32,7 +32,6 @@ using System.Collections.Generic;
 namespace PixelFarm.Drawing
 {
 
-  
 
     public enum NewCssFontStyle
     {
@@ -178,7 +177,7 @@ namespace PixelFarm.Drawing
         public Len Size { get; }
 
         public string Name { get; private set; }
-    
+
 
 
         public NewCssFontStyle NewStyle { get; private set; }
@@ -187,13 +186,13 @@ namespace PixelFarm.Drawing
 
         List<Choice> _otherChoices;
 
-        public RequestFont(string fontFamily, float fontSizeInPts, NewCssFontStyle cssFontStyle = NewCssFontStyle.Regular)
-            : this(fontFamily, Len.Pt(fontSizeInPts), cssFontStyle)
+        public RequestFont(string fontFamily, float fontSizeInPts, ushort fontWeight = 400, NewCssFontStyle cssFontStyle = NewCssFontStyle.Regular)
+            : this(fontFamily, Len.Pt(fontSizeInPts), fontWeight, cssFontStyle)
         {
 
         }
-
-        public RequestFont(string fontFamily, Len fontSize, NewCssFontStyle cssFontStyle = NewCssFontStyle.Regular)
+      
+        public RequestFont(string fontFamily, Len fontSize, ushort fontWeight = 400, NewCssFontStyle cssFontStyle = NewCssFontStyle.Regular)
         {
             //ctor of the RequestFont supports CSS's style font-family
             //font-family: Red/Black, sans-serif;
@@ -291,7 +290,7 @@ namespace PixelFarm.Drawing
                 fontSizeInPts,
                 style.GetHashCode());
         }
-       
+
         int _fontKey;
         public int FontKey => (_fontKey != 0) ? _fontKey : (_fontKey = CalculateFontKey(Name, SizeInPoints, NewStyle));
 
@@ -427,5 +426,3 @@ namespace PixelFarm.Drawing
         public short maxOffsetY;
     }
 }
-
-

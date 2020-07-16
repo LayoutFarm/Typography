@@ -519,17 +519,23 @@ namespace SampleWinForms
                 if (_devVxsTextPrinter != null)
                 {
                     PixelFarm.Drawing.NewCssFontStyle fontstyle = PixelFarm.Drawing.NewCssFontStyle.Regular;
+                    ushort fontWeight = (ushort)PixelFarm.Drawing.RequestFontWeight.Normal;
+
                     switch (_basicOptions.SelectedTypefaceStyle)
                     {
                         case Typography.FontManagement.TypefaceStyle.Italic:
                             fontstyle = PixelFarm.Drawing.NewCssFontStyle.Italic;
                             break;
                     }
+
                     _devVxsTextPrinter.Typeface = e.SelectedTypeface;
+
                     var reqFont = new PixelFarm.Drawing.RequestFont(
                         e.SelectedTypeface.Name,
                         _basicOptions.FontSizeInPoints,
+                        fontWeight,
                         fontstyle);
+
                     _devVxsTextPrinter.ChangeFont(reqFont);
                     _painter.CurrentFont = reqFont;
                 }

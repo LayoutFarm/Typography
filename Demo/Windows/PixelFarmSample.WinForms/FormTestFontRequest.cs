@@ -334,7 +334,7 @@ namespace SampleWinForms
                 //that if the system does not found Roboto-X
                 //then should use alternative Asana Math
                 textOutput = "Hello! 3";
-                RequestFont reqFont1 = new RequestFont("Roboto-X", 20, NewCssFontStyle.Regular);
+                RequestFont reqFont1 = new RequestFont("Roboto-X", 20);
                 reqFont1.AddOtherChoices(new RequestFont.Choice("Asana Math", 20));
 
                 DrawStringToMemBitmap(reqFont1, textOutput, 0, 150);
@@ -362,7 +362,7 @@ namespace SampleWinForms
                 //we have Roboto
 
                 textOutput = "Hello! 1😁";
-                RequestFont reqFont1 = new RequestFont("Roboto", 20, NewCssFontStyle.Regular);
+                RequestFont reqFont1 = new RequestFont("Roboto", 20);
                 reqFont1.AddOtherChoices(new RequestFont.Choice("Asana Math", 20));
 
                 DrawStringToMemBitmap(reqFont1, textOutput, 0, 50);
@@ -374,7 +374,7 @@ namespace SampleWinForms
                 //for Emoji=> our System default=> TwitterColorEmoji
                 //and in this case we want to specific that we want to use FireFoxColor Emoji instead 
                 textOutput = "Hello! 2😁";
-                RequestFont reqFont1 = new RequestFont("Roboto", 20, NewCssFontStyle.Regular);
+                RequestFont reqFont1 = new RequestFont("Roboto", 20);
                 reqFont1.AddOtherChoices(new RequestFont.Choice("Asana Math", 20), new RequestFont.Choice("Firefox Emoji", 20));
 
                 DrawStringToMemBitmap(reqFont1, textOutput, 0, 100);
@@ -385,9 +385,50 @@ namespace SampleWinForms
                 //use Droid Sans Fallback for CJK 
 
                 textOutput = "你好 Hello! 3 😁";
-                RequestFont reqFont1 = new RequestFont("Droid Sans Fallback", 20, NewCssFontStyle.Regular);
+                RequestFont reqFont1 = new RequestFont("Droid Sans Fallback", 20);
                 reqFont1.AddOtherChoices(new RequestFont.Choice("Asana Math", 20));
 
+                DrawStringToMemBitmap(reqFont1, textOutput, 0, 150);
+            }
+
+            CopyMemBitmapToScreen();
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            //use css style   ,//see https://www.w3.org/TR/css-fonts-3/     
+
+
+            //clear previous draw
+
+            _painter.Clear(PixelFarm.Drawing.Color.White);
+
+            string textOutput = "Hello! 1";
+
+            {
+                //example1 
+                //we have Roboto
+                textOutput = "Hello! 1😁";
+                RequestFont reqFont1 = new RequestFont("Roboto, Asana Math", 20); //use css style   ,//see https://www.w3.org/TR/css-fonts-3/             
+                DrawStringToMemBitmap(reqFont1, textOutput, 0, 50);
+            }
+
+            {
+                //example2  
+
+                //for Emoji=> our System default=> TwitterColorEmoji
+                //and in this case we want to specific that we want to use FireFoxColor Emoji instead 
+                textOutput = "Hello! 2😁";
+                RequestFont reqFont1 = new RequestFont("Roboto,Asana Math,Firefox Emoji", 20);
+                DrawStringToMemBitmap(reqFont1, textOutput, 0, 100);
+            }
+
+            {
+                //example3 
+                //use Droid Sans Fallback for CJK 
+
+                textOutput = "你好 Hello! 3 😁";
+                RequestFont reqFont1 = new RequestFont("Droid Sans Fallback,Asana Math", 20);
                 DrawStringToMemBitmap(reqFont1, textOutput, 0, 150);
             }
 
