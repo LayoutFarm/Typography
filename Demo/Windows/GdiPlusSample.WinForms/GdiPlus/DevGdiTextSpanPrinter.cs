@@ -20,9 +20,10 @@ namespace SampleWinForms
     {
         Typeface _currentTypeface;
         GlyphOutlineBuilder _currentGlyphPathBuilder;
-        GlyphTranslatorToGdiPath _txToGdiPath;
-        readonly TextServiceClient _txtClient;
 
+        readonly GlyphTranslatorToGdiPath _txToGdiPath;
+        readonly TextServiceClient _txtClient;
+        readonly Dictionary<Typeface, GlyphOutlineBuilder> _outlineBuilderCaches = new Dictionary<Typeface, GlyphOutlineBuilder>();
         readonly SolidBrush _fillBrush = new SolidBrush(Color.Black);
         readonly Pen _outlinePen = new Pen(Color.Green);
         //
@@ -35,6 +36,7 @@ namespace SampleWinForms
             FillBackground = true;
             FillColor = Color.Black;
             OutlineColor = Color.Green;
+            _txToGdiPath = new GlyphTranslatorToGdiPath();
         }
 
         public HintTechnique HintTechnique { get; set; }
@@ -65,11 +67,13 @@ namespace SampleWinForms
                 //--------------------------------
 
                 //2. glyph builder
-                _currentGlyphPathBuilder = new GlyphOutlineBuilder(_currentTypeface);
-                //for gdi path***
-                //3. glyph reader,output as Gdi+ GraphicsPath
-                _txToGdiPath = new GlyphTranslatorToGdiPath();
-                //4.
+                if (!_outlineBuilderCaches.TryGetValue(_currentTypeface, out _currentGlyphPathBuilder))
+                {
+                    //1 glyph outline builder per typeface
+                    _outlineBuilderCaches.Add(_currentTypeface,
+                        _currentGlyphPathBuilder = new GlyphOutlineBuilder(_currentTypeface));
+                }
+
                 OnFontSizeChanged();
             }
         }
