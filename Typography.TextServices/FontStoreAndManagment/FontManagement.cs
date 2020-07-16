@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Typography.OpenFont;
+using Typography.OpenFont.Extensions;
 using Typography.OpenFont.Tables;
 using Typography.TextBreak;
 
@@ -15,28 +16,30 @@ namespace Typography.FontManagement
     {
         readonly NameEntry _nameEntry;
         readonly OS2Table _os2Table;
-        internal InstalledTypeface(Typeface typeface, TypefaceStyle style, string fontPath)
+        internal InstalledTypeface(Typeface typeface, string fontPath)
             : this(typeface.GetNameEntry(),
                   typeface.GetOS2Table(),
-                  style,
                   typeface.Languages,
                   fontPath)
         { }
 
-        internal InstalledTypeface(PreviewFontInfo previewFontInfo, TypefaceStyle style, string fontPath)
+        internal InstalledTypeface(PreviewFontInfo previewFontInfo, string fontPath)
             : this(previewFontInfo.NameEntry,
                   previewFontInfo.OS2Table,
-                  style,
                   previewFontInfo.Languages, fontPath)
         { }
 
-        private InstalledTypeface(NameEntry nameTable, OS2Table os2Table, TypefaceStyle style, Languages languages, string fontPath)
+        private InstalledTypeface(NameEntry nameTable, OS2Table os2Table, Languages languages, string fontPath)
         {
             _nameEntry = nameTable;
             _os2Table = os2Table;
             FontPath = fontPath;
             Languages = languages;
-            TypefaceStyle = style;
+
+            var fsSelection = new OS2FsSelection(os2Table.fsSelection);
+            TypefaceStyle = fsSelection.IsItalic ? TypefaceStyle.Italic : TypefaceStyle.Regular;
+
+
         }
         public TypefaceStyle TypefaceStyle { get; internal set; }
 
@@ -83,10 +86,10 @@ namespace Typography.FontManagement
     }
 
 
-    
 
-   
-     
+
+
+
     public class InstalledTypefaceCollection : IInstalledTypefaceProvider
     {
         class InstalledTypefaceGroup
@@ -279,7 +282,6 @@ namespace Typography.FontManagement
 
             InstalledTypeface installedTypeface = new InstalledTypeface(
                 previewFont,
-                typefaceStyle,
                 srcPath)
             { ActualStreamOffset = previewFont.ActualStreamOffset };
 
@@ -601,7 +603,7 @@ namespace Typography.FontManagement
             }
             return found;
         }
-       
+
 
         internal static string GetSubFam(TypefaceStyle typefaceStyle)
         {
