@@ -1,8 +1,7 @@
 ﻿//MIT, 2019-present, WinterDev 
 using System.IO;
 using System.Collections.Generic;
- 
-using Typography.OpenFont.IO;
+
 using Typography.OpenFont.Tables;
 using Typography.OpenFont.Trimmable;
 

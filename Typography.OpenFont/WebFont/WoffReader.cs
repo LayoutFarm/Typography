@@ -3,7 +3,6 @@
 
 using System;
 using System.IO;
-using Typography.OpenFont.IO;
 using Typography.OpenFont.Tables;
 using Typography.OpenFont.Trimmable;
 

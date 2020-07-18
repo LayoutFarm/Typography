@@ -4,7 +4,7 @@ using Typography.OpenFont;
 using Typography.OpenFont.Extensions;
 using Typography.OpenFont.Tables; 
 
-namespace Typography.FontManagement
+namespace Typography.FontCollections
 {
 
     public class InstalledTypeface

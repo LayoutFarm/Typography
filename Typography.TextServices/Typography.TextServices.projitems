@@ -9,23 +9,25 @@
     <Import_RootNamespace>Typography.TextServices</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)AbstractTextSpanPrinter.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)FontStoreAndManagment\InstalledTypeface.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)FontStoreAndManagment\InstalledTypefaceCollection.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)FontStoreAndManagment\FontManagement.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)FontStoreAndManagment\OpenFontBitPosInfo.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)FontStoreAndManagment\OpenFontUnicodeUtilExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Text\AbstractTextSpanPrinter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FontCollections\InstalledTypeface.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FontCollections\InstalledTypefaceCollection.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FontCollections\FontManagement.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)OpenFont\OpenFontBitPosInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)OpenFont\OpenFontUnicodeUtilExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TextLayout\FormattedGlyphPlanSeq.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TextLayout\LineSegmentsAndWordVisitors.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)MeasureStringArgs.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ResolvedFonts.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TextBaseline.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TextBufferSpan.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Text\MeasureStringArgs.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Text\ResolvedFonts.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Text\TextBaseline.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Text\TextBufferSpan.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TextLayout\GlyphPlanCache.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TextLayout\CRC32.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)VirtualTextSpanPrinter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Text\VirtualTextSpanPrinter.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="$(MSBuildThisFileDirectory)Text\" />
+    <Folder Include="$(MSBuildThisFileDirectory)OpenFont\" />
     <Folder Include="$(MSBuildThisFileDirectory)TextLayout\" />
   </ItemGroup>
 </Project>

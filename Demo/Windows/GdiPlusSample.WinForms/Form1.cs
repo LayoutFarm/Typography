@@ -6,7 +6,7 @@ using System.Drawing;
 using System.Windows.Forms;
 // 
 
-using Typography.FontManagement;
+using Typography.FontCollections;
 using Typography.OpenFont;
 using Typography.OpenFont.Extensions;
 using Typography.OpenFont.Contours;

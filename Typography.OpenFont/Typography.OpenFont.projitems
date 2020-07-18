@@ -20,7 +20,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Geometry.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Glyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IGlyphTranslator.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)IO\ByteOrderSwappingBinaryReader.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ByteOrderSwappingBinaryReader.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)OpenFontReader.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tables.AdvancedLayout\AttachmentListTable.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tables.AdvancedLayout\Base.cs" />
