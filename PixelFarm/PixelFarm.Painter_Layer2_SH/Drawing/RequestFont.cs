@@ -176,11 +176,9 @@ namespace PixelFarm.Drawing
         public float SizeInPoints { get; }
         public Len Size { get; }
 
-        public string Name { get; private set; }
+        public string Name { get; private set; } 
 
-
-
-        public RequestFontStyle NewStyle { get; private set; }
+        public RequestFontStyle Style { get; private set; }
         public bool FromTypefaceFile { get; private set; }
         public string UserInputTypefaceFile { get; private set; }
 
@@ -241,7 +239,7 @@ namespace PixelFarm.Drawing
                 }
             }
 
-            NewStyle = cssFontStyle;
+            Style = cssFontStyle;
         }
 
         private RequestFont(Len fontSize)
@@ -292,7 +290,7 @@ namespace PixelFarm.Drawing
         }
 
         int _fontKey;
-        public int FontKey => (_fontKey != 0) ? _fontKey : (_fontKey = CalculateFontKey(Name, SizeInPoints, NewStyle));
+        public int FontKey => (_fontKey != 0) ? _fontKey : (_fontKey = CalculateFontKey(Name, SizeInPoints, Style));
 
         //------------------ 
         //caching ...
@@ -345,7 +343,7 @@ namespace PixelFarm.Drawing
 #if DEBUG
         public override string ToString()
         {
-            return Name + "," + SizeInPoints + "," + NewStyle;
+            return Name + "," + SizeInPoints + "," + Style;
         }
 #endif
     }

@@ -11,13 +11,7 @@ namespace Typography.OpenFont.Extensions
         Windows,
         Mac
     }
-    public enum CurrentOSName
-    {
-        None,//not evaluate yet
-        Windows,
-        Mac,
-        Others
-    }
+   
     public readonly struct OS2FsSelection
     {
         //Bit # 	macStyle bit 	C definition 	Description
@@ -65,11 +59,7 @@ namespace Typography.OpenFont.Extensions
         OBLIQUE = 1 << 3,
     }
 
-    public static class CurrentEnv
-    {
-        public static CurrentOSName CurrentOSName;
-    }
-
+   
     public enum OS2WidthClass : byte
     {
         //from https://docs.microsoft.com/en-us/typography/opentype/spec/os2#uswidthclass 
