@@ -3,8 +3,7 @@ using System;
 using System.Collections.Generic;
 
 using Typography.OpenFont;
-using Typography.OpenFont.Extensions;
-using Typography.FontManagement;
+using Typography.FontCollection;
 
 using PixelFarm.Drawing;
 
@@ -50,6 +49,9 @@ namespace Typography.Text
                 //TODO: handle error here
 
                 throw new NotSupportedException();
+                
+
+                
             }
         }
 
@@ -199,7 +201,7 @@ namespace Typography.Text
             //find it
 
             if ((typeface = _installedTypefaceCollection.ResolveTypeface(font.Name,
-                            PixelFarm.Drawing.FontStyleExtensions.ConvToInstalledFontStyle(font.NewStyle),
+                            PixelFarm.Drawing.FontStyleExtensions.ConvToInstalledFontStyle(font.Style),
                             font.WeightClass)) == null)
             {
                 //this come from other choices?
@@ -241,33 +243,6 @@ namespace Typography.Text
 
         public TextServiceClient CreateNewServiceClient() => new TextServiceClient(this);
 
-        static OpenFontTextService()
-        {
-
-            CurrentEnv.CurrentOSName = (IsOnMac()) ?
-                         CurrentOSName.Mac :
-                         CurrentOSName.Windows;
-        }
-
-        static bool s_evaluatedOS;
-        static bool s_onMac;
-        static bool IsOnMac()
-        {
-
-            if (s_evaluatedOS) return s_onMac;
-            // 
-            s_evaluatedOS = true;
-#if NETCORE
-                return _s_onMac=  System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(
-                  System.Runtime.InteropServices.OSPlatform.OSX);                    
-#else
-
-            return s_onMac = (System.Environment.OSVersion.Platform == System.PlatformID.MacOSX);
-#endif
-        }
-
-
     }
-
 
 }

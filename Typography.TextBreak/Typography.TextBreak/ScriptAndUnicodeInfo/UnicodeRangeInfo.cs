@@ -9,7 +9,7 @@ namespace Typography.OpenFont
         /// <summary>
         /// begin code point
         /// </summary>
-        public int StarCodepoint { get; }
+        public int StartCodepoint { get; }
         /// <summary>
         /// end codepoint
         /// </summary>
@@ -19,11 +19,11 @@ namespace Typography.OpenFont
 
         internal UnicodeRangeInfo(int startAt, int endAt, string name)
         {
-            StarCodepoint = startAt;
+            StartCodepoint = startAt;
             EndCodepoint = endAt;
             Name = name;
         }
-        public bool IsInRange(int codepoint) => codepoint >= StarCodepoint && codepoint <= EndCodepoint;
+        public bool IsInRange(int codepoint) => codepoint >= StartCodepoint && codepoint <= EndCodepoint;
         public override string ToString() => Name;
 
     }

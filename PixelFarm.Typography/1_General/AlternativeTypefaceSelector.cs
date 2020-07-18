@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 using Typography.OpenFont;
 using Typography.TextBreak;
-using Typography.FontManagement;
+using Typography.FontCollection;
 
 using PixelFarm.Drawing;
 
@@ -59,7 +59,7 @@ namespace Typography.Text
                     ResolvedFont resolvedFont = _textService.ResolveFont(choice);
                     //check if resolvedFont support specific unicodeRange info or not 
                     Typeface typeface = resolvedFont.Typeface;
-                    ushort codepoint = typeface.GetGlyphIndex(unicodeRangeInfo.StarCodepoint);
+                    ushort codepoint = typeface.GetGlyphIndex(unicodeRangeInfo.StartCodepoint);
                     if (codepoint > 0)
                     {
                         //use this

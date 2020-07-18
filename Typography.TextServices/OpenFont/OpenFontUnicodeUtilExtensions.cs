@@ -34,7 +34,7 @@ namespace Typography.OpenFont
             }
         }
 
-        public static void CollectScriptLang(this FontManagement.InstalledTypeface typeface, Dictionary<string, ScriptLang> output)
+        public static void CollectScriptLang(this FontCollection.InstalledTypeface typeface, Dictionary<string, ScriptLang> output)
         {
             CollectScriptLang(typeface.Languages, output);
         }
@@ -135,7 +135,7 @@ namespace Typography.OpenFont
 
                 foreach (UnicodeRangeInfo rng in unicodeLangRange)
                 {
-                    for (int codePoint = rng.StarCodepoint; codePoint <= rng.EndCodepoint; ++codePoint)
+                    for (int codePoint = rng.StartCodepoint; codePoint <= rng.EndCodepoint; ++codePoint)
                     {
                         ushort glyphIndex = typeface.GetGlyphIndex(codePoint);
                         if (glyphIndex > 0)

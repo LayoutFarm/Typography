@@ -6,7 +6,7 @@ using Typography.OpenFont;
 using Typography.OpenFont.Tables;
 
 
-namespace Typography.FontManagement
+namespace Typography.FontCollection
 {
     [Flags]
     public enum TypefaceStyle
@@ -44,13 +44,14 @@ namespace Typography.FontManagement
         public abstract SelectedTypeface Select(List<InstalledTypeface> choices, UnicodeRangeInfo unicodeRangeInfo, int codepoint);
 
 
-
+        
         public readonly struct SelectedTypeface
         {
             public readonly InstalledTypeface InstalledTypeface;
             public readonly Typeface Typeface;
             public SelectedTypeface(InstalledTypeface installedTypeface)
             {
+                
                 Typeface = null;
                 InstalledTypeface = installedTypeface;
             }

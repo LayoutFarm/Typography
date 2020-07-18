@@ -2,7 +2,7 @@
 using System;
 using Typography.OpenFont;
 using Typography.Text;
-using Typography.FontManagement;
+using Typography.FontCollection;
 using System.Collections.Generic;
 
 namespace SampleWinForms

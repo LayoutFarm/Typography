@@ -4,10 +4,9 @@ using System.IO;
 using System.Collections.Generic;
 using Typography.OpenFont;
 using Typography.OpenFont.Tables;
-using Typography.TextLayout;
 using Typography.TextBreak;
-using Typography.Text;
-namespace Typography.FontManagement
+
+namespace Typography.FontCollection
 {
 
     //=======
@@ -462,7 +461,7 @@ namespace Typography.FontManagement
                             //TODO: review here again
                             foreach (UnicodeRangeInfo rng in Unicode13RangeInfoList.GetNonePlane0Iter())
                             {
-                                if (instFont.ContainGlyphForUnicode(rng.StarCodepoint))
+                                if (instFont.ContainGlyphForUnicode(rng.StartCodepoint))
                                 {
                                     typefaceList = GetExisitingOrCreateNewListForUnicodeRange(rng);
                                     typefaceList.Add(instFont);

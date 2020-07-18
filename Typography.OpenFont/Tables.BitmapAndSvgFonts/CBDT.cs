@@ -41,7 +41,7 @@ namespace Typography.OpenFont.Tables
 
 
         System.IO.MemoryStream _ms; //sub-stream contains image data
-        Typography.OpenFont.IO.ByteOrderSwappingBinaryReader _binReader;
+        Typography.OpenFont.ByteOrderSwappingBinaryReader _binReader;
 
         public void Dispose()
         {
@@ -78,7 +78,7 @@ namespace Typography.OpenFont.Tables
             //-------------------
             byte[] data = reader.ReadBytes((int)this.Header.Length);//***
             _ms = new MemoryStream(data);
-            _binReader = new IO.ByteOrderSwappingBinaryReader(_ms);
+            _binReader = new ByteOrderSwappingBinaryReader(_ms);
         }
         public void FillGlyphInfo(Glyph glyph)
         {
