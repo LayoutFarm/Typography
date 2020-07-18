@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 
 using Typography.OpenFont;
-using Typography.FontCollection;
+using Typography.FontCollections;
 
 using PixelFarm.Drawing;
 

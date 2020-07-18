@@ -34,7 +34,7 @@ namespace Typography.OpenFont
             }
         }
 
-        public static void CollectScriptLang(this FontCollection.InstalledTypeface typeface, Dictionary<string, ScriptLang> output)
+        public static void CollectScriptLang(this FontCollections.InstalledTypeface typeface, Dictionary<string, ScriptLang> output)
         {
             CollectScriptLang(typeface.Languages, output);
         }

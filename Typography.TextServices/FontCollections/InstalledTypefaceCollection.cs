@@ -6,7 +6,7 @@ using Typography.OpenFont;
 using Typography.OpenFont.Tables;
 using Typography.TextBreak;
 
-namespace Typography.FontCollection
+namespace Typography.FontCollections
 {
 
     //=======
