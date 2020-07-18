@@ -355,7 +355,7 @@ namespace Typography.TextLayout
 
 }
 
-namespace Typography.OpenFont
+namespace Typography.OpenFont.Extensions
 {
 
     public static class TypefaceExtension5
