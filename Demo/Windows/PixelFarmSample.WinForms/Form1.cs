@@ -168,6 +168,7 @@ namespace SampleWinForms
             {
                 //latin
 
+
                 var preferredTypefaces = new Typography.FontCollections.PreferredTypefaceList();
                 preferredTypefaces.AddTypefaceName("Sarabun");
 

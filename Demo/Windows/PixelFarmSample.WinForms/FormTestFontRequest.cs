@@ -363,6 +363,11 @@ namespace SampleWinForms
 
                 textOutput = "Hello! 1😁";
                 RequestFont reqFont1 = new RequestFont("Roboto", 20);
+
+                int reqKey = reqFont1.GetReqKey();
+
+
+
                 reqFont1.AddOtherChoices(new RequestFont.Choice("Asana Math", 20));
 
                 DrawStringToMemBitmap(reqFont1, textOutput, 0, 50);

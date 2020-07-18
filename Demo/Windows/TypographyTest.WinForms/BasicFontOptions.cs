@@ -79,7 +79,7 @@ namespace TypographyTest
                         case ".otc":
                         case ".ttf":
                         case ".otf":
-                            _installedTypefaces.AddFontStreamSource(new Typography.FontCollections.FontFileStreamProvider(file));
+                            _installedTypefaces.AddFontStreamSource(new FontFileStreamProvider(file));
                             break;
                     }
 

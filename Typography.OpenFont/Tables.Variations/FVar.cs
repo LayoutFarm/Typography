@@ -4,7 +4,7 @@ using System.IO;
 
 namespace Typography.OpenFont.Tables
 {
-    //https://www.microsoft.com/typography/otspec/fvar.htm
+    //https://docs.microsoft.com/en-us/typography/opentype/spec/fvar
     //'fvar' Header 
     //The format of the font variations table header is as follows. 
 

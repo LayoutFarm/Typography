@@ -4,7 +4,7 @@ using System.IO;
 
 namespace Typography.OpenFont.Tables
 {
-    //https://www.microsoft.com/typography/otspec/gvar.htm
+    //https://docs.microsoft.com/en-us/typography/opentype/spec/gvar
 
     class GVar : TableEntry
     {
@@ -157,7 +157,7 @@ namespace Typography.OpenFont.Tables
             TupleVariationHeader[] headers = new TupleVariationHeader[tupleCount];
             for (int i = 0; i < tupleCount; ++i)
             {
-               
+
                 TupleVariationHeader header = new TupleVariationHeader();
                 header.variableDataSize = (short)reader.ReadUInt16();
                 header.tupleIndex = reader.ReadUInt16();
@@ -176,8 +176,8 @@ namespace Typography.OpenFont.Tables
             }
         }
 
-      
-        
+
+
     }
 }
 

@@ -3,17 +3,16 @@
 
 namespace Typography.OpenFont
 {
-    public static class IBMFontClassParameters
-    {
-        //This section defines the IBM Font Class
-        //and the IBM Font Subclass parameter values
-        //to be used in the classification of font designs by the font designer or supplier.
-        //
-        //This information is stored in the sFamilyClass field of a font's OS/2 table. 
-    }
+
+    //This section defines the IBM Font Class
+    //and the IBM Font Subclass parameter values
+    //to be used in the classification of font designs by the font designer or supplier.
+    //
+    //This information is stored in the sFamilyClass field of a font's OS/2 table. 
+
 
     [System.Flags]
-    public enum IBMFontClassParametersKind
+    enum IBMFontClassParametersKind
     {
         No_Classification = 0 << 8,
         //

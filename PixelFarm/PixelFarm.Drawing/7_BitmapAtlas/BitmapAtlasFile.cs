@@ -20,8 +20,9 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             TotalImageInfo,
             GlyphList,
             OverviewFontInfo,
-            OverviewMultiSizeFontInfo,
+            FontScriptTags,
 
+            OverviewMultiSizeFontInfo,
             OverviewBitmapInfo,
             ImgUrlDic,
         }
@@ -55,6 +56,9 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                             _atlas = new SimpleBitmapAtlas();
                             AtlasList.Add(_atlas);
                             ReadOverviewFontInfo(reader);
+                            break;
+                        case ObjectKind.FontScriptTags:
+                            ReadScriptTags(reader);
                             break;
                         case ObjectKind.End:
                             stop = true;
@@ -109,9 +113,17 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
         void ReadOverviewFontInfo(BinaryReader reader)
         {
             //read str len 
-            _atlas.FontFilename = ReadLengthPrefixUtf8String(reader);
-            _atlas.FontKey = reader.ReadInt32();
-            _atlas.OriginalFontSizePts = reader.ReadSingle();
+            _atlas.FontName = ReadLengthPrefixUtf8String(reader);
+            int old_random_num = reader.ReadInt32();//unused 
+            _atlas.SizeInPts = reader.ReadSingle();
+        }
+        void ReadScriptTags(BinaryReader reader)
+        {
+            ushort count = reader.ReadUInt16();
+            for (int i = 0; i < count; ++i)
+            {
+                _atlas.ScriptTags.Add(reader.ReadUInt32());
+            }
         }
         void ReadImgUrlDict(BinaryReader reader)
         {
@@ -182,12 +194,24 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             _writer.Write((ushort)utf8Buffer.Length);
             _writer.Write(utf8Buffer);
         }
-        internal void WriteOverviewFontInfo(string fontFileName, int fontKey, float sizeInPt)
+        internal void WriteOverviewFontInfo(string fontName, int fontKey, float sizeInPt)
         {
             _writer.Write((ushort)ObjectKind.OverviewFontInfo);
-            WriteLengthPrefixUtf8String(fontFileName);
-            _writer.Write(fontKey);
-            _writer.Write(sizeInPt);
+            WriteLengthPrefixUtf8String(fontName);
+            _writer.Write(fontKey); //
+            _writer.Write(sizeInPt); //
+        }
+        internal void WriteScriptTags(uint[] scriptTags)
+        {
+            if (scriptTags != null && scriptTags.Length > 0)
+            {
+                _writer.Write((ushort)ObjectKind.FontScriptTags);
+                _writer.Write((ushort)scriptTags.Length);
+                for (int i = 0; i < scriptTags.Length; ++i)
+                {
+                    _writer.Write(scriptTags[i]);
+                }
+            }
         }
         internal void WriteTotalImageInfo(ushort width, ushort height, byte colorComponent, TextureKind textureKind)
         {

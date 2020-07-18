@@ -26,8 +26,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)Text\VirtualTextSpanPrinter.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="$(MSBuildThisFileDirectory)FontCollections\" />
     <Folder Include="$(MSBuildThisFileDirectory)Text\" />
-    <Folder Include="$(MSBuildThisFileDirectory)OpenFont\" />
     <Folder Include="$(MSBuildThisFileDirectory)TextLayout\" />
   </ItemGroup>
 </Project>

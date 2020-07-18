@@ -2,11 +2,12 @@
 using System;
 using System.Collections.Generic;
 
+using Typography.FontCollections;
 using Typography.OpenFont;
 using Typography.OpenFont.Extensions;
 using Typography.TextLayout;
 using Typography.TextBreak;
-using Typography.FontCollections;
+
 
 namespace Typography.Text
 {
@@ -24,7 +25,7 @@ namespace Typography.Text
         CustomBreaker _textBreaker; //text break        
 
         public VirtualTextSpanPrinter()
-        {            
+        {
 
             this.PositionTechnique = PositionTechnique.OpenFont;
             FontSizeInPoints = 14;// 
@@ -313,10 +314,9 @@ namespace Typography.Text
                 formattedGlyphPlanSeq.PrefixWhitespaceCount = (ushort)prefix_whitespaceCount;//***
                 prefix_whitespaceCount = 0;//reset 
 
-                //TODO: other style?... (bold, italic)  
-
+                //TODO: other style?... (bold, italic) 
                 ResolvedFont foundResolvedFont = LocalResolveFont(curTypeface, FontSizeInPoints);
-                formattedGlyphPlanSeq.SetData(seq, foundResolvedFont);
+                formattedGlyphPlanSeq.SetData(seq, foundResolvedFont, spBreakInfo);
 
                 latestFmtGlyphPlanSeq = formattedGlyphPlanSeq;
 
@@ -426,7 +426,7 @@ namespace Typography.Text
             int key = InternalFontKey.CalculateGetHasCode(typefaceKey, sizeInPoint, 0);
             if (!_localResolvedFonts.TryGetValue(key, out ResolvedFont found))
             {
-                return _localResolvedFonts[key] = new ResolvedFont(typeface, sizeInPoint, key);
+                return _localResolvedFonts[key] = new ResolvedFont(typeface, sizeInPoint);
             }
             return found;
         }

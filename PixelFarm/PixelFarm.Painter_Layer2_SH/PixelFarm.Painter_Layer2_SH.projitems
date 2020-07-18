@@ -11,12 +11,13 @@
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)Basic\ColorEx.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Basic\CombineMode.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Basic\CRC32Calculator.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Basic\DashStyle.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Basic\ImageBinder.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Basic\LenAndLenUnit.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)_ESS_LINK_WITH_TY\ImageBinder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)_ESS_LINK_WITH_TY\LenAndLenUnit.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Basic\Region.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Basic\RenderVx.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)_ESS_LINK_WITH_TY\TextBufferSpan.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)_ESS_LINK_WITH_TY\TextSpanMeasureResult.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CpuBlit.VertexProcessing\BoundingRect.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CpuBlit.VertexProcessing\CurveFlattener.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CpuBlit.VertexProcessing\LineWalker.cs" />
@@ -42,9 +43,12 @@
     <Compile Include="$(MSBuildThisFileDirectory)Drawing\DrawBoard.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Drawing\ITextPrinter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Drawing\Painter.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Drawing\RequestFont.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)_ESS_LINK_WITH_TY\RequestFont.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Drawing\TextBaseline.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ForNet20.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TempContext.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="$(MSBuildThisFileDirectory)_ESS_LINK_WITH_TY\" />
   </ItemGroup>
 </Project>

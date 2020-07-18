@@ -7,12 +7,13 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
     public class SimpleBitmapAtlasBuilder
     {
         MemBitmap _latestResultBmp;
-        Dictionary<ushort, BitmapAtlasItemSource> _items = new Dictionary<ushort, BitmapAtlasItemSource>();
+        readonly Dictionary<ushort, BitmapAtlasItemSource> _items = new Dictionary<ushort, BitmapAtlasItemSource>();
+
 
         public SimpleBitmapAtlasBuilder()
         {
             SpaceCompactOption = CompactOption.BinPack; //default
-            MaxAtlasWidth = 800;
+            MaxAtlasWidth = 1024;
         }
 
         public int MaxAtlasWidth { get; set; }
@@ -20,9 +21,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
 
         //information about font
         public float FontSizeInPoints { get; private set; }
-        public string FontFilename { get; set; }
-        public int FontKey { get; set; }
-
+        public string FontName { get; private set; }
         public CompactOption SpaceCompactOption { get; set; }
         //
         public enum CompactOption
@@ -41,10 +40,35 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
         {
             _items[img.UniqueInt16Name] = img;
         }
+
         public Dictionary<string, ushort> ImgUrlDict { get; set; }
-        public void SetAtlasInfo(TextureKind textureKind, float fontSizeInPts)
+
+        public List<UnicodeRange> UnicodeRanges { get; private set; } = new List<UnicodeRange>();
+        public List<uint> ScriptTags = new List<uint>();//no lang tag
+
+        /// <summary>
+        /// DPI, dot-per-inch
+        /// </summary>
+        public uint DPI { get; private set; } = 96;
+
+        public readonly struct UnicodeRange
+        {
+            public readonly int startCodepoint;
+            public readonly int endCodepoint;
+            public UnicodeRange(int startCodepoint, int endCodepoint)
+            {
+                this.startCodepoint = startCodepoint;
+                this.endCodepoint = endCodepoint;
+            }
+        }
+        public void SetAtlasInfo(TextureKind textureKind, uint dpi)
         {
             this.TextureKind = textureKind;
+            this.DPI = dpi;
+        }
+        public void SetAtlasFontInfo(string fontName, float fontSizeInPts)
+        {
+            this.FontName = fontName;
             this.FontSizeInPoints = fontSizeInPts;
         }
         public MemBitmap BuildSingleImage(bool flipY)
@@ -229,6 +253,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                 return _latestResultBmp = PixelFarm.CpuBlit.MemBitmap.CreateFromCopy(totalImgWidth, imgH, mergeBmpBuffer);
             }
         }
+
         public void SaveAtlasInfo(System.IO.Stream outputStream)
         {
 
@@ -239,21 +264,16 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
 
             BitmapAtlasFile atlasFile = new BitmapAtlasFile();
             atlasFile.StartWrite(outputStream);
-            if (FontFilename != null)
-            {
-                atlasFile.WriteOverviewFontInfo(FontFilename, FontKey, FontSizeInPoints);
-            }
-            else
-            {
-                atlasFile.WriteOverviewFontInfo("", 0, 0);
-            }
+
+            atlasFile.WriteOverviewFontInfo(FontName ?? "", 0, FontSizeInPoints);
+            atlasFile.WriteScriptTags(ScriptTags.ToArray());
+
 
             atlasFile.WriteTotalImageInfo(
                 (ushort)_latestResultBmp.Width,
                 (ushort)_latestResultBmp.Height, 4,
                 this.TextureKind);
-            //
-            //
+
             atlasFile.WriteAtlasItems(_items);
 
             if (ImgUrlDict != null)
@@ -284,13 +304,16 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
 
         public SimpleBitmapAtlas CreateSimpleBitmapAtlas()
         {
-            SimpleBitmapAtlas atlas = new SimpleBitmapAtlas();
-            atlas.TextureKind = this.TextureKind;
-            atlas.OriginalFontSizePts = this.FontSizeInPoints;
+            SimpleBitmapAtlas atlas = new SimpleBitmapAtlas
+            {
+                TextureKind = this.TextureKind, 
+                FontName = this.FontName,
+                SizeInPts = this.FontSizeInPoints
+            };
 
             foreach (BitmapAtlasItemSource src in _items.Values)
             {
-                Rectangle area = src.Area; 
+                Rectangle area = src.Area;
 
                 atlas.AddAtlasItem(new AtlasItem(src.UniqueInt16Name)
                 {

@@ -3,7 +3,7 @@ using System;
 
 using PixelFarm.Drawing;
 using PixelFarm.CpuBlit.PixelProcessing;
-using Typography.OpenFont; 
+using Typography.OpenFont;
 using Typography.TextLayout;
 using Typography.Text;
 
@@ -77,7 +77,8 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
         {
             //call to service             
             _font = _textServices.ResolveFont(reqFont); //resolve for 'actual' font
-            _fontAtlas = _bmpFontMx.GetFontAtlas(_font, out _fontBmp);
+
+            _fontAtlas = _bmpFontMx.GetFontAtlas(_font, reqFont.StartCodePoint, reqFont.EndCodePoint, out _fontBmp);
             FontSizeInPoints = _font.SizeInPoints;
         }
 

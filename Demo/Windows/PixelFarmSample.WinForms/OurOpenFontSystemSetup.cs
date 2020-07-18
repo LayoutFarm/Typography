@@ -22,7 +22,12 @@ namespace SampleWinForms
             //2. woff and woff2 decompressor
             SetupWoffDecompressFunctions();
 
-            //3. read/write image file with gdi+
+            //3. 
+            //PixelFarm.Drawing.RequestFont.
+
+
+
+            //4. read/write image file with gdi+
             MemBitmapExt.DefaultMemBitmapIO = new PixelFarm.Drawing.WinGdi.GdiBitmapIO();
 
         }
