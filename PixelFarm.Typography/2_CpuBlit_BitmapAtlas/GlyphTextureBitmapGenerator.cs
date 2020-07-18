@@ -14,15 +14,29 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
     public class GlyphTextureBuildDetail
     {
         public ScriptLang ScriptLang;
-        public char[] OnlySelectedGlyphIndices;
-        public HintTechnique HintTechnique;
+        public UnicodeRangeInfo[] UnicodeRanges;
+        public char[] OnlySelectedChars; //TODO: review here
 
+        public HintTechnique HintTechnique;
         public bool AllGlyphs;
+
+#if DEBUG
+        public override string ToString()
+        {
+            return ScriptLang.ToString();
+        }
+#endif
     }
 
     public struct GlyphTextureBitmapGenerator
     {
         public delegate void OnEachGlyph(BitmapAtlasItemSource glyphImage);
+
+        Typeface _typeface;
+        float _sizeInPoints;
+        float _px_scale;
+        OnEachGlyph _onEachGlyphDel;
+        uint _currentDPI;
 
         /// <summary>
         /// version of msdf generator
@@ -30,17 +44,11 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
         public ushort MsdfGenVersion { get; set; }
 
         PixelFarm.Drawing.SvgBmpBuilderFunc _svgBmpBuilderFunc;
-
         public void SetSvgBmpBuilderFunc(PixelFarm.Drawing.SvgBmpBuilderFunc svgBmpBuilderFunc)
         {
             _svgBmpBuilderFunc = svgBmpBuilderFunc;
         }
 
-        Typeface _typeface;
-        float _sizeInPoints;
-        float _px_scale;
-        OnEachGlyph _onEachGlyphDel;
-        int _currentDPI;
 
         void SetCurrentFontInfo(Typeface typeface, float sizeInPoints)
         {
@@ -51,13 +59,12 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             //please note that DPI effect glyph size
             //TODO: 
             //1. add information about dpi to generated texture
-            //2. when dpi is changed we need to use correct texture for that dpi
-
-
-            _currentDPI = (int)Typeface.DefaultDpi;
-            _px_scale = _typeface.CalculateScaleToPixelFromPointSize(_sizeInPoints, _currentDPI);
+            //2. when dpi is changed we need to use correct texture for that dpi 
+            _currentDPI = Typeface.DefaultDpi;
+            _px_scale = _typeface.CalculateScaleToPixelFromPointSize(_sizeInPoints, (int)_currentDPI);
         }
-        public SimpleBitmapAtlasBuilder CreateTextureFontFromBuildDetail(
+        public void CreateTextureFontFromBuildDetail(
+            SimpleBitmapAtlasBuilder atlasBuilder,
             Typeface typeface,
             float sizeInPoint,
             TextureKind textureKind,
@@ -68,9 +75,9 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             _onEachGlyphDel = onEachGlyphDel;
             SetCurrentFontInfo(typeface, sizeInPoint);
             //-------------------------------------------------------------
-            var atlasBuilder = new SimpleBitmapAtlasBuilder();
-
-            atlasBuilder.SetAtlasInfo(textureKind, sizeInPoint);
+           
+            atlasBuilder.SetAtlasInfo(textureKind, _currentDPI);
+            atlasBuilder.SetAtlasFontInfo(typeface.Name, sizeInPoint);
             //-------------------------------------------------------------  
             int j = details.Length;
             for (int i = 0; i < j; ++i)
@@ -78,10 +85,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                 GlyphTextureBuildDetail detail = details[i];
                 if (detail.AllGlyphs)
                 {
-#if DEBUG
-
-#endif
-
+                    //all 
                     int count = typeface.GlyphCount;
                     ushort[] glyphIndexList = new ushort[count];
                     for (ushort m = 0; m < count; ++m)
@@ -98,7 +102,11 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                 {
                     //skip those script lang=null
                     //2. find associated glyph index base on input script langs
+                    atlasBuilder.ScriptTags.Add(detail.ScriptLang.scriptTag);
+
+
                     List<ushort> outputGlyphIndexList = new List<ushort>();
+
                     typeface.CollectAllAssociateGlyphIndex(outputGlyphIndexList, detail.ScriptLang);
                     CreateTextureFontFromGlyphIndices(
                         detail.HintTechnique,
@@ -106,12 +114,17 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                         GetUniqueGlyphIndexList(outputGlyphIndexList)
                         );
                 }
+                else
+                {
+                    //??
+
+                }
             }
 
             for (int i = 0; i < j; ++i)
             {
                 GlyphTextureBuildDetail detail = details[i];
-                if (detail.OnlySelectedGlyphIndices != null)
+                if (detail.OnlySelectedChars != null)
                 {
                     //skip those script lang=null
                     //2. find associated glyph index base on input script langs
@@ -119,16 +132,17 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                     CreateTextureFontFromGlyphIndices(
                         detail.HintTechnique,
                         atlasBuilder,
-                        detail.OnlySelectedGlyphIndices
+                        detail.OnlySelectedChars
                         );
                 }
             }
 
             _onEachGlyphDel = null;//reset
-            return atlasBuilder;
+           
         }
 
-        public SimpleBitmapAtlasBuilder CreateTextureFontFromInputChars(
+        public void CreateTextureFontFromInputChars(
+            SimpleBitmapAtlasBuilder atlasBuilder,
             Typeface typeface, float sizeInPoint,
             TextureKind textureKind,
             char[] chars,
@@ -146,8 +160,9 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                 i++;
             }
             //-------------------------------------------------------------
-            var atlasBuilder = new SimpleBitmapAtlasBuilder();
-            atlasBuilder.SetAtlasInfo(textureKind, sizeInPoint);
+             
+            atlasBuilder.SetAtlasInfo(textureKind, _currentDPI);
+            atlasBuilder.SetAtlasFontInfo(typeface.Name, sizeInPoint);
             //------------------------------------------------------------- 
             //we can specfic subset with special setting for each set 
             CreateTextureFontFromGlyphIndices(
@@ -156,7 +171,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                 GetUniqueGlyphIndexList(glyphIndices));
 
             _onEachGlyphDel = null;//reset                
-            return atlasBuilder;
+             
         }
 
         void CreateTextureFontFromGlyphIndices(

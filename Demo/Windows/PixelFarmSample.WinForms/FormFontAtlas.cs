@@ -150,7 +150,9 @@ namespace SampleWinForms
                 glyphTextureGen.MsdfGenVersion = textureKindAndDesc.TechniqueDetail;
             }
 
-            SimpleBitmapAtlasBuilder atlasBuilder = glyphTextureGen.CreateTextureFontFromInputChars(
+            var atlasBuilder = new SimpleBitmapAtlasBuilder();
+            glyphTextureGen.CreateTextureFontFromInputChars(
+               atlasBuilder,
                _typeface,
                fontSizeInPoints,
                textureKindAndDesc.Kind,
@@ -252,7 +254,7 @@ namespace SampleWinForms
             }
 
             FontAtlasBuilderHelper helper = new FontAtlasBuilderHelper();
-            helper.Build(glyphTextureGen, typeface, fontSizeInPoints, textureKindAndDesc.Kind, buildDetails.ToArray(), reqFont.FontKey);
+            helper.Build(glyphTextureGen, typeface, fontSizeInPoints, textureKindAndDesc.Kind, buildDetails.ToArray());
 
 #if DEBUG
 

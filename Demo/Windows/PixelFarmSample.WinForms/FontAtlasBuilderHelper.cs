@@ -28,24 +28,24 @@ namespace PaintLab
             GlyphTextureBitmapGenerator glyphTextureGen,
             Typeface typeface, float fontSizeInPoints,
             TextureKind textureKind,
-            GlyphTextureBuildDetail[] buildDetails,
-            int fontKey)
+            GlyphTextureBuildDetail[] buildDetails)
         {
 #if DEBUG
             //overall, glyph atlas generation time
             System.Diagnostics.Stopwatch dbugStopWatch = new System.Diagnostics.Stopwatch();
             dbugStopWatch.Start();
 #endif
-
-            SimpleBitmapAtlasBuilder atlasBuilder = glyphTextureGen.CreateTextureFontFromBuildDetail(typeface,
+            var atlasBuilder = new SimpleBitmapAtlasBuilder();
+            glyphTextureGen.CreateTextureFontFromBuildDetail(
+                atlasBuilder,
+                typeface,
                 fontSizeInPoints,
                 textureKind,
                 buildDetails);
 
             //3. set information before write to font-info
             atlasBuilder.SpaceCompactOption = SimpleBitmapAtlasBuilder.CompactOption.ArrangeByHeight;
-            atlasBuilder.FontFilename = typeface.Name;
-            atlasBuilder.FontKey = fontKey;
+            atlasBuilder.SetAtlasFontInfo(typeface.Name, fontSizeInPoints);
 
             //4. merge all glyph in the builder into a single image
             using (MemBitmap totalGlyphsImg = atlasBuilder.BuildSingleImage(true))
@@ -53,7 +53,9 @@ namespace PaintLab
 
                 if (TextureInfoFilename == null)
                 {
-                    string textureName = typeface.Name.ToLower() + "_" + fontKey + ".info";
+                    //use random suffix
+                    string random_suffix = Guid.NewGuid().ToString().Substring(0, 7);
+                    string textureName = typeface.Name.ToLower() + "_" + random_suffix + ".info";
                     string output_imgFilename = textureName + ".png";
 
                     TextureInfoFilename = textureName;
