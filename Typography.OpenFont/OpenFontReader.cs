@@ -5,7 +5,6 @@ using System;
 using System.IO;
 
 using Typography.OpenFont.Extensions;
-using Typography.OpenFont.IO;
 using Typography.OpenFont.Tables;
 using Typography.OpenFont.Trimmable;
 
@@ -22,7 +21,7 @@ namespace Typography.OpenFont
     }
 
 
-  
+
     static class KnownFontFiles
     {
         public static bool IsTtcf(ushort u1, ushort u2)
