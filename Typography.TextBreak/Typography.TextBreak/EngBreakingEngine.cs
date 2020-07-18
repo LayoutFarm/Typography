@@ -101,7 +101,7 @@ namespace Typography.TextBreak
             char c1 = input[start];
             if (UnicodeRangeFinder.GetUniCodeRangeFor(c1, out UnicodeRangeInfo unicodeRangeInfo, out spanBreakInfo))
             {
-                int startCodePoint = unicodeRangeInfo.StarCodepoint;
+                int startCodePoint = unicodeRangeInfo.StartCodepoint;
                 int endCodePoint = unicodeRangeInfo.EndCodepoint;
                 for (int i = start; i < endBefore; ++i)
                 {

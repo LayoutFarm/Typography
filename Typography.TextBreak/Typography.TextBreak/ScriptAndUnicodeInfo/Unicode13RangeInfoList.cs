@@ -661,7 +661,7 @@ Supplementary_Private_Use_Area_B,
             s_beginAt_list = new int[s_list.Length];
             for (int i = 0; i < s_list.Length; ++i)
             {
-                s_beginAt_list[i] = s_list[i].StarCodepoint;
+                s_beginAt_list[i] = s_list[i].StartCodepoint;
 
                 if (s_none_plane0_startAt == 0 && s_list[i] == Linear_B_Syllabary)
                 {

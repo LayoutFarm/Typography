@@ -414,7 +414,7 @@ namespace SampleWinForms
             {
                 //create a new one 
                 //resolve this font
-
+                
                 SimpleBitmapAtlas fontAtlas = bmpFontMx.GetFontAtlas(resolvedFont, out MemBitmap fontBmp);
                 multisizeFontAtlasBuilder.AddSimpleAtlasFile(reqFont,
                     resolveFontTextureFile,

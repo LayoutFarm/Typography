@@ -462,7 +462,7 @@ namespace Typography.FontManagement
                             //TODO: review here again
                             foreach (UnicodeRangeInfo rng in Unicode13RangeInfoList.GetNonePlane0Iter())
                             {
-                                if (instFont.ContainGlyphForUnicode(rng.StarCodepoint))
+                                if (instFont.ContainGlyphForUnicode(rng.StartCodepoint))
                                 {
                                     typefaceList = GetExisitingOrCreateNewListForUnicodeRange(rng);
                                     typefaceList.Add(instFont);
