@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using Typography.OpenFont;
 using Typography.OpenFont.Extensions;
 
-using Typography.FontCollection;
+using Typography.FontCollections;
 using Typography.TextLayout;
 using Typography.TextBreak;
 

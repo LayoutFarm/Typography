@@ -10,9 +10,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)Text\AbstractTextSpanPrinter.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)FontCollection\InstalledTypeface.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)FontCollection\InstalledTypefaceCollection.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)FontCollection\FontManagement.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FontCollections\InstalledTypeface.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FontCollections\InstalledTypefaceCollection.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FontCollections\FontManagement.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)OpenFont\OpenFontBitPosInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)OpenFont\OpenFontUnicodeUtilExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TextLayout\FormattedGlyphPlanSeq.cs" />

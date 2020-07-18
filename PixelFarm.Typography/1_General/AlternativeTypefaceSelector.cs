@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 using Typography.OpenFont;
 using Typography.TextBreak;
-using Typography.FontCollection;
+using Typography.FontCollections;
 
 using PixelFarm.Drawing;
 

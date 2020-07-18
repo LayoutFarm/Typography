@@ -20,7 +20,7 @@ namespace Typography.Text
             fontName = fontName.ToUpper();//***
             if (!s_registerFontNames.TryGetValue(fontName, out int found))
             {
-                int nameCrc32 = Typography.FontCollection.TinyCRC32Calculator.CalculateCrc32(fontName);
+                int nameCrc32 = Typography.FontCollections.TinyCRC32Calculator.CalculateCrc32(fontName);
                 s_registerFontNames.Add(fontName, nameCrc32);
                 return nameCrc32;
             }

@@ -6,7 +6,7 @@ using Typography.OpenFont;
 using Typography.OpenFont.Tables;
 
 
-namespace Typography.FontCollection
+namespace Typography.FontCollections
 {
     [Flags]
     public enum TypefaceStyle

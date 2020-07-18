@@ -6,7 +6,7 @@ using Typography.OpenFont;
 using Typography.OpenFont.Extensions;
 using Typography.TextLayout;
 using Typography.TextBreak;
-using Typography.FontCollection;
+using Typography.FontCollections;
 
 namespace Typography.Text
 {
