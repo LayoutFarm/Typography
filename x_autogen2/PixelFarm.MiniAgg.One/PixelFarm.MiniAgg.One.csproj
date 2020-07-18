@@ -342,17 +342,8 @@
     <Compile Include="..\..\PixelFarm\PixelFarm.Painter_Layer2_SH\Basic\CombineMode.cs">
       <Link>PixelFarm\PixelFarm.Painter_Layer2_SH\Basic\CombineMode.cs</Link>
     </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Painter_Layer2_SH\Basic\CRC32Calculator.cs">
-      <Link>PixelFarm\PixelFarm.Painter_Layer2_SH\Basic\CRC32Calculator.cs</Link>
-    </Compile>
     <Compile Include="..\..\PixelFarm\PixelFarm.Painter_Layer2_SH\Basic\DashStyle.cs">
       <Link>PixelFarm\PixelFarm.Painter_Layer2_SH\Basic\DashStyle.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Painter_Layer2_SH\Basic\ImageBinder.cs">
-      <Link>PixelFarm\PixelFarm.Painter_Layer2_SH\Basic\ImageBinder.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Painter_Layer2_SH\Basic\LenAndLenUnit.cs">
-      <Link>PixelFarm\PixelFarm.Painter_Layer2_SH\Basic\LenAndLenUnit.cs</Link>
     </Compile>
     <Compile Include="..\..\PixelFarm\PixelFarm.Painter_Layer2_SH\Basic\Region.cs">
       <Link>PixelFarm\PixelFarm.Painter_Layer2_SH\Basic\Region.cs</Link>
@@ -435,9 +426,6 @@
     <Compile Include="..\..\PixelFarm\PixelFarm.Painter_Layer2_SH\Drawing\Painter.cs">
       <Link>PixelFarm\PixelFarm.Painter_Layer2_SH\Drawing\Painter.cs</Link>
     </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Painter_Layer2_SH\Drawing\RequestFont.cs">
-      <Link>PixelFarm\PixelFarm.Painter_Layer2_SH\Drawing\RequestFont.cs</Link>
-    </Compile>
     <Compile Include="..\..\PixelFarm\PixelFarm.Painter_Layer2_SH\Drawing\TextBaseline.cs">
       <Link>PixelFarm\PixelFarm.Painter_Layer2_SH\Drawing\TextBaseline.cs</Link>
     </Compile>
@@ -446,6 +434,21 @@
     </Compile>
     <Compile Include="..\..\PixelFarm\PixelFarm.Painter_Layer2_SH\TempContext.cs">
       <Link>PixelFarm\PixelFarm.Painter_Layer2_SH\TempContext.cs</Link>
+    </Compile>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Painter_Layer2_SH\_ESS_LINK_WITH_TY\ImageBinder.cs">
+      <Link>PixelFarm\PixelFarm.Painter_Layer2_SH\_ESS_LINK_WITH_TY\ImageBinder.cs</Link>
+    </Compile>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Painter_Layer2_SH\_ESS_LINK_WITH_TY\LenAndLenUnit.cs">
+      <Link>PixelFarm\PixelFarm.Painter_Layer2_SH\_ESS_LINK_WITH_TY\LenAndLenUnit.cs</Link>
+    </Compile>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Painter_Layer2_SH\_ESS_LINK_WITH_TY\RequestFont.cs">
+      <Link>PixelFarm\PixelFarm.Painter_Layer2_SH\_ESS_LINK_WITH_TY\RequestFont.cs</Link>
+    </Compile>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Painter_Layer2_SH\_ESS_LINK_WITH_TY\TextBufferSpan.cs">
+      <Link>PixelFarm\PixelFarm.Painter_Layer2_SH\_ESS_LINK_WITH_TY\TextBufferSpan.cs</Link>
+    </Compile>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Painter_Layer2_SH\_ESS_LINK_WITH_TY\TextSpanMeasureResult.cs">
+      <Link>PixelFarm\PixelFarm.Painter_Layer2_SH\_ESS_LINK_WITH_TY\TextSpanMeasureResult.cs</Link>
     </Compile>
     <Compile Include="..\..\PixelFarm\PixelFarm.Vectors_SH\1_VectorMaths\AggMath.cs">
       <Link>PixelFarm\PixelFarm.Vectors_SH\1_VectorMaths\AggMath.cs</Link>
