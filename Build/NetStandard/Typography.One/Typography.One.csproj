@@ -33,7 +33,6 @@
     <Compile Include="..\..\..\PixelFarm\PixelFarm.Painter_Layer2_SH\Basic\LenAndLenUnit.cs" Link="Drawing_Ess\LenAndLenUnit.cs" />
     <Compile Include="..\..\..\PixelFarm\PixelFarm.Painter_Layer2_SH\Drawing\RequestFont.cs" Link="Drawing_Ess\RequestFont.cs" />
     <Compile Include="..\..\..\PixelFarm\PixelFarm.Painter_Layer2_SH\Drawing\TextBaseline.cs" Link="Drawing_Ess\TextBaseline.cs" />
-    <Compile Include="..\..\..\Typography.TextServices\TextBaseline.cs" Link="DevTextPrinter\TextBaseline.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -42,7 +41,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="DevTextPrinter\" />
     <Folder Include="Ty_Contours\" />
     <Folder Include="Ty_TextBreak\" />
     <Folder Include="Ty_TextServices\" />

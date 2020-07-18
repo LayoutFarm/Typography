@@ -4,7 +4,7 @@ using System.Windows.Forms;
 using System.IO;
 
 using Typography.TextLayout;
-using Typography.FontManagement;
+using Typography.FontCollection;
 using Typography.OpenFont;
 using System.Collections.Generic;
 using Typography.OpenFont.Tables;

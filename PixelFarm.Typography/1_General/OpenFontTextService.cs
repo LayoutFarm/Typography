@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 
 using Typography.OpenFont;
-using Typography.FontManagement;
+using Typography.FontCollection;
 
 using PixelFarm.Drawing;
 
@@ -49,6 +49,9 @@ namespace Typography.Text
                 //TODO: handle error here
 
                 throw new NotSupportedException();
+                
+
+                
             }
         }
 

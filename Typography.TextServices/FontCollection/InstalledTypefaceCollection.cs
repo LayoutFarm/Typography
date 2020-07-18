@@ -4,10 +4,9 @@ using System.IO;
 using System.Collections.Generic;
 using Typography.OpenFont;
 using Typography.OpenFont.Tables;
-using Typography.TextLayout;
 using Typography.TextBreak;
-using Typography.Text;
-namespace Typography.FontManagement
+
+namespace Typography.FontCollection
 {
 
     //=======

@@ -155,7 +155,7 @@ namespace SampleWinForms
 
                 //arabic
                 //1. create prefer typeface list for arabic script
-                var preferredTypefaces = new Typography.FontManagement.PreferredTypefaceList();
+                var preferredTypefaces = new Typography.FontCollection.PreferredTypefaceList();
                 preferredTypefaces.AddTypefaceName("Noto Sans Arabic UI");
 
                 //2. set unicode ranges and prefered typeface list. 
@@ -168,7 +168,7 @@ namespace SampleWinForms
             {
                 //latin
 
-                var preferredTypefaces = new Typography.FontManagement.PreferredTypefaceList();
+                var preferredTypefaces = new Typography.FontCollection.PreferredTypefaceList();
                 preferredTypefaces.AddTypefaceName("Sarabun");
 
                 myAlternativeTypefaceSelector.SetPreferredTypefaces(
@@ -523,7 +523,7 @@ namespace SampleWinForms
 
                     switch (_basicOptions.SelectedTypefaceStyle)
                     {
-                        case Typography.FontManagement.TypefaceStyle.Italic:
+                        case Typography.FontCollection.TypefaceStyle.Italic:
                             fontstyle = PixelFarm.Drawing.RequestFontStyle.Italic;
                             break;
                     }

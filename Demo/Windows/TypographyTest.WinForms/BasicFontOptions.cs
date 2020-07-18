@@ -5,7 +5,7 @@ using System.IO;
 using Typography.OpenFont;
 using Typography.TextLayout;
 using Typography.Text;
-using Typography.FontManagement;
+using Typography.FontCollection;
 using PixelFarm.Drawing;
 
 namespace TypographyTest
@@ -79,7 +79,7 @@ namespace TypographyTest
                         case ".otc":
                         case ".ttf":
                         case ".otf":
-                            _installedTypefaces.AddFontStreamSource(new Typography.FontManagement.FontFileStreamProvider(file));
+                            _installedTypefaces.AddFontStreamSource(new Typography.FontCollection.FontFileStreamProvider(file));
                             break;
                     }
 
