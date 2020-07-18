@@ -1,2 +1,2 @@
 ﻿//TODO: implement this
-//https://www.microsoft.com/typography/otspec/vvar.htm
+//https://docs.microsoft.com/en-us/typography/opentype/spec/vvar

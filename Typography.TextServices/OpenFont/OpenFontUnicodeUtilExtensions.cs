@@ -1,7 +1,8 @@
 ﻿//MIT, 2016-present, WinterDev 
 using System;
 using System.Collections.Generic;
-using Typography.OpenFont.Tables; 
+using Typography.OpenFont.Tables;
+using Typography.OpenFont.Extensions;
 
 namespace Typography.OpenFont
 {

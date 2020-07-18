@@ -20,19 +20,26 @@
   <Import Project="..\..\..\Typography.TextServices\Typography.TextServices.projitems" Label="Shared" />
 
   <ItemGroup>
+    <Compile Remove="DevTextPrinter\**" />
+    <EmbeddedResource Remove="DevTextPrinter\**" />
+    <None Remove="DevTextPrinter\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Include="..\..\..\Demo\Shared\GlyphOutlineBuilder\GlyphOutlineBuilder.cs" Link="Ty_Contours\GlyphOutlineBuilder.cs" />
     <Compile Include="..\..\..\Demo\Windows\PixelFarmSample.WinForms\IcuSimpleTextFileDictionaryProvider.cs" Link="Ty_TextBreak\IcuSimpleTextFileDictionaryProvider.cs" />
-    <Compile Include="..\..\..\PixelFarm.Typography\1_General\AlternativeTypefaceSelector.cs" Link="Ty_TextServices\AlternativeTypefaceSelector.cs" />
+    <Compile Include="..\..\..\PixelFarm.Typography\1_General\AlternativeTypefaceSelector.cs" Link="Ty_Text\AlternativeTypefaceSelector.cs" />
     <Compile Include="..\..\..\PixelFarm.Typography\1_General\FontStyleExtensions.cs" Link="Drawing_Ess\FontStyleExtensions.cs" />
-    <Compile Include="..\..\..\PixelFarm.Typography\1_General\OpenFontTextService.cs" Link="Ty_TextServices\OpenFontTextService.cs" />
-    <Compile Include="..\..\..\PixelFarm.Typography\1_General\TextServiceClient.cs" Link="Ty_TextServices\TextServiceClient.cs" />
+    <Compile Include="..\..\..\PixelFarm.Typography\1_General\OpenFontTextService.cs" Link="Ty_Text\OpenFontTextService.cs" />
+    <Compile Include="..\..\..\PixelFarm.Typography\1_General\TextServiceClient.cs" Link="Ty_Text\TextServiceClient.cs" />
     <Compile Include="..\..\..\PixelFarm.Typography\3_Typography_Contours\GlyphMeshCollection.cs" Link="Ty_Contours\GlyphMeshCollection.cs" />
     <Compile Include="..\..\..\PixelFarm.Typography\3_Typography_Contours\GlyphOutlineBuilderBase.cs" Link="Ty_Contours\GlyphOutlineBuilderBase.cs" />
     <Compile Include="..\..\..\PixelFarm\PixelFarm.BasicVisualElements_SH\BasicGeometries.cs" Link="Drawing_Ess\BasicGeometries.cs" />
-    <Compile Include="..\..\..\PixelFarm\PixelFarm.Painter_Layer2_SH\Basic\CRC32Calculator.cs" Link="Drawing_Ess\CRC32Calculator.cs" />
-    <Compile Include="..\..\..\PixelFarm\PixelFarm.Painter_Layer2_SH\Basic\LenAndLenUnit.cs" Link="Drawing_Ess\LenAndLenUnit.cs" />
-    <Compile Include="..\..\..\PixelFarm\PixelFarm.Painter_Layer2_SH\Drawing\RequestFont.cs" Link="Drawing_Ess\RequestFont.cs" />
     <Compile Include="..\..\..\PixelFarm\PixelFarm.Painter_Layer2_SH\Drawing\TextBaseline.cs" Link="Drawing_Ess\TextBaseline.cs" />
+    <Compile Include="..\..\..\PixelFarm\PixelFarm.Painter_Layer2_SH\_ESS_LINK_WITH_TY\LenAndLenUnit.cs" Link="Drawing_Ess\LenAndLenUnit.cs" />
+    <Compile Include="..\..\..\PixelFarm\PixelFarm.Painter_Layer2_SH\_ESS_LINK_WITH_TY\RequestFont.cs" Link="Drawing_Ess\RequestFont.cs" />
+    <Compile Include="..\..\..\PixelFarm\PixelFarm.Painter_Layer2_SH\_ESS_LINK_WITH_TY\TextBufferSpan.cs" Link="Drawing_Ess\TextBufferSpan.cs" />
+    <Compile Include="..\..\..\PixelFarm\PixelFarm.Painter_Layer2_SH\_ESS_LINK_WITH_TY\TextSpanMeasureResult.cs" Link="Drawing_Ess\TextSpanMeasureResult.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -43,7 +50,7 @@
   <ItemGroup>
     <Folder Include="Ty_Contours\" />
     <Folder Include="Ty_TextBreak\" />
-    <Folder Include="Ty_TextServices\" />
+    <Folder Include="Ty_Text\" />
     <Folder Include="Drawing_Ess\" />
   </ItemGroup>
 

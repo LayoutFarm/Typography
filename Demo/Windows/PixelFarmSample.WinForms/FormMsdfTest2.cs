@@ -125,11 +125,10 @@ namespace SampleWinForms
             //builder.UseTrueTypeInterpreter = this.chkTrueTypeHint.Checked;
             //builder.UseVerticalHinting = this.chkVerticalHinting.Checked;
             //-------------------------------------------------------------
-            RequestFont reqFont = new RequestFont(typeface.Name, sizeInPoint);
+
 
             var atlasBuilder = new SimpleBitmapAtlasBuilder();
-            atlasBuilder.FontFilename = System.IO.Path.GetFileName(fontfile);
-            atlasBuilder.FontKey = reqFont.FontKey;
+            atlasBuilder.SetAtlasFontInfo(typeface.Name, sizeInPoint);
             //create temp folder for each glyph
 
             string tempFolderName = "tmp_msdf";
@@ -393,7 +392,7 @@ namespace SampleWinForms
             RequestFont reqFont,
             BitmapFontManager<MemBitmap> bmpFontMx)
         {
-            int fontKey = reqFont.FontKey;
+            int fontKey = reqFont.GetReqKey();
 
             string fontTextureFile = reqFont.Name + "_" + fontKey;
             string resolveFontTextureFile = fontTextureFile + ".info";
@@ -414,8 +413,8 @@ namespace SampleWinForms
             {
                 //create a new one 
                 //resolve this font
-                
-                SimpleBitmapAtlas fontAtlas = bmpFontMx.GetFontAtlas(resolvedFont, out MemBitmap fontBmp);
+
+                SimpleBitmapAtlas fontAtlas = bmpFontMx.GetFontAtlas(resolvedFont, 0, 0, out MemBitmap fontBmp);
                 multisizeFontAtlasBuilder.AddSimpleAtlasFile(reqFont,
                     resolveFontTextureFile,
                     fontTextureImgFilename,

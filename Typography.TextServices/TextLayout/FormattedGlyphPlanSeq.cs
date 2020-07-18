@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using Typography.Text;
+using Typography.TextBreak;
 
 namespace Typography.TextLayout
 {
@@ -76,6 +77,7 @@ namespace Typography.TextLayout
 
         public ResolvedFont ResolvedFont { get; private set; }
 
+        public SpanBreakInfo BreakInfo { get; private set; }
         /// <summary>
         /// whitespace count at the end of this seq
         /// </summary>
@@ -87,16 +89,18 @@ namespace Typography.TextLayout
 
         public bool ColorGlyphOnTransparentBG { get; set; }
 
-        public void SetData(GlyphPlanSequence seq, ResolvedFont resolvedFont)
+        public void SetData(GlyphPlanSequence seq, ResolvedFont resolvedFont, SpanBreakInfo spBreakInfo)
         {
             Seq = seq;
             ResolvedFont = resolvedFont;
+            BreakInfo = spBreakInfo;
         }
         public bool IsEmpty() => Seq.IsEmpty();
         public void Reset()
         {
             Seq = s_EmptyGlypgPlanSeq;
             ResolvedFont = null;
+            BreakInfo = null;
             ColorGlyphOnTransparentBG = false;
             PrefixWhitespaceCount = PostfixWhitespaceCount = 0;
         }

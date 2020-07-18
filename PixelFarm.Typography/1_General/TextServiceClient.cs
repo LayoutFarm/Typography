@@ -287,33 +287,37 @@ namespace Typography.Text
             get => (AlternativeTypefaceSelector)_p.AlternativeTypefaceSelector;
             set => _p.AlternativeTypefaceSelector = value;
         }
-        readonly Dictionary<int, ResolvedFont> _localResolvedFonts = new Dictionary<int, ResolvedFont>();
 
-        public ResolvedFont LocalResolveFont(Typeface typeface, float sizeInPoint, RequestFontStyle style =  RequestFontStyle.Regular)
+        public bool Eq(ReqFontSpec spec1, ReqFontSpec spec2)
         {
-            //find local resolved font cache
-
-            //check if we have a cache key or not
-            int typefaceKey = TypefaceExtensions.GetCustomTypefaceKey(typeface);
-            if (typefaceKey == 0)
-            {
-                throw new System.NotSupportedException();
-                ////calculate and cache
-                //TypefaceExtensions.SetCustomTypefaceKey(typeface,
-                //    typefaceKey = RequestFont.CalculateTypefaceKey(typeface.Name));
-            }
-
-            int key = RequestFont.CalculateFontKey(typefaceKey, sizeInPoint, style);
-            if (!_localResolvedFonts.TryGetValue(key, out ResolvedFont found))
-            {
-                return _localResolvedFonts[key] = new ResolvedFont(typeface, sizeInPoint, key);
-            }
-            return found;
+            return spec1.GetReqKey() == spec2.GetReqKey();
         }
+        public bool Eq(ResolvedFont resolved1, ReqFontSpec spec2)
+        {
+            ResolvedFont resolved2 = ReqFontSpec.GetResolvedFont1<ResolvedFont>(spec2);
+            if (resolved1 == resolved2)
+            {
+                return true;
+            }
 
+            if (resolved2 == null)
+            {
+                //no cache resolved data,
+                if (spec2.Name == resolved1.Typeface.Name)
+                {
+
+                }
+                return false;
+            }
+            else
+            {
+                return resolved1.RuntimeResolvedKey == resolved2.RuntimeResolvedKey;
+            }
+
+        }
+        public bool Eq(ResolvedFont resolvedFont1, ResolvedFont resolvedFont2)
+        {
+            return resolvedFont1.RuntimeResolvedKey == resolvedFont2.RuntimeResolvedKey;
+        }
     }
-
-
-
-
 }

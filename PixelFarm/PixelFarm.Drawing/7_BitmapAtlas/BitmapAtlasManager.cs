@@ -13,8 +13,8 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
     public class BitmapCache<T, U> : IDisposable
         where U : IDisposable
     {
-        Dictionary<T, U> _loadBmps = new Dictionary<T, U>();
-        LoadNewBmpDelegate<T, U> _loadNewBmpDel;
+        readonly Dictionary<T, U> _loadBmps = new Dictionary<T, U>();
+        readonly LoadNewBmpDelegate<T, U> _loadNewBmpDel;
         public BitmapCache(LoadNewBmpDelegate<T, U> loadNewBmpDel)
         {
             _loadNewBmpDel = loadNewBmpDel;
@@ -60,38 +60,38 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
 
     public class BitmapAtlasManager<B> where B : IDisposable
     {
-        protected BitmapCache<SimpleBitmapAtlas, B> _loadAtlases;
-        readonly Dictionary<string, SimpleBitmapAtlas> _createdAtlases = new Dictionary<string, SimpleBitmapAtlas>();
+        protected BitmapCache<SimpleBitmapAtlas, B> _bitmapCache;
 
-        public BitmapAtlasManager()
-        {
-        }
-        public BitmapAtlasManager(LoadNewBmpDelegate<SimpleBitmapAtlas, B> _createNewDel)
+        readonly Dictionary<string, SimpleBitmapAtlas> _loadedAtlasByNames = new Dictionary<string, SimpleBitmapAtlas>();
+
+        public BitmapAtlasManager() { }
+        public BitmapAtlasManager(LoadNewBmpDelegate<SimpleBitmapAtlas, B> createNewDel)
         {
             //glyph cahce for specific atlas 
-            SetLoadNewBmpDel(_createNewDel);
+            SetLoadNewBmpDel(createNewDel);
         }
-        protected void SetLoadNewBmpDel(LoadNewBmpDelegate<SimpleBitmapAtlas, B> _createNewDel)
+        protected void SetLoadNewBmpDel(LoadNewBmpDelegate<SimpleBitmapAtlas, B> createNewDel)
         {
-            _loadAtlases = new BitmapCache<SimpleBitmapAtlas, B>(_createNewDel);
+            _bitmapCache = new BitmapCache<SimpleBitmapAtlas, B>(createNewDel);
         }
 
         public void RegisterBitmapAtlas(string atlasName, byte[] atlasInfoBuffer, byte[] totalImgBuffer)
         {
             //direct register atlas
             //instead of loading it from file
-            if (!_createdAtlases.ContainsKey(atlasName))
+            if (!_loadedAtlasByNames.ContainsKey(atlasName))
             {
-                SimpleBitmapAtlasBuilder atlasBuilder = new SimpleBitmapAtlasBuilder();
+               
                 using (System.IO.Stream fontAtlasTextureInfo = new MemoryStream(atlasInfoBuffer))
                 using (System.IO.Stream fontImgStream = new MemoryStream(totalImgBuffer))
                 {
                     try
                     {
+                        SimpleBitmapAtlasBuilder atlasBuilder = new SimpleBitmapAtlasBuilder();
                         List<SimpleBitmapAtlas> atlasList = atlasBuilder.LoadAtlasInfo(fontAtlasTextureInfo);
                         SimpleBitmapAtlas foundAtlas = atlasList[0];
                         foundAtlas.SetMainBitmap(MemBitmapExt.LoadBitmap(fontImgStream), true);
-                        _createdAtlases.Add(atlasName, foundAtlas);
+                        _loadedAtlasByNames.Add(atlasName, foundAtlas);
                     }
                     catch (Exception ex)
                     {
@@ -117,7 +117,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
 #endif
 
 
-            if (!_createdAtlases.TryGetValue(atlasName, out SimpleBitmapAtlas foundAtlas))
+            if (!_loadedAtlasByNames.TryGetValue(atlasName, out SimpleBitmapAtlas foundAtlas))
             {
                 //check from pre-built cache (if availiable)   
                 string textureInfoFile = atlasName + ".info";
@@ -126,16 +126,17 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                 if (InMemStorage.TryGetBuffer(textureInfoFile, out byte[] texture_info) &&
                     InMemStorage.TryGetBuffer(textureImgFilename, out byte[] img_buffer))
                 {
-                    SimpleBitmapAtlasBuilder atlasBuilder = new SimpleBitmapAtlasBuilder();
+                   
                     using (System.IO.Stream fontAtlasTextureInfo = new MemoryStream(texture_info))
                     using (System.IO.Stream fontImgStream = new MemoryStream(img_buffer))
                     {
                         try
                         {
+                            SimpleBitmapAtlasBuilder atlasBuilder = new SimpleBitmapAtlasBuilder();
                             List<SimpleBitmapAtlas> atlasList = atlasBuilder.LoadAtlasInfo(fontAtlasTextureInfo);
                             foundAtlas = atlasList[0];
                             foundAtlas.SetMainBitmap(MemBitmapExt.LoadBitmap(fontImgStream), true);
-                            _createdAtlases.Add(atlasName, foundAtlas);
+                            _loadedAtlasByNames.Add(atlasName, foundAtlas);
                         }
                         catch (Exception ex)
                         {
@@ -146,17 +147,18 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                 else if (StorageService.Provider.DataExists(textureInfoFile) &&
                     StorageService.Provider.DataExists(textureImgFilename))
                 {
-                    SimpleBitmapAtlasBuilder atlasBuilder = new SimpleBitmapAtlasBuilder();
+                    
                     using (System.IO.Stream fontAtlasTextureInfo = StorageService.Provider.ReadDataStream(textureInfoFile))
                     using (System.IO.Stream fontImgStream = StorageService.Provider.ReadDataStream(textureImgFilename))
                     {
                         try
                         {
+                            SimpleBitmapAtlasBuilder atlasBuilder = new SimpleBitmapAtlasBuilder();
                             List<SimpleBitmapAtlas> atlasList = atlasBuilder.LoadAtlasInfo(fontAtlasTextureInfo);
                             foundAtlas = atlasList[0];
-                            
+
                             foundAtlas.SetMainBitmap(MemBitmapExt.LoadBitmap(fontImgStream), true);
-                            _createdAtlases.Add(atlasName, foundAtlas);
+                            _loadedAtlasByNames.Add(atlasName, foundAtlas);
                         }
                         catch (Exception ex)
                         {
@@ -168,7 +170,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             }
             if (foundAtlas != null)
             {
-                outputBitmap = _loadAtlases.GetOrCreateNewOne(foundAtlas);
+                outputBitmap = _bitmapCache.GetOrCreateNewOne(foundAtlas);
                 return foundAtlas;
             }
             else
@@ -185,7 +187,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
 
         public void Clear()
         {
-            _loadAtlases.Clear();
+            _bitmapCache.Clear();
         }
     }
 

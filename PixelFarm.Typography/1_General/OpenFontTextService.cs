@@ -7,9 +7,14 @@ using Typography.FontCollections;
 
 using PixelFarm.Drawing;
 
+
 namespace Typography.Text
 {
+    public static class GlobalTextService
+    {
+        public static TextServiceClient TxtClient { get; set; }
 
+    }
     public partial class OpenFontTextService
     {
 
@@ -49,9 +54,6 @@ namespace Typography.Text
                 //TODO: handle error here
 
                 throw new NotSupportedException();
-                
-
-                
             }
         }
 
@@ -112,11 +114,11 @@ namespace Typography.Text
             if (resolvedFont != null) return resolvedFont;
 
             Typeface typeface;
-            if (choice.FromTypefaceFile)
+            if (choice.Src != null) //specific path to...
             {
                 //this may not be loaded
                 //so check if we have that file or not
-                typeface = _installedTypefaceCollection.ResolveTypefaceFromFile(choice.UserInputTypefaceFile);
+                typeface = _installedTypefaceCollection.ResolveTypefaceFromFile(choice.Src);
                 if (typeface != null)
                 {
                     //found
@@ -127,8 +129,9 @@ namespace Typography.Text
                 }
             }
 
+            int reqKey = choice.GetReqKey();
             //cache level-2 (stored in this openfont service)
-            if (_resolvedTypefaceCache.TryGetValue(choice.GetFontKey(), out resolvedFont))
+            if (_resolvedTypefaceCache.TryGetValue(reqKey, out resolvedFont))
             {
                 if (resolvedFont.Typeface == null)
                 {
@@ -149,12 +152,12 @@ namespace Typography.Text
                              choice.WeightClass)) != null)
             {
                 //NOT NULL=> found 
-                if (!_resolvedTypefaceCache.TryGetValue(choice.GetFontKey(), out resolvedFont))
+                if (!_resolvedTypefaceCache.TryGetValue(reqKey, out resolvedFont))
                 {
-                    resolvedFont = new ResolvedFont(typeface, choice.SizeInPoints, choice.GetFontKey());
+                    resolvedFont = new ResolvedFont(typeface, choice.SizeInPoints);
 
                     //** cache it with otherChoice.GetFontKey()**
-                    _resolvedTypefaceCache.Add(choice.GetFontKey(), resolvedFont);
+                    _resolvedTypefaceCache.Add(reqKey, resolvedFont);
                 }
                 return resolvedFont;
             }
@@ -162,16 +165,17 @@ namespace Typography.Text
         }
         public ResolvedFont ResolveFont(RequestFont font)
         {
+
             //cache level-1 (attached inside the request font)
             ResolvedFont resolvedFont = RequestFont.GetResolvedFont1<ResolvedFont>(font);
             if (resolvedFont != null) return resolvedFont;
 
             Typeface typeface;
-            if (font.FromTypefaceFile)
+            if (font.Src != null)
             {
                 //this may not be loaded
                 //so check if we have that file or not
-                typeface = _installedTypefaceCollection.ResolveTypefaceFromFile(font.UserInputTypefaceFile);
+                typeface = _installedTypefaceCollection.ResolveTypefaceFromFile(font.Src);
                 if (typeface != null)
                 {
                     //found
@@ -183,7 +187,8 @@ namespace Typography.Text
             }
 
             //cache level-2 (stored in this openfont service)
-            if (_resolvedTypefaceCache.TryGetValue(font.FontKey, out resolvedFont))
+            int reqKey = font.GetReqKey();
+            if (_resolvedTypefaceCache.TryGetValue(reqKey, out resolvedFont))
             {
                 if (resolvedFont.Typeface == null)
                 {
@@ -232,17 +237,14 @@ namespace Typography.Text
             }
             else
             {
-                resolvedFont = new ResolvedFont(typeface, font.SizeInPoints, font.FontKey);
+                resolvedFont = new ResolvedFont(typeface, font.SizeInPoints);
                 //cache to level2
-                _resolvedTypefaceCache.Add(resolvedFont.FontKey, resolvedFont);
+                _resolvedTypefaceCache.Add(reqKey, resolvedFont);
                 RequestFont.SetResolvedFont1(font, resolvedFont);
                 return resolvedFont;
             }
         }
 
-
         public TextServiceClient CreateNewServiceClient() => new TextServiceClient(this);
-
     }
-
 }

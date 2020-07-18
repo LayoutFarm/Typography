@@ -134,10 +134,7 @@
     <Compile Include="..\..\PixelFarm\PixelFarm.Painter_Layer1_SH\VertexStore.cs" Link="PixelFarm\PixelFarm.Painter_Layer1_SH\VertexStore.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.Painter_Layer2_SH\Basic\ColorEx.cs" Link="PixelFarm\PixelFarm.Painter_Layer2_SH\Basic\ColorEx.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.Painter_Layer2_SH\Basic\CombineMode.cs" Link="PixelFarm\PixelFarm.Painter_Layer2_SH\Basic\CombineMode.cs" />
-    <Compile Include="..\..\PixelFarm\PixelFarm.Painter_Layer2_SH\Basic\CRC32Calculator.cs" Link="PixelFarm\PixelFarm.Painter_Layer2_SH\Basic\CRC32Calculator.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.Painter_Layer2_SH\Basic\DashStyle.cs" Link="PixelFarm\PixelFarm.Painter_Layer2_SH\Basic\DashStyle.cs" />
-    <Compile Include="..\..\PixelFarm\PixelFarm.Painter_Layer2_SH\Basic\ImageBinder.cs" Link="PixelFarm\PixelFarm.Painter_Layer2_SH\Basic\ImageBinder.cs" />
-    <Compile Include="..\..\PixelFarm\PixelFarm.Painter_Layer2_SH\Basic\LenAndLenUnit.cs" Link="PixelFarm\PixelFarm.Painter_Layer2_SH\Basic\LenAndLenUnit.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.Painter_Layer2_SH\Basic\Region.cs" Link="PixelFarm\PixelFarm.Painter_Layer2_SH\Basic\Region.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.Painter_Layer2_SH\Basic\RenderVx.cs" Link="PixelFarm\PixelFarm.Painter_Layer2_SH\Basic\RenderVx.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.Painter_Layer2_SH\CpuBlit.VertexProcessing\BoundingRect.cs" Link="PixelFarm\PixelFarm.Painter_Layer2_SH\CpuBlit.VertexProcessing\BoundingRect.cs" />
@@ -165,10 +162,14 @@
     <Compile Include="..\..\PixelFarm\PixelFarm.Painter_Layer2_SH\Drawing\DrawBoard.cs" Link="PixelFarm\PixelFarm.Painter_Layer2_SH\Drawing\DrawBoard.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.Painter_Layer2_SH\Drawing\ITextPrinter.cs" Link="PixelFarm\PixelFarm.Painter_Layer2_SH\Drawing\ITextPrinter.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.Painter_Layer2_SH\Drawing\Painter.cs" Link="PixelFarm\PixelFarm.Painter_Layer2_SH\Drawing\Painter.cs" />
-    <Compile Include="..\..\PixelFarm\PixelFarm.Painter_Layer2_SH\Drawing\RequestFont.cs" Link="PixelFarm\PixelFarm.Painter_Layer2_SH\Drawing\RequestFont.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.Painter_Layer2_SH\Drawing\TextBaseline.cs" Link="PixelFarm\PixelFarm.Painter_Layer2_SH\Drawing\TextBaseline.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.Painter_Layer2_SH\ForNet20.cs" Link="PixelFarm\PixelFarm.Painter_Layer2_SH\ForNet20.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.Painter_Layer2_SH\TempContext.cs" Link="PixelFarm\PixelFarm.Painter_Layer2_SH\TempContext.cs" />
+    <Compile Include="..\..\PixelFarm\PixelFarm.Painter_Layer2_SH\_ESS_LINK_WITH_TY\ImageBinder.cs" Link="PixelFarm\PixelFarm.Painter_Layer2_SH\_ESS_LINK_WITH_TY\ImageBinder.cs" />
+    <Compile Include="..\..\PixelFarm\PixelFarm.Painter_Layer2_SH\_ESS_LINK_WITH_TY\LenAndLenUnit.cs" Link="PixelFarm\PixelFarm.Painter_Layer2_SH\_ESS_LINK_WITH_TY\LenAndLenUnit.cs" />
+    <Compile Include="..\..\PixelFarm\PixelFarm.Painter_Layer2_SH\_ESS_LINK_WITH_TY\RequestFont.cs" Link="PixelFarm\PixelFarm.Painter_Layer2_SH\_ESS_LINK_WITH_TY\RequestFont.cs" />
+    <Compile Include="..\..\PixelFarm\PixelFarm.Painter_Layer2_SH\_ESS_LINK_WITH_TY\TextBufferSpan.cs" Link="PixelFarm\PixelFarm.Painter_Layer2_SH\_ESS_LINK_WITH_TY\TextBufferSpan.cs" />
+    <Compile Include="..\..\PixelFarm\PixelFarm.Painter_Layer2_SH\_ESS_LINK_WITH_TY\TextSpanMeasureResult.cs" Link="PixelFarm\PixelFarm.Painter_Layer2_SH\_ESS_LINK_WITH_TY\TextSpanMeasureResult.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.Vectors_SH\1_VectorMaths\AggMath.cs" Link="PixelFarm\PixelFarm.Vectors_SH\1_VectorMaths\AggMath.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.Vectors_SH\1_VectorMaths\AxisAlignedBoundingBox.cs" Link="PixelFarm\PixelFarm.Vectors_SH\1_VectorMaths\AxisAlignedBoundingBox.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.Vectors_SH\1_VectorMaths\BezierCurve.cs" Link="PixelFarm\PixelFarm.Vectors_SH\1_VectorMaths\BezierCurve.cs" />
@@ -295,6 +296,7 @@
     <Folder Include="PixelFarm\PixelFarm.Painter_Layer2_SH\Drawing.Internal" />
     <Folder Include="PixelFarm\PixelFarm.Painter_Layer2_SH\Drawing" />
     <Folder Include="PixelFarm\PixelFarm.Painter_Layer2_SH" />
+    <Folder Include="PixelFarm\PixelFarm.Painter_Layer2_SH\_ESS_LINK_WITH_TY" />
     <Folder Include="PixelFarm\PixelFarm.Vectors_SH\1_VectorMaths" />
     <Folder Include="PixelFarm\PixelFarm.Vectors_SH\2_Geometry" />
     <Folder Include="PixelFarm\PixelFarm.Vectors_SH\3_Transform" />

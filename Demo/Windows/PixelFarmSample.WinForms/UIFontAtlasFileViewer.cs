@@ -83,7 +83,7 @@ namespace SampleWinForms
                 SimpleBitmapAtlas fontAtlas = fontAtlasList[i];
 
                 TreeNode atlasNode = new TreeNode();
-                atlasNode.Text = fontAtlas.FontFilename + ", count=" + fontAtlas.ItemDict.Count;
+                atlasNode.Text = fontAtlas.FontName + ", count=" + fontAtlas.ItemDict.Count;
 
                 treeView1.Nodes.Add(atlasNode);
 

@@ -128,7 +128,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                     TempMergingAtlasInfo atlasInfo = _atlasList[i];
 
                     RequestFont reqFont = atlasInfo.reqFont;
-                    fontAtlasFile.WriteOverviewFontInfo(reqFont.Name, reqFont.FontKey, reqFont.SizeInPoints);//size in points
+                    fontAtlasFile.WriteOverviewFontInfo(reqFont.Name, reqFont.GetReqKey(), reqFont.SizeInPoints);//size in points
 
                     fontAtlasFile.WriteTotalImageInfo(
                         (ushort)atlasW,

@@ -9,8 +9,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
 
     public class SimpleBitmapAtlas : IDisposable
     {
-
-        Dictionary<ushort, AtlasItem> _atlasItems = new Dictionary<ushort, AtlasItem>();
+        readonly Dictionary<ushort, AtlasItem> _atlasItems = new Dictionary<ushort, AtlasItem>();
 
 #if DEBUG
         static int s_totalDebugId;
@@ -20,16 +19,33 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
         {
 
         }
+
+        public TextureKind TextureKind { get; set; }
+
+        public readonly struct UnicodeRange
+        {
+            public readonly int startCodepoint;
+            public readonly int endCodepoint;
+            public UnicodeRange(int startCodepoint, int endCodepoint)
+            {
+                this.startCodepoint = startCodepoint;
+                this.endCodepoint = endCodepoint;
+            }
+#if DEBUG
+            public override string ToString()
+            {
+                return startCodepoint + "-" + endCodepoint;
+            }
+#endif
+        }
+
         public int Width { get; set; }
         public int Height { get; set; }
-        //------------
-        /// <summary>
-        /// original font size in point unit
-        /// </summary>
-        public float OriginalFontSizePts { get; set; }
-        public TextureKind TextureKind { get; set; }
-        public string FontFilename { get; set; }
-        public int FontKey { get; set; }
+
+        public string FontName { get; set; }
+        public float SizeInPts { get; set; }
+        
+        public List<uint> ScriptTags { get; set; } = new List<uint>();
         //------------
         public Dictionary<ushort, AtlasItem> ItemDict => _atlasItems;
         public Dictionary<string, ushort> ImgUrlDict { get; set; }
@@ -91,7 +107,6 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             atlasItem = null;
             return false;
         }
-
 
         public static Dictionary<ushort, AtlasItem> CloneLocationWithOffset(SimpleBitmapAtlas org, int dx, int dy)
         {
