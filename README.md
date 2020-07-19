@@ -108,6 +108,8 @@ The FreeType Project LICENSE (3-clauses BSD style),2003-2016, David Turner, Robe
 
 Apache2, 2018, Apache/PDFBox Authors,  https://github.com/apache/pdfbox
 
+Apache2, 2020, Adobe Font Development Kit for OpenType (AFDKO), https://github.com/adobe-type-tools/afdko
+
 **Text Processing**
 
 Unicode (BSD style), 2020, _UNICODE, INC_, https://www.unicode.org/license.html
