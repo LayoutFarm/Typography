@@ -86,7 +86,8 @@ namespace Typography.OpenFont.Tables
 
     //The tupleVariationCount field contains a packed value that includes flags and the number of logical tuple variation tables — which is also the number of physical tuple variation headers.The format of the tupleVariationCount value is as follows:
     //Mask      Name                    Description
-    //0x8000 	SHARED_POINT_NUMBERS    Flag indicating that some or all tuple variation tables reference a shared set of “point” numbers.These shared numbers are represented as packed point number data at the start of the serialized data.
+    //0x8000 	SHARED_POINT_NUMBERS    Flag indicating that some or all tuple variation tables reference a shared set of “point” numbers.
+    //                              These shared numbers are represented as packed point number data at the start of the serialized data.
     //0x7000 	Reserved                Reserved for future use — set to 0.
     //0x0FFF 	COUNT_MASK              Mask     for the low bits to give the number of tuple variation tables.
 
@@ -109,21 +110,57 @@ namespace Typography.OpenFont.Tables
     {
         //TupleVariationHeader:
         //Type      Name                    Description
-        //int16     variationDataSize       The size in bytes of the serialized data for this tuple variation table.
+        //uint16    variationDataSize       The size in bytes of the serialized data for this tuple variation table.
         //uint16    tupleIndex              A packed field.
         //                                  The high 4 bits are flags(see below).
         //                                  The low 12 bits are an index into a shared tuple records array.
-        //Tuple     peakTuple               Peak tuple record for this tuple variation table — optional, 
-        //                                  determined by flags in the tupleIndex value.
+        //Tuple     peakTuple               Peak tuple record for this tuple variation table — optional, determined by flags in the tupleIndex value.
         //                                  Note that this must always be included in the 'cvar' table.
         //Tuple     intermediateStartTuple  Intermediate start tuple record for this tuple variation table — optional, determined by flags in the tupleIndex value.
         //Tuple     intermediateEndTuple    Intermediate end tuple record for this tuple variation table — optional, determined by flags in the tupleIndex value.
 
-        public short variableDataSize;
-        public ushort tupleIndex;
+        public ushort variableDataSize;
+
+        public int flags;
+        public ushort indexToSharedTupleRecArray;
+
         public TupleRecord peakTuple;
         public TupleRecord intermediateStartTuple;
         public TupleRecord intermediateEndTuple;
+
+
+        public static TupleVariationHeader Read(BinaryReader reader, int axisCount)
+        {
+            TupleVariationHeader header = new TupleVariationHeader();
+
+            header.variableDataSize = reader.ReadUInt16();
+            ushort tupleIndex = reader.ReadUInt16();
+            int flags = (tupleIndex >> 12) & 0xF; //The high 4 bits are flags(see below).
+            header.flags = flags; //The high 4 bits are flags(see below).
+            header.indexToSharedTupleRecArray = (ushort)(tupleIndex & 0x0FFF); // The low 12 bits are an index into a shared tuple records array.
+
+
+            if ((flags & ((int)TupleIndexFormat.EMBEDDED_PEAK_TUPLE >> 12)) == ((int)TupleIndexFormat.EMBEDDED_PEAK_TUPLE >> 12))
+            {
+                //TODO:...
+                header.peakTuple = TupleRecord.ReadTupleRecord(reader, axisCount);
+            }
+            if ((flags & ((int)TupleIndexFormat.INTERMEDIATE_REGION >> 12)) == ((int)TupleIndexFormat.INTERMEDIATE_REGION >> 12))
+            {
+                //TODO:...
+                header.intermediateStartTuple = TupleRecord.ReadTupleRecord(reader, axisCount);
+                header.intermediateEndTuple = TupleRecord.ReadTupleRecord(reader, axisCount);
+            }
+
+            return header;
+        }
+
+
+
+        //---------
+        public ushort[] PrivatePoints;
+        public short[] PackedDeltasXY;
+
 
         //Note that the size of the TupleVariationHeader is variable, 
         //depending on whether peak or intermediate tuple records are included. (See below for more information.)
@@ -208,9 +245,22 @@ namespace Typography.OpenFont.Tables
         //    }
     }
 
-    struct TupleRecord
+    readonly struct TupleRecord
     {
-        public float[] coords;
+        public readonly float[] coords;
+        public TupleRecord(float[] coords) => this.coords = coords;
+#if DEBUG
+        public override string ToString() => coords?.Length.ToString() ?? "0";
+#endif
+        public static TupleRecord ReadTupleRecord(BinaryReader reader, int count)
+        {
+            float[] coords = new float[count];
+            for (int n = 0; n < coords.Length; ++n)
+            {
+                coords[n] = reader.ReadF2Dot14();
+            }
+            return new TupleRecord(coords);
+        }
     }
 
     //----------------------------------------------------------------
