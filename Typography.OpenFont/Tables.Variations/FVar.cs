@@ -145,6 +145,7 @@ namespace Typography.OpenFont.Tables
 
             }
         }
+
         public class InstanceRecord
         {
             //InstanceRecord
@@ -166,23 +167,24 @@ namespace Typography.OpenFont.Tables
             //Tuple     coordinates         The coordinates array for this instance.
             //uint16    postScriptNameID    Optional.The name ID for entries in the 'name' table that provide PostScript names for this instance.
 
-            public ushort subfamilyNameID;
+            public ushort subfamilyNameID;//point to name table, will be resolved later
             public ushort flags;
-            public float[] coordinates; //tuple record
-            public ushort postScriptNameID;
+            public TupleRecord coordinates;
+            public ushort postScriptNameID;//point to name table, will be resolved later
+
             public void ReadContent(BinaryReader reader, int axisCount, int instanceRecordSize)
             {
                 long expectedEndPos = reader.BaseStream.Position + instanceRecordSize;
                 subfamilyNameID = reader.ReadUInt16();
                 flags = reader.ReadUInt16();
-                coordinates = new float[axisCount];
+                float[] coords = new float[axisCount];
                 for (int i = 0; i < axisCount; ++i)
                 {
-                    coordinates[i] = reader.ReadFixed();
+                    coords[i] = reader.ReadFixed();
                 }
+                coordinates = new TupleRecord(coords);
 
-
-                if (reader.BaseStream.Position < instanceRecordSize)
+                if (reader.BaseStream.Position < expectedEndPos)
                 {
                     //optional field
                     postScriptNameID = reader.ReadUInt16();
