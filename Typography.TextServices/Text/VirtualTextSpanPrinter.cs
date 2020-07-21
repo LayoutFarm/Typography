@@ -178,7 +178,7 @@ namespace Typography.Text
             for (int i = 0; i < count; ++i)
             {
                 //
-                TextPrinterLineSegment line_seg = _lineSegs.GetLineSegment(i);
+                LineSegment line_seg = _lineSegs.GetLineSegment(i);
                 SpanBreakInfo spBreakInfo = line_seg.BreakInfo;
 
 #if DEBUG
@@ -405,8 +405,8 @@ namespace Typography.Text
         }
 
 
-        readonly protected TextPrinterWordVisitor _textPrinterWordVisitor = new TextPrinterWordVisitor();
-        readonly protected TextPrinterLineSegmentList<TextPrinterLineSegment> _lineSegs = new TextPrinterLineSegmentList<TextPrinterLineSegment>();
+        readonly protected LayoutWordVisitor _textPrinterWordVisitor = new LayoutWordVisitor();
+        readonly protected LineSegmentList<LineSegment> _lineSegs = new LineSegmentList<LineSegment>();
 
         readonly protected Dictionary<int, ResolvedFont> _localResolvedFonts = new Dictionary<int, ResolvedFont>();
         protected ResolvedFont LocalResolveFont(Typeface typeface, float sizeInPoint)

@@ -18,9 +18,9 @@ namespace Typography.TextLayout
 
 
     //---------
-    public readonly struct TextPrinterLineSegment : ILineSegment
+    public readonly struct LineSegment : ILineSegment
     {
-        public TextPrinterLineSegment(int startAt, int len, WordKind wordKind, SpanBreakInfo breakInfo)
+        public LineSegment(int startAt, int len, WordKind wordKind, SpanBreakInfo breakInfo)
         {
             _startAt = startAt;
             _len = (ushort)len; //***
@@ -43,21 +43,16 @@ namespace Typography.TextLayout
 #endif
     }
 
-    public class TextPrinterLineSegmentList<T> : ILineSegmentList
+    public class LineSegmentList<T> : ILineSegmentList
         where T : ILineSegment
     {
         readonly List<T> _segments = new List<T>();
-        public TextPrinterLineSegmentList()
+        public LineSegmentList()
         {
         }
-        public void AddLineSegment(T lineSegment)
-        {
-            _segments.Add(lineSegment);
-        }
-        public void Clear()
-        {
-            _segments.Clear();
-        }
+        public void AddLineSegment(T lineSegment) => _segments.Add(lineSegment);
+
+        public void Clear() => _segments.Clear();
 
         public T GetLineSegment(int index) => _segments[index];
         //
@@ -77,19 +72,19 @@ namespace Typography.TextLayout
     }
 
 
-    public class TextPrinterWordVisitor : WordVisitor
+    public class LayoutWordVisitor : WordVisitor
     {
-        TextPrinterLineSegmentList<TextPrinterLineSegment> _lineSegs;
+        LineSegmentList<LineSegment> _lineSegs;
 #if DEBUG
-        public TextPrinterWordVisitor() { }
+        public LayoutWordVisitor() { }
 #endif
-        public void SetLineSegmentList(TextPrinterLineSegmentList<TextPrinterLineSegment> lineSegs)
+        public void SetLineSegmentList(LineSegmentList<LineSegment> lineSegs)
         {
             _lineSegs = lineSegs;
         }
         protected override void OnBreak()
         {
-            _lineSegs.AddLineSegment(new TextPrinterLineSegment(
+            _lineSegs.AddLineSegment(new LineSegment(
                 this.LatestSpanStartAt,
                 this.LatestSpanLen,
                 this.LatestWordKind,

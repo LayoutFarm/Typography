@@ -36,9 +36,9 @@ namespace Typography.Text
         }
 
 
-        readonly TextPrinterWordVisitor _wordVisitor = new TextPrinterWordVisitor();
+        readonly LayoutWordVisitor _wordVisitor = new LayoutWordVisitor();
 
-        readonly TextPrinterLineSegmentList<TextPrinterLineSegment> _lineSegs = new TextPrinterLineSegmentList<TextPrinterLineSegment>();
+        readonly LineSegmentList<LineSegment> _lineSegs = new LineSegmentList<LineSegment>();
 
         public void CalculateUserCharGlyphAdvancePos(in Typography.Text.TextBufferSpan textBufferSpan, RequestFont font, ref TextSpanMeasureResult measureResult)
         {
