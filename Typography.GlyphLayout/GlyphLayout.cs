@@ -80,7 +80,7 @@ namespace Typography.TextLayout
         public readonly ushort len;
 
         bool _isRTL;
-      
+
         public GlyphPlanSequence(IUnscaledGlyphPlanList glyphPlanList, int startAt, int len)
         {
             _glyphPlanList = glyphPlanList;
@@ -662,10 +662,10 @@ namespace Typography.TextLayout
         /// <param name="index">glyph index</param>
         /// <param name="advW">advanced width</param>
         /// <returns></returns>
-        public ushort GetGlyph(int index, out ushort advW)
+        public ushort GetGlyph(int index, out short advW)
         {
             GlyphPos pos = _glyphPosList[index];
-            advW = (ushort)pos.advanceW;
+            advW = pos.advanceW;
             return pos.glyphIndex;
         }
         /// <summary>
@@ -720,7 +720,7 @@ namespace Typography.TextLayout
         public readonly ushort glyphIndex;
         public short xoffset;
         public short yoffset;
-        public short advanceW; // actually this value is ushort, TODO: review here
+        public short advanceW;
         public readonly GlyphClassKind glyphClass;
 
         public GlyphPos(ushort o_offset,
@@ -732,6 +732,16 @@ namespace Typography.TextLayout
             this.o_offset = o_offset;
             this.glyphClass = glyphClass;
             this.glyphIndex = glyphIndex;
+
+            //the original advanceW from glyph is ushort
+            //BUT we store this value as short
+            //since this value represent adjusted value 
+#if DEBUG
+            if (orgAdvanced >= short.MaxValue)
+            {
+                throw new NotSupportedException();
+            }
+#endif
             this.advanceW = (short)orgAdvanced;
             xoffset = yoffset = 0;
         }
