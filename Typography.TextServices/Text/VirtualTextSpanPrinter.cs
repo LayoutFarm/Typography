@@ -155,14 +155,17 @@ namespace Typography.Text
         public bool NeedRightToLeftArr { get; private set; }
 
 
-        Dictionary<UnicodeRangeInfo, Typeface> _prevResolvedTypefaces = new Dictionary<UnicodeRangeInfo, Typeface>();
+        readonly Dictionary<UnicodeRangeInfo, Typeface> _prevResolvedTypefaces = new Dictionary<UnicodeRangeInfo, Typeface>();
 
         public void PrepapreFormattedStringList(char[] textBuffer, int startAt, int len, FormattedGlyphPlanList fmtGlyphs)
         {
             _prevResolvedTypefaces.Clear();
             _lineSegs.Clear();//clear before reuse
+
             _textPrinterWordVisitor.SetLineSegmentList(_lineSegs);
+
             BreakToLineSegments(textBuffer, startAt, len, _textPrinterWordVisitor);//***
+
             _textPrinterWordVisitor.SetLineSegmentList(null);
 
             NeedRightToLeftArr = false;
@@ -503,7 +506,7 @@ namespace Typography.Text
             _glyphPlanCache.SetCurrentFont(_currentTypeface, FontSizeInPoints, this.ScriptLang);
             return _glyphPlanCache.GetUnscaledGlyphPlanSequence(buffSpan, _glyphLayout);
         }
-       
+
 
         readonly FormattedGlyphPlanList _fmtGlyphPlanList = new FormattedGlyphPlanList();
         int _limitWidth;

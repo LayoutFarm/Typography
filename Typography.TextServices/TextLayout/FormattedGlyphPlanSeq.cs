@@ -10,9 +10,11 @@ namespace Typography.TextLayout
 
     public class FormattedGlyphPlanList
     {
-        List<FormattedGlyphPlanSeq> _list;
+
         int _newElemIndex = 0;
         const int DEFAULT_LEN = 255;
+
+        readonly List<FormattedGlyphPlanSeq> _list;
         public FormattedGlyphPlanList()
         {
             _list = new List<FormattedGlyphPlanSeq>(DEFAULT_LEN);

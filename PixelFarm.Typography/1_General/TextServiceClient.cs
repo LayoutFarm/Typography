@@ -36,77 +36,36 @@ namespace Typography.Text
         }
 
 
-        readonly LayoutWordVisitor _wordVisitor = new LayoutWordVisitor();
-
-        readonly LineSegmentList<LineSegment> _lineSegs = new LineSegmentList<LineSegment>();
-
+        readonly FormattedGlyphPlanList _fmtGlyphPlanList = new FormattedGlyphPlanList();
         public void CalculateUserCharGlyphAdvancePos(in Typography.Text.TextBufferSpan textBufferSpan, RequestFont font, ref TextSpanMeasureResult measureResult)
         {
-
-            _lineSegs.Clear();
-            _wordVisitor.SetLineSegmentList(_lineSegs);
-
-            char[] str = textBufferSpan.GetRawCharBuffer(); //TODO: review here again!
-            _p.BreakToLineSegments(str, textBufferSpan.start, textBufferSpan.len, _wordVisitor);
-
-            _wordVisitor.SetLineSegmentList(null); //clear
-
-            CalculateUserCharGlyphAdvancePos(textBufferSpan,
-                _lineSegs,
-                font,
-                ref measureResult);
-        }
-
-        public void PrepareFormattedStringList(char[] textBuffer, int startAt, int len, FormattedGlyphPlanList fmtGlyphs)
-        {
-            _p.PrepapreFormattedStringList(textBuffer, startAt, len, fmtGlyphs);
-            fmtGlyphs.IsRightToLeftDirection = _p.NeedRightToLeftArr;
-        }
-
-        public void CalculateUserCharGlyphAdvancePos(in Typography.Text.TextBufferSpan textBufferSpan,
-            ILineSegmentList lineSegs,
-            RequestFont font,
-            ref TextSpanMeasureResult measureResult)
-        {
-
-            //layout  
-            //from font
-            //resolve for typeface
-            //  
-            Typeface typeface = _openFontTextService.ResolveFont(font).Typeface;
-
+            ResolvedFont resFont1 = _openFontTextService.ResolveFont(font);
+            Typeface typeface = resFont1.Typeface;
             _p.Typeface = typeface;
             _p.FontSizeInPoints = font.SizeInPoints;
 
 
-            float scale = typeface.CalculateScaleToPixelFromPointSize(font.SizeInPoints);
+            _fmtGlyphPlanList.Clear();
+            _p.PrepapreFormattedStringList(textBufferSpan.GetRawCharBuffer(), textBufferSpan.start, textBufferSpan.len, _fmtGlyphPlanList);
 
-            int j = lineSegs.Count;
-            int pos = 0; //start at 0
-
+            //then measure the result
+            int j = _fmtGlyphPlanList.Count;
 
             short minOffsetY = 0;
             short maxOffsetY = 0;
             int outputTotalW = 0;
             bool hasSomeExtraOffsetY = false;
 
+            int pos = 0;
+
             for (int i = 0; i < j; ++i)
             {
-                //get each segment
-                ILineSegment lineSeg = lineSegs[i];
-
-                //each line seg may has different script lang
-
-                //_txtServices.CurrentScriptLang = lineSeg.scriptLang;
-                //
-                //CACHING ...., reduce number of GSUB/GPOS
-                //
-                //we cache used line segment for a while
-                //we ask for caching context for a specific typeface and font size   
-
-                GlyphPlanSequence seq = _p.CreateGlyphPlanSeq(textBufferSpan.CreateSubspan(lineSeg.StartAt, lineSeg.Length));
-
+                FormattedGlyphPlanSeq fmtSeq = _fmtGlyphPlanList[i];
+                GlyphPlanSequence seq = fmtSeq.Seq;
                 int seqLen = seq.Count;
+                //
+                ResolvedFont resFont = fmtSeq.ResolvedFont;
+                float scale1 = resFont.GetScaleToPixelFromPointInSize();
 
                 for (int s = 0; s < seqLen; ++s)
                 {
@@ -122,16 +81,15 @@ namespace Typography.Text
                         {
                             maxOffsetY = glyphPlan.OffsetY;
                         }
-
                     }
-
                     outputTotalW +=
-                          measureResult.outputXAdvances[pos + glyphPlan.input_cp_offset] += (int)Math.Round(glyphPlan.AdvanceX * scale);
+                          measureResult.outputXAdvances[pos + glyphPlan.input_cp_offset] += (int)Math.Round(glyphPlan.AdvanceX * scale1);
                 }
-                pos += lineSeg.Length;
+                pos += seq.Count;
             }
 
-
+            //------
+            float scale = resFont1.GetScaleToPixelFromPointInSize();
             measureResult.outputTotalW = outputTotalW;
             measureResult.lineHeight = (ushort)Math.Round(typeface.CalculateMaxLineClipHeight() * scale);
 
@@ -145,6 +103,12 @@ namespace Typography.Text
                 }
             }
 
+        }
+
+        public void PrepareFormattedStringList(char[] textBuffer, int startAt, int len, FormattedGlyphPlanList fmtGlyphs)
+        {
+            _p.PrepapreFormattedStringList(textBuffer, startAt, len, fmtGlyphs);
+            fmtGlyphs.IsRightToLeftDirection = _p.NeedRightToLeftArr;
         }
 
         public float CalculateScaleToPixelsFromPoint(RequestFont font) => (_openFontTextService.ResolveFont(font) is ResolvedFont resolvedFont) ? resolvedFont.GetScaleToPixelFromPointInSize() : 0;
