@@ -307,11 +307,7 @@ namespace Typography.TextLayout
                 for (int i = 0; i < finalGlyphCount; ++i)
                 {
                     //all from pen-pos 
-                    ushort glyphIndex = glyphPositions.GetGlyph(i,
-                        out ushort input_offset,
-                        out short offsetX,
-                        out short offsetY,
-                        out short advW);
+                    glyphPositions.GetGlyph(i, out short advW);
                     accumW += (short)Math.Round(advW * pxscale);
                 }
 
@@ -324,11 +320,7 @@ namespace Typography.TextLayout
                 for (int i = 0; i < finalGlyphCount; ++i)
                 {
                     //all from pen-pos 
-                    ushort glyphIndex = glyphPositions.GetGlyph(i,
-                        out ushort input_offset,
-                        out short offsetX,
-                        out short offsetY,
-                        out short advW);
+                    glyphPositions.GetGlyph(i, out short advW);
                     accumW += advW * pxscale;
                 }
             }
@@ -352,12 +344,7 @@ namespace Typography.TextLayout
                 {
 
                     //all from pen-pos
-                    ushort glyphIndex = glyphPositions.GetGlyph(i,
-                        out ushort input_offset,
-                        out short offsetX,
-                        out short offsetY,
-                        out short advW);
-
+                    glyphPositions.GetGlyph(i, out short advW);
                     stopAtGlyphIndex = i; //***
                     //
                     short w = (short)Math.Round(advW * pxscale);
@@ -380,12 +367,7 @@ namespace Typography.TextLayout
                 for (int i = 0; i < finalGlyphCount; ++i)
                 {
                     //all from pen-pos
-                    ushort glyphIndex = glyphPositions.GetGlyph(i,
-                        out ushort input_offset,
-                        out short offsetX,
-                        out short offsetY,
-                        out short advW);
-
+                    glyphPositions.GetGlyph(i, out short advW);
 
                     stopAtGlyphIndex = i; //***
 
