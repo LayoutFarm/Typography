@@ -17,7 +17,6 @@ namespace Typography.TextLayout
     }
 
 
-    //---------
     public readonly struct LineSegment : ILineSegment
     {
         public LineSegment(int startAt, int len, WordKind wordKind, SpanBreakInfo breakInfo)
