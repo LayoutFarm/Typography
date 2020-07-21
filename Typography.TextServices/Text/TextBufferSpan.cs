@@ -23,11 +23,13 @@ namespace Typography.Text
             _rawString = rawCharBuffer;
         }
 
+        public TextBufferSpan CreateSubspan(int start, int len) => new TextBufferSpan(_rawString, start, len);
+
         public override string ToString()
         {
             return start + ":" + len;
-        } 
+        }
         public char[] GetRawCharBuffer() => _rawString;
     }
-     
+
 }

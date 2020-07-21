@@ -103,15 +103,8 @@ namespace Typography.Text
                 //
                 //we cache used line segment for a while
                 //we ask for caching context for a specific typeface and font size   
-#if DEBUG
 
-#endif
-                TextBufferSpan span1 = new Typography.Text.TextBufferSpan(
-                    textBufferSpan.GetRawCharBuffer(),
-                    lineSeg.StartAt,
-                    lineSeg.Length);
-
-                GlyphPlanSequence seq = _p.CreateGlyphPlanSeq(span1);
+                GlyphPlanSequence seq = _p.CreateGlyphPlanSeq(textBufferSpan.CreateSubspan(lineSeg.StartAt, lineSeg.Length));
 
                 int seqLen = seq.Count;
 
