@@ -157,7 +157,7 @@ namespace Typography.Text
 
         readonly Dictionary<UnicodeRangeInfo, Typeface> _prevResolvedTypefaces = new Dictionary<UnicodeRangeInfo, Typeface>();
 
-        public void PrepapreFormattedStringList(char[] textBuffer, int startAt, int len, FormattedGlyphPlanList fmtGlyphs)
+        public void PrepareFormattedStringList(char[] textBuffer, int startAt, int len, FormattedGlyphPlanList fmtGlyphs)
         {
             _prevResolvedTypefaces.Clear();
             _lineSegs.Clear();//clear before reuse
@@ -359,7 +359,7 @@ namespace Typography.Text
 
                 _fmtGlyphPlanList.Clear();
 
-                PrepapreFormattedStringList(textBuffer, startAt, len, _fmtGlyphPlanList);
+                PrepareFormattedStringList(textBuffer, startAt, len, _fmtGlyphPlanList);
 
                 _disableBaselineChange = true;
                 if (NeedRightToLeftArr)

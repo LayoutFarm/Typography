@@ -46,7 +46,7 @@ namespace Typography.Text
 
 
             _fmtGlyphPlanList.Clear();
-            _p.PrepapreFormattedStringList(textBufferSpan.GetRawCharBuffer(), textBufferSpan.start, textBufferSpan.len, _fmtGlyphPlanList);
+            _p.PrepareFormattedStringList(textBufferSpan.GetRawCharBuffer(), textBufferSpan.start, textBufferSpan.len, _fmtGlyphPlanList);
 
             //then measure the result
             int j = _fmtGlyphPlanList.Count;
@@ -107,7 +107,7 @@ namespace Typography.Text
 
         public void PrepareFormattedStringList(char[] textBuffer, int startAt, int len, FormattedGlyphPlanList fmtGlyphs)
         {
-            _p.PrepapreFormattedStringList(textBuffer, startAt, len, fmtGlyphs);
+            _p.PrepareFormattedStringList(textBuffer, startAt, len, fmtGlyphs);
             fmtGlyphs.IsRightToLeftDirection = _p.NeedRightToLeftArr;
         }
 
