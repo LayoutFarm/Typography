@@ -1,7 +1,7 @@
 ﻿//MIT, 2014-present, WinterDev    
 using System;
 using System.Collections.Generic;
-using Typography.OpenFont; 
+using Typography.OpenFont;
 
 namespace Typography.TextLayout
 {
@@ -48,9 +48,7 @@ namespace Typography.TextLayout
             //and create glyph list 
             //check if we have the string cache in specific value 
             //---------
-#if DEBUG
 
-#endif
             GlyphPlanSequence planSeq = GlyphPlanSequence.Empty;
             GlyphPlanSeqCollection seqCol = _multiLenSeqsCache.GetGlyphPlanSeqCollection(buffer.len);
 

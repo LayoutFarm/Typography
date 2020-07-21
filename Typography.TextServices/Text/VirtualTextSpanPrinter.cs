@@ -472,11 +472,12 @@ namespace Typography.Text
 
             return seq;
         }
-        public GlyphPlanSequence CreateGlyphPlanSeq(
+
+        public GlyphPlanSequence CreateGlyphPlanSeq_NoCache(
           in Typography.Text.TextBufferSpan buffer,
           IUnscaledGlyphPlanList output)
         {
-            //UNSCALED VERSION and NO CACHE here
+            //UNSCALED VERSION and NO CACHE here**
             //use current typeface + scriptlang
 
             //create a new one if we don't has a cache
@@ -488,7 +489,7 @@ namespace Typography.Text
                 buffer.len);
 
             int pre_count = output.Count;
-            //create glyph-plan ( UnScaled version) and add it to planList                
+            //create glyph-plan (UnScaled version) and add it to planList                
 
             _glyphLayout.GenerateUnscaledGlyphPlans(output);
 
@@ -496,30 +497,18 @@ namespace Typography.Text
             return new GlyphPlanSequence(output, pre_count, post_count - pre_count);//** 
         }
 
-        public GlyphPlanSequence CreateGlyphPlanSeq(in Typography.Text.TextBufferSpan textBufferSpan)
+        public GlyphPlanSequence CreateGlyphPlanSeq(in Typography.Text.TextBufferSpan buffSpan)
         {
             //use CACHE,
             _glyphPlanCache.SetCurrentFont(_currentTypeface, FontSizeInPoints, this.ScriptLang);
-            Typography.Text.TextBufferSpan buffSpan1 = new Typography.Text.TextBufferSpan(textBufferSpan.GetRawCharBuffer(), textBufferSpan.start, textBufferSpan.len);
-            return _glyphPlanCache.GetUnscaledGlyphPlanSequence(buffSpan1, _glyphLayout);
+            return _glyphPlanCache.GetUnscaledGlyphPlanSequence(buffSpan, _glyphLayout);
         }
-        public GlyphPlanSequence CreateGlyphPlanSeq(in Typography.Text.TextBufferSpan textBufferSpan, ResolvedFont font)
-        {
-
-            Typeface t = Typeface;
-            float sizeInPoints = FontSizeInPoints;
-
-            GlyphPlanSequence seq = CreateGlyphPlanSeq(textBufferSpan);
-
-            Typeface = t; //restore
-            FontSizeInPoints = sizeInPoints;
-            return seq;
-        }
+       
 
         readonly FormattedGlyphPlanList _fmtGlyphPlanList = new FormattedGlyphPlanList();
         int _limitWidth;
 
-        public void MeasureString(in Typography.Text.TextBufferSpan textBufferSpan, MeasureStringArgs args)
+        public void MeasureString(in Typography.Text.TextBufferSpan buffSpan, MeasureStringArgs args)
         {
             //TODO: review here again
 
@@ -528,7 +517,7 @@ namespace Typography.Text
 
             _limitWidth = args.LimitWidth;
 
-            DrawString(textBufferSpan.GetRawCharBuffer(), textBufferSpan.start, textBufferSpan.len, 0, 0);
+            DrawString(buffSpan.GetRawCharBuffer(), buffSpan.start, buffSpan.len, 0, 0);
 
             args.CharFitWidth = _latestAccumulateWidth;
             args.CharFit = _latestCharIndex;

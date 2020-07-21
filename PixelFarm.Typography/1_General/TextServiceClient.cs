@@ -182,13 +182,9 @@ namespace Typography.Text
 
             _p.UpdateGlyphLayoutSettings();
         }
-        public void CreateGlyphPlanSeq(in Typography.Text.TextBufferSpan textBufferSpan, IUnscaledGlyphPlanList unscaledList)
-        {
-            _p.CreateGlyphPlanSeq(textBufferSpan, unscaledList);
-        }
+
         public GlyphPlanSequence CreateGlyphPlanSeq(in Typography.Text.TextBufferSpan textBufferSpan, Typeface typeface, float sizeInPts)
         {
-
             _p.Typeface = typeface;
             _p.FontSizeInPoints = sizeInPts;
 

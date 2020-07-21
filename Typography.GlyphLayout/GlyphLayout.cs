@@ -80,13 +80,7 @@ namespace Typography.TextLayout
         public readonly ushort len;
 
         bool _isRTL;
-        public GlyphPlanSequence(IUnscaledGlyphPlanList glyphPlanList)
-        {
-            _glyphPlanList = glyphPlanList;
-            this.startAt = 0;
-            this.len = (ushort)glyphPlanList.Count;
-            _isRTL = false;
-        }
+      
         public GlyphPlanSequence(IUnscaledGlyphPlanList glyphPlanList, int startAt, int len)
         {
             _glyphPlanList = glyphPlanList;
