@@ -64,7 +64,7 @@ namespace Typography.Text
                     if (char.IsLowSurrogate(c2))
                     {
                         _isSurrogates.Append(true);
-                        _isSurrogates.Append(true);                         
+                        _isSurrogates.Append(true);
                         ++i;
                     }
                     else
@@ -102,6 +102,14 @@ namespace Typography.Text
                 ResolvedFont resFont = fmtSeq.ResolvedFont;
                 float scale1 = resFont.GetScaleToPixelFromPointInSize();
 
+                //1. prefix whitespace count
+                int ws_count = fmtSeq.PrefixWhitespaceCount;
+                for (int n = 0; n < ws_count; ++n)
+                {
+                    outputTotalW += measureResult.outputXAdvances[pos] = resFont.WhitespaceWidth;
+                    pos++;
+                }
+
                 for (int s = 0; s < seqLen; ++s)
                 {
                     //for each glyph index
@@ -132,7 +140,12 @@ namespace Typography.Text
                     }
 
                 }
-
+                ws_count = fmtSeq.PostfixWhitespaceCount;
+                for (int n = 0; n < ws_count; ++n)
+                {
+                    outputTotalW += measureResult.outputXAdvances[pos] = resFont.WhitespaceWidth;
+                    pos++;
+                }
             }
 
             //------
