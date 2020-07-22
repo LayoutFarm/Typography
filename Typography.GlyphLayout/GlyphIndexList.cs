@@ -9,10 +9,10 @@ namespace Typography.TextLayout
     /// </summary>
     class GlyphIndexList : IGlyphIndexList
     {
-        List<ushort> _glyphIndices = new List<ushort>();
-        List<int> _inputCodePointIndexList = new List<int>();
+        readonly List<ushort> _glyphIndices = new List<ushort>();
+        readonly List<int> _inputCodePointIndexList = new List<int>();
+        readonly List<GlyphIndexToUserCodePoint> _mapGlyphIndexToUserCodePoint = new List<GlyphIndexToUserCodePoint>();
         ushort _originalCodePointOffset = 0;
-        List<GlyphIndexToUserCodePoint> _mapGlyphIndexToUserCodePoint = new List<GlyphIndexToUserCodePoint>();
 
         /// <summary>
         /// map from glyph index to original user char
@@ -54,13 +54,13 @@ namespace Typography.TextLayout
         /// <summary>
         ///  add codepoint index and its glyph index
         /// </summary>
-        /// <param name="codePointIndex">index to codepoint element in code point array</param>
+        /// <param name="codepoint_index">index to codepoint element in code point array</param>
         /// <param name="glyphIndex">map to glyphindex</param>
-        public void AddGlyph(int codePointIndex, ushort glyphIndex)
+        public void AddGlyph(int codepoint_index, ushort glyphIndex)
         {
             //so we can monitor what substituion process
 
-            _inputCodePointIndexList.Add(codePointIndex);
+            _inputCodePointIndexList.Add(codepoint_index);
             _glyphIndices.Add(glyphIndex);
 
             var glyphIndexToCharMap = new GlyphIndexToUserCodePoint(_originalCodePointOffset, 1);

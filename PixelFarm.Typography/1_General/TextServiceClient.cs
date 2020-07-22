@@ -10,6 +10,7 @@ using Typography.TextLayout;
 using Typography.TextBreak;
 
 using PixelFarm.Drawing;
+using PixelFarm.CpuBlit;
 
 namespace Typography.Text
 {
@@ -37,6 +38,8 @@ namespace Typography.Text
 
 
         readonly FormattedGlyphPlanList _fmtGlyphPlanList = new FormattedGlyphPlanList();
+        readonly ArrayList<bool> _isSurrogates = new ArrayList<bool>();
+
         public void CalculateUserCharGlyphAdvancePos(in Typography.Text.TextBufferSpan textBufferSpan, RequestFont font, ref TextSpanMeasureResult measureResult)
         {
             ResolvedFont resFont1 = _openFontTextService.ResolveFont(font);
@@ -46,7 +49,40 @@ namespace Typography.Text
 
 
             _fmtGlyphPlanList.Clear();
-            _p.PrepareFormattedStringList(textBufferSpan.GetRawCharBuffer(), textBufferSpan.start, textBufferSpan.len, _fmtGlyphPlanList);
+
+            char[] rawBuffer = textBufferSpan.GetRawCharBuffer();
+
+            _p.PrepareFormattedStringList(rawBuffer, textBufferSpan.start, textBufferSpan.len, _fmtGlyphPlanList);
+
+            _isSurrogates.Clear();
+            for (int i = 0; i < rawBuffer.Length; ++i)
+            {
+                char c = rawBuffer[i];
+                if (char.IsHighSurrogate(c) && i < rawBuffer.Length - 1)
+                {
+                    char c2 = rawBuffer[i + 1];
+                    if (char.IsLowSurrogate(c2))
+                    {
+                        _isSurrogates.Append(true);
+                        _isSurrogates.Append(true);                         
+                        ++i;
+                    }
+                    else
+                    {
+                        throw new NotSupportedException();
+                    }
+                }
+                else if (char.IsLowSurrogate(c))
+                {
+                    throw new NotSupportedException();
+                }
+                else
+                {
+                    _isSurrogates.Append(false);
+                }
+            }
+            //---------
+
 
             //then measure the result
             int j = _fmtGlyphPlanList.Count;
@@ -57,7 +93,6 @@ namespace Typography.Text
             bool hasSomeExtraOffsetY = false;
 
             int pos = 0;
-
             for (int i = 0; i < j; ++i)
             {
                 FormattedGlyphPlanSeq fmtSeq = _fmtGlyphPlanList[i];
@@ -69,6 +104,7 @@ namespace Typography.Text
 
                 for (int s = 0; s < seqLen; ++s)
                 {
+                    //for each glyph index
                     UnscaledGlyphPlan glyphPlan = seq[s];
                     if (glyphPlan.OffsetY != 0)
                     {
@@ -82,10 +118,21 @@ namespace Typography.Text
                             maxOffsetY = glyphPlan.OffsetY;
                         }
                     }
-                    outputTotalW +=
-                          measureResult.outputXAdvances[pos + glyphPlan.input_cp_offset] += (int)Math.Round(glyphPlan.AdvanceX * scale1);
+
+                    //outputTotalW += measureResult.outputXAdvances[pos + glyphPlan.input_cp_offset] += (int)Math.Round(glyphPlan.AdvanceX * scale1);
+                    if (_isSurrogates[pos])
+                    {
+                        outputTotalW += measureResult.outputXAdvances[pos] = (int)Math.Round(glyphPlan.AdvanceX * scale1);
+                        pos += 2;
+                    }
+                    else
+                    {
+                        outputTotalW += measureResult.outputXAdvances[pos] = (int)Math.Round(glyphPlan.AdvanceX * scale1);
+                        pos++;
+                    }
+
                 }
-                pos += seq.Count;
+
             }
 
             //------

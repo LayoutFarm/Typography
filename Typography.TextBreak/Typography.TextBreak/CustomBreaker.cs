@@ -157,12 +157,12 @@ namespace Typography.TextBreak
             }
         }
 
-        public void BreakWords(string inputstr)
-        {
-            //TODO: review here
-            char[] buffer = inputstr.ToCharArray();
-            BreakWords(buffer, 0, inputstr.Length); //all
-        }
+        //public void BreakWords(string inputstr)
+        //{
+        //    //TODO: review here
+        //    char[] buffer = inputstr.ToCharArray();
+        //    BreakWords(buffer, 0, inputstr.Length); //all
+        //}
         public BreakingEngine GetBreakingEngineFor(char c)
         {
             return SelectEngine(c);
