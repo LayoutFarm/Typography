@@ -171,7 +171,7 @@ namespace Typography.Text
             return new CharSpan(_charSource, beginAt, count);
         }
 
-        public static readonly ArrayListSpan<char> Empty = new ArrayListSpan<char>();
+        public static readonly ArrayListSegment<char> Empty = new ArrayListSegment<char>();
 #if DEBUG
         public override string ToString()
         {

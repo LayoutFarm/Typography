@@ -570,7 +570,7 @@ namespace Typography.Text
         }
 
 
-        readonly struct TinyCRC32Calculator
+        readonly ref struct TinyCRC32Calculator
         {
 
             //NOTE: need a copy from 'Painter_Layer2'

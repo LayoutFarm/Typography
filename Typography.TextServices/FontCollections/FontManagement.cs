@@ -44,14 +44,14 @@ namespace Typography.FontCollections
         public abstract SelectedTypeface Select(List<InstalledTypeface> choices, UnicodeRangeInfo unicodeRangeInfo, int codepoint);
 
 
-        
+
         public readonly struct SelectedTypeface
         {
             public readonly InstalledTypeface InstalledTypeface;
             public readonly Typeface Typeface;
             public SelectedTypeface(InstalledTypeface installedTypeface)
             {
-                
+
                 Typeface = null;
                 InstalledTypeface = installedTypeface;
             }
@@ -119,7 +119,7 @@ namespace Typography.FontCollections
 
     public delegate void FirstInitFontCollectionDelegate(InstalledTypefaceCollection typefaceCollection);
 
-    public readonly struct TinyCRC32Calculator
+    public readonly ref struct TinyCRC32Calculator
     {
 
         /// <summary>
