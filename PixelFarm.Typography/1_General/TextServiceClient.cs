@@ -1,6 +1,5 @@
 ﻿//MIT, 2020-present, WinterDev
 using System;
-using System.Collections.Generic;
 
 using Typography.OpenFont;
 using Typography.OpenFont.Extensions;
@@ -217,14 +216,8 @@ namespace Typography.Text
             return CreateGlyphPlanSeq(textBufferSpan, font.Typeface, font.SizeInPoints);
         }
 
-
         readonly MeasureStringArgs _measureResult = new MeasureStringArgs();
-        public Size MeasureString(in PixelFarm.Drawing.TextBufferSpan textBufferSpan, RequestFont font)
-        {
-            //TODO: review here
-            var bufferSpan = new TextBufferSpan(textBufferSpan.GetRawCharBuffer(), textBufferSpan.start, textBufferSpan.len);
-            return MeasureString(bufferSpan, font);
-        }
+
         public Size MeasureString(in Typography.Text.TextBufferSpan bufferSpan, RequestFont font)
         {
             //TODO: review here
@@ -237,12 +230,7 @@ namespace Typography.Text
 
             return new Size(_measureResult.Width, _measureResult.Height);
         }
-        public Size MeasureString(in PixelFarm.Drawing.TextBufferSpan textBufferSpan, ResolvedFont font)
-        {
-            //TODO: review here
-            var bufferSpan = new TextBufferSpan(textBufferSpan.GetRawCharBuffer(), textBufferSpan.start, textBufferSpan.len);
-            return MeasureString(bufferSpan, font);
-        }
+
         public Size MeasureString(in Typography.Text.TextBufferSpan textBufferSpan, ResolvedFont font)
         {
             //TODO: review here
@@ -269,11 +257,6 @@ namespace Typography.Text
 
             charFit = _measureResult.CharFit;
             charFitWidth = _measureResult.CharFitWidth;
-        }
-        public void MeasureString(in PixelFarm.Drawing.TextBufferSpan textBufferSpan, RequestFont font, int limitWidth, out int charFit, out int charFitWidth)
-        {
-            var bufferSpan = new TextBufferSpan(textBufferSpan.GetRawCharBuffer(), textBufferSpan.start, textBufferSpan.len);
-            MeasureString(bufferSpan, font, limitWidth, out charFit, out charFitWidth);
         }
 
         public float MeasureBlankLineHeight(RequestFont font)
