@@ -151,6 +151,26 @@ namespace Typography.Text
         {
             _charSource.Copy(beginAt + start, beginAt + len - start, outputArr, 0);
         }
+        public CharSpan MakeSubSpan(int startOffset, int count)
+        {
+            if (startOffset + count < len)
+            {
+                return new CharSpan(_charSource, beginAt + startOffset, len);
+            }
+            else
+            {
+                throw new NotSupportedException();
+            }
+        }
+        public CharSpan MakeSubSpan(int startOffset)
+        {
+            return new CharSpan(_charSource, beginAt + startOffset, len - startOffset);
+        }
+        public CharSpan MakeLeftSubSpan(int count)
+        {
+            return new CharSpan(_charSource, beginAt, count);
+        }
+
         public static readonly ArrayListSpan<char> Empty = new ArrayListSpan<char>();
 #if DEBUG
         public override string ToString()
