@@ -25,7 +25,7 @@ namespace Typography.Text
         public IEnumerable<string> GetLineIter()
         {
             //TODO: review this again
-           
+
             using (System.IO.StringReader reader = new System.IO.StringReader(_sb.ToString()))
             {
                 string line = reader.ReadLine();
@@ -66,7 +66,7 @@ namespace Typography.Text
 
 
     /// <summary>
-    /// character source 
+    /// forward only character source 
     /// </summary>
     public class CharSource
     {
@@ -94,10 +94,12 @@ namespace Typography.Text
 
         public void Append(CharSpan charSpan)
         {
+            //append data from another charspan
             _arrList.Append(charSpan.UnsafeInternalCharArr, charSpan.beginAt, charSpan.len);
         }
         public void Append(char c)
         {
+            //TODO: 
             _arrList.Append(c);
         }
 
@@ -126,7 +128,7 @@ namespace Typography.Text
         }
 
         public int LatestLen => _arrList.Count;
-        public char[] UnsafeInternalArray => _arrList.UnsafeInternalArray;
+        internal char[] UnsafeInternalArray => _arrList.UnsafeInternalArray;
     }
 
 
@@ -144,15 +146,8 @@ namespace Typography.Text
         public int Count => len;
         public char[] UnsafeInternalCharArr => _charSource.UnsafeInternalArray;
         public CharSource UnsafeInternalCharSource => _charSource;
-        public string GetString()
-        {
-            return new string(UnsafeInternalCharArr, beginAt, len);
-        }
-        public Typography.Text.TextBufferSpan GetTextBufferSpan()
-        {
-            return new Typography.Text.TextBufferSpan(UnsafeInternalCharArr, beginAt, len);
-        }
-         
+
+
         public void WriteTo(TextCopyBuffer sb)
         {
             _charSource.WriteTo(sb, beginAt, len);
@@ -169,7 +164,7 @@ namespace Typography.Text
         {
             _charSource.Copy(beginAt + start, beginAt + len - start, outputArr, 0);
         }
-       
+
         public CharSpan MakeSubSpan(int startOffset, int count)
         {
             if (startOffset + count < len)
@@ -192,9 +187,13 @@ namespace Typography.Text
 
         public static readonly ArrayListSegment<char> Empty = new ArrayListSegment<char>();
 #if DEBUG
+        public string dbugGetString()
+        {
+            return new string(UnsafeInternalCharArr, beginAt, len);
+        }
         public override string ToString()
         {
-            return beginAt + "," + len + "," + GetString();
+            return beginAt + "," + len + "," + dbugGetString();
         }
 #endif
     }
@@ -213,14 +212,9 @@ namespace Typography.Text
         public int Count => len;
         public char[] UnsafeInternalCharArr => _charSource.UnsafeInternalArray;
         public CharSource UnsafeInternalCharSource => _charSource;
-        public string GetString()
-        {
-            return new string(UnsafeInternalCharArr, beginAt, len);
-        }
-        public Typography.Text.TextBufferSpan GetTextBufferSpan()
-        {
-            return new Typography.Text.TextBufferSpan(UnsafeInternalCharArr, beginAt, len);
-        }
+
+        public Typography.Text.TextBufferSpan GetTextBufferSpan() => new Typography.Text.TextBufferSpan(UnsafeInternalCharArr, beginAt, len);
+
         public char GetUtf16Char(int index)
         {
             return _charSource.UnsafeInternalArray[beginAt + index];
@@ -241,7 +235,7 @@ namespace Typography.Text
         {
             _charSource.Copy(beginAt + start, beginAt + len - start, outputArr, 0);
         }
-        
+
         public CharSpan MakeSubSpan(int startOffset, int count)
         {
             if (startOffset + count < len)
@@ -264,9 +258,13 @@ namespace Typography.Text
 
         public static readonly ArrayListSegment<char> Empty = new ArrayListSegment<char>();
 #if DEBUG
+        public string dbugGetString()
+        {
+            return new string(UnsafeInternalCharArr, beginAt, len);
+        }
         public override string ToString()
         {
-            return beginAt + "," + len + "," + GetString();
+            return beginAt + "," + len + "," + dbugGetString();
         }
 #endif
     }
