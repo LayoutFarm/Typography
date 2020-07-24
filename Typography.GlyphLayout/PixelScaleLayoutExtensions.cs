@@ -1,122 +1,19 @@
 ﻿//MIT, 2016-present, WinterDev
 using System;
-using System.Collections.Generic;
 using Typography.OpenFont;
 
 namespace Typography.TextLayout
 {
-    /// <summary>
-    /// scaled glyph plan to specfic font size.
-    /// offsetX,offsetY,advanceX are adjusted to fit with specific font size    
-    /// </summary>
-    public readonly struct PxScaledGlyphPlan
-    {
-        public readonly ushort input_cp_offset;
-        public readonly ushort glyphIndex;
-        public PxScaledGlyphPlan(ushort input_cp_offset, ushort glyphIndex, float advanceW, float offsetX, float offsetY)
-        {
-            this.input_cp_offset = input_cp_offset;
-            this.glyphIndex = glyphIndex;
-            this.OffsetX = offsetX;
-            this.OffsetY = offsetY;
-            this.AdvanceX = advanceW;
-        }
-        public readonly float AdvanceX;
-        /// <summary>
-        /// x offset from current position
-        /// </summary>
-        public readonly float OffsetX;
-        /// <summary>
-        /// y offset from current position
-        /// </summary>
-        public readonly float OffsetY;
-
-        public bool AdvanceMoveForward => this.AdvanceX > 0;
-
-#if DEBUG
-        public override string ToString()
-        {
-            return " adv:" + AdvanceX;
-        }
-#endif
-    }
 
 
-    /// <summary>
-    /// scaled glyph plan 
-    /// </summary>
-    public struct GlyphPlanSequencePixelScaleLayout
-    {
-
-        GlyphPlanSequence _seq;
-        float _pxscale;
-        float _accW;
-        int _index;
-        int _end;
-
-        float _exactX;
-        float _exactY;
-
-        ushort _currentGlyphIndex;
-        public GlyphPlanSequencePixelScaleLayout(GlyphPlanSequence glyphPlans, float pxscale)
-        {
-            _seq = glyphPlans;
-            _pxscale = pxscale;
-            _accW = 0;
-            _index = glyphPlans.startAt;
-            _end = glyphPlans.startAt + glyphPlans.len;
-            _exactX = _exactY = 0;
-            _currentGlyphIndex = 0;
-        }
-        //
-        public int CurrentIndex => _index;
-        //
-        public PxScaledGlyphPlan GlyphPlan
-        {
-            get
-            {
-                UnscaledGlyphPlan unscale = _seq[_index];
-                float scaled_advW = unscale.AdvanceX * _pxscale;
-                return new PxScaledGlyphPlan(
-                    unscale.input_cp_offset,
-                    unscale.glyphIndex,
-                    scaled_advW,
-                    unscale.OffsetX * _pxscale,
-                    unscale.OffsetY * _pxscale);
-            }
-        }
-
-        public float AccumWidth => _accW;
-        public float ExactX => _exactX;
-        public float ExactY => _exactY;
-        public ushort CurrentGlyphIndex => _currentGlyphIndex;
-        public bool Read()
-        {
-            if (_index >= _end)
-            {
-                return false;
-            }
-
-            //read current 
-            UnscaledGlyphPlan unscale = _seq[_index];
-
-            float scaled_advW = unscale.AdvanceX * _pxscale;
-            _exactX = _accW + (unscale.AdvanceX + unscale.OffsetX) * _pxscale;
-            _exactY = unscale.OffsetY * _pxscale;
-            _accW += scaled_advW;
-            _currentGlyphIndex = unscale.glyphIndex;
-            _index++;
-            return true;
-        }
-    }
     /// <summary>
     /// scaled glyph plan + snap-to-grid 
     /// </summary>
     public struct GlyphPlanSequenceSnapPixelScaleLayout
     {
 
-        GlyphPlanSequence _seq;
-        float _pxscale;
+        readonly GlyphPlanSequence _seq;
+        readonly float _pxscale;
         int _accW;
         int _index;
         int _end;
@@ -270,6 +167,8 @@ namespace Typography.TextLayout
             }
         }
     }
+
+
     public static class PixelScaleLayoutExtensions
     {
 

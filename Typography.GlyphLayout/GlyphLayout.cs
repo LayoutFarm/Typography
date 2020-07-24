@@ -15,14 +15,6 @@ namespace Typography.TextLayout
     {
         public readonly ushort input_cp_offset;
         public readonly ushort glyphIndex;
-        public UnscaledGlyphPlan(ushort input_cp_offset, ushort glyphIndex, short advanceW, short offsetX, short offsetY)
-        {
-            this.input_cp_offset = input_cp_offset;
-            this.glyphIndex = glyphIndex;
-            this.OffsetX = offsetX;
-            this.OffsetY = offsetY;
-            this.AdvanceX = advanceW;
-        }
         public readonly short AdvanceX;
         /// <summary>
         /// x offset from current position
@@ -32,6 +24,16 @@ namespace Typography.TextLayout
         /// y offset from current position
         /// </summary>
         public readonly short OffsetY;
+
+        public UnscaledGlyphPlan(ushort input_cp_offset, ushort glyphIndex, short advanceW, short offsetX, short offsetY)
+        {
+            this.input_cp_offset = input_cp_offset;
+            this.glyphIndex = glyphIndex;
+            this.OffsetX = offsetX;
+            this.OffsetY = offsetY;
+            this.AdvanceX = advanceW;
+        }
+
 
         public bool AdvanceMoveForward => this.AdvanceX > 0;
 
