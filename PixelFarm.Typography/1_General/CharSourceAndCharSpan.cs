@@ -9,12 +9,13 @@ namespace Typography.Text
 {
     public class TextCopyBuffer
     {
-
-        readonly StringBuilder _sb;
+        readonly StringBuilder _sb = new StringBuilder();
+#if DEBUG
         public TextCopyBuffer()
         {
-            _sb = new StringBuilder();
+
         }
+#endif       
         public void AppendNewLine()
         {
             //push content of current line 
@@ -46,25 +47,42 @@ namespace Typography.Text
         public int Length => _sb.Length;
 
         public void CopyTo(char[] charBuffer) => _sb.CopyTo(0, charBuffer, 0, _sb.Length);
+
+        [ThreadStatic]
+        static ArrayList<char> s_tempBuffer;
         public void CopyTo(StringBuilder stbuilder)
         {
-            //TODO: review here 
 
-            char[] buff = new char[_sb.Length];
-            _sb.CopyTo(0, buff, 0, buff.Length);
-
-            stbuilder.Append(buff);
+            if (s_tempBuffer == null)
+            {
+                s_tempBuffer = new ArrayList<char>();
+            }
+            s_tempBuffer.AdjustSize(_sb.Length);
+            _sb.CopyTo(0, s_tempBuffer.UnsafeInternalArray, 0, _sb.Length);
+            stbuilder.Append(s_tempBuffer.UnsafeInternalArray, 0, _sb.Length);
         }
         public override string ToString() => _sb.ToString();
     }
 
+
+    /// <summary>
+    /// character source 
+    /// </summary>
     public class CharSource
     {
-        internal readonly ArrayList<char> _arrList;
+        readonly ArrayList<char> _arrList = new ArrayList<char>();
+#if DEBUG
         public CharSource()
         {
-            _arrList = new ArrayList<char>();
+
         }
+#endif
+        /// <summary>
+        /// write content to TextCopyBuffer
+        /// </summary>
+        /// <param name="sb"></param>
+        /// <param name="offset"></param>
+        /// <param name="len"></param>
         internal void WriteTo(TextCopyBuffer sb, int offset, int len)
         {
             sb.AppendData(_arrList.UnsafeInternalArray, offset, len);
@@ -73,6 +91,7 @@ namespace Typography.Text
         {
             Array.Copy(_arrList.UnsafeInternalArray, srcStart, outputArr, outputStart, srcLen);
         }
+
         public void Append(CharSpan charSpan)
         {
             _arrList.Append(charSpan.UnsafeInternalCharArr, charSpan.beginAt, charSpan.len);
@@ -81,6 +100,7 @@ namespace Typography.Text
         {
             _arrList.Append(c);
         }
+
         public CharSpan NewSpan(char c)
         {
             int s = _arrList.Count;
@@ -98,7 +118,6 @@ namespace Typography.Text
             return NewSpan(str.ToCharArray());
         }
 
-
         public void CopyAndAppend(int start, int len)
         {
             //copy data from srcRange
@@ -107,6 +126,7 @@ namespace Typography.Text
         }
 
         public int LatestLen => _arrList.Count;
+        public char[] UnsafeInternalArray => _arrList.UnsafeInternalArray;
     }
 
     public readonly struct CharSpan
@@ -121,8 +141,8 @@ namespace Typography.Text
             this.len = len;
         }
         public int Count => len;
-        public char[] UnsafeInternalCharArr => _charSource._arrList.UnsafeInternalArray;
-
+        public char[] UnsafeInternalCharArr => _charSource.UnsafeInternalArray;
+        public CharSource UnsafeInternalCharSource => _charSource;
         public string GetString()
         {
             return new string(UnsafeInternalCharArr, beginAt, len);
@@ -133,7 +153,7 @@ namespace Typography.Text
         }
         public char GetUtf16Char(int index)
         {
-            return _charSource._arrList[beginAt + index];
+            return _charSource.UnsafeInternalArray[beginAt + index];
         }
         public void WriteTo(TextCopyBuffer sb)
         {
