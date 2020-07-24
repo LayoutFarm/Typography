@@ -25,7 +25,7 @@ namespace Typography.Text
         public IEnumerable<string> GetLineIter()
         {
             //TODO: review this again
-
+           
             using (System.IO.StringReader reader = new System.IO.StringReader(_sb.ToString()))
             {
                 string line = reader.ReadLine();
@@ -101,19 +101,19 @@ namespace Typography.Text
             _arrList.Append(c);
         }
 
-        public CharSpan NewSpan(char c)
+        public CharBufferSegment NewSpan(char c)
         {
             int s = _arrList.Count;
             _arrList.Append(c);
-            return new CharSpan(this, s, 1);
+            return new CharBufferSegment(this, s, 1);
         }
-        public CharSpan NewSpan(char[] charBuffer)
+        public CharBufferSegment NewSpan(char[] charBuffer)
         {
             int s = _arrList.Count;
             _arrList.Append(charBuffer);
-            return new CharSpan(this, s, charBuffer.Length);
+            return new CharBufferSegment(this, s, charBuffer.Length);
         }
-        public CharSpan NewSpan(string str)
+        public CharBufferSegment NewSpan(string str)
         {
             return NewSpan(str.ToCharArray());
         }
@@ -129,12 +129,82 @@ namespace Typography.Text
         public char[] UnsafeInternalArray => _arrList.UnsafeInternalArray;
     }
 
-    public readonly struct CharSpan
+
+    public readonly ref struct CharSpan
     {
         readonly CharSource _charSource;
         public readonly int beginAt;
         public readonly int len;
         public CharSpan(CharSource charSource, int beginAt, int len)
+        {
+            _charSource = charSource;
+            this.beginAt = beginAt;
+            this.len = len;
+        }
+        public int Count => len;
+        public char[] UnsafeInternalCharArr => _charSource.UnsafeInternalArray;
+        public CharSource UnsafeInternalCharSource => _charSource;
+        public string GetString()
+        {
+            return new string(UnsafeInternalCharArr, beginAt, len);
+        }
+        public Typography.Text.TextBufferSpan GetTextBufferSpan()
+        {
+            return new Typography.Text.TextBufferSpan(UnsafeInternalCharArr, beginAt, len);
+        }
+         
+        public void WriteTo(TextCopyBuffer sb)
+        {
+            _charSource.WriteTo(sb, beginAt, len);
+        }
+        public void WriteTo(TextCopyBuffer sb, int start, int count)
+        {
+            _charSource.WriteTo(sb, beginAt + start, count);
+        }
+        public void Copy(char[] outputArr, int start, int count)
+        {
+            _charSource.Copy(beginAt + start, count, outputArr, 0);
+        }
+        public void Copy(char[] outputArr, int start)
+        {
+            _charSource.Copy(beginAt + start, beginAt + len - start, outputArr, 0);
+        }
+       
+        public CharSpan MakeSubSpan(int startOffset, int count)
+        {
+            if (startOffset + count < len)
+            {
+                return new CharSpan(_charSource, beginAt + startOffset, len);
+            }
+            else
+            {
+                throw new NotSupportedException();
+            }
+        }
+        public CharSpan MakeSubSpan(int startOffset)
+        {
+            return new CharSpan(_charSource, beginAt + startOffset, len - startOffset);
+        }
+        public CharSpan MakeLeftSubSpan(int count)
+        {
+            return new CharSpan(_charSource, beginAt, count);
+        }
+
+        public static readonly ArrayListSegment<char> Empty = new ArrayListSegment<char>();
+#if DEBUG
+        public override string ToString()
+        {
+            return beginAt + "," + len + "," + GetString();
+        }
+#endif
+    }
+
+    public readonly struct CharBufferSegment
+    {
+        readonly CharSource _charSource;
+        public readonly int beginAt;
+        public readonly int len;
+        public CharBufferSegment(CharSource charSource, int beginAt, int len)
         {
             _charSource = charSource;
             this.beginAt = beginAt;
@@ -171,6 +241,7 @@ namespace Typography.Text
         {
             _charSource.Copy(beginAt + start, beginAt + len - start, outputArr, 0);
         }
+        
         public CharSpan MakeSubSpan(int startOffset, int count)
         {
             if (startOffset + count < len)
@@ -199,6 +270,5 @@ namespace Typography.Text
         }
 #endif
     }
-
 
 }
