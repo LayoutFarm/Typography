@@ -5,13 +5,11 @@ using Typography.OpenFont;
 namespace Typography.TextLayout
 {
 
-
     /// <summary>
     /// scaled glyph plan + snap-to-grid 
     /// </summary>
-    public struct GlyphPlanSequenceSnapPixelScaleLayout
+    public ref struct GlyphPlanSequenceSnapPixelScaleLayout
     {
-
         readonly GlyphPlanSequence _seq;
         readonly float _pxscale;
         int _accW;
