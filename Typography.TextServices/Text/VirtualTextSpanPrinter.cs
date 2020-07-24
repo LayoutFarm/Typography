@@ -157,7 +157,7 @@ namespace Typography.Text
 
         readonly Dictionary<UnicodeRangeInfo, Typeface> _prevResolvedTypefaces = new Dictionary<UnicodeRangeInfo, Typeface>();
 
-        public void PrepareFormattedStringList(char[] textBuffer, int startAt, int len, FormattedGlyphPlanList fmtGlyphs)
+        public void PrepareFormattedStringList(char[] textBuffer, int startAt, int len, FormattedGlyphPlanSeqProvider fmtGlyphs)
         {
             _prevResolvedTypefaces.Clear();
             _lineSegs.Clear();//clear before reuse
@@ -362,42 +362,50 @@ namespace Typography.Text
                 PrepareFormattedStringList(textBuffer, startAt, len, _fmtGlyphPlanList);
 
                 _disableBaselineChange = true;
-                if (NeedRightToLeftArr)
+
+                if (_fmtGlyphPlanList.Count > 0)
                 {
-                    //special arr left-to-right
-
-                    int count = _fmtGlyphPlanList.Count;//re-count
-                    for (int i = count - 1; i >= 0; --i)
+                    if (NeedRightToLeftArr)
                     {
-                        FormattedGlyphPlanSeq formattedGlyphPlanSeq = _fmtGlyphPlanList[i];
+                        //special arr left-to-right
 
-                        ResolvedFont resolvedFont = formattedGlyphPlanSeq.ResolvedFont;
-                        Typeface = resolvedFont.Typeface;
+                        FormattedGlyphPlanSeq fmtSeq = _fmtGlyphPlanList.GetLast();
+                        while (fmtSeq != null)
+                        {
+                            ResolvedFont resolvedFont = fmtSeq.ResolvedFont;
+                            Typeface = resolvedFont.Typeface;
 
-                        DrawFromGlyphPlans(formattedGlyphPlanSeq.Seq, xpos + (resolvedFont.WhitespaceWidth * formattedGlyphPlanSeq.PrefixWhitespaceCount), y);
+                            DrawFromGlyphPlans(fmtSeq.Seq, xpos + (resolvedFont.WhitespaceWidth * fmtSeq.PrefixWhitespaceCount), y);
 
-                        xpos += _latestAccumulateWidth + (resolvedFont.WhitespaceWidth * formattedGlyphPlanSeq.PostfixWhitespaceCount);
-                    }
+                            xpos += _latestAccumulateWidth + (resolvedFont.WhitespaceWidth * fmtSeq.PostfixWhitespaceCount);
 
-                }
-                else
-                {
-                    int count = _fmtGlyphPlanList.Count;//re-count
-
-                    for (int i = 0; i < count; ++i)
-                    {
-                        FormattedGlyphPlanSeq formattedGlyphPlanSeq = _fmtGlyphPlanList[i];
-
-                        //change typeface                     
-                        ResolvedFont resolvedFont = formattedGlyphPlanSeq.ResolvedFont;
-                        Typeface = resolvedFont.Typeface;
-
-                        DrawFromGlyphPlans(formattedGlyphPlanSeq.Seq, xpos + (resolvedFont.WhitespaceWidth * formattedGlyphPlanSeq.PrefixWhitespaceCount), y);
-
-                        xpos += _latestAccumulateWidth + (resolvedFont.WhitespaceWidth * formattedGlyphPlanSeq.PostfixWhitespaceCount);
+                            //---------
+                            fmtSeq = fmtSeq.Prev;
+                        }
 
                     }
+                    else
+                    {
+
+                        FormattedGlyphPlanSeq fmtSeq = _fmtGlyphPlanList.GetFirst();
+                        while (fmtSeq != null)
+                        {
+
+                            //change typeface                     
+                            ResolvedFont resolvedFont = fmtSeq.ResolvedFont;
+                            Typeface = resolvedFont.Typeface;
+
+                            DrawFromGlyphPlans(fmtSeq.Seq, xpos + (resolvedFont.WhitespaceWidth * fmtSeq.PrefixWhitespaceCount), y);
+
+                            xpos += _latestAccumulateWidth + (resolvedFont.WhitespaceWidth * fmtSeq.PostfixWhitespaceCount);
+                            //---------
+                            fmtSeq = fmtSeq.Next;
+                        }
+                    }
                 }
+
+
+
                 _disableBaselineChange = false;
 
                 _fmtGlyphPlanList.Clear();
@@ -508,7 +516,7 @@ namespace Typography.Text
         }
 
 
-        readonly FormattedGlyphPlanList _fmtGlyphPlanList = new FormattedGlyphPlanList();
+        readonly FormattedGlyphPlanSeqPool _fmtGlyphPlanList = new FormattedGlyphPlanSeqPool();
         int _limitWidth;
 
         public void MeasureString(in Typography.Text.TextBufferSpan buffSpan, MeasureStringArgs args)

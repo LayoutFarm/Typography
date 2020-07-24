@@ -13,6 +13,14 @@ using PixelFarm.CpuBlit;
 
 namespace Typography.Text
 {
+    public readonly struct FormattedGlyphPlanListHolder : IFormattedGlyphPlanList
+    {
+        public readonly FormattedGlyphPlanSeq _chainFmtGlyphPlans;
+        public FormattedGlyphPlanListHolder(FormattedGlyphPlanSeq fmtGlyphPlans)
+        {
+            _chainFmtGlyphPlans = fmtGlyphPlans;
+        }
+    }
 
     public class TextServiceClient
     {
@@ -36,7 +44,7 @@ namespace Typography.Text
         }
 
 
-        readonly FormattedGlyphPlanList _fmtGlyphPlanList = new FormattedGlyphPlanList();
+        readonly FormattedGlyphPlanSeqPool _fmtGlyphPlanList = new FormattedGlyphPlanSeqPool();
         readonly ArrayList<bool> _isSurrogates = new ArrayList<bool>();
 
         public void CalculateUserCharGlyphAdvancePos(in Typography.Text.TextBufferSpan textBufferSpan, RequestFont font, ref TextSpanMeasureResult measureResult)
@@ -84,7 +92,7 @@ namespace Typography.Text
 
 
             //then measure the result
-            int j = _fmtGlyphPlanList.Count;
+
 
             short minOffsetY = 0;
             short maxOffsetY = 0;
@@ -92,60 +100,68 @@ namespace Typography.Text
             bool hasSomeExtraOffsetY = false;
 
             int pos = 0;
-            for (int i = 0; i < j; ++i)
+            if (_fmtGlyphPlanList.Count > 0)
             {
-                FormattedGlyphPlanSeq fmtSeq = _fmtGlyphPlanList[i];
-                GlyphPlanSequence seq = fmtSeq.Seq;
-                int seqLen = seq.Count;
-                //
-                ResolvedFont resFont = fmtSeq.ResolvedFont;
-                float scale1 = resFont.GetScaleToPixelFromPointInSize();
-
-                //1. prefix whitespace count
-                int ws_count = fmtSeq.PrefixWhitespaceCount;
-                for (int n = 0; n < ws_count; ++n)
+                FormattedGlyphPlanSeq fmtSeq = _fmtGlyphPlanList.GetFirst();
+                while (fmtSeq != null)
                 {
-                    outputTotalW += measureResult.outputXAdvances[pos] = resFont.WhitespaceWidth;
-                    pos++;
-                }
+                    GlyphPlanSequence seq = fmtSeq.Seq;
+                    int seqLen = seq.Count;
+                    //
+                    ResolvedFont resFont = fmtSeq.ResolvedFont;
+                    float scale1 = resFont.GetScaleToPixelFromPointInSize();
 
-                for (int s = 0; s < seqLen; ++s)
-                {
-                    //for each glyph index
-                    UnscaledGlyphPlan glyphPlan = seq[s];
-                    if (glyphPlan.OffsetY != 0)
+                    //1. prefix whitespace count
+                    int ws_count = fmtSeq.PrefixWhitespaceCount;
+                    for (int n = 0; n < ws_count; ++n)
                     {
-                        hasSomeExtraOffsetY = true;
-                        if (minOffsetY > glyphPlan.OffsetY)
-                        {
-                            minOffsetY = glyphPlan.OffsetY;
-                        }
-                        if (maxOffsetY < glyphPlan.OffsetY)
-                        {
-                            maxOffsetY = glyphPlan.OffsetY;
-                        }
-                    }
-
-                    //outputTotalW += measureResult.outputXAdvances[pos + glyphPlan.input_cp_offset] += (int)Math.Round(glyphPlan.AdvanceX * scale1);
-                    if (_isSurrogates[pos])
-                    {
-                        outputTotalW += measureResult.outputXAdvances[pos] = (int)Math.Round(glyphPlan.AdvanceX * scale1);
-                        pos += 2;
-                    }
-                    else
-                    {
-                        outputTotalW += measureResult.outputXAdvances[pos] = (int)Math.Round(glyphPlan.AdvanceX * scale1);
+                        outputTotalW += measureResult.outputXAdvances[pos] = resFont.WhitespaceWidth;
                         pos++;
                     }
 
+                    for (int s = 0; s < seqLen; ++s)
+                    {
+                        //for each glyph index
+                        UnscaledGlyphPlan glyphPlan = seq[s];
+                        if (glyphPlan.OffsetY != 0)
+                        {
+                            hasSomeExtraOffsetY = true;
+                            if (minOffsetY > glyphPlan.OffsetY)
+                            {
+                                minOffsetY = glyphPlan.OffsetY;
+                            }
+                            if (maxOffsetY < glyphPlan.OffsetY)
+                            {
+                                maxOffsetY = glyphPlan.OffsetY;
+                            }
+                        }
+
+                        //outputTotalW += measureResult.outputXAdvances[pos + glyphPlan.input_cp_offset] += (int)Math.Round(glyphPlan.AdvanceX * scale1);
+                        if (_isSurrogates[pos])
+                        {
+                            outputTotalW += measureResult.outputXAdvances[pos] = (int)Math.Round(glyphPlan.AdvanceX * scale1);
+                            pos += 2;
+                        }
+                        else
+                        {
+                            outputTotalW += measureResult.outputXAdvances[pos] = (int)Math.Round(glyphPlan.AdvanceX * scale1);
+                            pos++;
+                        }
+
+                    }
+                    ws_count = fmtSeq.PostfixWhitespaceCount;
+                    for (int n = 0; n < ws_count; ++n)
+                    {
+                        outputTotalW += measureResult.outputXAdvances[pos] = resFont.WhitespaceWidth;
+                        pos++;
+                    }
+
+                    //
+                    fmtSeq = fmtSeq.Next;
                 }
-                ws_count = fmtSeq.PostfixWhitespaceCount;
-                for (int n = 0; n < ws_count; ++n)
-                {
-                    outputTotalW += measureResult.outputXAdvances[pos] = resFont.WhitespaceWidth;
-                    pos++;
-                }
+
             }
+
 
             //------
             float scale = resFont1.GetScaleToPixelFromPointInSize();
@@ -164,7 +180,7 @@ namespace Typography.Text
 
         }
 
-        public void PrepareFormattedStringList(char[] textBuffer, int startAt, int len, FormattedGlyphPlanList fmtGlyphs)
+        public void PrepareFormattedStringList(char[] textBuffer, int startAt, int len, FormattedGlyphPlanSeqProvider fmtGlyphs)
         {
             _p.PrepareFormattedStringList(textBuffer, startAt, len, fmtGlyphs);
             fmtGlyphs.IsRightToLeftDirection = _p.NeedRightToLeftArr;

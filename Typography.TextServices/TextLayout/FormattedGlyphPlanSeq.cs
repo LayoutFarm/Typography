@@ -1,4 +1,5 @@
 ﻿//MIT, 2016-present, WinterDev, Sam Hocevar
+
 using System;
 using System.Collections.Generic;
 using Typography.Text;
@@ -7,15 +8,20 @@ using Typography.TextBreak;
 namespace Typography.TextLayout
 {
 
+    public abstract class FormattedGlyphPlanSeqProvider
+    {
+        public bool IsRightToLeftDirection { get; set; }
+        public abstract FormattedGlyphPlanSeq AppendNew();
+    }
 
-    public class FormattedGlyphPlanList
+    public class FormattedGlyphPlanSeqPool : FormattedGlyphPlanSeqProvider
     {
 
         int _newElemIndex = 0;
         const int DEFAULT_LEN = 255;
 
         readonly List<FormattedGlyphPlanSeq> _list;
-        public FormattedGlyphPlanList()
+        public FormattedGlyphPlanSeqPool()
         {
             _list = new List<FormattedGlyphPlanSeq>(DEFAULT_LEN);
             for (int i = 0; i < DEFAULT_LEN; ++i)
@@ -24,20 +30,9 @@ namespace Typography.TextLayout
             }
         }
 
-        public FormattedGlyphPlanSeq this[int index]
-        {
-            get
-            {
-                if (index < 0) { throw new NotSupportedException(); }
+        public FormattedGlyphPlanSeq GetFirst() => _list[0];
+        public FormattedGlyphPlanSeq GetLast() => _list[_newElemIndex - 1];
 
-                if (index > _list.Count) { throw new NotSupportedException(); }
-
-                if (index >= _newElemIndex) { throw new NotSupportedException(); }
-
-
-                return _list[index];
-            }
-        }
         public int Count => _newElemIndex;
         public void Clear()
         {
@@ -49,7 +44,7 @@ namespace Typography.TextLayout
             _newElemIndex = 0;
             IsRightToLeftDirection = false;
         }
-        public FormattedGlyphPlanSeq AppendNew()
+        public override FormattedGlyphPlanSeq AppendNew()
         {
             if (_newElemIndex + 1 > _list.Count)
             {
@@ -62,12 +57,20 @@ namespace Typography.TextLayout
             }
 
             FormattedGlyphPlanSeq fmtGlyphPlanSeq = _list[_newElemIndex];
+            if (_newElemIndex > 0)
+            {
+                //link next-prev from pool
+                _list[_newElemIndex - 1].Next = fmtGlyphPlanSeq;
+                fmtGlyphPlanSeq.Prev = _list[_newElemIndex - 1];
+            }
             _newElemIndex++;
 
             return fmtGlyphPlanSeq;
         }
-        public bool IsRightToLeftDirection { get; set; }
+
     }
+
+
 
     public class FormattedGlyphPlanSeq
     {
@@ -105,8 +108,33 @@ namespace Typography.TextLayout
             BreakInfo = null;
             ColorGlyphOnTransparentBG = false;
             PrefixWhitespaceCount = PostfixWhitespaceCount = 0;
+            Next = null; //
+            Prev = null;
         }
 
+        //single-linked node
+
+        FormattedGlyphPlanSeq _next;
+        FormattedGlyphPlanSeq _prev;
+        public FormattedGlyphPlanSeq Next
+        {
+            get => _next;
+            set
+            {
+                if (_next == this) { throw new NotSupportedException(); }
+                _next = value;
+            }
+        }
+        public FormattedGlyphPlanSeq Prev
+        {
+            get => _prev;
+            set
+            {
+                if (_prev == this) { throw new NotSupportedException(); }
+                _prev = value;
+            }
+        }
+        //-----------
 
     }
 

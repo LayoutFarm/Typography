@@ -128,11 +128,16 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
         }
         public void PrepareStringForRenderVx(AggRenderVxFormattedString renderVx, char[] text, int startAt, int len)
         {
-
+            //TODO: review here
             //1. update some props.. 
             //2. update current type face
             UpdateGlyphLayoutSettings();
             //Typeface typeface = _currentTypeface;
+        }
+        public void PrepareStringForRenderVx(AggRenderVxFormattedString renderVx, IFormattedGlyphPlanList fmtGlyphPlans)
+        {
+            throw new NotSupportedException();
+            UpdateGlyphLayoutSettings();
         }
         public void PrepareStringForRenderVx(AggRenderVxFormattedString renderVx)
         {

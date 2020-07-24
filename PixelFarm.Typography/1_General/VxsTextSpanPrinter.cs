@@ -32,8 +32,8 @@ namespace PixelFarm.Drawing
             _txtClient = txtClient;
             _painter = painter;
             _glyphMeshStore = new GlyphMeshStore() { FlipGlyphUpward = true };
-            _glyphBitmapStore = new GlyphBitmapStore(); 
-           
+            _glyphBitmapStore = new GlyphBitmapStore();
+
         }
         public AlternativeTypefaceSelector AlternativeTypefaceSelector
         {
@@ -553,7 +553,7 @@ namespace PixelFarm.Drawing
             _painter.SetOrigin(ox, oy);
         }
 
-        readonly FormattedGlyphPlanList _fmtGlyphPlans = new FormattedGlyphPlanList();
+        readonly FormattedGlyphPlanSeqPool _fmtGlyphPlans = new FormattedGlyphPlanSeqPool();
         bool _renderingMultiTypefaceMode;
 
         public override void DrawString(char[] textBuffer, int startAt, int len, float x, float y)
@@ -593,38 +593,44 @@ namespace PixelFarm.Drawing
                 _renderingMultiTypefaceMode = true;
 
                 int count = _fmtGlyphPlans.Count;
-
-                if (needRightToLeftArr)
+                if (count > 0)
                 {
-                    //special arr left-to-right 
-                    for (int i = count - 1; i >= 0; --i)
+                    if (needRightToLeftArr)
                     {
-                        FormattedGlyphPlanSeq formattedGlyphPlanSeq = _fmtGlyphPlans[i];
+                        //special arr left-to-right 
+                        FormattedGlyphPlanSeq formattedGlyphPlanSeq = _fmtGlyphPlans.GetLast();
+                        while (formattedGlyphPlanSeq != null)
+                        {
+                            ResolvedFont resolvedFont = formattedGlyphPlanSeq.ResolvedFont;
+                            Typeface = resolvedFont.Typeface;
 
-                        ResolvedFont resolvedFont = formattedGlyphPlanSeq.ResolvedFont;
-                        Typeface = resolvedFont.Typeface;
+                            DrawFromGlyphPlans(formattedGlyphPlanSeq.Seq, xpos + (resolvedFont.WhitespaceWidth * formattedGlyphPlanSeq.PrefixWhitespaceCount), y);
 
-                        DrawFromGlyphPlans(formattedGlyphPlanSeq.Seq, xpos + (resolvedFont.WhitespaceWidth * formattedGlyphPlanSeq.PrefixWhitespaceCount), y);
+                            xpos += _latestAccumulateWidth + (resolvedFont.WhitespaceWidth * formattedGlyphPlanSeq.PostfixWhitespaceCount);
 
-                        xpos += _latestAccumulateWidth + (resolvedFont.WhitespaceWidth * formattedGlyphPlanSeq.PostfixWhitespaceCount);
+
+                            //---
+                            formattedGlyphPlanSeq = formattedGlyphPlanSeq.Prev;
+                        }
+
                     }
-
-                }
-                else
-                {
-
-                    for (int i = 0; i < count; ++i)
+                    else
                     {
-                        FormattedGlyphPlanSeq formattedGlyphPlanSeq = _fmtGlyphPlans[i];
+                        FormattedGlyphPlanSeq formattedGlyphPlanSeq = _fmtGlyphPlans.GetFirst();
+                        while (formattedGlyphPlanSeq != null)
+                        {
 
-                        //change typeface                     
-                        ResolvedFont resolvedFont = formattedGlyphPlanSeq.ResolvedFont;
-                        Typeface = resolvedFont.Typeface;
+                            //change typeface                     
+                            ResolvedFont resolvedFont = formattedGlyphPlanSeq.ResolvedFont;
+                            Typeface = resolvedFont.Typeface;
 
-                        DrawFromGlyphPlans(formattedGlyphPlanSeq.Seq, xpos + (resolvedFont.WhitespaceWidth * formattedGlyphPlanSeq.PrefixWhitespaceCount), y);
+                            DrawFromGlyphPlans(formattedGlyphPlanSeq.Seq, xpos + (resolvedFont.WhitespaceWidth * formattedGlyphPlanSeq.PrefixWhitespaceCount), y);
 
-                        xpos += _latestAccumulateWidth + (resolvedFont.WhitespaceWidth * formattedGlyphPlanSeq.PostfixWhitespaceCount);
+                            xpos += _latestAccumulateWidth + (resolvedFont.WhitespaceWidth * formattedGlyphPlanSeq.PostfixWhitespaceCount);
 
+                            //---
+                            formattedGlyphPlanSeq = formattedGlyphPlanSeq.Next;
+                        }
                     }
                 }
                 _renderingMultiTypefaceMode = false;
