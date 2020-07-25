@@ -26,8 +26,15 @@ namespace Typography.TextLayout
             //https://stackoverflow.com/questions/114085/fast-string-hashing-algorithm-with-low-collision-rates-with-32-bit-integer
             //https://stackoverflow.com/questions/2351087/what-is-the-best-32bit-hash-function-for-short-strings-tag-names
 
+            if (buffer.IsUtf32Buffer)
+            {
+                return CRC32.CalculateCRC32(buffer.GetRawUtf32Buffer(), buffer.start, buffer.len);
+            }
+            else
+            {
+                return CRC32.CalculateCRC32(buffer.GetRawUtf16Buffer(), buffer.start, buffer.len);
+            }
 
-            return CRC32.CalculateCRC32(buffer.GetRawCharBuffer(), buffer.start, buffer.len);
         }
 #if DEBUG
         internal Typeface dbug_typeface;
@@ -62,10 +69,21 @@ namespace Typography.TextLayout
             {
                 //create a new one if we don't has a cache
                 //1. layout 
-                glyphLayout.Layout(
-                    buffer.GetRawCharBuffer(),
-                    buffer.start,
-                    buffer.len);
+                if (buffer.IsUtf32Buffer)
+                {
+                    glyphLayout.Layout(
+                        buffer.GetRawUtf32Buffer(),
+                        buffer.start,
+                        buffer.len);
+                }
+                else
+                {
+                    glyphLayout.Layout(
+                        buffer.GetRawUtf16Buffer(),
+                        buffer.start,
+                        buffer.len);
+                }
+
 
                 int pre_count = _reusableGlyphPlanList.Count;
                 //create glyph-plan ( UnScaled version) and add it to planList                

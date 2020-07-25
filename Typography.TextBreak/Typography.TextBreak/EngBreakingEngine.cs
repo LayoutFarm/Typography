@@ -6,6 +6,7 @@
 
 
 using System;
+using System.Runtime.CompilerServices;
 using Typography.OpenFont;
 
 namespace Typography.TextBreak
@@ -66,6 +67,20 @@ namespace Typography.TextBreak
         public EngBreakingEngine()
         {
 
+        }
+
+        internal override void BreakWord(WordVisitor visitor, int[] charBuff, int startAt, int len)
+        {
+            //temp fix
+
+            visitor.State = VisitorState.Parsing;
+            visitor.SpanBreakInfo = s_latin;
+            char[] temp_buffer = new char[charBuff.Length * 2];
+            for (int i = 0; i < charBuff.Length; ++i)
+            {
+                temp_buffer[i] = (char)charBuff[i];
+            }
+            BreakWord(visitor, temp_buffer, startAt, len);
         }
         internal override void BreakWord(WordVisitor visitor, char[] charBuff, int startAt, int len)
         {
@@ -281,7 +296,7 @@ namespace Typography.TextBreak
                                 bb.startIndex = i;
                                 bb.kind = WordKind.Tab;
                                 lexState = LexState.Tab;
-                            } 
+                            }
                             else if (char.IsLetter(c))
                             {
                                 if (!IsInOurLetterRange(c, out SpanBreakInfo brkInfo))
@@ -620,8 +635,8 @@ namespace Typography.TextBreak
 
                                         bb.startIndex = i;
                                         bb.length = begin - i;
-                                        bb.kind = WordKind.SurrogatePair; 
-                                        
+                                        bb.kind = WordKind.SurrogatePair;
+
                                         OnBreak(visitor, bb);
 
                                         i += bb.length - 1;//consume 

@@ -11,6 +11,7 @@ namespace Typography.TextBreak
     public abstract class BreakingEngine
     {
         internal abstract void BreakWord(WordVisitor visitor, char[] charBuff, int startAt, int len);
+        internal abstract void BreakWord(WordVisitor visitor, int[] charBuff, int startAt, int len);
         public abstract bool CanBeStartChar(char c);
         public abstract bool CanHandle(char c);
     }
@@ -34,9 +35,12 @@ namespace Typography.TextBreak
         protected abstract WordGroup GetWordGroupForFirstChar(char c);
         public bool BreakPeroidInTextSpan { get; set; }
 
-
         public bool DontMergeLastIncompleteWord { get; set; }
 
+        internal override void BreakWord(WordVisitor visitor, int[] charBuff, int startAt, int len)
+        {
+            throw new NotImplementedException();
+        }
         internal override void BreakWord(WordVisitor visitor, char[] charBuff, int startAt, int len)
         {
             visitor.State = VisitorState.Parsing;

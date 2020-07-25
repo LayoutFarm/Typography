@@ -56,6 +56,14 @@ namespace Typography.TextLayout
         public static int CalculateCRC32(char[] charBuffer, int startAt, int len)
         {
             //calculate CRC32 
+
+            uint register = SlurpBlock2_(charBuffer, startAt, len);
+            return (Int32)(~register);
+        }
+        public static int CalculateCRC32(int[] charBuffer, int startAt, int len)
+        {
+            //calculate CRC32 
+
             uint register = SlurpBlock2_(charBuffer, startAt, len);
             return (Int32)(~register);
         }
@@ -80,13 +88,35 @@ namespace Typography.TextLayout
             {
 
                 char ch = block[offset + i];
-                byte b0 = (byte)(ch >> 8);
-                byte b1 = (byte)ch;
+
                 //b0
-                UInt32 temp = (_register & 0x000000FF) ^ b0;
+                UInt32 temp = (_register & 0x000000FF) ^ ((byte)(ch >> 8));
                 _register = (_register >> 8) ^ s_crc32[temp];
                 //b1
-                temp = (_register & 0x000000FF) ^ b1;
+                temp = (_register & 0x000000FF) ^ ((byte)ch);
+                _register = (_register >> 8) ^ s_crc32[temp];
+
+            }
+            return _register;
+        }
+        static uint SlurpBlock2_(int[] block, int offset, int count)
+        {
+            uint _register = RESET_REGISTER;
+            // bzip algorithm
+            for (int i = 0; i < count; i++)
+            {
+                int d = block[offset + i];
+
+                UInt32 temp = (_register & 0x000000FF) ^ ((byte)(d >> 24));
+                _register = (_register >> 8) ^ s_crc32[temp];
+
+                temp = (_register & 0x000000FF) ^ ((byte)(d >> 16));
+                _register = (_register >> 8) ^ s_crc32[temp];
+
+                temp = (_register & 0x000000FF) ^ ((byte)(d >> 8));
+                _register = (_register >> 8) ^ s_crc32[temp];
+
+                temp = (_register & 0x000000FF) ^ ((byte)d);
                 _register = (_register >> 8) ^ s_crc32[temp];
 
             }

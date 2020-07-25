@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 
 namespace Typography.TextBreak
 {
@@ -38,29 +39,60 @@ namespace Typography.TextBreak
         //        List<BreakAtInfo> dbugBreakAtList = new List<BreakAtInfo>();
         //        bool dbugCollectBreakAtList;
         //#endif
-        char[] _buffer;
+        char[] _utf16Buffer;
+        int[] _utf32Buffer;
 
         int _startIndex;
         int _endIndex;
 
         int _currentIndex;
-        char _currentChar;
+        char _currentChar; //store as utf32
         int _latestBreakAt;
 
-        Stack<int> _tempCandidateBreaks = new Stack<int>();
-
+        readonly Stack<int> _tempCandidateBreaks = new Stack<int>();
         public virtual SpanBreakInfo SpanBreakInfo { get; set; }
+        internal void LoadText(int[] buffer, int index, int len)
+        {
+            //input is utf32  
+            _utf16Buffer = null;
+            _utf32Buffer = buffer;
 
+            _endIndex = index + len;
+
+            _startIndex = _currentIndex = index;
+            _latestBreakAt = LatestSpanStartAt = _startIndex;
+
+            //in this case, the current char is upper 
+            int c1 = buffer[_currentIndex];
+
+            char upper = (char)(c1 >> 16);
+            char lower = (char)c1;
+
+            if (upper == '\0')
+            {
+                //use lower
+                _currentChar = lower;
+            }
+            else
+            {
+                _currentChar = upper;
+            }
+
+
+            _tempCandidateBreaks.Clear();
+        }
         internal void LoadText(char[] buffer, int index)
         {
             LoadText(buffer, index, buffer.Length);
         }
         internal void LoadText(char[] buffer, int index, int len)
         {
-            //check index < buffer
 
+            //input is utf16
             //reset all
-            _buffer = buffer;
+            _utf16Buffer = buffer;
+            _utf32Buffer = null;
+
             _endIndex = index + len;
 
             _startIndex = _currentIndex = index;
@@ -68,10 +100,6 @@ namespace Typography.TextBreak
 
             _currentChar = buffer[_currentIndex];
             _tempCandidateBreaks.Clear();
-
-            //#if DEBUG
-            //            dbugBreakAtList.Clear();
-            //#endif
         }
         protected virtual void OnBreak() { }
 
@@ -80,12 +108,13 @@ namespace Typography.TextBreak
         public int CurrentIndex => _currentIndex;
         //
         public char Char => _currentChar;
+
         //
         public bool IsEnd => _currentIndex >= _endIndex;
 
         public string CopyCurrentSpanString()
         {
-            return new string(_buffer, LatestSpanStartAt, LatestSpanLen);
+            return new string(_utf16Buffer, LatestSpanStartAt, LatestSpanLen);
         }
 
 #if DEBUG
@@ -144,10 +173,32 @@ namespace Typography.TextBreak
             _currentIndex = index;
             if (index < _endIndex)
             {
-                _currentChar = _buffer[index];
+                if (_utf16Buffer != null)
+                {
+                    _currentChar = _utf16Buffer[index];
+                }
+                else
+                {
+                    int c1 = _utf32Buffer[_currentIndex];
+
+                    char upper = (char)(c1 >> 16);
+                    char lower = (char)c1;
+
+                    if (upper == '\0')
+                    {
+                        //use lower
+                        _currentChar = lower;
+                    }
+                    else
+                    {
+                        _currentChar = upper;
+                    }
+                }
+
             }
             else
             {
+
                 //can't read next
                 //the set state= end
                 this.State = VisitorState.End;

@@ -360,7 +360,50 @@ namespace Typography.TextLayout
 
             Layout(_reusableUserCodePoints);
         }
+        /// <summary>
+        /// do glyph shaping and glyph out, output is unscaled glyph-plan
+        /// </summary>
+        /// <param name="str"></param>
+        /// <param name="startAt"></param>
+        /// <param name="len"></param>
+        public void Layout(
+            int[] str,
+            int startAt,
+            int len)
+        {
 
+            //[A]
+            //convert from char[] to codepoint-list
+            // this is important!
+            // -----------------------
+            // from @samhocevar's PR: (https://github.com/LayoutFarm/Typography/pull/56/commits/b71c7cf863531ebf5caa478354d3249bde40b96e)
+            // In many places, "char" is not a valid type to handle characters, because it
+            // only supports 16 bits.In order to handle the full range of Unicode characters,
+            // we need to use "int".
+            // This allows characters such as 🙌 or 𐐷 or to be treated as single codepoints even
+            // though they are encoded as two "char"s in a C# string.
+
+            _reusableUserCodePoints.Clear();
+#if DEBUG
+            _dbugReusableCodePointFromUserCharList.Clear();
+            if (str.Length > 2)
+            {
+
+            }
+
+#endif
+            for (int i = 0; i < len; ++i)
+            {
+
+                int codepoint = str[startAt + i];
+                _reusableUserCodePoints.Add(codepoint);
+#if DEBUG
+                _dbugReusableCodePointFromUserCharList.Add(new dbugCodePointFromUserChar((ushort)i, codepoint));
+#endif
+            }
+
+            Layout(_reusableUserCodePoints);
+        }
         public void SetGlyphIndexNotFoundHandler(GlyphNotFoundHandler glyphNotFoundHandler)
         {
             _glyphNotFoundHandler = glyphNotFoundHandler;

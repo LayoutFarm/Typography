@@ -1,6 +1,7 @@
 ﻿//MIT, 2016-present, WinterDev
 //some code from ICU project with BSD license
 
+using System.Text;
 using Typography.OpenFont;
 using Typography.TextBreak.SheenBidi;
 
@@ -48,8 +49,96 @@ namespace Typography.TextBreak
 
         public override bool CanHandle(char c) => IsArabicChar(c, out _);
 
-        RunAdapter _runAdapter = new RunAdapter();
+        readonly RunAdapter _runAdapter = new RunAdapter();
 
+        internal override void BreakWord(WordVisitor visitor, int[] charBuff, int startAt, int len)
+        {
+            //input is in utf32 buffer
+
+            visitor.State = VisitorState.Parsing;
+            RunAgent agent = _runAdapter.Agent;
+
+            //collect arabic char and break
+
+            int arabic_len = 0;
+            int lim = startAt + len;
+
+            SpanBreakInfo latest_ar = null;
+            for (int i = startAt; i < lim; ++i)
+            {
+                int c = charBuff[i];
+                char lower = (char)c;
+                if (IsArabicChar(lower, out SpanBreakInfo spBreak))
+                {
+                    arabic_len++;
+                    latest_ar = spBreak;
+                }
+                else
+                {
+                    break;
+                }
+            }
+            //
+            if (arabic_len == 0)
+            {
+                visitor.State = VisitorState.OutOfRangeChar;
+                return;
+            }
+
+
+            visitor.SpanBreakInfo = latest_ar;
+
+            //only collect char
+            Line line1;
+            unsafe
+            {
+
+                fixed (int* buffer_head = &charBuff[0])
+                {
+                    byte* buffer_h1 = (byte*)buffer_head;
+                    char[] buff = new char[charBuff.Length * 2];
+                    fixed (char* output1 = &buff[0])
+                    {
+                        int output_len = Encoding.UTF32.GetChars(buffer_h1, charBuff.Length * 4, output1, buff.Length);
+                        line1 = new Line(new string(output1, 0, output_len));
+                    }
+                }
+            }
+
+            _runAdapter.LoadLine(line1);
+
+            while (_runAdapter.MoveNext())
+            {
+                int offset = agent.Offset;
+                byte level = agent.Level;
+                int sp_len = agent.Length;
+                bool rtl = agent.IsRightToLeft;
+
+                if (rtl)
+                {
+                    //temp fix
+                    visitor.AddWordBreak_AndSetCurrentIndex(startAt + sp_len, WordKind.Text);
+                }
+                else
+                {
+                    //use other engine
+                    break;
+                }
+                //iter each run-span
+                //string tt = new string(buffer, offset, len);
+                //System.Diagnostics.Debug.WriteLine(tt);
+            }
+
+            if (visitor.CurrentIndex == startAt + len)
+            {
+                visitor.State = VisitorState.End;
+            }
+            else
+            {
+                //continue to other parser
+                visitor.State = VisitorState.OutOfRangeChar;
+            }
+        }
         internal override void BreakWord(WordVisitor visitor, char[] charBuff, int startAt, int len)
         {
             //use custom parsing

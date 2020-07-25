@@ -54,40 +54,65 @@ namespace Typography.Text
             _p.Typeface = typeface;
             _p.FontSizeInPoints = font.SizeInPoints;
 
-
             _fmtGlyphPlanList.Clear();
-
-            char[] rawBuffer = textBufferSpan.GetRawCharBuffer();
-
-            _p.PrepareFormattedStringList(rawBuffer, textBufferSpan.start, textBufferSpan.len, _fmtGlyphPlanList);
-
             _isSurrogates.Clear();
-            for (int i = 0; i < rawBuffer.Length; ++i)
+
+            if (textBufferSpan.IsUtf32Buffer)
             {
-                char c = rawBuffer[i];
-                if (char.IsHighSurrogate(c) && i < rawBuffer.Length - 1)
+                int[] rawBuffer = textBufferSpan.GetRawUtf32Buffer();
+                _p.PrepareFormattedStringList(rawBuffer, textBufferSpan.start, textBufferSpan.len, _fmtGlyphPlanList);
+
+                for (int i = 0; i < textBufferSpan.len; ++i)
                 {
-                    char c2 = rawBuffer[i + 1];
-                    if (char.IsLowSurrogate(c2))
+                    int c = rawBuffer[i];
+                    //
+                    char upper = (char)(c >> 16);
+                    char lower = (char)c;
+                    if (char.IsHighSurrogate(upper) && char.IsLowSurrogate(lower))
                     {
                         _isSurrogates.Append(true);
-                        _isSurrogates.Append(true);
-                        ++i;
                     }
                     else
                     {
-                        throw new NotSupportedException();
+                        _isSurrogates.Append(false);
                     }
-                }
-                else if (char.IsLowSurrogate(c))
-                {
-                    throw new NotSupportedException();
-                }
-                else
-                {
-                    _isSurrogates.Append(false);
+
                 }
             }
+            else
+            {
+                char[] rawBuffer = textBufferSpan.GetRawUtf16Buffer();
+                _p.PrepareFormattedStringList(rawBuffer, textBufferSpan.start, textBufferSpan.len, _fmtGlyphPlanList);
+
+                for (int i = 0; i < rawBuffer.Length; ++i)
+                {
+                    char c = rawBuffer[i];
+                    if (char.IsHighSurrogate(c) && i < rawBuffer.Length - 1)
+                    {
+                        char c2 = rawBuffer[i + 1];
+                        if (char.IsLowSurrogate(c2))
+                        {
+                            _isSurrogates.Append(true);
+                            _isSurrogates.Append(true);
+                            ++i;
+                        }
+                        else
+                        {
+                            throw new NotSupportedException();
+                        }
+                    }
+                    else if (char.IsLowSurrogate(c))
+                    {
+                        throw new NotSupportedException();
+                    }
+                    else
+                    {
+                        _isSurrogates.Append(false);
+                    }
+                }
+            }
+
+
             //---------
 
 
@@ -179,7 +204,11 @@ namespace Typography.Text
             }
 
         }
-
+        public void PrepareFormattedStringList(int[] textBuffer, int startAt, int len, FormattedGlyphPlanSeqProvider fmtGlyphs)
+        {
+            _p.PrepareFormattedStringList(textBuffer, startAt, len, fmtGlyphs);
+            fmtGlyphs.IsRightToLeftDirection = _p.NeedRightToLeftArr;
+        }
         public void PrepareFormattedStringList(char[] textBuffer, int startAt, int len, FormattedGlyphPlanSeqProvider fmtGlyphs)
         {
             _p.PrepareFormattedStringList(textBuffer, startAt, len, fmtGlyphs);
@@ -253,7 +282,7 @@ namespace Typography.Text
             Typeface typeface = font.Typeface;
             _p.Typeface = typeface;
             _p.FontSizeInPoints = font.SizeInPoints;
-            var bufferSpan = new Typography.Text.TextBufferSpan(textBufferSpan.GetRawCharBuffer(), textBufferSpan.start, textBufferSpan.len);
+            var bufferSpan = new Typography.Text.TextBufferSpan(textBufferSpan.GetRawUtf16Buffer(), textBufferSpan.start, textBufferSpan.len);
 
             _measureResult.Reset();
             _p.MeasureString(bufferSpan, _measureResult);
@@ -286,7 +315,7 @@ namespace Typography.Text
         {
             //a text buffer span is separated into multiple line segment list  
             _p.BreakToLineSegments(
-                textBufferSpan.GetRawCharBuffer(),
+                textBufferSpan.GetRawUtf16Buffer(),
                 textBufferSpan.start,
                 textBufferSpan.len,
                 wordVisitor);

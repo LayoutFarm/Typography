@@ -40,13 +40,33 @@ namespace Typography.Text
 
         public bool HasSomeRuns => _sb.Length > 0;
 
-        public void AppendData(char[] buffer, int start, int len) => _sb.Append(buffer, start, len);
-
+        public void AppendData(char[] buffer, int start, int len)
+        {
+            _sb.Append(buffer, start, len);
+        }
+        public void AppendData(int[] buffer, int start, int len)
+        {
+            int end = start + len;
+            for (int i = start; i < end; ++i)
+            {
+                int d = buffer[i];
+                char upper = (char)(d >> 16);
+                char lower = (char)d;
+                if (upper > 0)
+                {
+                    _sb.Append(upper);
+                }
+                _sb.Append(lower);
+            }
+        }
         public void Clear() => _sb.Length = 0;
 
         public int Length => _sb.Length;
 
-        public void CopyTo(char[] charBuffer) => _sb.CopyTo(0, charBuffer, 0, _sb.Length);
+        public void CopyTo(char[] charBuffer)
+        {
+            _sb.CopyTo(0, charBuffer, 0, _sb.Length);
+        }
 
         [ThreadStatic]
         static ArrayList<char> s_tempBuffer;
@@ -70,7 +90,9 @@ namespace Typography.Text
     /// </summary>
     public class CharSource
     {
-        readonly ArrayList<char> _arrList = new ArrayList<char>();
+        //readonly ArrayList<char> _arrList = new ArrayList<char>();
+        readonly ArrayList<int> _arrList = new ArrayList<int>();
+
 #if DEBUG
         public CharSource()
         {
@@ -85,6 +107,8 @@ namespace Typography.Text
         /// <param name="len"></param>
         internal void WriteTo(TextCopyBuffer sb, int offset, int len)
         {
+            //convert utf32 to utf16 
+
             sb.AppendData(_arrList.UnsafeInternalArray, offset, len);
         }
         internal void Copy(int srcStart, int srcLen, char[] outputArr, int outputStart)
@@ -96,6 +120,11 @@ namespace Typography.Text
         {
             //append data from another charspan
             _arrList.Append(charSpan.UnsafeInternalCharArr, charSpan.beginAt, charSpan.len);
+
+        }
+        public void Append(int c)
+        {
+            _arrList.Append((char)c);
         }
         public void Append(char c)
         {
@@ -109,10 +138,18 @@ namespace Typography.Text
             _arrList.Append(c);
             return new CharBufferSegment(this, s, 1);
         }
+        public CharBufferSegment NewSpan(int c)
+        {
+            char c1 = (char)c;
+            int s = _arrList.Count;
+            _arrList.Append(c1);
+
+            return new CharBufferSegment(this, s, 1);
+        }
         public CharBufferSegment NewSpan(char[] charBuffer)
         {
             int s = _arrList.Count;
-            _arrList.Append(charBuffer);
+            //_arrList.Append(charBuffer);
             return new CharBufferSegment(this, s, charBuffer.Length);
         }
         public CharBufferSegment NewSpan(string str)
@@ -128,7 +165,7 @@ namespace Typography.Text
         }
 
         public int LatestLen => _arrList.Count;
-        internal char[] UnsafeInternalArray => _arrList.UnsafeInternalArray;
+        internal int[] UnsafeInternalArray => _arrList.UnsafeInternalArray;
     }
 
 
@@ -144,7 +181,7 @@ namespace Typography.Text
             this.len = len;
         }
         public int Count => len;
-        public char[] UnsafeInternalCharArr => _charSource.UnsafeInternalArray;
+        public int[] UnsafeInternalCharArr => _charSource.UnsafeInternalArray;
         public CharSource UnsafeInternalCharSource => _charSource;
 
 
@@ -189,7 +226,9 @@ namespace Typography.Text
 #if DEBUG
         public string dbugGetString()
         {
-            return new string(UnsafeInternalCharArr, beginAt, len);
+            //convert internal utf32 to string
+            return "";
+            //return new string(UnsafeInternalCharArr, beginAt, len);
         }
         public override string ToString()
         {
@@ -210,12 +249,16 @@ namespace Typography.Text
             this.len = len;
         }
         public int Count => len;
-        public char[] UnsafeInternalCharArr => _charSource.UnsafeInternalArray;
+        public int[] UnsafeInternalCharArr => _charSource.UnsafeInternalArray;
         public CharSource UnsafeInternalCharSource => _charSource;
 
         public Typography.Text.TextBufferSpan GetTextBufferSpan() => new Typography.Text.TextBufferSpan(UnsafeInternalCharArr, beginAt, len);
 
-        public char GetUtf16Char(int index)
+        public int GetUtf16Char(int index)
+        {
+            return _charSource.UnsafeInternalArray[beginAt + index];
+        }
+        public int GetUtf32Char(int index)
         {
             return _charSource.UnsafeInternalArray[beginAt + index];
         }
@@ -260,7 +303,8 @@ namespace Typography.Text
 #if DEBUG
         public string dbugGetString()
         {
-            return new string(UnsafeInternalCharArr, beginAt, len);
+            //TODO: review here again
+            return "";
         }
         public override string ToString()
         {
