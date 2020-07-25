@@ -314,11 +314,24 @@ namespace Typography.Text
         public void BreakToLineSegments(in TextBufferSpan textBufferSpan, WordVisitor wordVisitor)
         {
             //a text buffer span is separated into multiple line segment list  
-            _p.BreakToLineSegments(
-                textBufferSpan.GetRawUtf16Buffer(),
-                textBufferSpan.start,
-                textBufferSpan.len,
-                wordVisitor);
+            if (textBufferSpan.IsUtf32Buffer)
+            {
+                _p.BreakToLineSegments(
+                    textBufferSpan.GetRawUtf32Buffer(),
+                    textBufferSpan.start,
+                    textBufferSpan.len,
+                    wordVisitor);
+            }
+            else
+            {
+                _p.BreakToLineSegments(
+                  textBufferSpan.GetRawUtf16Buffer(),
+                  textBufferSpan.start,
+                  textBufferSpan.len,
+                  wordVisitor);
+
+            }
+
         }
         public ResolvedFont ResolveFont(RequestFont reqFont) => _openFontTextService.ResolveFont(reqFont);
         public bool TryGetAlternativeTypefaceFromCodepoint(int codepoint, AltTypefaceSelectorBase selector, out Typeface found) => _openFontTextService.TryGetAlternativeTypefaceFromCodepoint(codepoint, selector, out found);

@@ -175,8 +175,14 @@ namespace Typography.TextBreak
                 _endAt = 0;
                 return;
             }
+
+
             _endAt = startAt + len;
             _visitor.LoadText(charBuff, startAt, len);
+
+            InputReader reader = new InputReader(charBuff, startAt, len);
+
+
             BreakingEngine currentEngine = _breakingEngine = (UseUnicodeRangeBreaker) ? _engBreakingEngine : SelectEngine(charBuff[startAt]);
             //----------------------------------------
             //select breaking engine
@@ -185,6 +191,8 @@ namespace Typography.TextBreak
             for (; ; )
             {
                 //----------------------------------------
+                _engBreakingEngine.DoBreak(_visitor, ref reader);
+
                 currentEngine.BreakWord(_visitor, charBuff, startAt, endAt - startAt); //please note that len is decreasing
                 switch (_visitor.State)
                 {
