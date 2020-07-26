@@ -32,9 +32,9 @@ namespace Typography.TextBreak
     }
 
     public abstract class WordVisitor
-    { 
-        int _endIndex; 
-        int _latestBreakAt; 
+    {
+        int _endIndex;
+        int _latestBreakAt;
         InputReader _inputReader;
 
         readonly Stack<int> _tempCandidateBreaks = new Stack<int>();
@@ -106,7 +106,13 @@ namespace Typography.TextBreak
             LatestSpanStartAt = _latestBreakAt;
             LatestWordKind = wordKind;
 
+
             _latestBreakAt = index;//**
+
+            //if (_latestBreakAt == 243)
+            //{
+
+            //}
 
             OnBreak();
 
@@ -143,7 +149,7 @@ namespace Typography.TextBreak
             }
             else
             {
-
+                _inputReader.SetCurrentIndex(_endIndex);
                 //can't read next
                 //the set state= end
                 this.State = VisitorState.End;

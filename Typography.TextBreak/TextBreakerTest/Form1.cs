@@ -54,7 +54,8 @@ namespace TextBreakerTest
 
             string test3 = "👩🏾‍👨🏾‍👧🏾‍👶🏾";
 
-            this.textBox1.Text = test3 + " " + test3;
+            //this.textBox1.Text = test3 + " " + test3;
+            this.textBox1.Text = test1;
 
             //this.textBox1.Text = test1 + test2;
             //this.textBox1.Text = test2;
@@ -124,17 +125,21 @@ namespace TextBreakerTest
             breaker1.BreakNumberAfterText = true;
 
 
-
+            List<string> list01 = new List<string>();
             this.listBox1.Items.Clear();
             breaker1.SetNewBreakHandler(vis =>
             {
                 BreakSpan span = vis.GetBreakSpan();
                 string s = new string(inputBuffer, span.startAt, span.len);
                 this.listBox1.Items.Add(span.startAt + " " + s);
-
+                list01.Add(s);
             });
 
-            breaker1.BreakWords(inputBuffer, 0, inputBuffer.Length);
+
+            //experiment convert to utf32
+            int[] utf32Buffer = ConvertToUtf32(inputBuffer);
+            breaker1.BreakWords(utf32Buffer, 0, utf32Buffer.Length);
+            //breaker1.BreakWords(inputBuffer, 0, inputBuffer.Length);
 
             //foreach (BreakSpan span in breaker1.GetBreakSpanIter())
             //{
@@ -142,6 +147,34 @@ namespace TextBreakerTest
             //    this.listBox1.Items.Add(span.startAt + " " + s);
             //}
         }
+
+        static int[] ConvertToUtf32(char[] buffer)
+        {
+            List<int> output = new List<int>();
+            for (int i = 0; i < buffer.Length; ++i)
+            {
+                char c0 = buffer[i];
+                if (char.IsHighSurrogate(c0))
+                {
+                    if (i < buffer.Length - 1)
+                    {
+                        output.Add(char.ConvertToUtf32(c0, buffer[i + 1]));
+                        i++;
+                    }
+                    else
+                    {
+                        output.Add(c0);
+                    }
+                }
+                else
+                {
+                    output.Add(c0);
+                }
+            }
+            return output.ToArray();
+        }
+
+
         private void cmdManaged_Click(object sender, EventArgs e)
         {
             InitNewCustomTextBreakerAndBreakWords(this.textBox1.Text.ToCharArray());

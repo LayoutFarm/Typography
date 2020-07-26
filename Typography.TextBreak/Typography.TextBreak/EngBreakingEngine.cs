@@ -184,6 +184,11 @@ namespace Typography.TextBreak
                     }
                 }
             }
+            else
+            {
+                _c0 = '\0';
+                _c1 = '\0';
+            }
         }
 
         public bool Read()
