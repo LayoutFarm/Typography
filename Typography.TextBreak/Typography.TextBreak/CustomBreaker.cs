@@ -190,9 +190,7 @@ namespace Typography.TextBreak
 
             for (; ; )
             {
-                //----------------------------------------
-                _engBreakingEngine.DoBreak(_visitor, ref reader);
-
+                
                 currentEngine.BreakWord(_visitor, charBuff, startAt, endAt - startAt); //please note that len is decreasing
                 switch (_visitor.State)
                 {

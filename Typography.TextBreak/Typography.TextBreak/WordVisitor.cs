@@ -97,6 +97,7 @@ namespace Typography.TextBreak
             _startIndex = _currentIndex = index;
             _latestBreakAt = LatestSpanStartAt = _startIndex;
 
+
             _currentChar = buffer[_currentIndex];
             _tempCandidateBreaks.Clear();
         }
