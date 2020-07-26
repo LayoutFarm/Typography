@@ -101,7 +101,7 @@ namespace TextBreakerTest
 
         }
 
-        void InitNewCustomTextBreakerAndBreakWords(char[] inputBuffer)
+        void InitNewCustomTextBreakerAndBreakWords(char[] utf16Buffer)
         {
             //---------------------------
             //we don't have to create a new text breaker everytime.
@@ -130,16 +130,16 @@ namespace TextBreakerTest
             breaker1.SetNewBreakHandler(vis =>
             {
                 BreakSpan span = vis.GetBreakSpan();
-                string s = new string(inputBuffer, span.startAt, span.len);
+                string s = new string(utf16Buffer, span.startAt, span.len);
                 this.listBox1.Items.Add(span.startAt + " " + s);
                 list01.Add(s);
             });
 
 
             //experiment convert to utf32
-            int[] utf32Buffer = ConvertToUtf32(inputBuffer);
-            breaker1.BreakWords(utf32Buffer, 0, utf32Buffer.Length);
-            //breaker1.BreakWords(inputBuffer, 0, inputBuffer.Length);
+            int[] utf32Buffer = ConvertToUtf32(utf16Buffer);
+            //breaker1.BreakWords(utf32Buffer, 0, utf32Buffer.Length);
+            breaker1.BreakWords(utf16Buffer, 0, utf16Buffer.Length);
 
             //foreach (BreakSpan span in breaker1.GetBreakSpanIter())
             //{
