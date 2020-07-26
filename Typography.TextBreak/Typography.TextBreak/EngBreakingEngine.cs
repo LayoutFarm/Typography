@@ -17,7 +17,7 @@ namespace Typography.TextBreak
         ConsecutiveSurrogatePairsAndJoiner
     }
 
-    struct InputReader
+    public struct InputReader
     {
         readonly char[] _utf16Buffer;
         readonly int[] _utf32Buffer;
@@ -44,6 +44,8 @@ namespace Typography.TextBreak
             ReadCurrentIndex();
         }
 
+      
+         
         public InputReader(int[] input, int start, int len)
         {
             _utf16Buffer = null;
@@ -56,6 +58,8 @@ namespace Typography.TextBreak
             _inc = 0;
             ReadCurrentIndex();
         }
+        public int StartAt => _start;
+
         public int Length => _len;
         public int Index => _index;
         public bool HasNext => _index >= _end;
@@ -274,6 +278,10 @@ namespace Typography.TextBreak
             DoBreak(visitor);
         }
         internal override void BreakWord(WordVisitor visitor, char[] charBuff, int startAt, int len)
+        {
+            DoBreak(visitor);
+        }
+        internal override void BreakWord(WordVisitor visitor, ref InputReader reader)
         {
             DoBreak(visitor);
         }

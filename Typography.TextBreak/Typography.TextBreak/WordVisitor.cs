@@ -72,17 +72,13 @@ namespace Typography.TextBreak
 
         //
         public bool IsEnd => _inputReader.IsEnd;
+
         internal bool Read() => _inputReader.Read();
         internal char C0 => _inputReader.C0;
         internal char C1 => _inputReader.C1;
         internal char PeekNext() => _inputReader.PeekNext();
         internal void PauseNextRead() => _inputReader.PauseNextRead();
-
-        //public string CopyCurrentSpanString()
-        //{
-        //    return new string(_utf16Buffer, LatestSpanStartAt, LatestSpanLen);
-        //}
-
+         
 #if DEBUG
         //int dbugAddSteps;
 #endif

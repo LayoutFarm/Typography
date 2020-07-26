@@ -1,6 +1,7 @@
 ﻿//MIT, 2016-present, WinterDev
 //some code from ICU project with BSD license
 
+using System.Collections.Generic;
 using System.Text;
 using Typography.OpenFont;
 using Typography.TextBreak.SheenBidi;
@@ -105,6 +106,83 @@ namespace Typography.TextBreak
                 }
             }
 
+            _runAdapter.LoadLine(line1);
+
+            while (_runAdapter.MoveNext())
+            {
+                int offset = agent.Offset;
+                byte level = agent.Level;
+                int sp_len = agent.Length;
+                bool rtl = agent.IsRightToLeft;
+
+                if (rtl)
+                {
+                    //temp fix
+                    visitor.AddWordBreak_AndSetCurrentIndex(startAt + sp_len, WordKind.Text);
+                }
+                else
+                {
+                    //use other engine
+                    break;
+                }
+                //iter each run-span
+                //string tt = new string(buffer, offset, len);
+                //System.Diagnostics.Debug.WriteLine(tt);
+            }
+
+            if (visitor.CurrentIndex == startAt + len)
+            {
+                visitor.State = VisitorState.End;
+            }
+            else
+            {
+                //continue to other parser
+                visitor.State = VisitorState.OutOfRangeChar;
+            }
+        }
+
+
+        readonly List<char> _arabicBuffer = new List<char>();
+        internal override void BreakWord(WordVisitor visitor, ref InputReader reader)
+        {
+            //collect arabic char and break
+            int startAt = reader.StartAt;
+            int len = reader.Length;
+
+            int arabic_len = 0;
+            int lim = startAt + len;
+
+            SpanBreakInfo latest_ar = null;
+            _arabicBuffer.Clear();
+
+            for (int i = startAt; i < lim; ++i)
+            {
+                char c = reader.C0;
+                if (IsArabicChar(c, out SpanBreakInfo spBreak))
+                {
+                    arabic_len++;
+                    _arabicBuffer.Add(c);
+                    latest_ar = spBreak;
+                    reader.Read();//read next
+                }
+                else
+                {
+                    break;
+                }
+            }
+            //
+            if (arabic_len == 0)
+            {
+                visitor.State = VisitorState.OutOfRangeChar;
+                return;
+            }
+            //----------------
+            visitor.SpanBreakInfo = latest_ar;
+
+            //only collect char
+
+            RunAgent agent = _runAdapter.Agent;
+            Line line1 = new Line(new string(_arabicBuffer.ToArray()));
             _runAdapter.LoadLine(line1);
 
             while (_runAdapter.MoveNext())
