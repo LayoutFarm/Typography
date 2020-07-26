@@ -52,118 +52,117 @@ namespace Typography.TextBreak
 
         readonly RunAdapter _runAdapter = new RunAdapter();
 
-        internal override void BreakWord(WordVisitor visitor, int[] charBuff, int startAt, int len)
-        {
-            //input is in utf32 buffer
+        //internal override void BreakWord(WordVisitor visitor, int[] charBuff, int startAt, int len)
+        //{
+        //    //input is in utf32 buffer
 
-            visitor.State = VisitorState.Parsing;
-            RunAgent agent = _runAdapter.Agent;
+        //    visitor.State = VisitorState.Parsing;
+        //    RunAgent agent = _runAdapter.Agent;
 
-            //collect arabic char and break
+        //    //collect arabic char and break
 
-            int arabic_len = 0;
-            int lim = startAt + len;
+        //    int arabic_len = 0;
+        //    int lim = startAt + len;
 
-            SpanBreakInfo latest_ar = null;
-            for (int i = startAt; i < lim; ++i)
-            {
-                int c = charBuff[i];
-                char lower = (char)c;
-                if (IsArabicChar(lower, out SpanBreakInfo spBreak))
-                {
-                    arabic_len++;
-                    latest_ar = spBreak;
-                }
-                else
-                {
-                    break;
-                }
-            }
-            //
-            if (arabic_len == 0)
-            {
-                visitor.State = VisitorState.OutOfRangeChar;
-                return;
-            }
+        //    SpanBreakInfo latest_ar = null;
+        //    for (int i = startAt; i < lim; ++i)
+        //    {
+        //        int c = charBuff[i];
+        //        char lower = (char)c;
+        //        if (IsArabicChar(lower, out SpanBreakInfo spBreak))
+        //        {
+        //            arabic_len++;
+        //            latest_ar = spBreak;
+        //        }
+        //        else
+        //        {
+        //            break;
+        //        }
+        //    }
+        //    //
+        //    if (arabic_len == 0)
+        //    {
+        //        visitor.State = VisitorState.OutOfRangeChar;
+        //        return;
+        //    }
 
 
-            visitor.SpanBreakInfo = latest_ar;
+        //    visitor.SpanBreakInfo = latest_ar;
 
-            //only collect char
-            Line line1;
-            unsafe
-            {
+        //    //only collect char
+        //    Line line1;
+        //    unsafe
+        //    {
 
-                fixed (int* buffer_head = &charBuff[0])
-                {
-                    byte* buffer_h1 = (byte*)buffer_head;
-                    char[] buff = new char[charBuff.Length * 2];
-                    fixed (char* output1 = &buff[0])
-                    {
-                        int output_len = Encoding.UTF32.GetChars(buffer_h1, charBuff.Length * 4, output1, buff.Length);
-                        line1 = new Line(new string(output1, 0, output_len));
-                    }
-                }
-            }
+        //        fixed (int* buffer_head = &charBuff[0])
+        //        {
+        //            byte* buffer_h1 = (byte*)buffer_head;
+        //            char[] buff = new char[charBuff.Length * 2];
+        //            fixed (char* output1 = &buff[0])
+        //            {
+        //                int output_len = Encoding.UTF32.GetChars(buffer_h1, charBuff.Length * 4, output1, buff.Length);
+        //                line1 = new Line(new string(output1, 0, output_len));
+        //            }
+        //        }
+        //    }
 
-            _runAdapter.LoadLine(line1);
+        //    _runAdapter.LoadLine(line1);
 
-            while (_runAdapter.MoveNext())
-            {
-                int offset = agent.Offset;
-                byte level = agent.Level;
-                int sp_len = agent.Length;
-                bool rtl = agent.IsRightToLeft;
+        //    while (_runAdapter.MoveNext())
+        //    {
+        //        int offset = agent.Offset;
+        //        byte level = agent.Level;
+        //        int sp_len = agent.Length;
+        //        bool rtl = agent.IsRightToLeft;
 
-                if (rtl)
-                {
-                    //temp fix
-                    visitor.AddWordBreak_AndSetCurrentIndex(startAt + sp_len, WordKind.Text);
-                }
-                else
-                {
-                    //use other engine
-                    break;
-                }
-                //iter each run-span
-                //string tt = new string(buffer, offset, len);
-                //System.Diagnostics.Debug.WriteLine(tt);
-            }
+        //        if (rtl)
+        //        {
+        //            //temp fix
+        //            visitor.AddWordBreak_AndSetCurrentIndex(startAt + sp_len, WordKind.Text);
+        //        }
+        //        else
+        //        {
+        //            //use other engine
+        //            break;
+        //        }
+        //        //iter each run-span
+        //        //string tt = new string(buffer, offset, len);
+        //        //System.Diagnostics.Debug.WriteLine(tt);
+        //    }
 
-            if (visitor.CurrentIndex == startAt + len)
-            {
-                visitor.State = VisitorState.End;
-            }
-            else
-            {
-                //continue to other parser
-                visitor.State = VisitorState.OutOfRangeChar;
-            }
-        }
+        //    if (visitor.CurrentIndex == startAt + len)
+        //    {
+        //        visitor.State = VisitorState.End;
+        //    }
+        //    else
+        //    {
+        //        //continue to other parser
+        //        visitor.State = VisitorState.OutOfRangeChar;
+        //    }
+        //}
 
 
         readonly List<char> _arabicBuffer = new List<char>();
-        internal override void BreakWord(WordVisitor visitor, ref InputReader reader)
+        internal override void BreakWord(WordVisitor visitor)
         {
             //collect arabic char and break
-            int startAt = reader.StartAt;
-            int len = reader.Length;
+
 
             int arabic_len = 0;
-            int lim = startAt + len;
+            int startAt = 0;//temp fix
 
             SpanBreakInfo latest_ar = null;
             _arabicBuffer.Clear();
 
-            for (int i = startAt; i < lim; ++i)
+            for (; !visitor.IsEnd;)
             {
-                char c = reader.C0;
+                char c = visitor.C0;
                 if (IsArabicChar(c, out SpanBreakInfo spBreak))
                 {
                     arabic_len++;
                     _arabicBuffer.Add(c);
                     latest_ar = spBreak;
-                    reader.Read();//read next
+                    visitor.Read();//read next
                 }
                 else
                 {
@@ -207,7 +206,7 @@ namespace Typography.TextBreak
                 //System.Diagnostics.Debug.WriteLine(tt);
             }
 
-            if (visitor.CurrentIndex == startAt + len)
+            if (visitor.IsEnd)
             {
                 visitor.State = VisitorState.End;
             }
@@ -217,78 +216,78 @@ namespace Typography.TextBreak
                 visitor.State = VisitorState.OutOfRangeChar;
             }
         }
-        internal override void BreakWord(WordVisitor visitor, char[] charBuff, int startAt, int len)
-        {
-            //use custom parsing
+        //internal override void BreakWord(WordVisitor visitor, char[] charBuff, int startAt, int len)
+        //{
+        //    //use custom parsing
 
-            visitor.State = VisitorState.Parsing;
-            RunAgent agent = _runAdapter.Agent;
+        //    visitor.State = VisitorState.Parsing;
+        //    RunAgent agent = _runAdapter.Agent;
 
-            //collect arabic char and break
+        //    //collect arabic char and break
 
-            int arabic_len = 0;
-            int lim = startAt + len;
+        //    int arabic_len = 0;
+        //    int lim = startAt + len;
 
-            SpanBreakInfo latest_ar = null;
-            for (int i = startAt; i < lim; ++i)
-            {
-                char c = charBuff[i];
-                if (IsArabicChar(c, out SpanBreakInfo spBreak))
-                {
-                    arabic_len++;
-                    latest_ar = spBreak;
-                }
-                else
-                {
-                    break;
-                }
-            }
-            //
-            if (arabic_len == 0)
-            {
-                visitor.State = VisitorState.OutOfRangeChar;
-                return;
-            }
+        //    SpanBreakInfo latest_ar = null;
+        //    for (int i = startAt; i < lim; ++i)
+        //    {
+        //        char c = charBuff[i];
+        //        if (IsArabicChar(c, out SpanBreakInfo spBreak))
+        //        {
+        //            arabic_len++;
+        //            latest_ar = spBreak;
+        //        }
+        //        else
+        //        {
+        //            break;
+        //        }
+        //    }
+        //    //
+        //    if (arabic_len == 0)
+        //    {
+        //        visitor.State = VisitorState.OutOfRangeChar;
+        //        return;
+        //    }
 
 
-            visitor.SpanBreakInfo = latest_ar;
+        //    visitor.SpanBreakInfo = latest_ar;
 
-            //only collect char
-            Line line1 = new Line(new string(charBuff, startAt, arabic_len));
-            _runAdapter.LoadLine(line1);
+        //    //only collect char
+        //    Line line1 = new Line(new string(charBuff, startAt, arabic_len));
+        //    _runAdapter.LoadLine(line1);
 
-            while (_runAdapter.MoveNext())
-            {
-                int offset = agent.Offset;
-                byte level = agent.Level;
-                int sp_len = agent.Length;
-                bool rtl = agent.IsRightToLeft;
+        //    while (_runAdapter.MoveNext())
+        //    {
+        //        int offset = agent.Offset;
+        //        byte level = agent.Level;
+        //        int sp_len = agent.Length;
+        //        bool rtl = agent.IsRightToLeft;
 
-                if (rtl)
-                {
-                    //temp fix
-                    visitor.AddWordBreak_AndSetCurrentIndex(startAt + sp_len, WordKind.Text);
-                }
-                else
-                {
-                    //use other engine
-                    break;
-                }
-                //iter each run-span
-                //string tt = new string(buffer, offset, len);
-                //System.Diagnostics.Debug.WriteLine(tt);
-            }
+        //        if (rtl)
+        //        {
+        //            //temp fix
+        //            visitor.AddWordBreak_AndSetCurrentIndex(startAt + sp_len, WordKind.Text);
+        //        }
+        //        else
+        //        {
+        //            //use other engine
+        //            break;
+        //        }
+        //        //iter each run-span
+        //        //string tt = new string(buffer, offset, len);
+        //        //System.Diagnostics.Debug.WriteLine(tt);
+        //    }
 
-            if (visitor.CurrentIndex == startAt + len)
-            {
-                visitor.State = VisitorState.End;
-            }
-            else
-            {
-                //continue to other parser
-                visitor.State = VisitorState.OutOfRangeChar;
-            }
+        //    if (visitor.CurrentIndex == startAt + len)
+        //    {
+        //        visitor.State = VisitorState.End;
+        //    }
+        //    else
+        //    {
+        //        //continue to other parser
+        //        visitor.State = VisitorState.OutOfRangeChar;
+        //    }
 
-        }
+        //}
     }
 }

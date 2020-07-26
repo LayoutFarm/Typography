@@ -69,8 +69,9 @@ namespace Typography.TextBreak
         public int CurrentIndex => _inputReader.Index;
         //
         public char Char => _inputReader.C0;
+        public int StartIndex => _inputReader.StartAt;
+        internal int EndIndex => _endIndex;
 
-        //
         public bool IsEnd => _inputReader.IsEnd;
 
         internal bool Read() => _inputReader.Read();
@@ -78,7 +79,7 @@ namespace Typography.TextBreak
         internal char C1 => _inputReader.C1;
         internal char PeekNext() => _inputReader.PeekNext();
         internal void PauseNextRead() => _inputReader.PauseNextRead();
-         
+
 #if DEBUG
         //int dbugAddSteps;
 #endif

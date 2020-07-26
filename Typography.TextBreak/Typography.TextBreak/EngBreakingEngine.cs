@@ -21,9 +21,9 @@ namespace Typography.TextBreak
     {
         readonly char[] _utf16Buffer;
         readonly int[] _utf32Buffer;
-        readonly int _start;
-        readonly int _len;
-        readonly int _end;
+        int _start;
+        int _len;
+        int _end;
         int _index;
         int _inc;
 
@@ -44,12 +44,20 @@ namespace Typography.TextBreak
             ReadCurrentIndex();
         }
 
-      
-         
         public InputReader(int[] input, int start, int len)
         {
             _utf16Buffer = null;
             _utf32Buffer = input;
+            _start = start;
+            _len = len;
+            _index = start;
+            _end = start + len;
+            _c0 = _c1 = '\0';
+            _inc = 0;
+            ReadCurrentIndex();
+        }
+        public void SetNewReadingRange(int start, int len)
+        {
             _start = start;
             _len = len;
             _index = start;
@@ -273,15 +281,15 @@ namespace Typography.TextBreak
         public EngBreakingEngine()
         {
         }
-        internal override void BreakWord(WordVisitor visitor, int[] charBuff, int startAt, int len)
-        {
-            DoBreak(visitor);
-        }
-        internal override void BreakWord(WordVisitor visitor, char[] charBuff, int startAt, int len)
-        {
-            DoBreak(visitor);
-        }
-        internal override void BreakWord(WordVisitor visitor, ref InputReader reader)
+        //internal override void BreakWord(WordVisitor visitor, int[] charBuff, int startAt, int len)
+        //{
+        //    DoBreak(visitor);
+        //}
+        //internal override void BreakWord(WordVisitor visitor, char[] charBuff, int startAt, int len)
+        //{
+        //    DoBreak(visitor);
+        //}
+        internal override void BreakWord(WordVisitor visitor)
         {
             DoBreak(visitor);
         }
