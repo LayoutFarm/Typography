@@ -13,13 +13,13 @@
 // warranty, and with no claim as to its suitability for any purpose.
 //
 //----------------------------------------------------------------------------
- 
+
 
 
 using PixelFarm.CpuBlit;
 namespace PixelFarm.Drawing
 {
-   
+
 
     public enum TargetBuffer
     {
@@ -36,7 +36,6 @@ namespace PixelFarm.Drawing
         //1. AggPainter 
         //2. GdiPlusPainter 
         //3. GLPainter
-
 
         public abstract float OriginX { get; }
         public abstract float OriginY { get; }
@@ -112,18 +111,22 @@ namespace PixelFarm.Drawing
 
 
         public abstract RenderVx CreateRenderVx(VertexStore vxs);
-        public abstract RenderVxFormattedString CreateRenderVx(string textspan);
-        public abstract RenderVxFormattedString CreateRenderVx(char[] textspanBuff, int startAt, int len);
         public abstract void FillRenderVx(Brush brush, RenderVx renderVx);
         public abstract void FillRenderVx(RenderVx renderVx);
         public abstract void DrawRenderVx(RenderVx renderVx);
         public abstract void Render(RenderVx renderVx);
 
         //////////////////////////////////////////////////////////////////////////////
+        
+        public abstract RenderVxFormattedString CreateRenderVx(IFormattedGlyphPlanList formattedGlyphPlans);
+        public abstract RenderVxFormattedString CreateRenderVx(string textspan);
+        public abstract RenderVxFormattedString CreateRenderVx(char[] textspanBuff, int startAt, int len);
+
         //text,string
         //TODO: review text drawing funcs 
 
         public abstract RequestFont CurrentFont { get; set; }
+
         public abstract void DrawString(
            string text,
            double x,
@@ -131,6 +134,11 @@ namespace PixelFarm.Drawing
         public abstract void DrawString(RenderVxFormattedString renderVx, double x, double y);
     }
 
+
+    public interface IFormattedGlyphPlanList
+    {
+
+    }
 
     public interface IDashGenerator
     {

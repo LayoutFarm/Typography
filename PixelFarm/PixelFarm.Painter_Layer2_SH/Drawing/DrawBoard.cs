@@ -194,19 +194,23 @@ namespace PixelFarm.Drawing
         //TODO: review these funcs
         public abstract RequestFont CurrentFont { get; set; }
         public abstract Color CurrentTextColor { get; set; }
-        public abstract void DrawText(char[] buffer, int x, int y);
-        public abstract void DrawText(char[] buffer, Rectangle logicalTextBox, int textAlignment);
-        public abstract void DrawText(char[] buffer, int startAt, int len, Rectangle logicalTextBox, int textAlignment);
+
         public abstract TextDrawingTech TextDrawingTech { get; set; }
         //TODO: review here again
         public abstract Color TextBackgroundColorHint { get; set; }//explicit set current text background color hint
-        
+
+        public abstract void DrawText(char[] buffer, int x, int y);
+        public abstract void DrawText(char[] buffer, Rectangle logicalTextBox, int textAlignment);
+        public abstract void DrawText(char[] buffer, int startAt, int len, Rectangle logicalTextBox, int textAlignment);
+
         /// <summary>
         /// create formatted string base on current font,font-size, font style
         /// </summary>
         /// <param name="buffer"></param>
         /// <returns></returns>
         public abstract RenderVxFormattedString CreateFormattedString(char[] buffer, int startAt, int len, bool delay);
+        public abstract RenderVxFormattedString CreateFormattedString(int[] buffer, int startAt, int len, bool delay);
+
         public abstract void DrawRenderVx(RenderVx renderVx, float x, float y);
         public abstract void Dispose();
         //--
@@ -224,7 +228,6 @@ namespace PixelFarm.Drawing
         public abstract bool IsGpuDrawBoard { get; }
         public abstract void BlitFrom(DrawBoard src, float srcX, float srcY, float srcW, float srcH, float dstX, float dstY);
         public abstract ImageBinder GetInternalBitmapProvider();
-
     }
 
     public enum TextDrawingTech : byte
@@ -245,7 +248,7 @@ namespace PixelFarm.Drawing
 
 
 
-  
+
 
     public enum RenderQuality
     {
@@ -309,15 +312,15 @@ namespace PixelFarm.Drawing
             internal SmoothingModeState(DrawBoard drawBoard, SmoothingMode state)
             {
                 _latestSmoothMode = state;
-                _drawBoard = drawBoard;
+                _drawBoard = drawBoard; 
+
             }
             public void Dispose()
             {
                 _drawBoard.SmoothingMode = _latestSmoothMode;
             }
         }
-        //--------------------------------------------------
-
+        
         public struct StrokeState : System.IDisposable
         {
             readonly DrawBoard _d;

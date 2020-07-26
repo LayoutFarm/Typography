@@ -112,14 +112,16 @@ namespace PixelFarm.Drawing
             EndCodePoint = endCodePoint;
         }
 
-        int _fontKey;
+
+        int _runtimeReqKey; //this value depends on the system (string.GetHashCode())
+
         /// <summary>
         /// get request key
         /// </summary>
         /// <returns></returns>
         public int GetReqKey()
         {
-            if (_fontKey == 0)
+            if (_runtimeReqKey == 0)
             {
                 //calculate request key
                 if (s_stbuilder == null)
@@ -129,17 +131,21 @@ namespace PixelFarm.Drawing
 
                 //create a string iden for this request font
                 s_stbuilder.Length = 0; //clear
-                s_stbuilder.Append(Name.ToUpper()); s_stbuilder.Append(',');
-                s_stbuilder.Append(SizeInPoints.ToString("0.00")); s_stbuilder.Append(',');
-                s_stbuilder.Append((ushort)Style); s_stbuilder.Append(',');
-                s_stbuilder.Append((ushort)WeightClass); s_stbuilder.Append(',');
-                s_stbuilder.Append((ushort)WidthClass); s_stbuilder.Append(',');
-                s_stbuilder.Append((ushort)StartCodePoint); s_stbuilder.Append(',');
-                s_stbuilder.Append((ushort)WeightClass); s_stbuilder.Append(',');
+                //
+                s_stbuilder.Append(Name.ToUpper());
+                s_stbuilder.Append(SizeInPoints.ToString("0.00"));
+                //
 
-                return _fontKey = s_stbuilder.ToString().GetHashCode();
+                int hash = 17;
+                hash = hash * 31 + s_stbuilder.ToString().GetHashCode();
+                hash = hash * 31 + (int)Style;
+                hash = hash * 31 + (int)WeightClass;
+                hash = hash * 31 + (int)WidthClass;
+                hash = hash * 31 + (int)StartCodePoint;
+                return _runtimeReqKey = hash * 31 + (int)EndCodePoint;
+
             }
-            return _fontKey;
+            return _runtimeReqKey;
         }
 
         [ThreadStatic]
@@ -167,11 +173,24 @@ namespace PixelFarm.Drawing
         {
             reqFont._resolvedFont2 = resolvedFont;
         }
+
+        /// <summary>
+        /// get cached resolved-object as specific type
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="reqFont"></param>
+        /// <returns></returns>
         public static T GetResolvedFont1<T>(ReqFontSpec reqFont)
             where T : class
         {
             return reqFont._resolvedFont1 as T;
         }
+        /// <summary>
+        /// get cached resolved-object as specific type
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="reqFont"></param>
+        /// <returns></returns>
         public static T GetResolvedFont2<T>(ReqFontSpec reqFont)
            where T : class
         {

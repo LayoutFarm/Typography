@@ -1347,7 +1347,7 @@ namespace PixelFarm.CpuBlit.Rasterization
         /// <summary>
         /// temporary (forward write) accum buffer
         /// </summary>
-        struct TempForwardAccumBuffer
+        ref struct TempForwardAccumBuffer
         {
             //similar to circular queue.
 

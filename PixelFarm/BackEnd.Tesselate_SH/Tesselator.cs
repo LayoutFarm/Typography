@@ -72,7 +72,7 @@ namespace Tesselate
         internal const double MAX_COORD = 1.0e150;
 
 
-        public struct CombineParameters
+        public ref struct CombineParameters
         {//mutable-struct//
             public int d0, d1, d2, d3;
             public double w0, w1, w2, w3;

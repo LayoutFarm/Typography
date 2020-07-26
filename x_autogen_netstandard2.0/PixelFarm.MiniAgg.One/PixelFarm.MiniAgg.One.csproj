@@ -160,7 +160,6 @@
     <Compile Include="..\..\PixelFarm\PixelFarm.Painter_Layer2_SH\Drawing\Brushes_Pens.cs" Link="PixelFarm\PixelFarm.Painter_Layer2_SH\Drawing\Brushes_Pens.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.Painter_Layer2_SH\Drawing\ClipingTechnique.cs" Link="PixelFarm\PixelFarm.Painter_Layer2_SH\Drawing\ClipingTechnique.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.Painter_Layer2_SH\Drawing\DrawBoard.cs" Link="PixelFarm\PixelFarm.Painter_Layer2_SH\Drawing\DrawBoard.cs" />
-    <Compile Include="..\..\PixelFarm\PixelFarm.Painter_Layer2_SH\Drawing\ITextPrinter.cs" Link="PixelFarm\PixelFarm.Painter_Layer2_SH\Drawing\ITextPrinter.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.Painter_Layer2_SH\Drawing\Painter.cs" Link="PixelFarm\PixelFarm.Painter_Layer2_SH\Drawing\Painter.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.Painter_Layer2_SH\Drawing\TextBaseline.cs" Link="PixelFarm\PixelFarm.Painter_Layer2_SH\Drawing\TextBaseline.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.Painter_Layer2_SH\ForNet20.cs" Link="PixelFarm\PixelFarm.Painter_Layer2_SH\ForNet20.cs" />
@@ -168,8 +167,6 @@
     <Compile Include="..\..\PixelFarm\PixelFarm.Painter_Layer2_SH\_ESS_LINK_WITH_TY\ImageBinder.cs" Link="PixelFarm\PixelFarm.Painter_Layer2_SH\_ESS_LINK_WITH_TY\ImageBinder.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.Painter_Layer2_SH\_ESS_LINK_WITH_TY\LenAndLenUnit.cs" Link="PixelFarm\PixelFarm.Painter_Layer2_SH\_ESS_LINK_WITH_TY\LenAndLenUnit.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.Painter_Layer2_SH\_ESS_LINK_WITH_TY\RequestFont.cs" Link="PixelFarm\PixelFarm.Painter_Layer2_SH\_ESS_LINK_WITH_TY\RequestFont.cs" />
-    <Compile Include="..\..\PixelFarm\PixelFarm.Painter_Layer2_SH\_ESS_LINK_WITH_TY\TextBufferSpan.cs" Link="PixelFarm\PixelFarm.Painter_Layer2_SH\_ESS_LINK_WITH_TY\TextBufferSpan.cs" />
-    <Compile Include="..\..\PixelFarm\PixelFarm.Painter_Layer2_SH\_ESS_LINK_WITH_TY\TextSpanMeasureResult.cs" Link="PixelFarm\PixelFarm.Painter_Layer2_SH\_ESS_LINK_WITH_TY\TextSpanMeasureResult.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.Vectors_SH\1_VectorMaths\AggMath.cs" Link="PixelFarm\PixelFarm.Vectors_SH\1_VectorMaths\AggMath.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.Vectors_SH\1_VectorMaths\AxisAlignedBoundingBox.cs" Link="PixelFarm\PixelFarm.Vectors_SH\1_VectorMaths\AxisAlignedBoundingBox.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.Vectors_SH\1_VectorMaths\BezierCurve.cs" Link="PixelFarm\PixelFarm.Vectors_SH\1_VectorMaths\BezierCurve.cs" />

@@ -25,7 +25,8 @@ namespace PixelFarm.CpuBlit.VertexProcessing
 
     public class CoordTransformationChain : ICoordTransformer
     {
-        ICoordTransformer _left, _right;
+        readonly ICoordTransformer _left;
+        readonly ICoordTransformer _right;
         public CoordTransformationChain(ICoordTransformer left, ICoordTransformer right)
         {
             _left = left;

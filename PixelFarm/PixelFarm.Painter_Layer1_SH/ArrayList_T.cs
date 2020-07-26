@@ -18,8 +18,37 @@
 //          http://www.antigrain.com
 //---------------------------------------------------------------------------- 
 
+
 namespace PixelFarm.CpuBlit
 {
+    public readonly struct ArrayListSegment<T>
+    {
+        internal readonly ArrayList<T> _arrList;
+        public readonly int beginAt;
+        public readonly int len;
+        public ArrayListSegment(ArrayList<T> arrList, int beginAt, int len)
+        {
+            this._arrList = arrList;
+            this.beginAt = beginAt;
+            this.len = len;
+        }
+
+        public int Count => len;
+
+        public static void UnsafeGetInternalArr(in ArrayListSegment<T> listSpan, out T[] internalArr)
+        {
+            internalArr = listSpan._arrList.UnsafeInternalArray;
+        }
+
+        public static readonly ArrayListSegment<T> Empty = new ArrayListSegment<T>();
+#if DEBUG
+        public override string ToString()
+        {
+            return beginAt + "," + len;
+        }
+#endif
+    }
+
     public sealed class ArrayList<T>
     {
         int _currentSize;
@@ -94,24 +123,23 @@ namespace PixelFarm.CpuBlit
         /// <param name="newSize"></param>
         public void AdjustSize(int newSize)
         {
-            if (newSize > _currentSize)
+            if (newSize > _currentSize && newSize > AllocatedSize)
             {
-                if (newSize > AllocatedSize)
+                //create new array and copy data to that 
+                var newArray = new T[newSize];
+                if (_internalArray != null)
                 {
-                    //create new array and copy data to that 
-                    var newArray = new T[newSize];
-                    if (_internalArray != null)
-                    {
-                        System.Array.Copy(_internalArray, newArray, _internalArray.Length);
-                        //for (int i = _internalArray.Length - 1; i >= 0; --i)
-                        //{
-                        //    newArray[i] = _internalArray[i];
-                        //}
-                    }
-                    _internalArray = newArray;
+                    System.Array.Copy(_internalArray, newArray, _internalArray.Length);
+                    //for (int i = _internalArray.Length - 1; i >= 0; --i)
+                    //{
+                    //    newArray[i] = _internalArray[i];
+                    //}
                 }
+                _internalArray = newArray;
             }
         }
+
+
         public void Zero()
         {
             System.Array.Clear(_internalArray, 0, _internalArray.Length);
@@ -121,6 +149,23 @@ namespace PixelFarm.CpuBlit
             T[] output = new T[_currentSize];
             System.Array.Copy(_internalArray, output, _currentSize);
             return output;
+        }
+
+        void EnsureSpaceForAppend(int newAppendLen)
+        {
+            int newSize = _currentSize + newAppendLen;
+            if (_internalArray.Length < newSize)
+            {
+                //copy
+                if (newSize < 100000)
+                {
+                    AdjustSize(newSize + (newSize / 2) + 16);
+                }
+                else
+                {
+                    AdjustSize(newSize + newSize / 4);
+                }
+            }
         }
         /// <summary>
         /// append element to latest index
@@ -141,25 +186,26 @@ namespace PixelFarm.CpuBlit
             }
             _internalArray[_currentSize++] = v;
         }
+
         public void Append(T[] arr)
         {
             //append arr             
-            int newSize = _currentSize + arr.Length;
-            if (_internalArray.Length < newSize)
-            {
-                //copy
-                if (newSize < 100000)
-                {
-                    AdjustSize(newSize + (newSize / 2) + 16);
-                }
-                else
-                {
-                    AdjustSize(newSize + newSize / 4);
-                }
-            }
-            System.Array.Copy(arr, 0, _internalArray, _currentSize, arr.Length);
-            _currentSize = newSize;
+            Append(arr, 0, arr.Length);
         }
+        public void Append(T[] arr, int start, int len)
+        {
+            EnsureSpaceForAppend(len);
+            System.Array.Copy(arr, start, _internalArray, _currentSize, len);
+            _currentSize = _currentSize + len;
+        }
+        public void CopyAndAppend(int srcIndex, int len)
+        {
+            EnsureSpaceForAppend(len);
+            System.Array.Copy(_internalArray, srcIndex, _internalArray, _currentSize, len);
+            _currentSize = _currentSize + len;
+        }
+
+
         public T this[int i]
         {
             get => _internalArray[i];
@@ -175,5 +221,8 @@ namespace PixelFarm.CpuBlit
         }
         //
         public int Length => _currentSize;
+
+        //
+        public ArrayListSegment<T> CreateSpan(int beginAt, int len) => new ArrayListSegment<T>(this, beginAt, len);
     }
 }

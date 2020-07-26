@@ -20,10 +20,8 @@ namespace PixelFarm
 
     public static class Temp<T>
     {
-
         public delegate T CreateNewItemDelegate();
         public delegate void ReleaseItemDelegate(T item);
-
 
         [System.ThreadStatic]
         static Stack<T> s_pool;

@@ -1,16 +1,12 @@
 ﻿//MIT, 2018-present, WinterDev 
- 
+
 namespace PixelFarm.Drawing.Internal
 {
-    public struct MicroPainter
+    public ref struct MicroPainter
     {
-        float _viewportWidth;
-        float _viewportHeight;
         public readonly DrawBoard _drawBoard;
         public MicroPainter(DrawBoard drawBoard)
         {
-            _viewportWidth = 0;
-            _viewportHeight = 0;
             _drawBoard = drawBoard;
         }
         public float ViewportWidth => _drawBoard.Width;
@@ -27,8 +23,8 @@ namespace PixelFarm.Drawing.Internal
         }
         public void SetViewportSize(float width, float height)
         {
-            _viewportWidth = width;
-            _viewportHeight = height;
+            //_viewportWidth = width;
+            //_viewportHeight = height;
         }
 
         public void AttachToNormalBuffer()

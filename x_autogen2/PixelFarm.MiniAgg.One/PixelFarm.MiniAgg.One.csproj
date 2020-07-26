@@ -420,9 +420,6 @@
     <Compile Include="..\..\PixelFarm\PixelFarm.Painter_Layer2_SH\Drawing\DrawBoard.cs">
       <Link>PixelFarm\PixelFarm.Painter_Layer2_SH\Drawing\DrawBoard.cs</Link>
     </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Painter_Layer2_SH\Drawing\ITextPrinter.cs">
-      <Link>PixelFarm\PixelFarm.Painter_Layer2_SH\Drawing\ITextPrinter.cs</Link>
-    </Compile>
     <Compile Include="..\..\PixelFarm\PixelFarm.Painter_Layer2_SH\Drawing\Painter.cs">
       <Link>PixelFarm\PixelFarm.Painter_Layer2_SH\Drawing\Painter.cs</Link>
     </Compile>
@@ -443,12 +440,6 @@
     </Compile>
     <Compile Include="..\..\PixelFarm\PixelFarm.Painter_Layer2_SH\_ESS_LINK_WITH_TY\RequestFont.cs">
       <Link>PixelFarm\PixelFarm.Painter_Layer2_SH\_ESS_LINK_WITH_TY\RequestFont.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Painter_Layer2_SH\_ESS_LINK_WITH_TY\TextBufferSpan.cs">
-      <Link>PixelFarm\PixelFarm.Painter_Layer2_SH\_ESS_LINK_WITH_TY\TextBufferSpan.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Painter_Layer2_SH\_ESS_LINK_WITH_TY\TextSpanMeasureResult.cs">
-      <Link>PixelFarm\PixelFarm.Painter_Layer2_SH\_ESS_LINK_WITH_TY\TextSpanMeasureResult.cs</Link>
     </Compile>
     <Compile Include="..\..\PixelFarm\PixelFarm.Vectors_SH\1_VectorMaths\AggMath.cs">
       <Link>PixelFarm\PixelFarm.Vectors_SH\1_VectorMaths\AggMath.cs</Link>

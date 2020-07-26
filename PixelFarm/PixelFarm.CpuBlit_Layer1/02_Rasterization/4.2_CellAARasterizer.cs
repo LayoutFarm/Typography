@@ -46,7 +46,8 @@ namespace PixelFarm.CpuBlit.Rasterization
         // A pixel cell. There're no constructors defined and it was done ***
         // intentionally in order to avoid extra overhead when allocating an ****
         // array of cells. ***
-        struct CellAA
+
+        readonly struct CellAA
         {
             public readonly int x;
             public readonly int y;
@@ -54,8 +55,8 @@ namespace PixelFarm.CpuBlit.Rasterization
             public readonly int area;
 #if DEBUG
 #if !COSMOS
-            public int dbugLeft;
-            public int dbugRight;
+            public readonly int dbugLeft;
+            public readonly int dbugRight;
 #endif
 #endif
             private CellAA(int x, int y, int cover, int area)
@@ -72,6 +73,21 @@ namespace PixelFarm.CpuBlit.Rasterization
 #endif
             }
 
+#if DEBUG
+            private CellAA(int x, int y, int cover, int area, int dbugLeft, int dbugRight)
+            {
+                this.x = x;
+                this.y = y;
+                this.cover = cover;
+                this.area = area;
+#if DEBUG
+#if !COSMOS
+                this.dbugLeft = dbugLeft;
+                this.dbugRight = dbugRight;
+#endif
+#endif
+            }
+#endif
             public static CellAA Create(int x, int y, int cover, int area)
             {
                 return new CellAA(x, y, cover, area);
@@ -85,16 +101,14 @@ namespace PixelFarm.CpuBlit.Rasterization
 #if DEBUG
             public static CellAA dbugCreate(int x, int y, int cover, int area, int left, int right)
             {
-                CellAA cell = new CellAA(x, y, cover, area);
-                //cell.x = x;
-                //cell.y = y;
-                //cell.cover = cover;
-                //cell.area = area;
+                return new CellAA(x, y, cover, area, left, right);
+
+                //CellAA cell = new CellAA(x, y, cover, area, left, right);
 #if !COSMOS
-                cell.dbugLeft = left;
-                cell.dbugRight = right;
+                //cell.dbugLeft = left;
+                //cell.dbugRight = right;
 #endif
-                return cell;
+                //return cell;
             }
 #endif
 #if DEBUG
@@ -109,7 +123,9 @@ namespace PixelFarm.CpuBlit.Rasterization
         }
 
 
-
+#if !DEBUG
+        readonly
+#endif
         struct CellAABlob
         {
             readonly CellAARasterizer _cellAARas;
@@ -673,9 +689,10 @@ namespace PixelFarm.CpuBlit.Rasterization
                     while (m < n)
                     {
                         //swap data between m and n
-                        CellAA temp = dataToSort[m];
+                        CellAA temp = dataToSort[m];//copy value
                         dataToSort[m] = dataToSort[n];
                         dataToSort[n] = temp;
+
                         while ((m < endPoint) && (x_at_PivotPoint >= dataToSort[m].x))
                         {
                             m++;

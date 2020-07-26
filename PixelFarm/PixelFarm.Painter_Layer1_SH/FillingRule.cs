@@ -15,8 +15,6 @@
 //----------------------------------------------------------------------------
 
 
-
-using PixelFarm.CpuBlit;
 namespace PixelFarm.Drawing
 {
     public enum FillingRule

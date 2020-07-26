@@ -16,8 +16,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)_ESS_LINK_WITH_TY\LenAndLenUnit.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Basic\Region.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Basic\RenderVx.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)_ESS_LINK_WITH_TY\TextBufferSpan.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)_ESS_LINK_WITH_TY\TextSpanMeasureResult.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CpuBlit.VertexProcessing\BoundingRect.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CpuBlit.VertexProcessing\CurveFlattener.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CpuBlit.VertexProcessing\LineWalker.cs" />
@@ -41,7 +39,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Drawing\Brushes_Pens.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Drawing\ClipingTechnique.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Drawing\DrawBoard.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Drawing\ITextPrinter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Drawing\Painter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)_ESS_LINK_WITH_TY\RequestFont.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Drawing\TextBaseline.cs" />

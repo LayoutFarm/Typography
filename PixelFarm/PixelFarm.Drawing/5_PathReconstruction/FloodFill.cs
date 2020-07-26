@@ -115,9 +115,9 @@ namespace PixelFarm.PathReconstruction
     sealed class FloodFillRunner
     {
         bool[] _pixelsChecked;
-        SimpleQueue<HSpan> _hspanQueue = new SimpleQueue<HSpan>(9);
-        List<HSpan> _upperSpans = new List<HSpan>();
-        List<HSpan> _lowerSpans = new List<HSpan>();
+        readonly SimpleQueue<HSpan> _hspanQueue = new SimpleQueue<HSpan>(9);
+        readonly List<HSpan> _upperSpans = new List<HSpan>();
+        readonly List<HSpan> _lowerSpans = new List<HSpan>();
         int _yCutAt;
         IPixelEvaluator _pixelEvalutor;
         public HSpan[] InternalFill(IPixelEvaluator pixelEvalutor, int x, int y, bool collectHSpans)

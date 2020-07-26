@@ -250,7 +250,7 @@ namespace PixelFarm.PathReconstruction
         Right = 1 << 1,//2 
         LeftAndRight = Left | Right //3
     }
-    struct Remaining
+    readonly struct Remaining
     {
         public readonly HSpanColumn column;
         public readonly ReadSide unreadSide;
@@ -780,7 +780,7 @@ namespace PixelFarm.PathReconstruction
             List<Remaining> incompleteReadList = new List<Remaining>();
             TraceOutlineCcw(new Remaining(_verticalGroupList.GetGroup(0).GetColumn(0), ReadSide.Left), output, true);
 
-            TRACE_AGAIN://**
+        TRACE_AGAIN://**
 
             //check if the shape have hole(s) 
             _verticalGroupList.CollectIncompleteColumns(incompleteReadList);
