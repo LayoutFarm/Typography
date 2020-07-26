@@ -621,7 +621,7 @@ namespace Typography.Text
 #if DEBUG
             if (len > 2)
             {
-
+                
             }
 #endif
             if (_textBreaker == null)

@@ -32,52 +32,21 @@ namespace Typography.TextBreak
     }
 
     public abstract class WordVisitor
-    {
-
-        //#if DEBUG
-        //        List<BreakAtInfo> dbugBreakAtList = new List<BreakAtInfo>();
-        //        bool dbugCollectBreakAtList;
-        //#endif
-        char[] _utf16Buffer;
-        int[] _utf32Buffer;
-
-        int _startIndex;
-        int _endIndex;
-
-        int _currentIndex;
-        char _currentChar; //store as utf32
-        int _latestBreakAt;
+    { 
+        int _endIndex; 
+        int _latestBreakAt; 
+        InputReader _inputReader;
 
         readonly Stack<int> _tempCandidateBreaks = new Stack<int>();
         public virtual SpanBreakInfo SpanBreakInfo { get; set; }
+
         internal void LoadText(int[] buffer, int index, int len)
         {
             //input is utf32  
-            _utf16Buffer = null;
-            _utf32Buffer = buffer;
-
+            _inputReader = new InputReader(buffer, index, len);
             _endIndex = index + len;
 
-            _startIndex = _currentIndex = index;
-            _latestBreakAt = LatestSpanStartAt = _startIndex;
-
-            //in this case, the current char is upper 
-            int c1 = buffer[_currentIndex];
-
-            char upper = (char)(c1 >> 16);
-            char lower = (char)c1;
-
-            if (upper == '\0')
-            {
-                //use lower
-                _currentChar = lower;
-            }
-            else
-            {
-                _currentChar = upper;
-            }
-
-
+            _latestBreakAt = LatestSpanStartAt = index;
             _tempCandidateBreaks.Clear();
         }
         internal void LoadText(char[] buffer, int index)
@@ -86,36 +55,33 @@ namespace Typography.TextBreak
         }
         internal void LoadText(char[] buffer, int index, int len)
         {
-
-            //input is utf16
-            //reset all
-            _utf16Buffer = buffer;
-            _utf32Buffer = null;
-
+            _inputReader = new InputReader(buffer, index, len);
             _endIndex = index + len;
+            _latestBreakAt = LatestSpanStartAt = index;
 
-            _startIndex = _currentIndex = index;
-            _latestBreakAt = LatestSpanStartAt = _startIndex;
-
-
-            _currentChar = buffer[_currentIndex];
             _tempCandidateBreaks.Clear();
         }
+
         protected virtual void OnBreak() { }
 
         public VisitorState State { get; internal set; }
         //
-        public int CurrentIndex => _currentIndex;
+        public int CurrentIndex => _inputReader.Index;
         //
-        public char Char => _currentChar;
+        public char Char => _inputReader.C0;
 
         //
-        public bool IsEnd => _currentIndex >= _endIndex;
+        public bool IsEnd => _inputReader.IsEnd;
+        internal bool Read() => _inputReader.Read();
+        internal char C0 => _inputReader.C0;
+        internal char C1 => _inputReader.C1;
+        internal char PeekNext() => _inputReader.PeekNext();
+        internal void PauseNextRead() => _inputReader.PauseNextRead();
 
-        public string CopyCurrentSpanString()
-        {
-            return new string(_utf16Buffer, LatestSpanStartAt, LatestSpanLen);
-        }
+        //public string CopyCurrentSpanString()
+        //{
+        //    return new string(_utf16Buffer, LatestSpanStartAt, LatestSpanLen);
+        //}
 
 #if DEBUG
         //int dbugAddSteps;
@@ -160,6 +126,7 @@ namespace Typography.TextBreak
         {
             AddWordBreakAt(index, wordKind);
             SetCurrentIndex(LatestBreakAt);
+            PauseNextRead();
         }
         //
         public int LatestSpanStartAt { get; private set; }
@@ -170,31 +137,9 @@ namespace Typography.TextBreak
 
         internal void SetCurrentIndex(int index)
         {
-            _currentIndex = index;
             if (index < _endIndex)
             {
-                if (_utf16Buffer != null)
-                {
-                    _currentChar = _utf16Buffer[index];
-                }
-                else
-                {
-                    int c1 = _utf32Buffer[_currentIndex];
-
-                    char upper = (char)(c1 >> 16);
-                    char lower = (char)c1;
-
-                    if (upper == '\0')
-                    {
-                        //use lower
-                        _currentChar = lower;
-                    }
-                    else
-                    {
-                        _currentChar = upper;
-                    }
-                }
-
+                _inputReader.SetCurrentIndex(index);
             }
             else
             {

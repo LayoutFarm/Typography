@@ -17,7 +17,7 @@ namespace Typography.TextBreak
         ConsecutiveSurrogatePairsAndJoiner
     }
 
-    public ref struct InputReader
+    struct InputReader
     {
         readonly char[] _utf16Buffer;
         readonly int[] _utf32Buffer;
@@ -204,6 +204,13 @@ namespace Typography.TextBreak
 
         public char C0 => _c0;
         public char C1 => _c1;
+
+        public void SetCurrentIndex(int index)
+        {
+            _index = _start + index;
+            _inc = 0;
+            ReadCurrentIndex();
+        }
     }
 
     public class EngBreakingEngine : BreakingEngine
@@ -259,13 +266,11 @@ namespace Typography.TextBreak
         }
         internal override void BreakWord(WordVisitor visitor, int[] charBuff, int startAt, int len)
         {
-            InputReader r = new InputReader(charBuff, startAt, len);
-            DoBreak(visitor, ref r);
+            DoBreak(visitor);
         }
         internal override void BreakWord(WordVisitor visitor, char[] charBuff, int startAt, int len)
         {
-            InputReader r = new InputReader(charBuff, startAt, len);
-            DoBreak(visitor, ref r);
+            DoBreak(visitor);
         }
         public override bool CanHandle(char c)
         {
@@ -286,10 +291,10 @@ namespace Typography.TextBreak
 
         static void OnBreak(WordVisitor vis, in BreakBounds bb) => vis.AddWordBreak_AndSetCurrentIndex(bb.startIndex + bb.length, bb.kind);
 
-        static void CollectConsecutiveUnicodeRange(ref InputReader reader, out SpanBreakInfo spanBreakInfo)
+        static void CollectConsecutiveUnicodeRange(WordVisitor visitor, out SpanBreakInfo spanBreakInfo)
         {
 
-            char c1 = reader.C0;
+            char c1 = visitor.C0;
             if (UnicodeRangeFinder.GetUniCodeRangeFor(c1, out UnicodeRangeInfo unicodeRangeInfo, out spanBreakInfo))
             {
                 int startCodePoint = unicodeRangeInfo.StartCodepoint;
@@ -297,18 +302,18 @@ namespace Typography.TextBreak
 
                 do
                 {
-                    c1 = reader.C0;
+                    c1 = visitor.C0;
                     if (c1 < startCodePoint || c1 > endCodePoint)
                     {
                         //new char is out of range
                         //and we've read it
                         //instead of StepBack
                         //we just pause next read
-                        reader.PauseNextRead();
+                        visitor.PauseNextRead();
                         break;
                     }
 
-                } while (reader.Read());
+                } while (visitor.Read());
             }
             else
             {
@@ -318,9 +323,9 @@ namespace Typography.TextBreak
                 System.Diagnostics.Debug.WriteLine("unknown unicode range:");
 #endif
 
-                while (reader.Read())
+                while (visitor.Read())
                 {
-                    c1 = reader.C0;
+                    c1 = visitor.C0;
                     if ((c1 >= 0 && c1 < 256) || //eng range
                         char.IsHighSurrogate(c1) || //surrogate pair
                         UnicodeRangeFinder.GetUniCodeRangeFor(c1, out unicodeRangeInfo, out spanBreakInfo)) //or found some wellknown range
@@ -379,13 +384,13 @@ namespace Typography.TextBreak
                 spanBreakInfo = s_unknown;
             }
         }
-        static void CollectConsecutiveSurrogatePairs(ref InputReader reader, bool withZeroWidthJoiner)
+        static void CollectConsecutiveSurrogatePairs(WordVisitor visitor, bool withZeroWidthJoiner)
         {
             do
             {
-                char c = reader.C0;
+                char c = visitor.C0;
                 if (char.IsHighSurrogate(c) &&
-                    char.IsLowSurrogate(reader.C1))
+                    char.IsLowSurrogate(visitor.C1))
                 {
 
                 }
@@ -399,7 +404,7 @@ namespace Typography.TextBreak
                     return;
                 }
             }
-            while (reader.Read());
+            while (visitor.Read());
         }
         static void CollectConsecutiveSurrogatePairs(char[] input, ref int start, int len, bool withZeroWidthJoiner)
         {
@@ -462,28 +467,16 @@ namespace Typography.TextBreak
             return false;
         }
 
-        void DoBreak(WordVisitor visitor, ref InputReader inputReader)
+        void DoBreak(WordVisitor visitor)
         {
             visitor.State = VisitorState.Parsing;
             visitor.SpanBreakInfo = s_latin;
-            ////----------------------------------------
-            ////simple break word/ num/ punc / space
-            ////similar to lexer function            
-            ////----------------------------------------
-            //int endBefore = start + len;
-            //if (endBefore > input.Length)
-            //    throw new System.ArgumentOutOfRangeException(nameof(len), len, "The range provided was partially out of bounds.");
-            //else if (start < 0)
-            //    throw new System.ArgumentOutOfRangeException(nameof(start), start, "The starting index was negative.");
-            ////throw instead of skipping the entire for loop
-            //else if (len < 0)
-            //    throw new System.ArgumentOutOfRangeException(nameof(len), len, "The length provided was negative.");
-            ////----------------------------------------
+
 
             LexState lexState = LexState.Init;
             BreakBounds bb = new BreakBounds();
 
-            bb.startIndex = inputReader.Index;//*** 
+            bb.startIndex = visitor.CurrentIndex;
 
             bool enableUnicodeRangeBreaker = EnableUnicodeRangeBreaker;
             bool breakPeroidInTextSpan = BreakPeroidInTextSpan;
@@ -491,18 +484,18 @@ namespace Typography.TextBreak
             visitor.SpanBreakInfo = s_c0BasicLatin;//default
 
 
-            for (; !inputReader.IsEnd; inputReader.Read())
+            for (; !visitor.IsEnd; visitor.Read())
             {
-                char c = inputReader.C0;
+                char c = visitor.C0;
                 switch (lexState)
                 {
                     case LexState.Init:
                         {
                             //check char
-                            if (c == '\r' && inputReader.PeekNext() == '\n')
+                            if (c == '\r' && visitor.PeekNext() == '\n')
                             {
                                 //this is '\r\n' linebreak
-                                bb.startIndex = inputReader.Index;
+                                bb.startIndex = visitor.CurrentIndex;
                                 bb.length = 2;
                                 bb.kind = WordKind.NewLine;
                                 //
@@ -511,12 +504,12 @@ namespace Typography.TextBreak
                                 //
                                 bb.Consume();
                                 lexState = LexState.Init;
-                                inputReader.Read();//consume \n
+                                visitor.Read();//consume \n
                                 continue;
                             }
                             else if (c == '\r' || c == '\n' || c == 0x85) //U+0085 NEXT LINE
                             {
-                                bb.startIndex = inputReader.Index;
+                                bb.startIndex = visitor.CurrentIndex;
                                 bb.length = 1;
                                 bb.kind = WordKind.NewLine;
                                 //
@@ -531,14 +524,14 @@ namespace Typography.TextBreak
                             {
                                 //explicit whitespace
                                 //we collect whitespace
-                                bb.startIndex = inputReader.Index;
+                                bb.startIndex = visitor.CurrentIndex;
                                 bb.kind = WordKind.Whitespace;
                                 lexState = LexState.Whitespace;
                             }
                             else if (c == '\t')
                             {
                                 //explicit tab
-                                bb.startIndex = inputReader.Index;
+                                bb.startIndex = visitor.CurrentIndex;
                                 bb.kind = WordKind.Tab;
                                 lexState = LexState.Tab;
                             }
@@ -547,12 +540,12 @@ namespace Typography.TextBreak
                                 if (!IsInOurLetterRange(c, out SpanBreakInfo brkInfo))
                                 {
                                     //letter is OUT_OF_RANGE
-                                    if (inputReader.Index > bb.startIndex)
+                                    if (visitor.CurrentIndex > bb.startIndex)
                                     {
 
                                         //???TODO: review here
                                         //flush
-                                        bb.length = inputReader.Index - bb.startIndex;
+                                        bb.length = visitor.CurrentIndex - bb.startIndex;
                                         //
                                         OnBreak(visitor, bb);
                                         bb.Consume();
@@ -582,20 +575,20 @@ namespace Typography.TextBreak
                                 visitor.SpanBreakInfo = brkInfo;
 
                                 //just collect
-                                bb.startIndex = inputReader.Index;
+                                bb.startIndex = visitor.CurrentIndex;
                                 bb.kind = WordKind.Text;
                                 lexState = LexState.Text;
                             }
                             else if (char.IsNumber(c))
                             {
-                                bb.startIndex = inputReader.Index;
+                                bb.startIndex = visitor.CurrentIndex;
                                 bb.kind = WordKind.Number;
                                 lexState = LexState.Number;
                             }
                             else if (char.IsWhiteSpace(c))
                             {
                                 //other whitespace***=> similar to control
-                                bb.startIndex = inputReader.Index;
+                                bb.startIndex = visitor.CurrentIndex;
                                 bb.length = 1;
                                 bb.kind = WordKind.OtherWhitespace;
                                 //
@@ -609,7 +602,7 @@ namespace Typography.TextBreak
                             {
                                 //\t is control and \t is also whitespace
                                 //we assign that \t to be a control
-                                bb.startIndex = inputReader.Index;
+                                bb.startIndex = visitor.CurrentIndex;
                                 bb.length = 1;
                                 bb.kind = WordKind.Control;
                                 //
@@ -627,10 +620,10 @@ namespace Typography.TextBreak
                                 if (c == '-')
                                 {
                                     //check next char is number or not
-                                    if (char.IsNumber(inputReader.PeekNext()))
+                                    if (char.IsNumber(visitor.PeekNext()))
                                     {
                                         //review here again
-                                        bb.startIndex = inputReader.Index;
+                                        bb.startIndex = visitor.CurrentIndex;
                                         bb.kind = WordKind.Number;
                                         lexState = LexState.Number;
 
@@ -638,7 +631,7 @@ namespace Typography.TextBreak
                                     }
                                 }
 
-                                bb.startIndex = inputReader.Index;
+                                bb.startIndex = visitor.CurrentIndex;
                                 bb.length = 1;
                                 bb.kind = WordKind.Punc;
 
@@ -679,7 +672,7 @@ namespace Typography.TextBreak
                             {
                                 //if not
                                 //flush current state 
-                                bb.length = inputReader.Index - bb.startIndex;
+                                bb.length = visitor.CurrentIndex - bb.startIndex;
                                 bb.kind = WordKind.Number;
                                 //
                                 OnBreak(visitor, bb);
@@ -699,13 +692,13 @@ namespace Typography.TextBreak
                                 //flush 
                                 if (BreakNumberAfterText)
                                 {
-                                    bb.length = inputReader.Index - bb.startIndex;
+                                    bb.length = visitor.CurrentIndex - bb.startIndex;
                                     bb.kind = WordKind.Text;
                                     //
                                     OnBreak(visitor, bb);
                                     //
                                     bb.length = 1;
-                                    bb.startIndex = inputReader.Index;
+                                    bb.startIndex = visitor.CurrentIndex;
                                     lexState = LexState.Number;
                                 }
                             }
@@ -714,10 +707,10 @@ namespace Typography.TextBreak
                                 //c is letter
                                 if (!IsInOurLetterRange(c, out SpanBreakInfo brkInfo))
                                 {
-                                    if (inputReader.Index > bb.startIndex)
+                                    if (visitor.CurrentIndex > bb.startIndex)
                                     {
                                         //flush
-                                        bb.length = inputReader.Index - bb.startIndex;
+                                        bb.length = visitor.CurrentIndex - bb.startIndex;
                                         bb.kind = WordKind.Text;
                                         //
                                         OnBreak(visitor, bb);
@@ -730,7 +723,7 @@ namespace Typography.TextBreak
                                     if (char.IsHighSurrogate(c))
                                     {
                                         bb.kind = WordKind.SurrogatePair;
-                                        bb.startIndex = inputReader.Index;
+                                        bb.startIndex = visitor.CurrentIndex;
 
                                         lexState = LexState.CollectSurrogatePair;
                                         goto case LexState.CollectSurrogatePair;
@@ -767,7 +760,7 @@ namespace Typography.TextBreak
                             {
                                 //other characer
                                 //flush existing text ***
-                                bb.length = inputReader.Index - bb.startIndex;
+                                bb.length = visitor.CurrentIndex - bb.startIndex;
                                 bb.kind = WordKind.Text;
                                 //
                                 OnBreak(visitor, bb);
@@ -783,7 +776,7 @@ namespace Typography.TextBreak
                             //for explicit whitespace
                             if (c != ' ')
                             {
-                                bb.length = inputReader.Index - bb.startIndex;
+                                bb.length = visitor.CurrentIndex - bb.startIndex;
                                 bb.kind = WordKind.Whitespace;
                                 //
                                 OnBreak(visitor, bb);
@@ -798,7 +791,7 @@ namespace Typography.TextBreak
                         {
                             if (c != '\t')
                             {
-                                bb.length = inputReader.Index - bb.startIndex;
+                                bb.length = visitor.CurrentIndex - bb.startIndex;
                                 bb.kind = WordKind.Tab;
                                 //
                                 OnBreak(visitor, bb);
@@ -813,7 +806,7 @@ namespace Typography.TextBreak
                         {
 
                             //check next is surrogate 
-                            if (!char.IsLowSurrogate(inputReader.C1))
+                            if (!char.IsLowSurrogate(visitor.C1))
                             {
                                 //the next one this not low surrogate
                                 //so this is error too
@@ -834,7 +827,7 @@ namespace Typography.TextBreak
 
                                 if (SurrogatePairBreakingOption == SurrogatePairBreakingOption.OnlySurrogatePair)
                                 {
-                                    bb.startIndex = inputReader.Index;
+                                    bb.startIndex = visitor.CurrentIndex;
                                     bb.length = 2;
                                     bb.kind = WordKind.SurrogatePair;
 
@@ -844,13 +837,13 @@ namespace Typography.TextBreak
                                 else
                                 {
                                     //see https://github.com/LayoutFarm/Typography/issues/18#issuecomment-345480185
-                                    int begin = inputReader.Index;
+                                    int begin = visitor.CurrentIndex;
 
                                     //CollectConsecutiveSurrogatePairs(input, ref begin, endBefore - begin, SurrogatePairBreakingOption == SurrogatePairBreakingOption.ConsecutiveSurrogatePairsAndJoiner);
-                                    CollectConsecutiveSurrogatePairs(ref inputReader, SurrogatePairBreakingOption == SurrogatePairBreakingOption.ConsecutiveSurrogatePairsAndJoiner);
+                                    CollectConsecutiveSurrogatePairs(visitor, SurrogatePairBreakingOption == SurrogatePairBreakingOption.ConsecutiveSurrogatePairsAndJoiner);
 
 
-                                    bb.length = inputReader.Index - begin;
+                                    bb.length = visitor.CurrentIndex - begin;
                                     bb.kind = WordKind.SurrogatePair;
 
                                     OnBreak(visitor, bb);
@@ -866,15 +859,15 @@ namespace Typography.TextBreak
                     case LexState.CollectConsecutiveUnicode:
                         {
 
-                            bb.startIndex = inputReader.Index;
+                            bb.startIndex = visitor.CurrentIndex;
                             bb.kind = WordKind.Text;
 
-                            CollectConsecutiveUnicodeRange(ref inputReader, out SpanBreakInfo spBreakInfo);
+                            CollectConsecutiveUnicodeRange(visitor, out SpanBreakInfo spBreakInfo);
 
-                            if (inputReader.Index > bb.startIndex)
+                            if (visitor.CurrentIndex > bb.startIndex)
                             {
                                 visitor.SpanBreakInfo = spBreakInfo;
-                                bb.length = inputReader.Index - bb.startIndex;
+                                bb.length = visitor.CurrentIndex - bb.startIndex;
 
                                 OnBreak(visitor, bb); //flush
 
@@ -894,11 +887,11 @@ namespace Typography.TextBreak
             }
 
             if (lexState != LexState.Init &&
-                bb.startIndex < inputReader.Index)
+                bb.startIndex < visitor.CurrentIndex)
             {
                 //some remaining data
 
-                bb.length = (inputReader.Index) - bb.startIndex;
+                bb.length = visitor.CurrentIndex - bb.startIndex;
                 //
                 OnBreak(visitor, bb);
                 //

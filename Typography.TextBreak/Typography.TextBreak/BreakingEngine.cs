@@ -55,10 +55,11 @@ namespace Typography.TextBreak
 
             for (int i = startAt; i < endAt;)
             {
+
             ENTER_LOOP:
 
                 //find proper start words;
-                char c = charBuff[i];
+                char c = visitor.Char;// charBuff[i];
                 //----------------------
                 //check if c is in our responsiblity
 
@@ -92,6 +93,7 @@ namespace Typography.TextBreak
                 }
                 //----------------------
 
+                //get word group for current char
                 WordGroup wordgroup = GetWordGroupForFirstChar(c);
                 if (wordgroup == null)
                 {
