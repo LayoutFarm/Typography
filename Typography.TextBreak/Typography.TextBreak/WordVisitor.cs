@@ -112,7 +112,6 @@ namespace Typography.TextBreak
             LatestSpanStartAt = _latestBreakAt;
             LatestWordKind = wordKind;
 
-
             _latestBreakAt = index;//** 
 
             OnBreak();

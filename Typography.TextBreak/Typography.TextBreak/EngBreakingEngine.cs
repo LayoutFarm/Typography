@@ -4,12 +4,8 @@
 // License & terms of use: http://www.unicode.org/copyright.html#License
 
 
-
 using System;
-using System.Runtime.InteropServices;
 using Typography.OpenFont;
-using Typography.OpenFont.Tables;
-
 namespace Typography.TextBreak
 {
     public enum SurrogatePairBreakingOption
