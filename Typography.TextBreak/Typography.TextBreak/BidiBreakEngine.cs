@@ -149,7 +149,7 @@ namespace Typography.TextBreak
 
 
             int arabic_len = 0;
-            int startAt = 0;//temp fix
+            int startAt = visitor.CurrentIndex;
 
             SpanBreakInfo latest_ar = null;
             _arabicBuffer.Clear();
@@ -169,6 +169,7 @@ namespace Typography.TextBreak
                     break;
                 }
             }
+
             //
             if (arabic_len == 0)
             {

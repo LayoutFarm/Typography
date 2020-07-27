@@ -164,15 +164,12 @@ namespace Typography.TextBreak
 
             //----------------------------------------
             //select breaking engine
-            int endAt = startAt + len;
+            //int endAt = startAt + len;
             //InputReader reader = new InputReader(charBuff, startAt, endAt - startAt);
             BreakWords();
 
         }
-        public void BreakWords(char[] charBuff)
-        {
-            BreakWords(charBuff, 0, charBuff.Length);
-        }
+
         public void BreakWords(char[] charBuff, int startAt, int len)
         {
             //conver to char buffer 
@@ -206,5 +203,17 @@ namespace Typography.TextBreak
         }
     }
 
+    public static class CustomBreakerExtensions
+    {
+        public static void BreakWords(this CustomBreaker breaker, string str)
+        {
+            char[] buffer = str.ToCharArray();
+            breaker.BreakWords(buffer, 0, buffer.Length);
+        }
+        public static void BreakWords(this CustomBreaker breaker, char[] charBuff)
+        {
+            breaker.BreakWords(charBuff, 0, charBuff.Length);
+        }
+    }
 
 }

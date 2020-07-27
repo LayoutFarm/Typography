@@ -60,7 +60,7 @@ namespace Typography.TextBreak
         {
             LoadText(buffer, index, buffer.Length);
         }
-         
+
 
         protected virtual void OnBreak() { }
 
@@ -88,6 +88,10 @@ namespace Typography.TextBreak
         {
 
 #if DEBUG
+            if (index == 4 || _latestBreakAt == 4)
+            {
+
+            }
             //dbugAddSteps++;
             //if (dbugAddSteps >= 57)
             //{
@@ -318,7 +322,9 @@ namespace Typography.TextBreak
                             }
                             else
                             {
-                                throw new NotSupportedException();
+                                //ERROR
+                                _inc = 1;
+                                _c1 = '\0';
                                 //error
                             }
                         }
@@ -353,7 +359,7 @@ namespace Typography.TextBreak
         }
         public void PauseNextRead()
         {
-            _inc = 0;
+            //_inc = 0;
         }
         public bool IsEnd => _index >= _end;
 

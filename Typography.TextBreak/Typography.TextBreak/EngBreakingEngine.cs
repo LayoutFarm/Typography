@@ -6,6 +6,7 @@
 
 
 using System;
+using System.Runtime.InteropServices;
 using Typography.OpenFont;
 
 namespace Typography.TextBreak
@@ -17,7 +18,7 @@ namespace Typography.TextBreak
         ConsecutiveSurrogatePairsAndJoiner
     }
 
- 
+
 
     public class EngBreakingEngine : BreakingEngine
     {
@@ -148,52 +149,52 @@ namespace Typography.TextBreak
                 spanBreakInfo = s_unknown;
             }
         }
-        static void CollectConsecutiveUnicodeRange(char[] input, ref int start, int endBefore, out SpanBreakInfo spanBreakInfo)
-        {
+        //        static void CollectConsecutiveUnicodeRange(char[] input, ref int start, int endBefore, out SpanBreakInfo spanBreakInfo)
+        //        {
 
-            char c1 = input[start];
-            if (UnicodeRangeFinder.GetUniCodeRangeFor(c1, out UnicodeRangeInfo unicodeRangeInfo, out spanBreakInfo))
-            {
-                int startCodePoint = unicodeRangeInfo.StartCodepoint;
-                int endCodePoint = unicodeRangeInfo.EndCodepoint;
-                for (int i = start; i < endBefore; ++i)
-                {
-                    c1 = input[i];
-                    if (c1 < startCodePoint || c1 > endCodePoint)
-                    {
-                        //out of range again
-                        //break here
-                        start = i;
-                        return;
-                    }
-                }
-                start = endBefore;
-            }
-            else
-            {
-                //for unknown,
-                //just collect until turn back to latin
-#if DEBUG
-                System.Diagnostics.Debug.WriteLine("unknown unicode range:");
-#endif
+        //            char c1 = input[start];
+        //            if (UnicodeRangeFinder.GetUniCodeRangeFor(c1, out UnicodeRangeInfo unicodeRangeInfo, out spanBreakInfo))
+        //            {
+        //                int startCodePoint = unicodeRangeInfo.StartCodepoint;
+        //                int endCodePoint = unicodeRangeInfo.EndCodepoint;
+        //                for (int i = start; i < endBefore; ++i)
+        //                {
+        //                    c1 = input[i];
+        //                    if (c1 < startCodePoint || c1 > endCodePoint)
+        //                    {
+        //                        //out of range again
+        //                        //break here
+        //                        start = i;
+        //                        return;
+        //                    }
+        //                }
+        //                start = endBefore;
+        //            }
+        //            else
+        //            {
+        //                //for unknown,
+        //                //just collect until turn back to latin
+        //#if DEBUG
+        //                System.Diagnostics.Debug.WriteLine("unknown unicode range:");
+        //#endif
 
-                for (int i = start; i < endBefore; ++i)
-                {
-                    c1 = input[i];
-                    if ((c1 >= 0 && c1 < 256) || //eng range
-                        char.IsHighSurrogate(c1) || //surrogate pair
-                        UnicodeRangeFinder.GetUniCodeRangeFor(c1, out unicodeRangeInfo, out spanBreakInfo)) //or found some wellknown range
-                    {
-                        //break here
-                        start = i;
-                        return;
-                    }
-                }
+        //                for (int i = start; i < endBefore; ++i)
+        //                {
+        //                    c1 = input[i];
+        //                    if ((c1 >= 0 && c1 < 256) || //eng range
+        //                        char.IsHighSurrogate(c1) || //surrogate pair
+        //                        UnicodeRangeFinder.GetUniCodeRangeFor(c1, out unicodeRangeInfo, out spanBreakInfo)) //or found some wellknown range
+        //                    {
+        //                        //break here
+        //                        start = i;
+        //                        return;
+        //                    }
+        //                }
 
-                start = endBefore;
-                spanBreakInfo = s_unknown;
-            }
-        }
+        //                start = endBefore;
+        //                spanBreakInfo = s_unknown;
+        //            }
+        //        }
         static void CollectConsecutiveSurrogatePairs(WordVisitor visitor, bool withZeroWidthJoiner)
         {
             do
@@ -216,36 +217,36 @@ namespace Typography.TextBreak
             }
             while (visitor.Read());
         }
-        static void CollectConsecutiveSurrogatePairs(char[] input, ref int start, int len, bool withZeroWidthJoiner)
-        {
+        //static void CollectConsecutiveSurrogatePairs(char[] input, ref int start, int len, bool withZeroWidthJoiner)
+        //{
 
-            int lim = start + len;
-            for (int i = start; i < lim;) //start+1
-            {
-                char c = input[i];
+        //    int lim = start + len;
+        //    for (int i = start; i < lim;) //start+1
+        //    {
+        //        char c = input[i];
 
-                if ((i + 1 < lim) &&
-                    char.IsHighSurrogate(c) &&
-                    char.IsLowSurrogate(input[i + 1]))
-                {
-                    i += 2;//**
-                    start = i;
-                }
-                else if (withZeroWidthJoiner && c == 8205)
-                {
-                    //https://en.wikipedia.org/wiki/Zero-width_joiner
-                    i += 1;
-                    start = i;
-                }
-                else
-                {
-                    //stop
-                    start = i;
-                    return;
-                }
-            }
+        //        if ((i + 1 < lim) &&
+        //            char.IsHighSurrogate(c) &&
+        //            char.IsLowSurrogate(input[i + 1]))
+        //        {
+        //            i += 2;//**
+        //            start = i;
+        //        }
+        //        else if (withZeroWidthJoiner && c == 8205)
+        //        {
+        //            //https://en.wikipedia.org/wiki/Zero-width_joiner
+        //            i += 1;
+        //            start = i;
+        //        }
+        //        else
+        //        {
+        //            //stop
+        //            start = i;
+        //            return;
+        //        }
+        //    }
 
-        }
+        //}
 
 
         bool IsInOurLetterRange(char c, out SpanBreakInfo brkInfo)
@@ -293,10 +294,31 @@ namespace Typography.TextBreak
 
             visitor.SpanBreakInfo = s_c0BasicLatin;//default
 
-
-            for (; !visitor.IsEnd; visitor.Read())
+#if DEBUG
+            int same_pos_count = 0;
+            char prev_char = '\0';
+            int prev_pos = -1;
+#endif
+            while (!visitor.IsEnd)
             {
+
+#if DEBUG
+                if (prev_pos == visitor.CurrentIndex)
+                {
+                    same_pos_count++;
+                    if (same_pos_count > 5)
+                    {
+                        System.Diagnostics.Debugger.Break();
+                    }
+                }
+                else
+                {
+                    prev_pos = visitor.CurrentIndex;
+                }
+#endif
+
                 char c = visitor.C0;
+
                 switch (lexState)
                 {
                     case LexState.Init:
@@ -314,7 +336,9 @@ namespace Typography.TextBreak
                                 //
                                 bb.Consume();
                                 lexState = LexState.Init;
-                                visitor.Read();//consume \n
+
+                                //TODO: review here
+                                //visitor.Read();//consume \n
                                 continue;
                             }
                             else if (c == '\r' || c == '\n' || c == 0x85) //U+0085 NEXT LINE
@@ -337,6 +361,7 @@ namespace Typography.TextBreak
                                 bb.startIndex = visitor.CurrentIndex;
                                 bb.kind = WordKind.Whitespace;
                                 lexState = LexState.Whitespace;
+                                visitor.Read();
                             }
                             else if (c == '\t')
                             {
@@ -344,6 +369,7 @@ namespace Typography.TextBreak
                                 bb.startIndex = visitor.CurrentIndex;
                                 bb.kind = WordKind.Tab;
                                 lexState = LexState.Tab;
+                                visitor.Read();
                             }
                             else if (char.IsLetter(c))
                             {
@@ -388,12 +414,14 @@ namespace Typography.TextBreak
                                 bb.startIndex = visitor.CurrentIndex;
                                 bb.kind = WordKind.Text;
                                 lexState = LexState.Text;
+                                visitor.Read();
                             }
                             else if (char.IsNumber(c))
                             {
                                 bb.startIndex = visitor.CurrentIndex;
                                 bb.kind = WordKind.Number;
                                 lexState = LexState.Number;
+                                visitor.Read();
                             }
                             else if (char.IsWhiteSpace(c))
                             {
@@ -436,7 +464,7 @@ namespace Typography.TextBreak
                                         bb.startIndex = visitor.CurrentIndex;
                                         bb.kind = WordKind.Number;
                                         lexState = LexState.Number;
-
+                                        visitor.Read();
                                         continue;
                                     }
                                 }
@@ -491,6 +519,8 @@ namespace Typography.TextBreak
                                 lexState = LexState.Init;
                                 goto case LexState.Init;
                             }
+                            //still in number state
+                            visitor.Read();
                         }
                         break;
                     case LexState.Text:
@@ -579,6 +609,9 @@ namespace Typography.TextBreak
                                 lexState = LexState.Init;
                                 goto case LexState.Init;
                             }
+
+
+                            visitor.Read();
                         }
                         break;
                     case LexState.Whitespace:
@@ -595,6 +628,7 @@ namespace Typography.TextBreak
                                 lexState = LexState.Init;
                                 goto case LexState.Init;
                             }
+                            visitor.Read();
                         }
                         break;
                     case LexState.Tab:
@@ -610,6 +644,7 @@ namespace Typography.TextBreak
                                 lexState = LexState.Init;
                                 goto case LexState.Init;
                             }
+                            visitor.Read();
                         }
                         break;
                     case LexState.CollectSurrogatePair:
@@ -649,9 +684,7 @@ namespace Typography.TextBreak
                                     //see https://github.com/LayoutFarm/Typography/issues/18#issuecomment-345480185
                                     int begin = visitor.CurrentIndex;
 
-                                    //CollectConsecutiveSurrogatePairs(input, ref begin, endBefore - begin, SurrogatePairBreakingOption == SurrogatePairBreakingOption.ConsecutiveSurrogatePairsAndJoiner);
                                     CollectConsecutiveSurrogatePairs(visitor, SurrogatePairBreakingOption == SurrogatePairBreakingOption.ConsecutiveSurrogatePairsAndJoiner);
-
 
                                     bb.length = visitor.CurrentIndex - begin;
                                     bb.kind = WordKind.SurrogatePair;

@@ -33,11 +33,14 @@ public class BasicTests
         //customBreaker.CopyBreakResults(outputList);
         for (int i = 0; i < outputList.Count - 1; i++)
         {
-            Assert.AreEqual
-            (
-                output[i],
-                input.Substring(outputList[i], outputList[i + 1] - outputList[i])
-            );
+            string result = output[i];
+            string expected = input.Substring(outputList[i], outputList[i + 1] - outputList[i]);
+            if (result != expected)
+            {
+
+            }
+
+            Assert.AreEqual(result, expected);
         }
     }
 

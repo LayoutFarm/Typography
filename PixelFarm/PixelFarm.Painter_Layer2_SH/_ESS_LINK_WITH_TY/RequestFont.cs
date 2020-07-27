@@ -34,7 +34,10 @@ using System.Text;
 namespace PixelFarm.Drawing
 {
 
+    public interface IFormattedGlyphPlanList
+    {
 
+    }
     public enum RequestFontStyle
     {
         //https://www.w3.org/TR/css-fonts-3/#propdef-font-style
