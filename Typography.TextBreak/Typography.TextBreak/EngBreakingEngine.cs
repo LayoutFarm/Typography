@@ -66,7 +66,10 @@ namespace Typography.TextBreak
 
             LexState lexState = LexState.Init;
             BreakBounds bb = new BreakBounds();
+            if (visitor.EndIndex == 3)
+            {
 
+            }
             bb.startIndex = visitor.CurrentIndex;
 
             bool enableUnicodeRangeBreaker = EnableUnicodeRangeBreaker;
@@ -252,14 +255,11 @@ namespace Typography.TextBreak
                                 bb.startIndex = visitor.CurrentIndex;
                                 bb.length = 1;
                                 bb.kind = WordKind.Punc;
-
-                                //we not collect punc
-
+                                 
                                 visitor.AddWordBreakAt(bb);
+
                                 bb.Consume();
-
                                 lexState = LexState.Init;
-
                                 continue;
                             }
 
@@ -637,7 +637,15 @@ namespace Typography.TextBreak
 
     static class WordVisitorExtensions
     {
-        public static void AddWordBreakAt(this WordVisitor vis, in BreakBounds bb) => vis.AddWordBreak_AndSetCurrentIndex(bb.startIndex + bb.length, bb.kind);
+        public static void AddWordBreakAt(this WordVisitor vis, in BreakBounds bb)
+        {
+            //vis.AddWordBreakAtCurrentIndex(bb.kind);
+            if (bb.startIndex + bb.length != vis.CurrentIndex)
+            {
+                System.Diagnostics.Debugger.Break();
+            }
+            vis.AddWordBreak_AndSetCurrentIndex(bb.startIndex + bb.length, bb.kind);
+        }
     }
 
 

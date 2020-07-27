@@ -10,9 +10,7 @@ namespace Typography.TextBreak
 {
     public abstract class BreakingEngine
     {
-        //internal abstract void BreakWord(WordVisitor visitor, char[] charBuff, int startAt, int len);
-        //internal abstract void BreakWord(WordVisitor visitor, int[] charBuff, int startAt, int len);
-
+      
         internal abstract void BreakWord(WordVisitor visitor);
         public abstract bool CanBeStartChar(char c);
         public abstract bool CanHandle(char c);
@@ -468,15 +466,16 @@ namespace Typography.TextBreak
             //------
             if (visitor.CurrentIndex >= len - 1)
             {
-                //the last one 
+                ////the last one 
                 visitor.State = VisitorState.End;
                 if (visitor.LatestBreakAt < startAt + len)
                 {
-                    visitor.AddWordBreakAt(startAt + len, WordKind.Text);
+                    throw new NotSupportedException();
+                    //visitor.AddWordBreakAt(startAt + len, WordKind.Text);
                 }
             }
         }
-         
+
         internal WordGroup GetSubGroup(WordVisitor visitor, WordGroup wordGroup)
         {
 

@@ -60,7 +60,7 @@ namespace TextBreakerTest
             string test2 = "یہ ایک (car) ہے۔";
             string test3 = "👩🏾‍👨🏾‍👧🏾‍👶🏾";
             //string test4 = "aBこん😁";
-            string test4 = "A";
+            string test4 = "AB";
 
             //this.textBox1.Text = test3 + " " + test2;
             //this.textBox1.Text = test1;
