@@ -5,7 +5,7 @@ using System.Windows.Forms;
 using Typography.OpenFont;
 
 namespace SampleWinForms
-{
+{ 
     static class Program
     {
         /// <summary>

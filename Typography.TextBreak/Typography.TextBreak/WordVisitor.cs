@@ -31,6 +31,19 @@ namespace Typography.TextBreak
         }
     }
 
+    ref struct BreakBounds
+    {
+        public int startIndex;
+        public int length;
+        public WordKind kind;
+        public void Consume()
+        {
+            startIndex += length;
+            length = 0;
+            kind = WordKind.Unknown;
+        }
+    }
+
     public abstract class WordVisitor
     {
         int _endIndex;
@@ -78,7 +91,8 @@ namespace Typography.TextBreak
         internal char C0 => _inputReader.C0;
         internal char C1 => _inputReader.C1;
         internal char PeekNext() => _inputReader.PeekNext();
-        internal void PauseNextRead() => _inputReader.PauseNextRead();
+
+
 
 #if DEBUG
         //int dbugAddSteps;
@@ -87,16 +101,7 @@ namespace Typography.TextBreak
         internal void AddWordBreakAt(int index, WordKind wordKind)
         {
 
-#if DEBUG
-            if (index == 4 || _latestBreakAt == 4)
-            {
-
-            }
-            //dbugAddSteps++;
-            //if (dbugAddSteps >= 57)
-            //{
-
-            //}
+#if DEBUG 
             if (index == _latestBreakAt)
             {
                 throw new NotSupportedException();
@@ -108,12 +113,7 @@ namespace Typography.TextBreak
             LatestWordKind = wordKind;
 
 
-            _latestBreakAt = index;//**
-
-            //if (_latestBreakAt == 243)
-            //{
-
-            //}
+            _latestBreakAt = index;//** 
 
             OnBreak();
 
@@ -133,7 +133,6 @@ namespace Typography.TextBreak
         {
             AddWordBreakAt(index, wordKind);
             SetCurrentIndex(LatestBreakAt);
-            PauseNextRead();
         }
         //
         public int LatestSpanStartAt { get; private set; }
@@ -357,10 +356,7 @@ namespace Typography.TextBreak
             }
             return false;
         }
-        public void PauseNextRead()
-        {
-            //_inc = 0;
-        }
+
         public bool IsEnd => _index >= _end;
 
         public char C0 => _c0;

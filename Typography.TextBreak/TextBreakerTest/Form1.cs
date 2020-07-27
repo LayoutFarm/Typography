@@ -58,12 +58,12 @@ namespace TextBreakerTest
             //string test1 = "6+23-456*78/9";
 
             string test2 = "یہ ایک (car) ہے۔";
-
             string test3 = "👩🏾‍👨🏾‍👧🏾‍👶🏾";
-
+            string test4 = "aBこん😁";
             //this.textBox1.Text = test3 + " " + test2;
             //this.textBox1.Text = test1;
-            this.textBox1.Text = test2;
+            //this.textBox1.Text = test2;
+            this.textBox1.Text = test4;
 
             //this.textBox1.Text = test1 + test2;
             //this.textBox1.Text = test2;
