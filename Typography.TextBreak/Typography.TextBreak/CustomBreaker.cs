@@ -60,13 +60,8 @@ namespace Typography.TextBreak
         protected BreakingEngine SelectEngine(int c)
         {
             //from 
-            char upper = (char)(c >> 16);
-            char lower = (char)(c);
-            if ((char)(c >> 16) == 0)
-            {
-                return SelectEngine((char)(c));
-            }
-            return null;
+            InputReader.GetChars(c, out char c0, out char c1);
+            return SelectEngine(c0);
         }
         protected BreakingEngine SelectEngine(char c)
         {
@@ -150,6 +145,8 @@ namespace Typography.TextBreak
                 }
             }
         }
+        
+        
         public void BreakWords(int[] charBuff, int startAt, int len)
         {
             //conver to char buffer 

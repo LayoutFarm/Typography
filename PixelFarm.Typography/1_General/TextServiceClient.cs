@@ -62,13 +62,13 @@ namespace Typography.Text
                 int[] rawBuffer = textBufferSpan.GetRawUtf32Buffer();
                 _p.PrepareFormattedStringList(rawBuffer, textBufferSpan.start, textBufferSpan.len, _fmtGlyphPlanList);
 
+                int pos1 = textBufferSpan.start;
                 for (int i = 0; i < textBufferSpan.len; ++i)
                 {
-                    int c = rawBuffer[i];
-                    //
-                    char upper = (char)(c >> 16);
-                    char lower = (char)c;
-                    if (char.IsHighSurrogate(upper) && char.IsLowSurrogate(lower))
+                    int c = rawBuffer[pos1];
+
+                    InputReader.GetChars(c, out char c0, out char c1);
+                    if (c1 != 0)
                     {
                         _isSurrogates.Append(true);
                     }
@@ -76,6 +76,7 @@ namespace Typography.Text
                     {
                         _isSurrogates.Append(false);
                     }
+                    pos1++;
 
                 }
             }
@@ -83,18 +84,20 @@ namespace Typography.Text
             {
                 char[] rawBuffer = textBufferSpan.GetRawUtf16Buffer();
                 _p.PrepareFormattedStringList(rawBuffer, textBufferSpan.start, textBufferSpan.len, _fmtGlyphPlanList);
-
-                for (int i = 0; i < rawBuffer.Length; ++i)
+              
+                int pos1 = textBufferSpan.start;
+                for (int i = 0; i < textBufferSpan.len; ++i)
                 {
-                    char c = rawBuffer[i];
-                    if (char.IsHighSurrogate(c) && i < rawBuffer.Length - 1)
+                    char c = rawBuffer[pos1];
+                    if (char.IsHighSurrogate(c) && i < textBufferSpan.len - 1)
                     {
-                        char c2 = rawBuffer[i + 1];
+                        char c2 = rawBuffer[pos1 + 1];
                         if (char.IsLowSurrogate(c2))
                         {
                             _isSurrogates.Append(true);
                             _isSurrogates.Append(true);
                             ++i;
+                            ++pos1;
                         }
                         else
                         {
@@ -109,6 +112,7 @@ namespace Typography.Text
                     {
                         _isSurrogates.Append(false);
                     }
+                    ++pos1;
                 }
             }
 
@@ -161,17 +165,18 @@ namespace Typography.Text
                             }
                         }
 
-                        //outputTotalW += measureResult.outputXAdvances[pos + glyphPlan.input_cp_offset] += (int)Math.Round(glyphPlan.AdvanceX * scale1);
-                        if (_isSurrogates[pos])
-                        {
-                            outputTotalW += measureResult.outputXAdvances[pos] = (int)Math.Round(glyphPlan.AdvanceX * scale1);
-                            pos += 2;
-                        }
-                        else
-                        {
-                            outputTotalW += measureResult.outputXAdvances[pos] = (int)Math.Round(glyphPlan.AdvanceX * scale1);
-                            pos++;
-                        }
+                        outputTotalW += measureResult.outputXAdvances[pos] = (int)Math.Round(glyphPlan.AdvanceX * scale1);
+                        pos++;
+                        //if (_isSurrogates[pos])
+                        //{
+                        //    outputTotalW += measureResult.outputXAdvances[pos] = (int)Math.Round(glyphPlan.AdvanceX * scale1);
+                        //    pos += 2;
+                        //}
+                        //else
+                        //{
+                        //    outputTotalW += measureResult.outputXAdvances[pos] = (int)Math.Round(glyphPlan.AdvanceX * scale1);
+                        //    pos++;
+                        //}
 
                     }
                     ws_count = fmtSeq.PostfixWhitespaceCount;
@@ -311,29 +316,10 @@ namespace Typography.Text
         }
 
 
-        public void BreakToLineSegments(in TextBufferSpan textBufferSpan, WordVisitor wordVisitor)
-        {
-            //a text buffer span is separated into multiple line segment list  
-            if (textBufferSpan.IsUtf32Buffer)
-            {
-                _p.BreakToLineSegments(
-                    textBufferSpan.GetRawUtf32Buffer(),
-                    textBufferSpan.start,
-                    textBufferSpan.len,
-                    wordVisitor);
-            }
-            else
-            {
-                _p.BreakToLineSegments(
-                  textBufferSpan.GetRawUtf16Buffer(),
-                  textBufferSpan.start,
-                  textBufferSpan.len,
-                  wordVisitor);
+        public void BreakToLineSegments(in TextBufferSpan textBufferSpan, WordVisitor wordVisitor) => _p.BreakToLineSegments(textBufferSpan, wordVisitor);
 
-            }
-
-        }
         public ResolvedFont ResolveFont(RequestFont reqFont) => _openFontTextService.ResolveFont(reqFont);
+
         public bool TryGetAlternativeTypefaceFromCodepoint(int codepoint, AltTypefaceSelectorBase selector, out Typeface found) => _openFontTextService.TryGetAlternativeTypefaceFromCodepoint(codepoint, selector, out found);
 
         public AlternativeTypefaceSelector AlternativeTypefaceSelector

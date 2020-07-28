@@ -41,9 +41,6 @@ namespace Typography.TextBreak
 
         public CustomAbbrvDic EngCustomAbbrvDic { get; set; }
 
-
-
-
         static readonly SpanBreakInfo s_c0BasicLatin = new SpanBreakInfo(Unicode13RangeInfoList.C0_Controls_and_Basic_Latin, false, ScriptTagDefs.Latin.Tag);
         static readonly SpanBreakInfo s_c1LatinSupplement = new SpanBreakInfo(Unicode13RangeInfoList.C1_Controls_and_Latin_1_Supplement, false, ScriptTagDefs.Latin.Tag);
         static readonly SpanBreakInfo s_latinExtendA = new SpanBreakInfo(Unicode13RangeInfoList.Latin_Extended_A, false, ScriptTagDefs.Latin.Tag);
@@ -66,10 +63,8 @@ namespace Typography.TextBreak
 
             LexState lexState = LexState.Init;
             BreakBounds bb = new BreakBounds();
-            if (visitor.EndIndex == 3)
-            {
 
-            }
+
             bb.startIndex = visitor.CurrentIndex;
 
             bool enableUnicodeRangeBreaker = EnableUnicodeRangeBreaker;
@@ -255,7 +250,7 @@ namespace Typography.TextBreak
                                 bb.startIndex = visitor.CurrentIndex;
                                 bb.length = 1;
                                 bb.kind = WordKind.Punc;
-                                 
+
                                 visitor.AddWordBreakAt(bb);
 
                                 bb.Consume();
@@ -642,7 +637,7 @@ namespace Typography.TextBreak
             //vis.AddWordBreakAtCurrentIndex(bb.kind);
             if (bb.startIndex + bb.length != vis.CurrentIndex)
             {
-                System.Diagnostics.Debugger.Break();
+              //  System.Diagnostics.Debugger.Break();
             }
             vis.AddWordBreak_AndSetCurrentIndex(bb.startIndex + bb.length, bb.kind);
         }

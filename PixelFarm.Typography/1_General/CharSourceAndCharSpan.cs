@@ -2,39 +2,107 @@
 
 using System;
 using System.Collections.Generic;
+
 using System.Text;
 using PixelFarm.CpuBlit;
+using Typography.TextBreak;
 
 namespace Typography.Text
 {
     public class TextCopyBuffer
     {
+        public enum BackupBufferKind
+        {
+            StringBuilder,
+            Utf16ArrayList,
+            Utf32ArrayList
+        }
+
         readonly StringBuilder _sb = new StringBuilder();
-#if DEBUG
+        readonly ArrayList<int> _utf32Buffer = new ArrayList<int>();
+        readonly ArrayList<char> _utf16Buffer = new ArrayList<char>();
+
         public TextCopyBuffer()
         {
 
         }
-#endif       
+        public BackupBufferKind BackupKind { get; set; }
+
         public void AppendNewLine()
         {
             //push content of current line 
             //into plain doc
-            _sb.AppendLine();
+            switch (BackupKind)
+            {
+                default:
+                    _sb.AppendLine();
+                    break;
+                case BackupBufferKind.Utf32ArrayList:
+                    _utf32Buffer.Append('\r');
+                    _utf32Buffer.Append('\n');
+                    break;
+                case BackupBufferKind.Utf16ArrayList:
+                    _utf16Buffer.Append('\r');
+                    _utf16Buffer.Append('\n');
+                    break;
+            }
         }
         public IEnumerable<string> GetLineIter()
         {
             //TODO: review this again
-
-            using (System.IO.StringReader reader = new System.IO.StringReader(_sb.ToString()))
+            switch (BackupKind)
             {
-                string line = reader.ReadLine();
-                while (line != null)
-                {
-                    yield return line;
-                    line = reader.ReadLine();
-                }
+                default:
+                    {
+                        using (System.IO.StringReader reader = new System.IO.StringReader(_sb.ToString()))
+                        {
+                            string line = reader.ReadLine();
+                            while (line != null)
+                            {
+                                yield return line;
+                                line = reader.ReadLine();
+                            }
+                        }
+                    }
+                    break;
+                case BackupBufferKind.Utf16ArrayList:
+                    {
+                        InputReader reader = new InputReader(_utf16Buffer.UnsafeInternalArray, 0, _utf16Buffer.Length);
+                        int latest_cut_begin = 0;
+                        while (!reader.IsEnd)
+                        {
+                            char c0 = reader.C0;
+                            if (c0 == '\r' && reader.PeekNext() == '\n')
+                            {
+                                //copy to a string line
+                                yield return "";
+
+                                reader.Read();
+                            }
+                            reader.Read();
+                        }
+                    }
+                    break;
+                case BackupBufferKind.Utf32ArrayList:
+                    {
+                        int latest_cut_begin = 0;
+                        InputReader reader = new InputReader(_utf32Buffer.UnsafeInternalArray, 0, _utf32Buffer.Length);
+                        while (!reader.IsEnd)
+                        {
+                            char c0 = reader.C0;
+                            if (c0 == '\r' && reader.PeekNext() == '\n')
+                            {
+                                //copy to a string line
+                                yield return "";
+
+                                reader.Read();
+                            }
+                            reader.Read();
+                        }
+                    }
+                    break;
             }
+
         }
 
 
@@ -47,27 +115,77 @@ namespace Typography.Text
         public void AppendData(int[] buffer, int start, int len)
         {
             int end = start + len;
-            for (int i = start; i < end; ++i)
+            switch (BackupKind)
             {
-                int d = buffer[i];
-                char upper = (char)(d >> 16);
-                char lower = (char)d;
-                if (upper > 0)
+                case BackupBufferKind.Utf32ArrayList:
+                    {
+                        _utf32Buffer.Append(buffer, start, len);
+                    }
+                    break;
+                default:
+                    {
+                        for (int i = start; i < end; ++i)
+                        {
+                            int d = buffer[i];
+                            char upper = (char)(d >> 16);
+                            if (upper > 0)
+                            {
+                                InputReader.GetChars(buffer[i], out upper, out char lower);
+                                _sb.Append(upper);
+                                _sb.Append(lower);
+                            }
+                            else
+                            {
+                                _sb.Append((char)d);
+                            }
+                        }
+                    }
+                    break;
+            }
+
+        }
+        public void Clear()
+        {
+            _sb.Length = 0;
+            _utf32Buffer.Clear();
+            _utf16Buffer.Clear();
+        }
+
+        public int Length
+        {
+            get
+            {
+                switch (BackupKind)
                 {
-                    _sb.Append(upper);
+                    default: return _sb.Length;
+                    case BackupBufferKind.Utf16ArrayList:
+                        return _utf16Buffer.Length;
+                    case BackupBufferKind.Utf32ArrayList:
+                        return _utf32Buffer.Length;
                 }
-                _sb.Append(lower);
             }
         }
-        public void Clear() => _sb.Length = 0;
-
-        public int Length => _sb.Length;
 
         public void CopyTo(char[] charBuffer)
         {
+            switch (BackupKind)
+            {
+
+            }
             _sb.CopyTo(0, charBuffer, 0, _sb.Length);
         }
+        public void CopyTo(ArrayList<int> output)
+        {
+            switch (BackupKind)
+            {
+                case BackupBufferKind.Utf32ArrayList:
+                    output.Append(_utf32Buffer.UnsafeInternalArray, 0, _utf32Buffer.Length);
+                    break;
+                default:
+                    throw new NotSupportedException();
+            }
 
+        }
         [ThreadStatic]
         static ArrayList<char> s_tempBuffer;
         public void CopyTo(StringBuilder stbuilder)
@@ -149,8 +267,22 @@ namespace Typography.Text
         public CharBufferSegment NewSpan(char[] charBuffer)
         {
             int s = _arrList.Count;
-            //_arrList.Append(charBuffer);
-            return new CharBufferSegment(this, s, charBuffer.Length);
+
+            for (int i = 0; i < charBuffer.Length; ++i)
+            {
+                char c0 = charBuffer[i];
+                if (char.IsHighSurrogate(c0) && i + 1 < charBuffer.Length)
+                {
+                    _arrList.Append(char.ConvertToUtf32(c0, charBuffer[i + 1]));
+                    i++;
+                }
+                else
+                {
+                    _arrList.Append(c0);
+                }
+            } 
+           
+            return new CharBufferSegment(this, s, _arrList.Count - s);
         }
         public CharBufferSegment NewSpan(string str)
         {

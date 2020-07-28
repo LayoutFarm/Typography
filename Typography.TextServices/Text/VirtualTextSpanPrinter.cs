@@ -157,17 +157,22 @@ namespace Typography.Text
 
         readonly Dictionary<UnicodeRangeInfo, Typeface> _prevResolvedTypefaces = new Dictionary<UnicodeRangeInfo, Typeface>();
 
-        public void PrepareFormattedStringList(char[] textBuffer, int startAt, int len, FormattedGlyphPlanSeqProvider fmtGlyphs)
+
+        public void PrepareFormattedStringList(in Typography.Text.TextBufferSpan bufferSpan, FormattedGlyphPlanSeqProvider fmtGlyphs)
         {
-            _prevResolvedTypefaces.Clear();
+            //[A] break words
             _lineSegs.Clear();//clear before reuse
 
             _textPrinterWordVisitor.SetLineSegmentList(_lineSegs);
 
-            BreakToLineSegments(textBuffer, startAt, len, _textPrinterWordVisitor);//***
+            BreakToLineSegments(bufferSpan, _textPrinterWordVisitor);
+
 
             _textPrinterWordVisitor.SetLineSegmentList(null);
+            //--------------------------------------------------------------------             
 
+            //[B]
+            _prevResolvedTypefaces.Clear();
             NeedRightToLeftArr = false;
 
             Typeface defaultTypeface = _currentTypeface;
@@ -178,6 +183,9 @@ namespace Typography.Text
             int prefix_whitespaceCount = 0;
 
             int count = _lineSegs.Count;
+
+            InputReader inputReader = new InputReader(bufferSpan);
+
             for (int i = 0; i < count; ++i)
             {
                 //
@@ -213,21 +221,13 @@ namespace Typography.Text
                 //each line segment may have different unicode range 
                 //and the current typeface may not support that range
                 //so we need to ensure that we get a proper typeface,
-                //if not => alternative typeface
+                //if not => alternative typeface 
 
-                ushort sample_glyphIndex = 0;
-                char sample_char = textBuffer[line_seg.StartAt];
-                int codepoint = sample_char;
+                inputReader.SetCurrentIndex(line_seg.StartAt - bufferSpan.start);
 
-                if (line_seg.Length > 1 && line_seg.WordKind == WordKind.SurrogatePair)
-                {
-                    sample_glyphIndex = curTypeface.GetGlyphIndex(codepoint = char.ConvertToUtf32(sample_char, textBuffer[line_seg.StartAt + 1]));
-                }
-                else
-                {
-                    sample_glyphIndex = curTypeface.GetGlyphIndex(codepoint);
-                }
+                int codepoint = inputReader.Codepoint;
 
+                ushort sample_glyphIndex = curTypeface.GetGlyphIndex(codepoint);
 
                 if (sample_glyphIndex == 0)
                 {
@@ -280,7 +280,7 @@ namespace Typography.Text
 
                 //layout glyphs in each context
 
-                var buff = new Typography.Text.TextBufferSpan(textBuffer, line_seg.StartAt, line_seg.Length);
+                Typography.Text.TextBufferSpan buff = bufferSpan.CreateSubspan(line_seg.StartAt, line_seg.Length);
 
                 _glyphLayout.ScriptLang = new ScriptLang(spBreakInfo.ScriptTag, spBreakInfo.LangTag);
 
@@ -329,173 +329,15 @@ namespace Typography.Text
             }
         }
 
+
+        public void PrepareFormattedStringList(char[] textBuffer, int startAt, int len, FormattedGlyphPlanSeqProvider fmtGlyphs)
+        {
+            PrepareFormattedStringList(new TextBufferSpan(textBuffer, startAt, len), fmtGlyphs);
+        }
+
         public void PrepareFormattedStringList(int[] textBuffer, int startAt, int len, FormattedGlyphPlanSeqProvider fmtGlyphs)
         {
-
-            _prevResolvedTypefaces.Clear();
-            _lineSegs.Clear();//clear before reuse
-
-            _textPrinterWordVisitor.SetLineSegmentList(_lineSegs);
-
-            BreakToLineSegments(textBuffer, startAt, len, _textPrinterWordVisitor);//***
-
-            _textPrinterWordVisitor.SetLineSegmentList(null);
-
-            NeedRightToLeftArr = false;
-
-            Typeface defaultTypeface = _currentTypeface;
-            Typeface curTypeface = defaultTypeface;
-
-            ResolvedFont resolvedFont = LocalResolveFont(curTypeface, FontSizeInPoints);
-            FormattedGlyphPlanSeq latestFmtGlyphPlanSeq = null;
-            int prefix_whitespaceCount = 0;
-
-            int count = _lineSegs.Count;
-            for (int i = 0; i < count; ++i)
-            {
-                //
-                LineSegment line_seg = _lineSegs.GetLineSegment(i);
-                SpanBreakInfo spBreakInfo = line_seg.BreakInfo;
-
-#if DEBUG
-                if (spBreakInfo == null)
-                {
-
-                }
-#endif
-                if (spBreakInfo.RightToLeft)
-                {
-                    NeedRightToLeftArr = true;
-                }
-
-
-                if (line_seg.WordKind == WordKind.Whitespace)
-                {
-                    if (latestFmtGlyphPlanSeq == null)
-                    {
-                        prefix_whitespaceCount += line_seg.Length;
-                    }
-                    else
-                    {
-                        latestFmtGlyphPlanSeq.PostfixWhitespaceCount += line_seg.Length;
-                    }
-                    continue; //***
-                }
-
-
-                //each line segment may have different unicode range 
-                //and the current typeface may not support that range
-                //so we need to ensure that we get a proper typeface,
-                //if not => alternative typeface
-
-                ushort sample_glyphIndex = 0;
-                int sample_char = textBuffer[line_seg.StartAt];
-                int codepoint = sample_char;
-
-                
-                sample_glyphIndex = curTypeface.GetGlyphIndex(codepoint);
-                 
-
-
-                if (sample_glyphIndex == 0)
-                {
-                    //not found then => find other typeface                    
-                    //we need more information about line seg layout
-                    bool foundFromPrev = false;
-                    if (_prevResolvedTypefaces.Count > 0 && spBreakInfo != null &&
-                        spBreakInfo.UnicodeRange != null &&
-                        _prevResolvedTypefaces.TryGetValue(spBreakInfo.UnicodeRange, out Typeface prevTypeface))
-                    {
-
-                        //found
-                        //use this...
-                        if (line_seg.WordKind == WordKind.SurrogatePair)
-                        {
-                            //find unicode range of this surrogate pair
-                            if (UnicodeRangeFinder.GetUniCodeRangeFor(codepoint, out UnicodeRangeInfo u1, out SpanBreakInfo brk1) &&
-                                u1 == spBreakInfo.UnicodeRange)
-                            {
-                                resolvedFont = LocalResolveFont(prevTypeface, FontSizeInPoints);
-                                curTypeface = prevTypeface;
-                                foundFromPrev = true;
-                            }
-                        }
-                        else
-                        {
-                            resolvedFont = LocalResolveFont(prevTypeface, FontSizeInPoints);
-                            curTypeface = prevTypeface;
-                            foundFromPrev = true;
-                        }
-                    }
-
-                    if (!foundFromPrev)
-                    {
-                        if (AlternativeTypefaceSelector != null)
-                        {
-                            AlternativeTypefaceSelector.LatestTypeface = curTypeface;
-                        }
-
-                        if (BuiltInAlternativeTypefaceSelector != null &&
-                            BuiltInAlternativeTypefaceSelector.Invoke(codepoint, AlternativeTypefaceSelector, out Typeface alternative))
-                        {
-                            resolvedFont = LocalResolveFont(alternative, FontSizeInPoints);
-                            curTypeface = alternative;
-                            foundFromPrev = true;
-                        }
-                    }
-                }
-
-
-                //layout glyphs in each context
-
-                var buff = new Typography.Text.TextBufferSpan(textBuffer, line_seg.StartAt, line_seg.Length);
-
-                _glyphLayout.ScriptLang = new ScriptLang(spBreakInfo.ScriptTag, spBreakInfo.LangTag);
-
-                //in some text context (+typeface)=>user can disable gsub, gpos
-                //this is an example                  
-
-                if (line_seg.WordKind == WordKind.Tab || line_seg.WordKind == WordKind.Number ||
-                    (spBreakInfo.UnicodeRange == Unicode13RangeInfoList.C0_Controls_and_Basic_Latin && line_seg.WordKind != WordKind.SurrogatePair))
-                {
-                    _glyphLayout.EnableGpos = false;
-                    _glyphLayout.EnableGsub = false;
-                }
-                else
-                {
-                    _glyphLayout.EnableGpos = true;
-                    _glyphLayout.EnableGsub = true;
-                }
-
-
-                GlyphPlanSequence seq = CreateGlyphPlanSeq(buff, curTypeface);
-                seq.IsRightToLeft = spBreakInfo.RightToLeft;
-
-                if (spBreakInfo.UnicodeRange != null &&
-                    !_prevResolvedTypefaces.ContainsKey(spBreakInfo.UnicodeRange))
-                {
-                    //add 
-                    _prevResolvedTypefaces.Add(spBreakInfo.UnicodeRange, curTypeface);
-                }
-
-                //create an object that hold more information about GlyphPlanSequence
-
-                FormattedGlyphPlanSeq formattedGlyphPlanSeq = fmtGlyphs.AppendNew();
-
-                formattedGlyphPlanSeq.PrefixWhitespaceCount = (ushort)prefix_whitespaceCount;//***
-                prefix_whitespaceCount = 0;//reset 
-
-                //TODO: other style?... (bold, italic) 
-                ResolvedFont foundResolvedFont = LocalResolveFont(curTypeface, FontSizeInPoints);
-                formattedGlyphPlanSeq.SetData(seq, foundResolvedFont, spBreakInfo);
-
-                latestFmtGlyphPlanSeq = formattedGlyphPlanSeq;
-
-                curTypeface = defaultTypeface;//switch back to default
-
-                //restore latest script lang?
-            }
-
+            PrepareFormattedStringList(new TextBufferSpan(textBuffer, startAt, len), fmtGlyphs);
         }
         public override void DrawString(char[] textBuffer, int startAt, int len, float x, float y)
         {
@@ -610,55 +452,35 @@ namespace Typography.Text
             return found;
         }
 
-        public void BreakToLineSegments(int[] str, int startAt, int len, WordVisitor visitor)
+        public void BreakToLineSegments(in TextBufferSpan textBufferSpan, WordVisitor visitor)
         {
+
             //user must setup the CustomBreakerBuilder before use      
-            if (len < 1)
+            if (textBufferSpan.len < 1)
             {
                 return;
             }
 
-#if DEBUG
-            if (len > 2)
-            {
-                
-            }
-#endif
+
             if (_textBreaker == null)
             {
                 //setup 
                 _textBreaker = Typography.TextBreak.CustomBreakerBuilder.NewCustomBreaker();
             }
 
+            //TODO: configure this?
             _textBreaker.UseUnicodeRangeBreaker = true;
             _textBreaker.CurrentVisitor = visitor;
-            _textBreaker.BreakWords(str, startAt, len);
+
+            if (textBufferSpan.IsUtf32Buffer)
+            {
+                _textBreaker.BreakWords(textBufferSpan.GetRawUtf32Buffer(), textBufferSpan.start, textBufferSpan.len);
+            }
+            else
+            {
+                _textBreaker.BreakWords(textBufferSpan.GetRawUtf16Buffer(), textBufferSpan.start, textBufferSpan.len);
+            }
         }
-        public void BreakToLineSegments(char[] str, int startAt, int len, WordVisitor visitor)
-        {
-            //user must setup the CustomBreakerBuilder before use      
-            if (len < 1)
-            {
-                return;
-            }
-
-#if DEBUG
-            if (len > 2)
-            {
-
-            }
-#endif
-            if (_textBreaker == null)
-            {
-                //setup 
-                _textBreaker = Typography.TextBreak.CustomBreakerBuilder.NewCustomBreaker();
-            }
-
-            _textBreaker.UseUnicodeRangeBreaker = true;
-            _textBreaker.CurrentVisitor = visitor;
-            _textBreaker.BreakWords(str, startAt, len);
-        }
-
 
         GlyphPlanSequence CreateGlyphPlanSeq(in Typography.Text.TextBufferSpan textBufferSpan, Typeface typeface)
         {

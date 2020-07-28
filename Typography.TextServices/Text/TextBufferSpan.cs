@@ -46,6 +46,7 @@ namespace Typography.Text
         public int[] GetRawUtf32Buffer() => _utf32Buffer;
         public char[] GetRawUtf16Buffer() => _utf16Buffer;
         public bool IsUtf32Buffer => _utf32Buffer != null;
+
     }
 
 }

@@ -3,8 +3,10 @@
 // © 2016 and later: Unicode, Inc. and others.
 // License & terms of use: http://www.unicode.org/copyright.html#License
 
+
 using System;
 using System.Collections.Generic;
+
 
 namespace Typography.TextBreak
 {
@@ -79,7 +81,7 @@ namespace Typography.TextBreak
 
         public VisitorState State { get; internal set; }
         //
-        public int CurrentIndex => _inputReader.Index;
+        public int CurrentIndex => _inputReader.ActualIndex;
         //
         public char Char => _inputReader.C0;
         public int StartIndex => _inputReader.StartAt;
@@ -157,7 +159,9 @@ namespace Typography.TextBreak
         internal Stack<int> GetTempCandidateBreaks() => _tempCandidateBreaks;
     }
 
-    struct InputReader
+
+
+    public struct InputReader
     {
         readonly char[] _utf16Buffer;
         readonly int[] _utf32Buffer;
@@ -175,41 +179,62 @@ namespace Typography.TextBreak
         {
             _utf16Buffer = input;
             _utf32Buffer = null;
-            _start = start;
+            _index = _start = start;
             _len = len;
-            _index = start;
+
             _end = start + len;
             _c0 = _c1 = '\0';
             _inc = 0;
-            ReadCurrentIndex();
+            ReadCurrentOffset();
         }
 
         public InputReader(int[] input, int start, int len)
         {
             _utf16Buffer = null;
             _utf32Buffer = input;
-            _start = start;
+            _index = _start = start;
             _len = len;
-            _index = start;
+
             _end = start + len;
             _c0 = _c1 = '\0';
             _inc = 0;
-            ReadCurrentIndex();
+            ReadCurrentOffset();
         }
-        public void SetNewReadingRange(int start, int len)
+
+        public InputReader(Typography.Text.TextBufferSpan span)
         {
-            _start = start;
-            _len = len;
-            _index = start;
-            _end = start + len;
+            if (span.IsUtf32Buffer)
+            {
+                _utf16Buffer = null;
+                _utf32Buffer = span.GetRawUtf32Buffer();
+            }
+            else
+            {
+                _utf16Buffer = span.GetRawUtf16Buffer();
+                _utf32Buffer = null;
+
+            }
+            _index = _start = span.start;
+            _len = span.len;
+
+            _end = _start + span.len;
             _c0 = _c1 = '\0';
             _inc = 0;
-            ReadCurrentIndex();
+            ReadCurrentOffset();
         }
+
         public int StartAt => _start;
 
         public int Length => _len;
-        public int Index => _index;
+        /// <summary>
+        /// relative offset from start
+        /// </summary>
+        public int Offset => _index - _start;
+        ///// <summary>
+        ///// actual offset from original buffer
+        ///// </summary>
+        //public int ActualIndex => _index;
+
         public bool HasNext => _index >= _end;
         public char PeekNext()
         {
@@ -236,73 +261,79 @@ namespace Typography.TextBreak
             return '\0';
         }
 
-        //https://www.unicode.org/faq/utf_bom.html#utf16-1
-        //the first snippet calculates the high (or leading) surrogate from a character code C.
-
-        //    const UTF16 HI_SURROGATE_START = 0xD800
-
-        //    UTF16 X = (UTF16) C;
-        //    UTF32 U = (C >> 16) & ((1 << 5) - 1);
-        //    UTF16 W = (UTF16) U - 1;
-        //    UTF16 HiSurrogate = HI_SURROGATE_START | (W << 6) | X >> 10;
-
-        //where X, U and W correspond to the labels used in Table 3-5 UTF-16 Bit Distribution. The next snippet does the same for the low surrogate.
-
-        //    const UTF16 LO_SURROGATE_START = 0xDC00
-
-        //    UTF16 X = (UTF16) C;
-        //    UTF16 LoSurrogate = (UTF16) (LO_SURROGATE_START | X & ((1 << 10) - 1));
-
-        //Finally, the reverse, where hi and lo are the high and low surrogate, and C the resulting character
-
-        //    UTF32 X = (hi & ((1 << 6) -1)) << 10 | lo & ((1 << 10) -1);
-        //    UTF32 W = (hi >> 6) & ((1 << 5) - 1);
-        //    UTF32 U = W + 1;
-
-        //    UTF32 C = U << 16 | X;
 
         //------------------
         // constants
         const int LEAD_OFFSET = 0xD800 - (0x10000 >> 10);
         const int SURROGATE_OFFSET = 0x10000 - (0xD800 << 10) - 0xDC00;
 
-        ////from codepoint to upper and lower 
-        //ushort lead = (ushort)(LEAD_OFFSET + (utf32_x1 >> 10));
-        //ushort trail = (ushort)(0xDC00 + (utf32_x1 & 0x3FF));
+        public static void GetChars(int codepoint, out char c0, out char c1)
+        {
+            //https://www.unicode.org/faq/utf_bom.html#utf16-1
 
-        ////compute back
-        //int codepoint_x = (lead << 10) + trail + SURROGATE_OFFSET;
-        ////UTF32 codepoint = (lead << 10) + trail + SURROGATE_OFFSET;
+            //the first snippet calculates the high (or leading) surrogate from a character code C.
 
-        //char x1_0 = (char)(utf32_x1 >> 16);
-        //char x1_1 = (char)(utf32_x1);
+            //    const UTF16 HI_SURROGATE_START = 0xD800
 
-        //static void GetSurrogatePair(int codepoint, out char upper, out char lower)
-        //{
-        //    upper = (char)(LEAD_OFFSET + (codepoint >> 10));
-        //    lower = (char)(0xDC00 + (codepoint & 0x3FF));
-        //}
+            //    UTF16 X = (UTF16) C;
+            //    UTF32 U = (C >> 16) & ((1 << 5) - 1);
+            //    UTF16 W = (UTF16) U - 1;
+            //    UTF16 HiSurrogate = HI_SURROGATE_START | (W << 6) | X >> 10;
 
-        void ReadCurrentIndex()
+            //where X, U and W correspond to the labels used in Table 3-5 UTF-16 Bit Distribution. The next snippet does the same for the low surrogate.
+
+            //    const UTF16 LO_SURROGATE_START = 0xDC00
+
+            //    UTF16 X = (UTF16) C;
+            //    UTF16 LoSurrogate = (UTF16) (LO_SURROGATE_START | X & ((1 << 10) - 1));
+
+            //Finally, the reverse, where hi and lo are the high and low surrogate, and C the resulting character
+
+            //    UTF32 X = (hi & ((1 << 6) -1)) << 10 | lo & ((1 << 10) -1);
+            //    UTF32 W = (hi >> 6) & ((1 << 5) - 1);
+            //    UTF32 U = W + 1;
+
+            //    UTF32 C = U << 16 | X;
+
+
+            ////from codepoint to upper and lower 
+            //ushort lead = (ushort)(LEAD_OFFSET + (utf32_x1 >> 10));
+            //ushort trail = (ushort)(0xDC00 + (utf32_x1 & 0x3FF));
+
+            ////compute back
+            //int codepoint_x = (lead << 10) + trail + SURROGATE_OFFSET;
+            ////UTF32 codepoint = (lead << 10) + trail + SURROGATE_OFFSET;
+
+            //char x1_0 = (char)(utf32_x1 >> 16);
+            //char x1_1 = (char)(utf32_x1);
+
+            //static void GetSurrogatePair(int codepoint, out char upper, out char lower)
+            //{
+            //    upper = (char)(LEAD_OFFSET + (codepoint >> 10));
+            //    lower = (char)(0xDC00 + (codepoint & 0x3FF));
+            //}
+
+            c0 = (char)(codepoint >> 16);
+
+            if (c0 == '\0')
+            {
+                c0 = (char)codepoint;
+                c1 = '\0';
+            }
+            else
+            {
+                c0 = (char)(LEAD_OFFSET + (codepoint >> 10));
+                c1 = (char)(0xDC00 + (codepoint & 0x3FF));
+            }
+        }
+
+        void ReadCurrentOffset()
         {
             if (_index < _end)
             {
                 if (_utf32Buffer != null)
                 {
-                    int codepoint = _utf32Buffer[_index];
-                    //GetSurrogatePair(_utf32Buffer[_index], out _c0, out _c1);
-                    _c0 = (char)(codepoint >> 16);
-
-                    if (_c0 == '\0')
-                    {
-                        _c0 = (char)codepoint;
-                        _c1 = '\0';
-                    }
-                    else
-                    {
-                        _c0 = (char)(LEAD_OFFSET + (codepoint >> 10));
-                        _c1 = (char)(0xDC00 + (codepoint & 0x3FF));
-                    }
+                    GetChars(_utf32Buffer[_index], out _c0, out _c1);
                     _inc = 1;
                 }
                 else
@@ -350,7 +381,7 @@ namespace Typography.TextBreak
             if (_index + _inc <= _end)
             {
                 _index += _inc;
-                ReadCurrentIndex();
+                ReadCurrentOffset();
                 return true;
             }
             return false;
@@ -360,12 +391,23 @@ namespace Typography.TextBreak
 
         public char C0 => _c0;
         public char C1 => _c1;
+        public int Codepoint
+        {
+            get
+            {
+                if (_c1 != '\0')
+                {
+                    return char.ConvertToUtf32(_c0, _c1);
+                }
+                return _c0;
+            }
+        }
 
         public void SetCurrentIndex(int index)
         {
             _index = _start + index;
             _inc = 0;
-            ReadCurrentIndex();
+            ReadCurrentOffset();
         }
     }
 
