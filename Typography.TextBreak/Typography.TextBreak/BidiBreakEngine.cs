@@ -61,7 +61,7 @@ namespace Typography.TextBreak
 
 
             int arabic_len = 0;
-            int startAt = visitor.CurrentIndex;
+            int startAt = visitor.Offset;
 
             SpanBreakInfo latest_ar = null;
             _arabicBuffer.Clear();

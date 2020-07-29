@@ -97,7 +97,7 @@ namespace Typography.TextBreak
 
         void BreakWords()
         {
-            int startAt = _visitor.CurrentIndex;
+            int startAt = _visitor.Offset;
             BreakingEngine currentEngine = _breakingEngine = (UseUnicodeRangeBreaker) ? _engBreakingEngine : SelectEngine(_visitor.C0);
             for (; ; )
             {
@@ -129,7 +129,7 @@ namespace Typography.TextBreak
 #endif
 
                                 if (ThrowIfCharOutOfRange) throw new NotSupportedException($"A proper breaking engine for character '{_visitor.Char}' was not found.");
-                                startAt = _visitor.CurrentIndex + 1;
+                                startAt = _visitor.Offset + 1;
                                 _visitor.SetCurrentIndex(startAt);
                                 _visitor.AddWordBreakAtCurrentIndex(WordKind.Unknown);
 
@@ -137,7 +137,7 @@ namespace Typography.TextBreak
                             else
                             {
                                 currentEngine = anotherEngine;
-                                startAt = _visitor.CurrentIndex;
+                                startAt = _visitor.Offset;
 
                             }
                         }

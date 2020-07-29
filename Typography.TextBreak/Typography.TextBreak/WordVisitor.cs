@@ -4,9 +4,11 @@
 // License & terms of use: http://www.unicode.org/copyright.html#License
 
 
+
+
 using System;
 using System.Collections.Generic;
-
+using Typography.Text;
 
 namespace Typography.TextBreak
 {
@@ -48,6 +50,7 @@ namespace Typography.TextBreak
 
     public abstract class WordVisitor
     {
+        int _startAt;
         int _endIndex;
         int _latestBreakAt;
         InputReader _inputReader;
@@ -59,15 +62,21 @@ namespace Typography.TextBreak
         internal void LoadText(int[] buffer, int index, int len)
         {
             //input is utf32  
+            _startAt = index;
+            _endIndex = index + len;
             _inputReader = new InputReader(buffer, index, len);
             _endIndex = index + len;
+
             _latestBreakAt = LatestSpanStartAt = index;
+
             _tempCandidateBreaks.Clear();
         }
         internal void LoadText(char[] buffer, int index, int len)
         {
-            _inputReader = new InputReader(buffer, index, len);
+            _startAt = index;
             _endIndex = index + len;
+            _inputReader = new InputReader(buffer, index, len);
+
             _latestBreakAt = LatestSpanStartAt = index;
             _tempCandidateBreaks.Clear();
         }
@@ -81,10 +90,10 @@ namespace Typography.TextBreak
 
         public VisitorState State { get; internal set; }
         //
-        public int CurrentIndex => _inputReader.ActualIndex;
+        public int Offset => _inputReader.Offset;
         //
         public char Char => _inputReader.C0;
-        public int StartIndex => _inputReader.StartAt;
+
         internal int EndIndex => _endIndex;
 
         public bool IsEnd => _inputReader.IsEnd;
@@ -93,28 +102,25 @@ namespace Typography.TextBreak
         internal char C0 => _inputReader.C0;
         internal char C1 => _inputReader.C1;
         internal char PeekNext() => _inputReader.PeekNext();
-
-
-
 #if DEBUG
         //int dbugAddSteps;
 #endif
 
-        internal void AddWordBreakAt(int index, WordKind wordKind)
+        internal void AddWordBreakAt(int offset, WordKind wordKind)
         {
-
+            int actualOffset = offset + _startAt;
 #if DEBUG 
-            if (index == _latestBreakAt)
+            if (actualOffset == _latestBreakAt)
             {
                 throw new NotSupportedException();
             }
 #endif
 
-            LatestSpanLen = (ushort)(index - LatestBreakAt);
+            LatestSpanLen = (ushort)(actualOffset - LatestBreakAt);
             LatestSpanStartAt = _latestBreakAt;
             LatestWordKind = wordKind;
 
-            _latestBreakAt = index;//** 
+            _latestBreakAt = actualOffset;//** 
 
             OnBreak();
 
@@ -128,12 +134,12 @@ namespace Typography.TextBreak
         }
         internal void AddWordBreakAtCurrentIndex(WordKind wordKind = WordKind.Text)
         {
-            AddWordBreakAt(this.CurrentIndex, wordKind);
+            AddWordBreakAt(this.Offset, wordKind);
         }
         internal void AddWordBreak_AndSetCurrentIndex(int index, WordKind wordKind)
         {
             AddWordBreakAt(index, wordKind);
-            SetCurrentIndex(LatestBreakAt);
+            SetCurrentIndex(LatestBreakAt - _startAt);
         }
         //
         public int LatestSpanStartAt { get; private set; }
@@ -142,15 +148,16 @@ namespace Typography.TextBreak
         public ushort LatestSpanLen { get; private set; }
         //
 
-        internal void SetCurrentIndex(int index)
+        internal void SetCurrentIndex(int offset)
         {
-            if (index < _endIndex)
+            int actualOffset = offset + _startAt;
+            if (actualOffset < _endIndex)
             {
-                _inputReader.SetCurrentIndex(index);
+                _inputReader.SetCurrentOffset(offset);
             }
             else
             {
-                _inputReader.SetCurrentIndex(_endIndex);
+                _inputReader.SetCurrentOffset(_endIndex);
                 //can't read next
                 //the set state= end
                 this.State = VisitorState.End;
@@ -168,13 +175,13 @@ namespace Typography.TextBreak
         int _start;
         int _len;
         int _end;
-        int _index;
+        int _index;//index from start of original buffer
         int _inc;
 
         //
         char _c0;
         char _c1;
-
+        public InputReader(char[] input) : this(input, 0, input.Length) { }
         public InputReader(char[] input, int start, int len)
         {
             _utf16Buffer = input;
@@ -187,7 +194,6 @@ namespace Typography.TextBreak
             _inc = 0;
             ReadCurrentOffset();
         }
-
         public InputReader(int[] input, int start, int len)
         {
             _utf16Buffer = null;
@@ -201,39 +207,17 @@ namespace Typography.TextBreak
             ReadCurrentOffset();
         }
 
-        public InputReader(Typography.Text.TextBufferSpan span)
-        {
-            if (span.IsUtf32Buffer)
-            {
-                _utf16Buffer = null;
-                _utf32Buffer = span.GetRawUtf32Buffer();
-            }
-            else
-            {
-                _utf16Buffer = span.GetRawUtf16Buffer();
-                _utf32Buffer = null;
 
-            }
-            _index = _start = span.start;
-            _len = span.len;
-
-            _end = _start + span.len;
-            _c0 = _c1 = '\0';
-            _inc = 0;
-            ReadCurrentOffset();
-        }
-
-        public int StartAt => _start;
 
         public int Length => _len;
         /// <summary>
         /// relative offset from start
         /// </summary>
         public int Offset => _index - _start;
-        ///// <summary>
-        ///// actual offset from original buffer
-        ///// </summary>
-        //public int ActualIndex => _index;
+        /// <summary>
+        /// actual offset from original buffer
+        /// </summary>
+        public int ActualIndex => _index;
 
         public bool HasNext => _index >= _end;
         public char PeekNext()
@@ -387,27 +371,112 @@ namespace Typography.TextBreak
             return false;
         }
 
+        public enum LineEnd : byte
+        {
+            None,
+            /// <summary>
+            /// \r
+            /// </summary>
+            R,
+            /// <summary>
+            /// n, new line
+            /// </summary>
+            N,
+            /// <summary>
+            /// \r\n
+            /// </summary>
+            RN
+        }
+
+
+        public bool Readline(out int begin, out int end, out LineEnd endlineWith)
+        {
+            begin = _index;
+            end = begin;
+            endlineWith = LineEnd.None;
+            if (_index + _inc >= _end)
+            {
+                return false;
+            }
+            //----------------------
+            _index += _inc;
+            //read until found the end of line
+
+            //find       
+            do
+            {
+                int codepoint = (_utf32Buffer != null) ? _utf32Buffer[_index] : _utf16Buffer[_index];
+                if (codepoint == '\r')
+                {
+                    if (_index + 2 <= _end)
+                    {
+                        int next_codepoint = (_utf32Buffer != null) ? _utf32Buffer[_index + 1] : _utf16Buffer[_index + 1];
+                        if (next_codepoint == '\n')
+                        {
+                            _index++;
+                            _inc = 1;
+
+                            end = _index - 2;
+                            endlineWith = LineEnd.RN;
+                            return true;
+                        }
+                        else
+                        {
+                            _inc = 1;
+                            end = _index - 1;
+                            endlineWith = LineEnd.R;
+                            return true;
+                        }
+                    }
+                    else
+                    {
+                        _inc = 1;
+                        end = _index - 1;
+                        endlineWith = LineEnd.R;
+                        return true;
+                    }
+                }
+                else if (codepoint == '\n')
+                {
+                    end = _index - 1;
+                    _inc = 1;
+                    endlineWith = LineEnd.N;
+                    return true;
+                }
+                else
+                {
+                    _index++;
+
+                }
+            } while (_index < _end);
+            //----------------
+            if (_index > begin)
+            {
+                end = _index - 1;//
+
+                return true;
+            }
+
+            return false;
+        }
         public bool IsEnd => _index >= _end;
 
         public char C0 => _c0;
         public char C1 => _c1;
-        public int Codepoint
-        {
-            get
-            {
-                if (_c1 != '\0')
-                {
-                    return char.ConvertToUtf32(_c0, _c1);
-                }
-                return _c0;
-            }
-        }
 
-        public void SetCurrentIndex(int index)
+        public int Codepoint => (_c1 != '\0') ? char.ConvertToUtf32(_c0, _c1) : _c0;
+
+        public void SetCurrentOffset(int offset)
         {
-            _index = _start + index;
+            _index = _start + offset;
             _inc = 0;
             ReadCurrentOffset();
+        }
+
+
+        public Typography.Text.TextBufferSpan GetBufferSpan(int start, int len)
+        {
+            return (_utf32Buffer != null) ? new TextBufferSpan(_utf32Buffer, start, len) : new TextBufferSpan(_utf16Buffer, start, len);
         }
     }
 

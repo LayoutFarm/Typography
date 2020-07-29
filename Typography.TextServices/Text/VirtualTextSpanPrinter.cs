@@ -184,7 +184,19 @@ namespace Typography.Text
 
             int count = _lineSegs.Count;
 
-            InputReader inputReader = new InputReader(bufferSpan);
+            InputReader inputReader;
+            if (bufferSpan.IsUtf32Buffer)
+            {
+                inputReader = new InputReader(bufferSpan.GetRawUtf32Buffer(),
+                    bufferSpan.start,
+                    bufferSpan.len);
+            }
+            else
+            {
+                inputReader = new InputReader(bufferSpan.GetRawUtf16Buffer(),
+                  bufferSpan.start,
+                  bufferSpan.len);
+            }
 
             for (int i = 0; i < count; ++i)
             {
@@ -223,7 +235,7 @@ namespace Typography.Text
                 //so we need to ensure that we get a proper typeface,
                 //if not => alternative typeface 
 
-                inputReader.SetCurrentIndex(line_seg.StartAt - bufferSpan.start);
+                inputReader.SetCurrentOffset(line_seg.StartAt - bufferSpan.start);
 
                 int codepoint = inputReader.Codepoint;
 
