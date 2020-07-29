@@ -8,7 +8,7 @@
 
 using System;
 using System.Collections.Generic;
-using Typography.Text;
+
 
 namespace Typography.TextBreak
 {
@@ -473,11 +473,11 @@ namespace Typography.TextBreak
             ReadCurrentOffset();
         }
 
+        //temp fix
+        public bool IsUtf32Buffer => _utf32Buffer != null;
 
-        public Typography.Text.TextBufferSpan GetBufferSpan(int start, int len)
-        {
-            return (_utf32Buffer != null) ? new TextBufferSpan(_utf32Buffer, start, len) : new TextBufferSpan(_utf16Buffer, start, len);
-        }
+        public ArraySegment<int> GetUtf32Segment(int start, int len) => new ArraySegment<int>(_utf32Buffer, start, len);
+        public ArraySegment<char> GetUtf16Segment(int start, int len) => new ArraySegment<char>(_utf16Buffer, start, len);
     }
 
 }

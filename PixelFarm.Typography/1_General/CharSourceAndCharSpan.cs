@@ -351,6 +351,14 @@ namespace Typography.Text
                 return NewSpan(textspan.GetRawUtf16Buffer(), textspan.start, textspan.len);
             }
         }
+        public CharBufferSegment NewSegment(ArraySegment<int> textspan)
+        { 
+            return NewSpan(textspan.Array, textspan.Offset, textspan.Count);
+        }
+        public CharBufferSegment NewSegment(ArraySegment<char> textspan)
+        {
+            return NewSpan(textspan.Array, textspan.Offset, textspan.Count);
+        }
         public void CopyAndAppend(int start, int len)
         {
             //copy data from srcRange

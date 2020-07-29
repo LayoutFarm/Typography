@@ -135,10 +135,7 @@ namespace PixelFarm.Drawing
     }
 
 
-    public interface IFormattedGlyphPlanList
-    {
-
-    }
+   
 
     public interface IDashGenerator
     {
