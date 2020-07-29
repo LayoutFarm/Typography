@@ -41,7 +41,6 @@
             this.chkFlipY = new System.Windows.Forms.CheckBox();
             this.txtMsgInfo = new System.Windows.Forms.TextBox();
             this.chkEnableMultiTypefaces = new System.Windows.Forms.CheckBox();
-            this.button2 = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // lstFontList
@@ -114,7 +113,6 @@
             this.button1.TabIndex = 34;
             this.button1.Text = "Render!";
             this.button1.UseVisualStyleBackColor = true;
-             
             // 
             // lstHintList
             // 
@@ -167,22 +165,11 @@
             this.chkEnableMultiTypefaces.Text = "Enable MultiTypefaces";
             this.chkEnableMultiTypefaces.UseVisualStyleBackColor = true;
             // 
-            // button2
-            // 
-            this.button2.Location = new System.Drawing.Point(693, 634);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(153, 37);
-            this.button2.TabIndex = 41;
-            this.button2.Text = "MeasureTextSpan2";
-            this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.button2_Click);
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1185, 750);
-            this.Controls.Add(this.button2);
             this.Controls.Add(this.chkEnableMultiTypefaces);
             this.Controls.Add(this.txtMsgInfo);
             this.Controls.Add(this.chkFlipY);
@@ -218,6 +205,5 @@
         private System.Windows.Forms.CheckBox chkFlipY;
         private System.Windows.Forms.TextBox txtMsgInfo;
         private System.Windows.Forms.CheckBox chkEnableMultiTypefaces;
-        private System.Windows.Forms.Button button2;
     }
 }

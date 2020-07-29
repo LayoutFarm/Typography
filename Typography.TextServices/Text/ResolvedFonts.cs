@@ -3,6 +3,7 @@ using System;
 
 using Typography.OpenFont;
 using Typography.OpenFont.Extensions;
+using Typography.OpenFont.Tables;
 
 namespace Typography.Text
 {
@@ -46,13 +47,14 @@ namespace Typography.Text
             }
         }
         public int WhitespaceWidth => _ws;
-        public float GetScaleToPixelFromPointInSize() => _px_scale;
+        public float GetScaleToPixelFromPointUnit() => _px_scale;
         public float AscentInPixels => (Typeface != null) ? _px_scale * Typeface.Ascender : 0;
         public float DescentInPixels => (Typeface != null) ? _px_scale * Typeface.Descender : 0;
         public float LineGapInPx => (Typeface != null) ? (int)(Math.Round(Typeface.LineGap * _px_scale)) : 0;
 
-        public int LineSpacingInPixels => (Typeface != null) ? (int)(Math.Round(Typeface.CalculateRecommendLineSpacing() * _px_scale)) : 0;
+        public int LineSpacingInPixels => (Typeface != null) ? (int)(Math.Round(Typeface.CalculateMaxLineClipHeight() * _px_scale)) : 0;
         public int MaxLineClipHeightInPixels => (Typeface != null) ? (int)(Math.Round(Typeface.CalculateMaxLineClipHeight() * _px_scale)) : 0;
+        public float UsDescendingInPixels => (Typeface != null) ? _px_scale * Typeface.GetOS2Table().usWinDescent : 0;
 
 #if DEBUG
         public override string ToString() => Typeface?.Name;

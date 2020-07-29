@@ -15,7 +15,7 @@ using Typography.Text;
 using Typography.TextLayout;
 
 using PixelFarm.Drawing;
-
+using Typography.OpenFont.Tables;
 
 namespace SampleWinForms
 {
@@ -85,7 +85,7 @@ namespace SampleWinForms
             }
             //set default font for current text printer
             //
-          
+
             //set default font for current text printer
             _currentTextPrinter.Typeface = OurOpenFontSystem.ResolveTypeface(selectedFF);
 
@@ -201,16 +201,9 @@ namespace SampleWinForms
         }
 
         UnscaledGlyphPlanList _reusableUnscaledGlyphPlanList = new UnscaledGlyphPlanList();
-
-        FormattedGlyphPlanList _ftmGlyphPlansList = new FormattedGlyphPlanList();
-        VirtualTextSpanPrinter _virtualTextPrinter;
-
-        void ShowMeasureBox2()
-        {
+        FormattedGlyphPlanSeqPool _reusableGlyphPlanSeqPool = new FormattedGlyphPlanSeqPool();
 
 
-
-        }
         void RenderAndShowMeasureBox()
         {
             bool flipY = chkFlipY.Checked;
@@ -264,170 +257,204 @@ namespace SampleWinForms
             //Example 2: print glyph plan to 'user' list-> then draw it (or hold it/ not draw)                         
             //you can create you own class to hold userGlyphPlans.***
             //2.1
-            if (chkEnableMultiTypefaces.Checked)
+            //if (chkEnableMultiTypefaces.Checked)
+            //{
+
+            _reusableGlyphPlanSeqPool.Clear();
+
+            _currentTextPrinter.GenerateGlyphPlans(textBuffer, 0, textBuffer.Length, _reusableGlyphPlanSeqPool);
+
+            //2.2
+            //and we can print the formatted glyph plan later.
+            y_pos -= lineSpacing;//next line
+            _currentTextPrinter.FillColor = Color.Red;
+
+            _currentTextPrinter.DrawFromFormattedGlyphPlans(
+                _reusableGlyphPlanSeqPool,
+                  x_pos,
+                  y_pos
+             );
+
+
+            //--------------------------------------------------
+            //Example 3: MeasureString   
+            //3.1 use data in formatted_glyph_plan_list to measure string => OK, OR 
+            //3.2 use another 'light-weight' text printer to measure string (without drawing actual string)
+
+            //3.1                  
+            _currentTextPrinter.MeasureGlyphPlanList(_reusableGlyphPlanSeqPool, out int measureWidth);
+            _g.DrawRectangle(Pens.Red, x_pos, y_pos, measureWidth, 30);
+            _g.FillRectangle(Brushes.Blue, x_pos, y_pos, 5, 5); //show baseline reference (xpos,ypos)
+
+            float baseline = y_pos;
+
+            //3.2 draw each glyph bounds
             {
-                _ftmGlyphPlansList.Clear();
-                _currentTextPrinter.GenerateGlyphPlans(textBuffer, 0, textBuffer.Length, _ftmGlyphPlansList);
-                //2.2
-                //and we can print the formatted glyph plan later.
-                y_pos -= lineSpacing;//next line
-                _currentTextPrinter.FillColor = Color.Red;
+                int m = _reusableGlyphPlanSeqPool.Count;
 
-                _currentTextPrinter.DrawFromFormattedGlyphPlans(
-                    _ftmGlyphPlansList,
-                      x_pos,
-                      y_pos
-                 );
-
-
-                //--------------------------------------------------
-                //Example 3: MeasureString   
-                //3.1 use data in formatted_glyph_plan_list to measure string => OK, OR 
-                //3.2 use another 'light-weight' text printer to measure string (without drawing actual string)
-
-                //3.1                  
-                _currentTextPrinter.MeasureGlyphPlanList(_ftmGlyphPlansList, out int measureWidth);
-                _g.DrawRectangle(Pens.Red, x_pos, y_pos, measureWidth, 30);
-
-
-                float baseline = y_pos;
-
-                //3.2 draw each glyph bounds
+                //right-to-left 
+                //TODO: add left-to-right
+                FormattedGlyphPlanSeq seq = _reusableGlyphPlanSeqPool.GetFirst();
+                while (seq != null)
                 {
-                    int m = _ftmGlyphPlansList.Count;
 
-                    for (int i = 0; i < m; ++i)
+
+                    ResolvedFont resolvedFont = seq.ResolvedFont;
+                    Typeface localTypeface = resolvedFont.Typeface;
+                    pxscale = resolvedFont.GetScaleToPixelFromPointUnit();
+
+                    //------------
+                    //debug....
+                    float pointToPixelScale = localTypeface.CalculateScaleToPixelFromPointSize(resolvedFont.SizeInPoints);
+                    float ascendingPx = localTypeface.Ascender * pointToPixelScale;
+                    float descedingPx = localTypeface.Descender * pointToPixelScale;
+                    float lineGapPx = localTypeface.LineGap * pointToPixelScale;
+                    float clipHeightPx = localTypeface.CalculateMaxLineClipHeight() * pointToPixelScale;
+                    float usAscending = localTypeface.GetOS2Table().usWinAscent * pointToPixelScale;
+                    float usDescending = localTypeface.GetOS2Table().usWinDescent * pointToPixelScale;
+                    float lineSpacingPx = ascendingPx - descedingPx + lineGapPx;
+                    //------------
+
+                    GlyphPlanSequence glyph_seq = seq.Seq;
+                    var snapToPxScale = new GlyphPlanSequenceSnapPixelScaleLayout(seq.Seq, 0, glyph_seq.Count, pxscale);
+
+                    float x_beginAt = x_pos;
+
+                    x_pos += (resolvedFont.WhitespaceWidth * seq.PrefixWhitespaceCount);
+
+                    int nn = 0;///
+                    while (snapToPxScale.Read())
                     {
-                        FormattedGlyphPlanSeq seq = _ftmGlyphPlansList[i];
-                        ResolvedFont resolvedFont = seq.ResolvedFont;
-                        Typeface localTypeface = resolvedFont.Typeface;
+                        //float cx = (float)Math.Round(snapToPxScale.ExactX + x_pos);
+                        //float cy = (float)Math.Floor(snapToPxScale.ExactY + baseline);
 
-                        pxscale = resolvedFont.GetScaleToPixelFromPointInSize();
-                        GlyphPlanSequence glyph_seq = seq.Seq;
-                        var snapToPxScale = new GlyphPlanSequenceSnapPixelScaleLayout(seq.Seq, 0, glyph_seq.Count, pxscale);
+                        UnscaledGlyphPlan glyphPlan = glyph_seq[nn];
+                        Glyph glyph = localTypeface.GetGlyph(glyphPlan.glyphIndex);
 
+                        Bounds b = glyph.Bounds;
+                        //
+                        float xmin = b.XMin * pxscale;
+                        float ymin = b.YMin * pxscale;
+                        //
+                        float xmax = b.XMax * pxscale;
+                        float ymax = b.YMax * pxscale;
+                        //
+                        float glyph_x = x_pos + (glyphPlan.OffsetX * pxscale);
+                        _g.DrawRectangle(Pens.Red, glyph_x + xmin, y_pos + ymin, xmax - xmin, ymax - ymin);
 
-                        x_pos += (resolvedFont.WhitespaceWidth * seq.PrefixWhitespaceCount);
+                        x_pos += glyphPlan.AdvanceX * pxscale;
 
-                        int nn = 0;///
-                        while (snapToPxScale.Read())
-                        {
-                            //float cx = (float)Math.Round(snapToPxScale.ExactX + x_pos);
-                            //float cy = (float)Math.Floor(snapToPxScale.ExactY + baseline);
-
-                            UnscaledGlyphPlan glyphPlan = glyph_seq[nn];
-                            Glyph glyph = localTypeface.GetGlyph(glyphPlan.glyphIndex);
-
-                            Bounds b = glyph.Bounds;
-                            //
-                            float xmin = b.XMin * pxscale;
-                            float ymin = b.YMin * pxscale;
-                            //
-                            float xmax = b.XMax * pxscale;
-                            float ymax = b.YMax * pxscale;
-                            //
-                            float glyph_x = x_pos + (glyphPlan.OffsetX * pxscale);
-                            _g.DrawRectangle(Pens.Red, glyph_x + xmin, y_pos + ymin, xmax - xmin, ymax - ymin);
-
-                            x_pos += glyphPlan.AdvanceX * pxscale;
-
-                            nn++;
-                        }
-
-                        x_pos += (resolvedFont.WhitespaceWidth * seq.PostfixWhitespaceCount);
-
+                        nn++;
                     }
+
+                    x_pos += (resolvedFont.WhitespaceWidth * seq.PostfixWhitespaceCount);
+
+                    float textspanW = x_pos - x_beginAt;
+                    float x_pos2 = x_pos;
+
+
+                    //show referenec lines
+                    //_g.DrawRectangle(Pens.Black, x_beginAt, y_pos + descedingPx, textspanW, clipHeightPx);
+                    _g.DrawLine(Pens.Black, x_beginAt, y_pos + usAscending, x_pos2, y_pos + usAscending); //usWinAscending 
+                    _g.DrawLine(Pens.Black, x_beginAt, y_pos - usDescending, x_pos2, y_pos - usDescending); //usWinDescending
+
+                    //_g.DrawRectangle(Pens.Red, x_beginAt, y_pos + descedingPx, textspanW, lineSpacingPx);
+
+                    _g.DrawLine(Pens.Blue, x_beginAt, y_pos, x_pos2, y_pos); //baseline
+                    _g.DrawLine(Pens.Green, x_beginAt, y_pos + descedingPx, x_pos2, y_pos + descedingPx);//descending
+                    _g.DrawLine(Pens.Magenta, x_beginAt, y_pos + ascendingPx, x_pos2, y_pos + ascendingPx);//ascending
+
+                    //------------
+                    seq = seq.Next;
                 }
 
-                _ftmGlyphPlansList.Clear();
-            }
-            else
-            {
-                _reusableUnscaledGlyphPlanList.Clear();
-                _currentTextPrinter.GenerateGlyphPlans(textBuffer, 0, textBuffer.Length, _reusableUnscaledGlyphPlanList);
-                //2.2
-                //and we can print the formatted glyph plan later.
-                y_pos -= lineSpacing;//next line
-                _currentTextPrinter.FillColor = Color.Red;
-
-
-                //
-                GlyphPlanSequence seq = new GlyphPlanSequence(_reusableUnscaledGlyphPlanList);
-
-                _currentTextPrinter.DrawFromGlyphPlans(
-                      seq,
-                      x_pos,
-                      y_pos
-                 );
-
-                //--------------------------------------------------
-                //Example 3: MeasureString    
-
-                float descending_px = _currentTextPrinter.FontDescedingPx;
-                float ascending_px = _currentTextPrinter.FontAscendingPx;
-                float lineSpacing_px = _currentTextPrinter.FontLineSpacingPx;
-                float clippedHeight_px = _currentTextPrinter.FontClipHeightPx;
-
-                _currentTextPrinter.MeasureGlyphPlanSeq(seq, out int textspanW);
-
-                UnscaledGlyphPlanList glyphPlans = new UnscaledGlyphPlanList();
-                _currentTextPrinter.GenerateGlyphPlans(textBuffer, 0, textBuffer.Length, glyphPlans);
-
-
-                int j = glyphPlans.Count;
-                float backup_xpos = x_pos;
-                for (int i = 0; i < j; ++i)
-                {
-                    UnscaledGlyphPlan glyphPlan = glyphPlans[i];
-                    Glyph glyph = typeface.GetGlyph(glyphPlan.glyphIndex);
-                    //
-                    Bounds b = glyph.Bounds;
-                    //
-                    float xmin = b.XMin * pxscale;
-                    float ymin = b.YMin * pxscale;
-                    //
-                    float xmax = b.XMax * pxscale;
-                    float ymax = b.YMax * pxscale;
-                    //
-                    float glyph_x = x_pos + (glyphPlan.OffsetX * pxscale);
-                    _g.DrawRectangle(Pens.Red, glyph_x + xmin, y_pos + ymin, xmax - xmin, ymax - ymin);
-                    x_pos += glyphPlan.AdvanceX * pxscale;
-                }
-
-                x_pos = backup_xpos;
-
-                _g.FillRectangle(Brushes.Red, new RectangleF(0, 0, 5, 5));//reference point(0,0)
-                _g.FillRectangle(Brushes.Green, new RectangleF(x_pos, y_pos, 3, 3));
-
-
-                float x_pos2 = x_pos + textspanW + 10;
-
-
-                _g.DrawRectangle(Pens.Black, x_pos, y_pos + descending_px, textspanW, clippedHeight_px);
-                _g.DrawRectangle(Pens.Red, x_pos, y_pos + descending_px, textspanW, lineSpacing_px);
-
-                _g.DrawLine(Pens.Blue, x_pos, y_pos, x_pos2, y_pos); //baseline
-                _g.DrawLine(Pens.Green, x_pos, y_pos + descending_px, x_pos2, y_pos + descending_px);//descending
-                _g.DrawLine(Pens.Magenta, x_pos, y_pos + ascending_px, x_pos2, y_pos + ascending_px);//ascending
-
-
-                ////------------
-                ////draw another line (for reference)
-                y_pos -= lineSpacing;//next line
-
-
-                _currentTextPrinter.FillColor = Color.Black;
-
-                _currentTextPrinter.DrawFromGlyphPlans(
-                      new GlyphPlanSequence(_reusableUnscaledGlyphPlanList),
-                      x_pos,
-                      y_pos
-                 );
             }
 
+            _reusableGlyphPlanSeqPool.Clear();
+            //}
+            //else
+            //{
+            //    _reusableGlyphPlanSeqPool.Clear();
+            //    _currentTextPrinter.GenerateGlyphPlans(textBuffer, 0, textBuffer.Length, _reusableGlyphPlanSeqPool);
+            //    //2.2
+            //    //and we can print the formatted glyph plan later.
+            //    y_pos -= lineSpacing;//next line
+            //    _currentTextPrinter.FillColor = Color.Red;
+            //    // 
+            //    _currentTextPrinter.DrawFromFormattedGlyphPlans(
+            //          _reusableGlyphPlanSeqPool,
+            //          x_pos,
+            //          y_pos
+            //     );
+
+            //    //--------------------------------------------------
+            //    //Example 3: MeasureString    
+
+            //    float descending_px = _currentTextPrinter.FontDescedingPx;
+            //    float ascending_px = _currentTextPrinter.FontAscendingPx;
+            //    float lineSpacing_px = _currentTextPrinter.FontLineSpacingPx;
+            //    float clippedHeight_px = _currentTextPrinter.FontClipHeightPx;
+
+            //    _currentTextPrinter.MeasureGlyphPlanSeq(_reusableGlyphPlanSeqPool.GetFirst(), out int textspanW);
+
+            //    _reusableGlyphPlanSeqPool.Clear();
+            //    _currentTextPrinter.GenerateGlyphPlans(textBuffer, 0, textBuffer.Length, _reusableGlyphPlanSeqPool);
+
+            //    FormattedGlyphPlanSeq fmtSeq = _reusableGlyphPlanSeqPool.GetFirst();
+            //    float backup_xpos = x_pos;
+            //    while (fmtSeq != null)
+            //    {
+            //        GlyphPlanSequence seq = fmtSeq.Seq;
+            //        int j = seq.Count;
+            //        for (int i = 0; i < j; ++i)
+            //        {
+            //            UnscaledGlyphPlan glyphPlan = seq[i];
+            //            Glyph glyph = typeface.GetGlyph(glyphPlan.glyphIndex);
+            //            //
+            //            Bounds b = glyph.Bounds;
+            //            //
+            //            float xmin = b.XMin * pxscale;
+            //            float ymin = b.YMin * pxscale;
+            //            //
+            //            float xmax = b.XMax * pxscale;
+            //            float ymax = b.YMax * pxscale;
+            //            //
+            //            float glyph_x = x_pos + (glyphPlan.OffsetX * pxscale);
+            //            _g.DrawRectangle(Pens.Red, glyph_x + xmin, y_pos + ymin, xmax - xmin, ymax - ymin);
+            //            x_pos += glyphPlan.AdvanceX * pxscale;
+            //        }
+
+            //        fmtSeq = fmtSeq.Next;
+            //    }
+
+            //    x_pos = backup_xpos;
+
+            //    _g.FillRectangle(Brushes.Red, new RectangleF(0, 0, 5, 5));//reference point(0,0)
+            //    _g.FillRectangle(Brushes.Green, new RectangleF(x_pos, y_pos, 3, 3));
 
 
+            //    float x_pos2 = x_pos + textspanW + 10;
 
+
+            //    _g.DrawRectangle(Pens.Black, x_pos, y_pos + descending_px, textspanW, clippedHeight_px);
+            //    _g.DrawRectangle(Pens.Red, x_pos, y_pos + descending_px, textspanW, lineSpacing_px);
+
+            //    _g.DrawLine(Pens.Blue, x_pos, y_pos, x_pos2, y_pos); //baseline
+            //    _g.DrawLine(Pens.Green, x_pos, y_pos + descending_px, x_pos2, y_pos + descending_px);//descending
+            //    _g.DrawLine(Pens.Magenta, x_pos, y_pos + ascending_px, x_pos2, y_pos + ascending_px);//ascending
+
+            //    ////------------
+            //    ////draw another line (for reference)
+            //    y_pos -= lineSpacing;//next line
+
+            //    _currentTextPrinter.FillColor = Color.Black;
+
+            //    _currentTextPrinter.DrawFromGlyphPlans(
+            //          new GlyphPlanSequence(_reusableUnscaledGlyphPlanList),
+            //          x_pos,
+            //          y_pos
+            //     );
+            //} 
 
             //transform back
             if (flipY)
@@ -452,7 +479,7 @@ namespace SampleWinForms
 
         private void button2_Click(object sender, System.EventArgs e)
         {
-            ShowMeasureBox2();
+
         }
     }
 }

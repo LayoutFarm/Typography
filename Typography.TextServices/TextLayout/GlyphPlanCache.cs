@@ -91,7 +91,7 @@ namespace Typography.TextLayout
                 glyphLayout.GenerateUnscaledGlyphPlans(_reusableGlyphPlanList);
 
                 int post_count = _reusableGlyphPlanList.Count;
-                planSeq = new GlyphPlanSequence(_reusableGlyphPlanList, pre_count, post_count - pre_count);//**                //
+                planSeq = new GlyphPlanSequence(_reusableGlyphPlanList, pre_count, post_count - pre_count);//**
 
 #if DEBUG
                 if (!dbug_disableCache)

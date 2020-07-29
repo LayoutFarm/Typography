@@ -131,6 +131,34 @@ namespace SampleWinForms
             width = snapToPxScale.AccumWidth;
 
         }
+        public void MeasureGlyphPlanSeq(FormattedGlyphPlanSeq seq1, out int width)
+        {
+            width = 0;
+            while (seq1 != null)
+            {
+                GlyphPlanSequence seq = seq1.Seq;
+
+                //TODO: add 
+                ResolvedFont resolvedFont = seq1.ResolvedFont;
+
+                width += seq1.PrefixWhitespaceCount * resolvedFont.WhitespaceWidth;
+
+                var snapToPxScale = new GlyphPlanSequenceSnapPixelScaleLayout(
+                    seq,
+                    seq.startAt,
+                    seq.len,
+                    resolvedFont.GetScaleToPixelFromPointUnit());
+
+
+                snapToPxScale.ReadToEnd();
+
+                width += snapToPxScale.AccumWidth;
+                width += seq1.PostfixWhitespaceCount * resolvedFont.WhitespaceWidth;
+
+                seq1 = seq1.Next;
+            }
+
+        }
         public void MeasureGlyphPlanSeq(GlyphPlanSequence seq, int startAt, int len, out int width)
         {
             var snapToPxScale = new GlyphPlanSequenceSnapPixelScaleLayout(seq, startAt, len,
@@ -251,7 +279,8 @@ namespace SampleWinForms
         }
 
 
-        readonly FormattedGlyphPlanList _fmtGlyphPlanList = new FormattedGlyphPlanList();
+        FormattedGlyphPlanSeqPool _glyphPlanSeqPool = new FormattedGlyphPlanSeqPool();
+
         int _latestAccumulateWidth;
         public override void DrawString(char[] textBuffer, int startAt, int len, float x, float y)
         {
@@ -275,37 +304,35 @@ namespace SampleWinForms
             else
             {
                 Typeface defaultTypeface = _currentTypeface; //save, restore later
+                _glyphPlanSeqPool.Clear();
+                _txtClient.PrepareFormattedStringList(textBuffer, startAt, len, _glyphPlanSeqPool);
+                int count = _glyphPlanSeqPool.Count;//re-count
 
-                _fmtGlyphPlanList.Clear();
-                _txtClient.PrepareFormattedStringList(textBuffer, startAt, len, _fmtGlyphPlanList);
-
-                int count = _fmtGlyphPlanList.Count;//re-count
-
-                bool needRightToLeftArr = _fmtGlyphPlanList.IsRightToLeftDirection;
+                bool needRightToLeftArr = _glyphPlanSeqPool.IsRightToLeftDirection;
                 float xpos = x;
 
                 if (needRightToLeftArr)
                 {
                     //special arr left-to-right
-
-                    for (int i = count - 1; i >= 0; --i)
+                    FormattedGlyphPlanSeq formattedGlyphPlanSeq = _glyphPlanSeqPool.GetLast();
+                    while (formattedGlyphPlanSeq != null)
                     {
-                        FormattedGlyphPlanSeq formattedGlyphPlanSeq = _fmtGlyphPlanList[i];
-
                         ResolvedFont resolvedFont = formattedGlyphPlanSeq.ResolvedFont;
                         Typeface = resolvedFont.Typeface;
 
                         DrawFromGlyphPlans(formattedGlyphPlanSeq.Seq, xpos + (resolvedFont.WhitespaceWidth * formattedGlyphPlanSeq.PrefixWhitespaceCount), y);
 
                         xpos += _latestAccumulateWidth + (resolvedFont.WhitespaceWidth * formattedGlyphPlanSeq.PostfixWhitespaceCount);
+
+                        formattedGlyphPlanSeq = formattedGlyphPlanSeq.Prev;
                     }
                 }
                 else
                 {
-
-                    for (int i = 0; i < count; ++i)
+                    FormattedGlyphPlanSeq formattedGlyphPlanSeq = _glyphPlanSeqPool.GetFirst();
+                    while (formattedGlyphPlanSeq != null)
                     {
-                        FormattedGlyphPlanSeq formattedGlyphPlanSeq = _fmtGlyphPlanList[i];
+
 
                         //change typeface                     
                         ResolvedFont resolvedFont = formattedGlyphPlanSeq.ResolvedFont;
@@ -315,6 +342,7 @@ namespace SampleWinForms
 
                         xpos += _latestAccumulateWidth + (resolvedFont.WhitespaceWidth * formattedGlyphPlanSeq.PostfixWhitespaceCount);
 
+                        formattedGlyphPlanSeq = formattedGlyphPlanSeq.Next;
                     }
                 }
 
@@ -324,23 +352,22 @@ namespace SampleWinForms
             }
         }
 
-        /// <summary>
-        /// generate glyph plan for current typeface only (EnableMutliTypeface always=> false)
-        /// </summary>
-        /// <param name="textBuffer"></param>
-        /// <param name="startAt"></param>
-        /// <param name="len"></param>
-        /// <param name="unscaledGlyphPlan"></param>
-        public void GenerateGlyphPlans(
-              char[] textBuffer,
-              int startAt,
-              int len,
-              IUnscaledGlyphPlanList unscaledGlyphPlanList)
-        {
-            var sp1 = new Typography.Text.TextBufferSpan(textBuffer, startAt, len);
-            _txtClient.CreateGlyphPlanSeq(sp1, unscaledGlyphPlanList);
-
-        }
+        ///// <summary>
+        ///// generate glyph plan for current typeface only (EnableMutliTypeface always=> false)
+        ///// </summary>
+        ///// <param name="textBuffer"></param>
+        ///// <param name="startAt"></param>
+        ///// <param name="len"></param>
+        ///// <param name="unscaledGlyphPlan"></param>
+        //public void GenerateGlyphPlans(
+        //      char[] textBuffer,
+        //      int startAt,
+        //      int len,
+        //      IUnscaledGlyphPlanList unscaledGlyphPlanList)
+        //{
+        //    var sp1 = new Typography.Text.TextBufferSpan(textBuffer, startAt, len);
+        //    _txtClient.CreateGlyphPlanSeq(sp1, unscaledGlyphPlanList);
+        //}
 
         /// <summary>
         /// generate glyph plan with MultipleTypeface= true
@@ -353,12 +380,12 @@ namespace SampleWinForms
             char[] textBuffer,
             int startAt,
             int len,
-            FormattedGlyphPlanList ftmGlyphPlans)
+            FormattedGlyphPlanSeqProvider ftmGlyphPlans)
         {
             //similar to draw
             _txtClient.PrepareFormattedStringList(textBuffer, startAt, len, ftmGlyphPlans);
         }
-        public void MeasureGlyphPlanList(FormattedGlyphPlanList list, out int width)
+        public void MeasureGlyphPlanList(FormattedGlyphPlanSeqPool list, out int width)
         {
             //layout and measure length
 
@@ -369,10 +396,9 @@ namespace SampleWinForms
                 //special arr left-to-right
                 int count = list.Count;//re-count
 
-                for (int i = count - 1; i >= 0; --i)
+                FormattedGlyphPlanSeq formattedGlyphPlanSeq = list.GetLast();
+                while (formattedGlyphPlanSeq != null)
                 {
-                    FormattedGlyphPlanSeq formattedGlyphPlanSeq = list[i];
-
                     ResolvedFont resolvedFont = formattedGlyphPlanSeq.ResolvedFont;
                     Typeface = resolvedFont.Typeface;
 
@@ -382,16 +408,17 @@ namespace SampleWinForms
                     MeasureGlyphPlanSeq(seq, 0, seq.Count, out int w);
 
                     xpos += w + (resolvedFont.WhitespaceWidth * formattedGlyphPlanSeq.PostfixWhitespaceCount);
+
+                    formattedGlyphPlanSeq = formattedGlyphPlanSeq.Prev;
                 }
                 width = xpos;
             }
             else
             {
                 int count = list.Count;//re-count
-
-                for (int i = 0; i < count; ++i)
+                FormattedGlyphPlanSeq formattedGlyphPlanSeq = list.GetFirst();
+                while (formattedGlyphPlanSeq != null)
                 {
-                    FormattedGlyphPlanSeq formattedGlyphPlanSeq = list[i];
 
                     ResolvedFont resolvedFont = formattedGlyphPlanSeq.ResolvedFont;
                     Typeface = resolvedFont.Typeface;
@@ -402,11 +429,13 @@ namespace SampleWinForms
                     MeasureGlyphPlanSeq(seq, 0, seq.Count, out int w);
 
                     xpos += w + (resolvedFont.WhitespaceWidth * formattedGlyphPlanSeq.PostfixWhitespaceCount);
+
+                    formattedGlyphPlanSeq = formattedGlyphPlanSeq.Next;
                 }
                 width = xpos;
             }
         }
-        public void DrawFromFormattedGlyphPlans(FormattedGlyphPlanList list, float x, float y)
+        public void DrawFromFormattedGlyphPlans(FormattedGlyphPlanSeqPool list, float x, float y)
         {
             bool needRightToLeftArr = false;
 
@@ -415,26 +444,25 @@ namespace SampleWinForms
             {
                 //special arr left-to-right
                 int count = list.Count;//re-count
-                for (int i = count - 1; i >= 0; --i)
+                FormattedGlyphPlanSeq formattedGlyphPlanSeq = list.GetLast();
+                while (formattedGlyphPlanSeq != null)
                 {
-                    FormattedGlyphPlanSeq formattedGlyphPlanSeq = list[i];
-
                     ResolvedFont resolvedFont = formattedGlyphPlanSeq.ResolvedFont;
                     Typeface = resolvedFont.Typeface;
 
                     DrawFromGlyphPlans(formattedGlyphPlanSeq.Seq, xpos + (resolvedFont.WhitespaceWidth * formattedGlyphPlanSeq.PrefixWhitespaceCount), y);
 
                     xpos += _latestAccumulateWidth + (resolvedFont.WhitespaceWidth * formattedGlyphPlanSeq.PostfixWhitespaceCount);
+
+                    formattedGlyphPlanSeq = formattedGlyphPlanSeq.Prev;
                 }
             }
             else
             {
                 int count = list.Count;//re-count
-
+                FormattedGlyphPlanSeq formattedGlyphPlanSeq = list.GetFirst();
                 for (int i = 0; i < count; ++i)
                 {
-                    FormattedGlyphPlanSeq formattedGlyphPlanSeq = list[i];
-
                     //change typeface                     
                     ResolvedFont resolvedFont = formattedGlyphPlanSeq.ResolvedFont;
                     Typeface = resolvedFont.Typeface;
@@ -443,13 +471,14 @@ namespace SampleWinForms
 
                     xpos += _latestAccumulateWidth + (resolvedFont.WhitespaceWidth * formattedGlyphPlanSeq.PostfixWhitespaceCount);
 
+                    formattedGlyphPlanSeq = formattedGlyphPlanSeq.Next;
                 }
             }
         }
 
         void ClearTempFormattedGlyphPlanSeq()
         {
-            _fmtGlyphPlanList.Clear();
+
         }
 
 

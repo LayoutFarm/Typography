@@ -138,7 +138,7 @@ namespace Typography.Text
                     int seqLen = seq.Count;
                     //
                     ResolvedFont resFont = fmtSeq.ResolvedFont;
-                    float scale1 = resFont.GetScaleToPixelFromPointInSize();
+                    float scale1 = resFont.GetScaleToPixelFromPointUnit();
 
                     //1. prefix whitespace count
                     int ws_count = fmtSeq.PrefixWhitespaceCount;
@@ -194,7 +194,7 @@ namespace Typography.Text
 
 
             //------
-            float scale = resFont1.GetScaleToPixelFromPointInSize();
+            float scale = resFont1.GetScaleToPixelFromPointUnit();
             measureResult.outputTotalW = outputTotalW;
             measureResult.lineHeight = (ushort)Math.Round(typeface.CalculateMaxLineClipHeight() * scale);
 
@@ -220,7 +220,7 @@ namespace Typography.Text
             fmtGlyphs.IsRightToLeftDirection = _p.NeedRightToLeftArr;
         }
 
-        public float CalculateScaleToPixelsFromPoint(RequestFont font) => (_openFontTextService.ResolveFont(font) is ResolvedFont resolvedFont) ? resolvedFont.GetScaleToPixelFromPointInSize() : 0;
+        public float CalculateScaleToPixelsFromPoint(RequestFont font) => (_openFontTextService.ResolveFont(font) is ResolvedFont resolvedFont) ? resolvedFont.GetScaleToPixelFromPointUnit() : 0;
 
         public float MeasureWhitespace(RequestFont f)
         {
