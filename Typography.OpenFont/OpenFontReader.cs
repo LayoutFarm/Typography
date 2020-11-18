@@ -203,7 +203,7 @@ namespace Typography.OpenFont
             return ReadPreviewFontInfo(tables, input);
         }
         public Typeface Read(Stream stream, int streamStartOffset = 0, ReadFlags readFlags = ReadFlags.Full)
-        {
+        { 
             Typeface typeface = new Typeface();
             if (Read(typeface, null, stream, streamStartOffset, readFlags))
             {
@@ -467,6 +467,9 @@ namespace Typography.OpenFont
             {
                 VerticalMetrics vmtx = rd.Read(new VerticalMetrics(vhea.NumOfLongVerMetrics));
             }
+
+            OS2FsSelection os2Select = new OS2FsSelection(os2Table.fsSelection);
+            typeface._useTypographicMertic = os2Select.USE_TYPO_METRICS;
 
             Cmap cmaps = rd.Read(new Cmap());
             VerticalDeviceMetrics vdmx = rd.Read(new VerticalDeviceMetrics());
