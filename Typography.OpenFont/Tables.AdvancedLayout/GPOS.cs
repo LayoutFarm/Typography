@@ -129,23 +129,37 @@ namespace Typography.OpenFont.Tables
 
             class LkSubTableType1 : LookupSubTable
             {
-                ValueRecord _singleValue;
-                ValueRecord[] _multiValues;
-                public LkSubTableType1(ValueRecord singleValue)
+                public LkSubTableType1(CoverageTable coverage, ValueRecord singleValue)
                 {
                     this.Format = 1;
-                    _singleValue = singleValue;
+                    _coverageTable = coverage;
+                    _valueRecords = new ValueRecord[] { singleValue };
                 }
-                public LkSubTableType1(ValueRecord[] valueRecords)
+
+                public LkSubTableType1(CoverageTable coverage, ValueRecord[] valueRecords)
                 {
                     this.Format = 2;
-                    _multiValues = valueRecords;
+                    _coverageTable = coverage;
+                    _valueRecords = valueRecords;
                 }
+
                 public int Format { get; private set; }
-                public CoverageTable CoverageTable { get; set; }
+                CoverageTable _coverageTable;
+                ValueRecord[] _valueRecords;
+
                 public override void DoGlyphPosition(IGlyphPositions inputGlyphs, int startAt, int len)
                 {
-                    Utils.WarnUnimplemented("GPOS Lookup Sub Table Type 1");
+                    int lim = Math.Min(startAt + len, inputGlyphs.Count);
+                    for (int i = startAt; i < lim; ++i)
+                    {
+                        ushort glyph_index = inputGlyphs.GetGlyph(i, out ushort glyph_advW);
+                        int cov_index = _coverageTable.FindPosition(glyph_index);
+                        if (cov_index > -1)
+                        {
+                            var vr = _valueRecords[Format == 1 ? 0 : cov_index];
+                            inputGlyphs.AppendGlyphAdvance(i, vr.XAdvance, 0);
+                        }
+                    }
                 }
             }
 
@@ -155,49 +169,45 @@ namespace Typography.OpenFont.Tables
             /// <param name="reader"></param>
             static LookupSubTable ReadLookupType1(BinaryReader reader, long subTableStartAt)
             {
+                // Single Adjustment Positioning: Format 1
+                // Value         Type          Description
+                // uint16        PosFormat     Format identifier-format = 1
+                // Offset16      Coverage      Offset to Coverage table-from beginning of SinglePos subtable
+                // uint16        ValueFormat   Defines the types of data in the ValueRecord
+                // ValueRecord   Value         Defines positioning value(s)-applied to all glyphs in the Coverage table
+
+                // Single Adjustment Positioning: Format 2
+                // Value         Type                Description
+                // USHORT        PosFormat           Format identifier-format = 2
+                // Offset16      Coverage            Offset to Coverage table-from beginning of SinglePos subtable
+                // uint16        ValueFormat         Defines the types of data in the ValueRecord
+                // uint16        ValueCount          Number of ValueRecords
+                // ValueRecord   Value[ValueCount]   Array of ValueRecords-positioning values applied to glyphs
+
                 reader.BaseStream.Seek(subTableStartAt, SeekOrigin.Begin);
 
                 ushort format = reader.ReadUInt16();
+                ushort coverage = reader.ReadUInt16();
+                ushort valueFormat = reader.ReadUInt16();
                 switch (format)
                 {
                     default: throw new NotSupportedException();
                     case 1:
                         {
-                            //Single Adjustment Positioning: Format 1
-                            //Value 	    Type 	        Description
-                            //uint16 	    PosFormat 	    Format identifier-format = 1
-                            //Offset16 	    Coverage 	    Offset to Coverage table-from beginning of SinglePos subtable
-                            //uint16 	    ValueFormat     Defines the types of data in the ValueRecord
-                            //ValueRecord 	Value 	        Defines positioning value(s)-applied to all glyphs in the Coverage table 
-                            ushort coverage = reader.ReadUInt16();
-                            ushort valueFormat = reader.ReadUInt16();
-                            var subTable = new LkSubTableType1(ValueRecord.CreateFrom(reader, valueFormat));
-                            //-------
-                            subTable.CoverageTable = CoverageTable.CreateFrom(reader, subTableStartAt + coverage);
-                            //-------
-                            return subTable;
+                            var valueRecord = ValueRecord.CreateFrom(reader, valueFormat);
+                            var coverageTable = CoverageTable.CreateFrom(reader, subTableStartAt + coverage);
+                            return new LkSubTableType1(coverageTable, valueRecord);
                         }
                     case 2:
                         {
-                            //Single Adjustment Positioning: Format 2
-                            //Value 	    Type 	        Description
-                            //USHORT 	    PosFormat 	    Format identifier-format = 2
-                            //Offset16 	    Coverage 	    Offset to Coverage table-from beginning of SinglePos subtable
-                            //uint16 	    ValueFormat 	Defines the types of data in the ValueRecord
-                            //uint16 	    ValueCount 	    Number of ValueRecords
-                            //ValueRecord 	Value[ValueCount] 	Array of ValueRecords-positioning values applied to glyphs
-                            ushort coverage = reader.ReadUInt16();
-                            ushort valueFormat = reader.ReadUInt16();
                             ushort valueCount = reader.ReadUInt16();
-                            var values = new ValueRecord[valueCount];
+                            var valueRecords = new ValueRecord[valueCount];
                             for (int n = 0; n < valueCount; ++n)
                             {
-                                values[n] = ValueRecord.CreateFrom(reader, valueFormat);
+                                valueRecords[n] = ValueRecord.CreateFrom(reader, valueFormat);
                             }
-                            var subTable = new LkSubTableType1(values);
-                            subTable.CoverageTable = CoverageTable.CreateFrom(reader, subTableStartAt + coverage);
-                            //-------
-                            return subTable;
+                            var coverageTable = CoverageTable.CreateFrom(reader, subTableStartAt + coverage);
+                            return new LkSubTableType1(coverageTable, valueRecords);
                         }
                 }
             }
