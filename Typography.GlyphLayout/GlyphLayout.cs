@@ -463,7 +463,7 @@ namespace Typography.TextLayout
             }
 
             PositionTechnique posTech = this.PositionTechnique;
-            if (EnableGpos && _gpos != null && glyphs.Count > 1 && posTech == PositionTechnique.OpenFont)
+            if (EnableGpos && _gpos != null && glyphs.Count > 0 && posTech == PositionTechnique.OpenFont)
             {
                 _gpos.DoGlyphPosition(_glyphPositions);
             }
