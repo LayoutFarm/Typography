@@ -951,7 +951,7 @@ namespace Typography.OpenFont.Tables
                             ushort[] posClassSetOffsets = Utils.ReadUInt16Array(reader, posClassSetCount);
 
                             var subTable = new LkSubTableType7Fmt2();
-                            subTable.ClassDefOffset = classDefOffset;
+                            subTable.ClassDef = ClassDefTable.CreateFrom(reader, subTableStartAt + classDefOffset);
 
                             PosClassSetTable[] posClassSetTables = new PosClassSetTable[posClassSetCount];
                             subTable.PosClassSetTables = posClassSetTables;
@@ -996,7 +996,7 @@ namespace Typography.OpenFont.Tables
 
             class LkSubTableType7Fmt2 : LookupSubTable
             {
-                public ushort ClassDefOffset { get; set; }
+                public ClassDefTable ClassDef { get; set; }
                 public CoverageTable CoverageTable { get; set; }
                 public PosClassSetTable[] PosClassSetTables { get; set; }
                 public override void DoGlyphPosition(IGlyphPositions inputGlyphs, int startAt, int len)
@@ -1033,10 +1033,6 @@ namespace Typography.OpenFont.Tables
                 }
                 public CoverageTable CoverageTable { get; set; }
                 public PosClassSetTable[] PosClassSetTables { get; set; }
-
-                public ushort BacktrackClassDefOffset { get; set; }
-                public ushort InputClassDefOffset { get; set; }
-                public ushort LookaheadClassDefOffset { get; set; }
 
                 public ClassDefTable BackTrackClassDef { get; set; }
                 public ClassDefTable InputClassDef { get; set; }
@@ -1116,13 +1112,8 @@ namespace Typography.OpenFont.Tables
                             ushort[] chainPosClassSetOffsetArray = Utils.ReadUInt16Array(reader, chainPosClassSetCnt);
 
                             LkSubTableType8Fmt2 subTable = new LkSubTableType8Fmt2();
-                            subTable.BacktrackClassDefOffset = backTrackClassDefOffset;
                             subTable.BackTrackClassDef = ClassDefTable.CreateFrom(reader, subTableStartAt + backTrackClassDefOffset);
-
-                            subTable.InputClassDefOffset = inputClassDefOffset;
                             subTable.InputClassDef = ClassDefTable.CreateFrom(reader, subTableStartAt + inputClassDefOffset);
-
-                            subTable.LookaheadClassDefOffset = lookadheadClassDefOffset;
                             subTable.LookaheadClassDef = ClassDefTable.CreateFrom(reader, subTableStartAt + lookadheadClassDefOffset);
 
                             //----------
