@@ -951,15 +951,19 @@ namespace Typography.OpenFont.Tables
                             ushort[] posClassSetOffsets = Utils.ReadUInt16Array(reader, posClassSetCount);
 
                             var subTable = new LkSubTableType7Fmt2();
+                            subTable.CoverageTable = CoverageTable.CreateFrom(reader, subTableStartAt + coverageOffset);
                             subTable.ClassDef = ClassDefTable.CreateFrom(reader, subTableStartAt + classDefOffset);
 
                             PosClassSetTable[] posClassSetTables = new PosClassSetTable[posClassSetCount];
                             subTable.PosClassSetTables = posClassSetTables;
                             for (int n = 0; n < posClassSetCount; ++n)
                             {
-                                posClassSetTables[n] = PosClassSetTable.CreateFrom(reader, subTableStartAt + posClassSetOffsets[n]);
+                                ushort offset = posClassSetOffsets[n];
+                                if (offset > 0)
+                                {
+                                    posClassSetTables[n] = PosClassSetTable.CreateFrom(reader, subTableStartAt + offset);
+                                }
                             }
-                            subTable.CoverageTable = CoverageTable.CreateFrom(reader, subTableStartAt + coverageOffset);
                             return subTable;
                         }
                     case 3:
