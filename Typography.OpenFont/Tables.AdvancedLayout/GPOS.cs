@@ -1005,9 +1005,48 @@ namespace Typography.OpenFont.Tables
                 public PosClassSetTable[] PosClassSetTables { get; set; }
                 public override void DoGlyphPosition(IGlyphPositions inputGlyphs, int startAt, int len)
                 {
-                    Utils.WarnUnimplemented("GPOS Lookup Sub Table Type 7 Format 2");
-                }
+                    int lim = Math.Min(startAt + len, inputGlyphs.Count);
+                    for (int i = startAt; i < lim; ++i)
+                    {
+                        ushort glyph1_index = inputGlyphs.GetGlyph(i, out ushort unused);
+                        if (CoverageTable.FindPosition(glyph1_index) < 0)
+                        {
+                            continue;
+                        }
 
+                        int glyph1_class = ClassDef.GetClassValue(glyph1_index);
+                        if (glyph1_class >= PosClassSetTables.Length || PosClassSetTables[glyph1_class] == null)
+                        {
+                            continue;
+                        }
+
+                        foreach (var rule in PosClassSetTables[glyph1_class].PosClassRules)
+                        {
+                            var glyphIds = rule.InputGlyphIds;
+                            bool success = false;
+                            for (int n = 0; n < glyphIds.Length && i + 1 + n < lim; ++n)
+                            {
+                                ushort glyphn_index = inputGlyphs.GetGlyph(i + 1 + n, out unused);
+                                int glyphn_class = ClassDef.GetClassValue(glyphn_index);
+                                if (glyphn_class != glyphIds[n])
+                                {
+                                    break;
+                                }
+
+                                if (n == glyphIds.Length - 1)
+                                {
+                                    success = true;
+                                    Utils.WarnUnimplemented("GPOS Lookup Sub Table Type 7 Format 2");
+                                }
+                            }
+
+                            if (success)
+                            {
+                                break;
+                            }
+                        }
+                    }
+                 }
             }
             class LkSubTableType7Fmt3 : LookupSubTable
             {

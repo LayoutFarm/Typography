@@ -836,18 +836,19 @@ namespace Typography.OpenFont.Tables
             //struct 	PosLookupRecord[PosCount] 	Array of positioning lookups-in design order
             //----------------------
 
-            PosClassRule[] _posClassRules;
+            public PosClassRule[] PosClassRules;
+
             void ReadFrom(BinaryReader reader)
             {
                 long tableStartAt = reader.BaseStream.Position;
                 //
                 ushort posClassRuleCnt = reader.ReadUInt16();
                 ushort[] posClassRuleOffsets = Utils.ReadUInt16Array(reader, posClassRuleCnt);
-                _posClassRules = new PosClassRule[posClassRuleCnt];
+                PosClassRules = new PosClassRule[posClassRuleCnt];
                 for (int i = 0; i < posClassRuleOffsets.Length; ++i)
                 {
                     //move to and read                     
-                    _posClassRules[i] = PosClassRule.CreateFrom(reader, tableStartAt + posClassRuleOffsets[i]);
+                    PosClassRules[i] = PosClassRule.CreateFrom(reader, tableStartAt + posClassRuleOffsets[i]);
                 }
             }
 
@@ -860,10 +861,11 @@ namespace Typography.OpenFont.Tables
                 return posClassSetTable;
             }
         }
+
         class PosClassRule
         {
-            PosLookupRecord[] _posLookupRecords;
-            ushort[] _inputGlyphIds;
+            public PosLookupRecord[] PosLookupRecords;
+            public ushort[] InputGlyphIds;
 
             public static PosClassRule CreateFrom(BinaryReader reader, long beginAt)
             {
@@ -875,11 +877,10 @@ namespace Typography.OpenFont.Tables
                 ushort posCount = reader.ReadUInt16();
                 if (glyphCount > 1)
                 {
-                    posClassRule._inputGlyphIds = Utils.ReadUInt16Array(reader, glyphCount - 1);
-
+                    posClassRule.InputGlyphIds = Utils.ReadUInt16Array(reader, glyphCount - 1);
                 }
 
-                posClassRule._posLookupRecords = CreateMultiplePosLookupRecords(reader, posCount);
+                posClassRule.PosLookupRecords = CreateMultiplePosLookupRecords(reader, posCount);
                 return posClassRule;
             }
         }
