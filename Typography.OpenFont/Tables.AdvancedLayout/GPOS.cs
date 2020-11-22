@@ -157,6 +157,7 @@ namespace Typography.OpenFont.Tables
                         if (cov_index > -1)
                         {
                             var vr = _valueRecords[Format == 1 ? 0 : cov_index];
+                            inputGlyphs.AppendGlyphOffset(i, vr.XPlacement, vr.YPlacement);
                             inputGlyphs.AppendGlyphAdvance(i, vr.XAdvance, 0);
                         }
                     }
@@ -246,14 +247,15 @@ namespace Typography.OpenFont.Tables
                                 //TODO: recheck for vertical writing ... (YAdvance)
                                 if (v1 != null)
                                 {
+                                    inputGlyphs.AppendGlyphOffset(i, v1.XPlacement, v1.YPlacement);
                                     inputGlyphs.AppendGlyphAdvance(i, v1.XAdvance, 0);
                                 }
 
                                 if (v2 != null)
                                 {
+                                    inputGlyphs.AppendGlyphOffset(i + 1, v2.XPlacement, v2.YPlacement);
                                     inputGlyphs.AppendGlyphAdvance(i + 1, v2.XAdvance, 0);
                                 }
-
                             }
                         }
                     }
@@ -308,13 +310,15 @@ namespace Typography.OpenFont.Tables
                                     ValueRecord v1 = pair.value1;
                                     ValueRecord v2 = pair.value2;
 
-                                    if (v1 != null && v1.XAdvance != 0)
+                                    if (v1 != null)
                                     {
+                                        inputGlyphs.AppendGlyphOffset(i, v1.XPlacement, v1.YPlacement);
                                         inputGlyphs.AppendGlyphAdvance(i, v1.XAdvance, 0);
                                     }
 
                                     if (v2 != null)
                                     {
+                                        inputGlyphs.AppendGlyphOffset(i + 1, v2.XPlacement, v2.YPlacement);
                                         inputGlyphs.AppendGlyphAdvance(i + 1, v2.XAdvance, 0);
                                     }
                                 }
