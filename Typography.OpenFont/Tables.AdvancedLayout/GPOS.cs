@@ -604,16 +604,16 @@ namespace Typography.OpenFont.Tables
                             int baseFound = BaseCoverageTable.FindPosition(inputGlyphs.GetGlyph(i - 1, out ushort prev_glyph_adv_w));
                             if (baseFound > -1)
                             {
+                                inputGlyphs.GetOffset(i - 1, out short prev_glyph_xoffset, out short prev_glyph_yoffset);
                                 ushort markClass = this.MarkArrayTable.GetMarkClass(markFound);
                                 //find anchor on base glyph
                                 AnchorPoint markAnchorPoint = this.MarkArrayTable.GetAnchorPoint(markFound);
                                 BaseRecord baseRecord = BaseArrayTable.GetBaseRecords(baseFound);
                                 AnchorPoint basePointForMark = baseRecord.anchors[markClass];
-                                inputGlyphs.AppendGlyphOffset(
-                                    i,
-                                    (short)((-prev_glyph_adv_w + basePointForMark.xcoord - markAnchorPoint.xcoord)),
-                                    (short)(basePointForMark.ycoord - markAnchorPoint.ycoord)
-                                    );
+                                int xoffset = prev_glyph_xoffset - prev_glyph_adv_w
+                                            + basePointForMark.xcoord - markAnchorPoint.xcoord;
+                                int yoffset = basePointForMark.ycoord - markAnchorPoint.ycoord;
+                                inputGlyphs.AppendGlyphOffset(i, (short)xoffset, (short)yoffset);
                             }
                         }
                         xpos += glyph_advW;
@@ -1093,6 +1093,7 @@ namespace Typography.OpenFont.Tables
                     Utils.WarnUnimplemented("GPOS Lookup Sub Table Type 8 Format 2");
                 }
             }
+
             class LkSubTableType8Fmt3 : LookupSubTable
             {
                 public CoverageTable[] BacktrackCoverages { get; set; }
