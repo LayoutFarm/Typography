@@ -598,28 +598,30 @@ namespace Typography.OpenFont.Tables
                     for (int i = Math.Max(startAt, 1); i < lim; ++i)
                     {
                         int markFound = MarkCoverageTable.FindPosition(inputGlyphs.GetGlyph(i, out ushort glyph_advW));
-                        if (markFound > -1)
+                        if (markFound < 0)
                         {
-                            // Look backwards for the base glyph
-                            // FIXME: how do we really know where to stop?
-                            for (int j = i - 1; j >= startAt; --j)
+                            continue;
+                        }
+
+                        // Look backwards for the base glyph
+                        // FIXME: how do we really know where to stop?
+                        for (int j = i - 1; j >= startAt; --j)
+                        {
+                            var prev_glyph = inputGlyphs.GetGlyph(j, out ushort prev_glyph_adv_w);
+                            int baseFound = BaseCoverageTable.FindPosition(prev_glyph);
+                            if (baseFound > -1)
                             {
-                                var prev_glyph = inputGlyphs.GetGlyph(j, out ushort prev_glyph_adv_w);
-                                int baseFound = BaseCoverageTable.FindPosition(prev_glyph);
-                                if (baseFound > -1)
-                                {
-                                    inputGlyphs.GetOffset(j, out short prev_glyph_xoffset, out short prev_glyph_yoffset);
-                                    ushort markClass = this.MarkArrayTable.GetMarkClass(markFound);
-                                    //find anchor on base glyph
-                                    AnchorPoint markAnchorPoint = this.MarkArrayTable.GetAnchorPoint(markFound);
-                                    BaseRecord baseRecord = BaseArrayTable.GetBaseRecords(baseFound);
-                                    AnchorPoint basePointForMark = baseRecord.anchors[markClass];
-                                    int xoffset = prev_glyph_xoffset - prev_glyph_adv_w
-                                                + basePointForMark.xcoord - markAnchorPoint.xcoord;
-                                    int yoffset = basePointForMark.ycoord - markAnchorPoint.ycoord;
-                                    inputGlyphs.AppendGlyphOffset(i, (short)xoffset, (short)yoffset);
-                                    break;
-                                }
+                                BaseRecord baseRecord = BaseArrayTable.GetBaseRecords(baseFound);
+                                ushort markClass = MarkArrayTable.GetMarkClass(markFound);
+                                // find anchor on base glyph
+                                AnchorPoint anchor = MarkArrayTable.GetAnchorPoint(markFound);
+                                AnchorPoint prev_anchor = baseRecord.anchors[markClass];
+                                inputGlyphs.GetOffset(j, out short prev_glyph_xoffset, out short prev_glyph_yoffset);
+                                inputGlyphs.GetOffset(i, out short glyph_xoffset, out short glyph_yoffset);
+                                int xoffset = prev_glyph_xoffset + prev_anchor.xcoord - (prev_glyph_adv_w + glyph_xoffset + anchor.xcoord);
+                                int yoffset = prev_glyph_yoffset + prev_anchor.ycoord - (glyph_yoffset + anchor.ycoord);
+                                inputGlyphs.AppendGlyphOffset(i, (short)xoffset, (short)yoffset);
+                                break;
                             }
                         }
                     }
@@ -813,51 +815,35 @@ namespace Typography.OpenFont.Tables
                     }
 #endif
                     //find marker
-                    startAt = Math.Max(startAt, 1);
                     int lim = Math.Min(startAt + len, inputGlyphs.Count);
 
-                    for (int i = startAt; i < lim; ++i)
+                    for (int i = Math.Max(startAt, 1); i < lim; ++i)
                     {
                         int mark1Found = MarkCoverage1.FindPosition(inputGlyphs.GetGlyph(i, out ushort glyph_adv_w));
-                        if (mark1Found > -1)
+                        if (mark1Found < 0)
                         {
-                            //this is mark glyph
-                            //then-> look back for base mark (mark2)
-                            int mark2Found = MarkCoverage2.FindPosition(inputGlyphs.GetGlyph(i - 1, out ushort prev_pos_adv_w));
-                            if (mark2Found > -1)
-                            {
-                                int mark1ClassId = this.Mark1ArrayTable.GetMarkClass(mark1Found);
-                                AnchorPoint mark2BaseAnchor = this.Mark2ArrayTable.GetAnchorPoint(mark2Found, mark1ClassId);
-                                AnchorPoint mark1Anchor = this.Mark1ArrayTable.GetAnchorPoint(mark1Found);
-
-                                // TODO: review here
-                                if (mark1Anchor.ycoord < 0)
-                                {
-                                    //temp HACK!
-                                    //eg. น้ำ in Tahoma 
-
-                                    inputGlyphs.AppendGlyphOffset(i - 1 /*PREV*/, mark1Anchor.xcoord, mark1Anchor.ycoord);
-                                }
-                                else
-                                {
-                                    //short offset_x, offset_y;
-                                    //inputGlyphs.GetOffset(i - 1/*PREV*/, out offset_x, out offset_y);
-                                    //inputGlyphs.AppendGlyphOffset(
-                                    //     i,
-                                    //     (short)(offset_x + mark2BaseAnchor.xcoord - mark1Anchor.xcoord),
-                                    //     (short)(offset_y + mark2BaseAnchor.ycoord - mark1Anchor.ycoord));
-
-
-                                    //TEMP hack
-                                    short offset_x, offset_y;
-                                    inputGlyphs.GetOffset(i - 1/*PREV*/, out offset_x, out offset_y);
-                                    inputGlyphs.AppendGlyphOffset(
-                                         i,
-                                         (short)(offset_x + mark2BaseAnchor.xcoord - mark1Anchor.xcoord),
-                                         (short)(offset_y + mark1Anchor.ycoord - mark2BaseAnchor.ycoord));
-                                }
-                            }
+                            continue;
                         }
+
+                        //this is mark glyph
+                        //then-> look back for base mark (mark2)
+                        int mark2Found = MarkCoverage2.FindPosition(inputGlyphs.GetGlyph(i - 1, out ushort prev_pos_adv_w));
+                        if (mark2Found < 0)
+                        {
+                            continue;
+                        }
+
+                        // Examples:
+                        // 👨🏻‍👩🏿‍👧🏽‍👦🏽‍👦🏿 in Segoe UI Emoji
+                        // น้ำ in Tahoma
+                        int mark1ClassId = Mark1ArrayTable.GetMarkClass(mark1Found);
+                        AnchorPoint prev_anchor = Mark2ArrayTable.GetAnchorPoint(mark2Found, mark1ClassId);
+                        AnchorPoint anchor = Mark1ArrayTable.GetAnchorPoint(mark1Found);
+                        inputGlyphs.GetOffset(i - 1, out short prev_glyph_xoffset, out short prev_glyph_yoffset);
+                        inputGlyphs.GetOffset(i, out short glyph_xoffset, out short glyph_yoffset);
+                        int xoffset = prev_glyph_xoffset + prev_anchor.xcoord - (prev_pos_adv_w + glyph_xoffset + anchor.xcoord);
+                        int yoffset = prev_glyph_yoffset + prev_anchor.ycoord - (glyph_yoffset + anchor.ycoord);
+                        inputGlyphs.AppendGlyphOffset(i, (short)xoffset, (short)yoffset);
                     }
                 }
             }
