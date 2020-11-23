@@ -1028,7 +1028,7 @@ namespace Typography.OpenFont.Tables
                         foreach (var rule in PosClassSetTables[glyph1_class].PosClassRules)
                         {
                             var glyphIds = rule.InputGlyphIds;
-                            bool success = false;
+                            int matches = 0;
                             for (int n = 0; n < glyphIds.Length && i + 1 + n < lim; ++n)
                             {
                                 ushort glyphn_index = inputGlyphs.GetGlyph(i + 1 + n, out unused);
@@ -1037,16 +1037,16 @@ namespace Typography.OpenFont.Tables
                                 {
                                     break;
                                 }
-
-                                if (n == glyphIds.Length - 1)
-                                {
-                                    success = true;
-                                    Utils.WarnUnimplemented("GPOS Lookup Sub Table Type 7 Format 2");
-                                }
+                                ++matches;
                             }
 
-                            if (success)
+                            if (matches == glyphIds.Length)
                             {
+                                foreach (var plr in rule.PosLookupRecords)
+                                {
+                                    var lookup = OwnerGPos.LookupList[plr.lookupListIndex];
+                                    lookup.DoGlyphPosition(inputGlyphs, i + plr.seqIndex, glyphIds.Length - plr.seqIndex);
+                                }
                                 break;
                             }
                         }
