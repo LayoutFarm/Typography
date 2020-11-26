@@ -33,6 +33,8 @@ namespace Typography.Text
             _p = new VirtualTextSpanPrinter();
             _p.BuiltInAlternativeTypefaceSelector = (int codepoint, AltTypefaceSelectorBase userSelector, out Typeface typeface) => _openFontTextService.TryGetAlternativeTypefaceFromCodepoint(codepoint, userSelector, out typeface);
         }
+        public OpenFontTextService TextService => _openFontTextService;
+
         public ScriptLang CurrentScriptLang
         {
             get => _p.ScriptLang;
@@ -84,7 +86,7 @@ namespace Typography.Text
             {
                 char[] rawBuffer = textBufferSpan.GetRawUtf16Buffer();
                 _p.PrepareFormattedStringList(rawBuffer, textBufferSpan.start, textBufferSpan.len, _fmtGlyphPlanList);
-              
+
                 int pos1 = textBufferSpan.start;
                 for (int i = 0; i < textBufferSpan.len; ++i)
                 {

@@ -71,10 +71,7 @@ namespace Typography.OpenFont.Trimmable
         {
             //use default opent font reader
             RestoreUp(typeface, ticket, new OpenFontReader(), fontStream);
-        }
-
-
-
+        } 
     }
 }
 

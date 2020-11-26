@@ -17,6 +17,7 @@ namespace Typography.Text
             Utf32ArrayList
         }
 
+        //TODO: review this 2 buffer here again***
         readonly ArrayList<int> _utf32Buffer = new ArrayList<int>();
         readonly ArrayList<char> _utf16Buffer = new ArrayList<char>();
 
@@ -149,7 +150,12 @@ namespace Typography.Text
             }
         }
 
-
+        public int GetChar(int index)
+        {
+            //TODO:
+            throw new NotSupportedException();
+            return -1;
+        }
         public void CopyTo(ArrayList<int> output)
         {
             switch (BackupKind)
@@ -234,6 +240,7 @@ namespace Typography.Text
 
         public override string ToString()
         {
+            //TODO:review here
             return "";
             //_sb.ToString();
         }
@@ -352,7 +359,7 @@ namespace Typography.Text
             }
         }
         public CharBufferSegment NewSegment(ArraySegment<int> textspan)
-        { 
+        {
             return NewSpan(textspan.Array, textspan.Offset, textspan.Count);
         }
         public CharBufferSegment NewSegment(ArraySegment<char> textspan)

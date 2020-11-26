@@ -90,6 +90,8 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             }
             return found;
         }
+    
+    
     }
 
 
