@@ -129,7 +129,7 @@ namespace Typography.OpenFont.Tables
 
             static int FindGlyphBackwardByKind(IGlyphPositions inputGlyphs, GlyphClassKind kind, int pos, int lim)
             {
-                for (int i = pos; --i >= lim; )
+                for (int i = pos; --i >= lim;)
                 {
                     if (inputGlyphs.GetGlyphClassKind(i) == kind)
                     {
@@ -847,13 +847,13 @@ namespace Typography.OpenFont.Tables
                         }
 
                         // Look back for previous mark glyph
-                        int j = FindGlyphBackwardByKind(inputGlyphs, GlyphClassKind.Mark, i, startAt);
-                        if (j < 0)
+                        int prev_mark = FindGlyphBackwardByKind(inputGlyphs, GlyphClassKind.Mark, i, startAt);
+                        if (prev_mark < 0)
                         {
                             continue;
                         }
 
-                        int mark2Found = MarkCoverage2.FindPosition(inputGlyphs.GetGlyph(j, out ushort prev_pos_adv_w));
+                        int mark2Found = MarkCoverage2.FindPosition(inputGlyphs.GetGlyph(prev_mark, out ushort prev_pos_adv_w));
                         if (mark2Found < 0)
                         {
                             continue;
@@ -861,15 +861,23 @@ namespace Typography.OpenFont.Tables
 
                         // Examples:
                         // 👨🏻‍👩🏿‍👧🏽‍👦🏽‍👦🏿 in Segoe UI Emoji
-                        // น้ำ in Tahoma
+
                         int mark1ClassId = Mark1ArrayTable.GetMarkClass(mark1Found);
                         AnchorPoint prev_anchor = Mark2ArrayTable.GetAnchorPoint(mark2Found, mark1ClassId);
                         AnchorPoint anchor = Mark1ArrayTable.GetAnchorPoint(mark1Found);
-                        inputGlyphs.GetOffset(j, out short prev_glyph_xoffset, out short prev_glyph_yoffset);
-                        inputGlyphs.GetOffset(i, out short glyph_xoffset, out short glyph_yoffset);
-                        int xoffset = prev_glyph_xoffset + prev_anchor.xcoord - (prev_pos_adv_w + glyph_xoffset + anchor.xcoord);
-                        int yoffset = prev_glyph_yoffset + prev_anchor.ycoord - (glyph_yoffset + anchor.ycoord);
-                        inputGlyphs.AppendGlyphOffset(i, (short)xoffset, (short)yoffset);
+                        if (anchor.ycoord < 0)
+                        {
+                            //temp HACK!   น้ำ in Tahoma
+                            inputGlyphs.AppendGlyphOffset(prev_mark /*PREV*/, anchor.xcoord, anchor.ycoord);
+                        }
+                        else
+                        {
+                            inputGlyphs.GetOffset(prev_mark, out short prev_glyph_xoffset, out short prev_glyph_yoffset);
+                            inputGlyphs.GetOffset(i, out short glyph_xoffset, out short glyph_yoffset);
+                            int xoffset = prev_glyph_xoffset + prev_anchor.xcoord - (prev_pos_adv_w + glyph_xoffset + anchor.xcoord);
+                            int yoffset = prev_glyph_yoffset + prev_anchor.ycoord - (glyph_yoffset + anchor.ycoord);
+                            inputGlyphs.AppendGlyphOffset(i, (short)xoffset, (short)yoffset);
+                        }
                     }
                 }
             }
@@ -1051,7 +1059,7 @@ namespace Typography.OpenFont.Tables
                             }
                         }
                     }
-                 }
+                }
             }
             class LkSubTableType7Fmt3 : LookupSubTable
             {
