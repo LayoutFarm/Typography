@@ -540,8 +540,8 @@ namespace Typography.FontCollections
                 }
                 else if (installedTypefaceList.Count > 0)
                 {
-                    InstalledTypeface instTypeface = installedTypefaceList[0];//default
-                    selectedTypeface = this.ResolveTypeface(installedTypefaceList[0]);
+    
+                    selectedTypeface = this.ResolveTypeface(installedTypefaceList[0]);//default
                     return selectedTypeface != null;
                 }
             }

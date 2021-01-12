@@ -222,18 +222,23 @@ namespace Typography.FontCollections
 
         public static int CalculateCrc32(byte[] buffer) => SlurpBlock(buffer, 0, buffer.Length);
     }
+     
 
     public static class InstalledTypefaceCollectionExtensions
     {
 
+        //TODO: remove custom delegate type eg MyFunc<T>
+
         public delegate R MyFunc<T1, T2, R>(T1 t1, T2 t2);
         public delegate R MyFunc<T, R>(T t);
 
+        
         public static Action<InstalledTypefaceCollection> CustomSystemFontListLoader;
-
         public static MyFunc<string, Stream> CustomFontStreamLoader;
+
         public static void LoadFontsFromFolder(this InstalledTypefaceCollection fontCollection, string folder, bool recursive = false)
         {
+
             if (!Directory.Exists(folder))
             {
 #if DEBUG
@@ -246,6 +251,8 @@ namespace Typography.FontCollections
             //-------------------------------------
 
             // 1. font dir
+            PixelFarm.Platforms.StorageService.Provider.GetDataDirNameList(folder);
+
             foreach (string file in Directory.GetFiles(folder))
             {
                 //eg. this is our custom font folder
@@ -375,7 +382,7 @@ namespace Typography.FontCollections
                 {
                     //TODO: handle duplicated font!!
                     //try read this             
-                    InstalledTypeface instTypeface;
+
                     using (FileStream fs = new FileStream(filename, FileMode.Open))
                     {
                         OpenFontReader reader = new OpenFontReader();
@@ -386,7 +393,7 @@ namespace Typography.FontCollections
                             typeface,
                             TinyCRC32Calculator.CalculateCrc32(typeface.Name.ToUpper()));
 
-                        instTypeface = new InstalledTypeface(typeface, filename);
+                        InstalledTypeface instTypeface = new InstalledTypeface(typeface, filename);
                         fontCollection._installedTypefacesByFilenames.Add(filename, instTypeface);
 
                         return instTypeface.ResolvedTypeface = typeface;//assign  and return                         
@@ -400,8 +407,9 @@ namespace Typography.FontCollections
                 return ResolveTypeface(fontCollection, found);
             }
             return null;
-
         }
+
+
         //for Windows , how to find Windows' Font Directory from Windows Registry
         //        string[] localMachineFonts = Registry.LocalMachine.OpenSubKey("Software\\Microsoft\\Windows NT\\CurrentVersion\\Fonts", false).GetValueNames();
         //        // get parent of System folder to have Windows folder

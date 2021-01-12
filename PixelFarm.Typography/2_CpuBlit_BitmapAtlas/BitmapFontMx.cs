@@ -90,8 +90,8 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             }
             return found;
         }
-    
-    
+
+
     }
 
 
@@ -273,10 +273,8 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                         int fontKey = font.RuntimeResolvedKey;
                         Typeface typeface = font.Typeface;
                         string fontTextureFile = typeface.Name + "_" + fontKey;
-                        string resolveFontFile = fontTextureFile + ".tx_info";
-                        string fontTextureInfoFile = resolveFontFile;
+                        string fontTextureInfoFile = fontTextureFile + ".tx_info";
                         string fontTextureImgFilename = fontTextureInfoFile + ".png";
-
 
                         fontAtlas.SetMainBitmap(MemBitmapExt.LoadBitmap(fontTextureImgFilename), true);
                     }
@@ -311,8 +309,8 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             int fontKey = font.RuntimeResolvedKey;
             Typeface typeface = font.Typeface;
             string fontTextureFile = typeface.Name + "_" + fontKey;
-            string resolveFontFile = fontTextureFile + ".tx_info";
-            string fontTextureInfoFile = resolveFontFile;
+            
+            string fontTextureInfoFile = fontTextureFile + ".tx_info";
             string fontTextureImgFilename = fontTextureInfoFile + ".png";
 
 
@@ -404,8 +402,8 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
 #if DEBUG
                 //write temp debug info
 #if !__MOBILE__
-                System.IO.File.WriteAllBytes(fontTextureInfoFile, ms.ToArray());
-                System.IO.File.WriteAllText(fontTextureInfoFile + ".txt", font.Name + ",size" + font.SizeInPoints + "pts");
+                //System.IO.File.WriteAllBytes(fontTextureInfoFile, ms.ToArray());
+                //System.IO.File.WriteAllText(fontTextureInfoFile + ".txt", font.Name + ",size" + font.SizeInPoints + "pts");
 #endif
 #endif
 
