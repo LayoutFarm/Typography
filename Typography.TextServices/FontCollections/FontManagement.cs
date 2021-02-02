@@ -251,7 +251,7 @@ namespace Typography.FontCollections
             //-------------------------------------
 
             // 1. font dir
-            PixelFarm.Platforms.StorageService.Provider.GetDataDirNameList(folder);
+            //PixelFarm.Platforms.StorageService.Provider.GetDataDirNameList(folder);
 
             foreach (string file in Directory.GetFiles(folder))
             {

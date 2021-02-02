@@ -152,9 +152,15 @@ namespace Typography.Text
 
         public int GetChar(int index)
         {
-            //TODO:
-            throw new NotSupportedException();
-            return -1;
+            //TODO: review here again
+            switch (BackupKind)
+            {
+                default: throw new NotSupportedException();
+                case BackupBufferKind.Utf16ArrayList:
+                    return _utf16Buffer[index];
+                case BackupBufferKind.Utf32ArrayList:
+                    return _utf32Buffer[index];
+            }
         }
         public void CopyTo(ArrayList<int> output)
         {

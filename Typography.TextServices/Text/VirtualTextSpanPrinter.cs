@@ -92,8 +92,8 @@ namespace Typography.Text
             _glyphLayout.EnableLigature = this.EnableLigature;
         }
 
-        float _orgX;
-        float _orgY;
+        //float _orgX;
+        //float _orgY;
 
         int _latestAccumulateWidth;
         int _latestCharIndex; //if we use limit width
@@ -125,8 +125,8 @@ namespace Typography.Text
             float scale = _currentTypeface.CalculateScaleToPixelFromPointSize(fontSizePoint);
 
             //4. render each glyph 
-            float ox = _orgX;
-            float oy = _orgY;
+            //float ox = _orgX;
+            //float oy = _orgY;
 
             //--------------------------------------------------- 
             //Test svg font with Twitter Color Emoji Regular 
@@ -497,14 +497,14 @@ namespace Typography.Text
         GlyphPlanSequence CreateGlyphPlanSeq(in Typography.Text.TextBufferSpan textBufferSpan, Typeface typeface)
         {
 
-            Typeface t = Typeface;
+            Typeface prev = Typeface;
 
             Typeface = typeface;
 
             GlyphPlanSequence seq = CreateGlyphPlanSeq(textBufferSpan);
             //restore typeface and font size
 
-            Typeface = t;
+            Typeface = prev;
 
             return seq;
         }
