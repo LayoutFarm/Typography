@@ -249,8 +249,8 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                 //clear mask buffer at specific pos
                 //_maskBufferPainter.FillRect(gx - 1, gy - 1, srcW + 2, srcH + 2, Color.Black);
                 //draw 'stencil' glyph on mask-buffer                
-                _maskBufferPainter.DrawImage(_fontBmp, gx, gy, srcX, _fontBmp.Height - (srcY + srcH), srcW, srcH);
-
+                //_maskBufferPainter.DrawImage(_fontBmp, gx, gy, srcX, _fontBmp.Height - (srcY + srcH), srcW, srcH);
+                _maskBufferPainter.DrawImage(_fontBmp, gx, gy, srcX, srcY, srcW, srcH);//
 
 #if DEBUG
                 //_alphaBmp.SaveImage("alpha_0.png");
