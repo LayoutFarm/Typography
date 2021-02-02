@@ -132,26 +132,27 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             //1. update some props.. 
             //2. update current type face
             UpdateGlyphLayoutSettings();
-            //Typeface typeface = _currentTypeface;
+            //ask text service to parse user input char buffer and create a glyph-plan-sequence (list of glyph-plan) 
+            //with specific request font
+            renderVx.Seq = _txtClient.CreateGlyphPlanSeq(new Typography.Text.TextBufferSpan(text, startAt, len), _font);
+
         }
         public void PrepareStringForRenderVx(AggRenderVxFormattedString renderVx, IFormattedGlyphPlanList fmtGlyphPlans)
         {
             throw new NotSupportedException();
-            UpdateGlyphLayoutSettings();
+            //UpdateGlyphLayoutSettings();
         }
         public void PrepareStringForRenderVx(AggRenderVxFormattedString renderVx)
         {
-
             //1. update some props.. 
             //2. update current type face
             UpdateGlyphLayoutSettings();
-            //Typeface typeface = _currentTypeface;
-        }
-        //public override void DrawCaret(float x, float y)
-        //{
-        //    //TODO: remove draw caret here, this is for debug only 
 
-        //}
+            char[] text = renderVx.DelayString.ToCharArray();
+            renderVx.Seq = _txtClient.CreateGlyphPlanSeq(new Typography.Text.TextBufferSpan(text, 0, text.Length), _font);
+            renderVx.State = RenderVxFormattedString.VxState.Ready;
+        }
+
 
         public void UpdateGlyphLayoutSettings()
         {
@@ -168,11 +169,9 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             w = s.Width;
             h = s.Height;
         }
-
-
         public void DrawString(AggRenderVxFormattedString renderVx, double x, double y)
         {
-
+            DrawFromGlyphPlans(renderVx.Seq, 0, renderVx.Seq.len, (float)x, (float)y);
         }
         public override void DrawFromGlyphPlans(GlyphPlanSequence glyphPlanSeq, int startAt, int len, float left, float top)
         {
@@ -213,9 +212,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             //fill glyph-by-glyh
             AntialiasTechnique aaTech = this.AntialiasTech;
             int seqLen = glyphPlanSeq.Count;
-            _maskBufferPainter.Clear(Color.Black); //clear all
-
-
+            int outOfspaceCount = 0;
             for (int i = 0; i < seqLen; ++i)
             {
                 UnscaledGlyphPlan unscaledGlyphPlan = glyphPlanSeq[i];
@@ -229,9 +226,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                 //--------------------------------------
                 //TODO: review precise height in float
                 //-------------------------------------- 
-
                 atlasItem.GetRect(out int srcX, out int srcY, out int srcW, out int srcH);
-
                 float ngx = acc_x + (float)Math.Round(unscaledGlyphPlan.OffsetX * scale);
                 float ngy = acc_y + (float)Math.Round(unscaledGlyphPlan.OffsetY * scale);
 
@@ -252,7 +247,35 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                 //_maskBufferPainter.FillRect(gx - 1, gy - 1, srcW + 2, srcH + 2, Color.Black);
                 //draw 'stencil' glyph on mask-buffer                
                 //_maskBufferPainter.DrawImage(_fontBmp, gx, gy, srcX, _fontBmp.Height - (srcY + srcH), srcW, srcH);
-                _maskBufferPainter.DrawImage(_fontBmp, gx, gy, srcX, srcY, srcW, srcH);//
+
+                if (gx >= _alphaBmp.Width || gy >= _alphaBmp.Height)
+                {
+                    outOfspaceCount++;
+                    if (outOfspaceCount > 3)
+                    {
+                        //stop
+                        break;
+                    }
+                    else
+                    {
+                        continue;//skip
+                    }
+                }
+
+
+                if (i == 0)
+                {
+                    //first seq clear dest
+                    _maskBufferPainter.Clear(Color.Black, (int)gx, (int)gy, srcW, srcH);
+                }
+
+                //copy sub-img from font-glyph-atlas to mask-bitmap
+                //we can use a more simple copy 
+                //_maskBufferPainter.DrawImage(_fontBmp, gx, gy, srcX, srcY, srcW, srcH);//
+
+
+
+                _maskBufferPainter.BitBlt(_fontBmp, gx, gy, srcX, srcY, srcW, srcH); //faster 
 
 #if DEBUG
                 //_alphaBmp.SaveImage("alpha_0.png");
