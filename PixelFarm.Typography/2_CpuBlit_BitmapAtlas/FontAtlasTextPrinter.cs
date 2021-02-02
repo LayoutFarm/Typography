@@ -213,6 +213,8 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             //fill glyph-by-glyh
             AntialiasTechnique aaTech = this.AntialiasTech;
             int seqLen = glyphPlanSeq.Count;
+            _maskBufferPainter.Clear(Color.Black); //clear all
+
 
             for (int i = 0; i < seqLen; ++i)
             {
@@ -244,8 +246,8 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                 acc_x += (float)Math.Round(unscaledGlyphPlan.AdvanceX * scale);
                 gy = (float)Math.Floor(gy);// + lineHeight;
 
-                //clear with solid black color 
-                _maskBufferPainter.Clear(Color.Black);
+                //clear with solid black color  
+
                 //clear mask buffer at specific pos
                 //_maskBufferPainter.FillRect(gx - 1, gy - 1, srcW + 2, srcH + 2, Color.Black);
                 //draw 'stencil' glyph on mask-buffer                
@@ -292,6 +294,9 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                         }
                         break;
                 }
+
+                //clear mask
+                _maskBufferPainter.Clear(Color.Black, (int)gx, (int)gy, srcW, srcH);
             }
 
 

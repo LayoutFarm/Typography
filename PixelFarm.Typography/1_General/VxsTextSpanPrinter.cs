@@ -556,7 +556,7 @@ namespace PixelFarm.Drawing
         readonly FormattedGlyphPlanSeqPool _fmtGlyphPlans = new FormattedGlyphPlanSeqPool();
         bool _renderingMultiTypefaceMode;
 
-        public override void DrawString(char[] textBuffer, int startAt, int len, float x, float y)
+        public override void DrawString(char[] textBuffer, int startAt, int len, float x, float top)
         {
 
 #if DEBUG
@@ -571,13 +571,26 @@ namespace PixelFarm.Drawing
             //unscale layout, with design unit scale
             var buffSpan = new Typography.Text.TextBufferSpan(textBuffer, startAt, len);
 
+            float baseLine = top;
+            switch (TextBaseline)
+            {
+                case Typography.Text.TextBaseline.Alphabetic:
+                    break;
+                case Typography.Text.TextBaseline.Top:
+                    baseLine += this.FontAscendingPx;
+                    break;
+                case Typography.Text.TextBaseline.Bottom:
+                    baseLine += this.FontDescedingPx;
+                    break;
+            }
+
             float xpos = x;
-            float ypos = y;
+            float ypos = baseLine;
 
             if (!EnableMultiTypefaces)
             {
                 GlyphPlanSequence glyphPlanSeq = _txtClient.CreateGlyphPlanSeq(buffSpan, _currentTypeface, FontSizeInPoints);
-                DrawFromGlyphPlans(glyphPlanSeq, xpos, y);
+                DrawFromGlyphPlans(glyphPlanSeq, xpos, ypos);
             }
             else
             {
@@ -604,7 +617,7 @@ namespace PixelFarm.Drawing
                             ResolvedFont resolvedFont = formattedGlyphPlanSeq.ResolvedFont;
                             Typeface = resolvedFont.Typeface;
 
-                            DrawFromGlyphPlans(formattedGlyphPlanSeq.Seq, xpos + (resolvedFont.WhitespaceWidth * formattedGlyphPlanSeq.PrefixWhitespaceCount), y);
+                            DrawFromGlyphPlans(formattedGlyphPlanSeq.Seq, xpos + (resolvedFont.WhitespaceWidth * formattedGlyphPlanSeq.PrefixWhitespaceCount), ypos);
 
                             xpos += _latestAccumulateWidth + (resolvedFont.WhitespaceWidth * formattedGlyphPlanSeq.PostfixWhitespaceCount);
 
@@ -624,7 +637,7 @@ namespace PixelFarm.Drawing
                             ResolvedFont resolvedFont = formattedGlyphPlanSeq.ResolvedFont;
                             Typeface = resolvedFont.Typeface;
 
-                            DrawFromGlyphPlans(formattedGlyphPlanSeq.Seq, xpos + (resolvedFont.WhitespaceWidth * formattedGlyphPlanSeq.PrefixWhitespaceCount), y);
+                            DrawFromGlyphPlans(formattedGlyphPlanSeq.Seq, xpos + (resolvedFont.WhitespaceWidth * formattedGlyphPlanSeq.PrefixWhitespaceCount), ypos);
 
                             xpos += _latestAccumulateWidth + (resolvedFont.WhitespaceWidth * formattedGlyphPlanSeq.PostfixWhitespaceCount);
 

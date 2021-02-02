@@ -13,12 +13,9 @@ namespace Typography.Text
     public static class GlobalTextService
     {
         public static TextServiceClient TxtClient { get; set; }
-
     }
     public partial class OpenFontTextService
     {
-
-
         readonly Dictionary<int, ResolvedFont> _resolvedTypefaceCache = new Dictionary<int, ResolvedFont>(); //similar to TypefaceStore
         //
         public static ScriptLang DefaultScriptLang { get; set; }
