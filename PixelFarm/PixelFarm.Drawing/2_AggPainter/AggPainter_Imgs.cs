@@ -39,6 +39,7 @@ namespace PixelFarm.CpuBlit
             this.UseLcdEffectSubPixelRendering = useSubPix;
             _aggsx.UseSubPixelLcdEffect = useSubPix;
         }
+       
         void DrawBitmap(MemBitmap memBmp, double left, double top, int srcX, int srcY, int srcW, int srcH)
         {
 
@@ -97,7 +98,7 @@ namespace PixelFarm.CpuBlit
 
             //-------------------------------
             bool useSubPix = UseLcdEffectSubPixelRendering; //save, restore later... 
-                                                   //before render an image we turn off vxs subpixel rendering
+                                                            //before render an image we turn off vxs subpixel rendering
             this.UseLcdEffectSubPixelRendering = false;
 
             _aggsx.Render(memBmp);
@@ -113,7 +114,7 @@ namespace PixelFarm.CpuBlit
             }
 
             bool useSubPix = UseLcdEffectSubPixelRendering; //save, restore later... 
-                                                   //before render an image we turn off vxs subpixel rendering
+                                                            //before render an image we turn off vxs subpixel rendering
             this.UseLcdEffectSubPixelRendering = false;
 
             _aggsx.Render(memBmp, aff);
@@ -132,7 +133,7 @@ namespace PixelFarm.CpuBlit
             }
 
             bool useSubPix = UseLcdEffectSubPixelRendering; //save, restore later... 
-                                                   //before render an image we turn off vxs subpixel rendering
+                                                            //before render an image we turn off vxs subpixel rendering
             this.UseLcdEffectSubPixelRendering = false;
 
             if (coordTx is Affine aff)

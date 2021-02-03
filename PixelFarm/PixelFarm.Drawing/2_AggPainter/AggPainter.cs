@@ -121,6 +121,7 @@ namespace PixelFarm.CpuBlit
         public override float OriginX => _aggsx.ScanlineRasOriginX;
         public override float OriginY => _aggsx.ScanlineRasOriginY;
         public override void Clear(Color color) => _aggsx.Clear(color);
+        public void Clear(Color color, int left, int top, int width, int height) => _aggsx.Clear(color, left, top, width, height);
         public override void SetOrigin(float x, float y) => _aggsx.SetScanlineRasOrigin(x, y);
 
         public override RenderQuality RenderQuality { get; set; }

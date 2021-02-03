@@ -92,20 +92,20 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                         //3. layout 
                         for (int i = itemList.Count - 1; i >= 0; --i)
                         {
-                            BitmapAtlasItemSource g = itemList[i];
-                            if (g.Height > maxRowHeight)
+                            BitmapAtlasItemSource itm = itemList[i];
+                            if (itm.Height > maxRowHeight)
                             {
-                                maxRowHeight = g.Height;
+                                maxRowHeight = itm.Height;
                             }
-                            if (currentX + g.Width > totalMaxLim)
+                            if (currentX + itm.Width > totalMaxLim)
                             {
                                 //start new row
                                 currentY += maxRowHeight;
                                 currentX = 0;
                             }
                             //-------------------
-                            g.Area = new Rectangle(currentX, currentY, g.Width, g.Height);
-                            currentX += g.Width;
+                            itm.Area = new Rectangle(currentX, currentY, itm.Width, itm.Height);
+                            currentX += itm.Width;
                         }
 
                     }
@@ -116,24 +116,24 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                         itemList.Sort((a, b) => a.Height.CompareTo(b.Height));
 
                         //3. layout 
-                        int glyphCount = itemList.Count;
-                        for (int i = 0; i < glyphCount; ++i)
+                        int count = itemList.Count;
+                        for (int i = 0; i < count; ++i)
                         {
-                            BitmapAtlasItemSource g = itemList[i];
-                            if (g.Height > maxRowHeight)
+                            BitmapAtlasItemSource itm = itemList[i];
+                            if (itm.Height > maxRowHeight)
                             {
-                                maxRowHeight = g.Height;
+                                maxRowHeight = itm.Height;
                             }
-                            if (currentX + g.Width > totalMaxLim)
+                            if (currentX + itm.Width > totalMaxLim)
                             {
                                 //start new row
                                 currentY += maxRowHeight;
                                 currentX = 0;
-                                maxRowHeight = g.Height;//reset, after start new row
+                                maxRowHeight = itm.Height;//reset, after start new row
                             }
                             //-------------------
-                            g.Area = new Rectangle(currentX, currentY, g.Width, g.Height);
-                            currentX += g.Width;
+                            itm.Area = new Rectangle(currentX, currentY, itm.Width, itm.Height);
+                            currentX += itm.Width;
                         }
 
                     }

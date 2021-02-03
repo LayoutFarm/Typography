@@ -12,14 +12,41 @@ namespace PixelFarm.Drawing
     public abstract class RenderVxFormattedString : RenderVx
     {
         public short DescendingInPx { get; set; }
+        public short SpanDescendingInPx { get; set; }
         public float Width { get; set; }
         public float SpanHeight { get; set; }
-        public VxState State { get; set; } 
+
+        VxState _state;
+        public abstract int StripCount { get; }
+        public VxState State
+        {
+            get => _state;
+            set
+            {
+                //if (!this.IsReset && value == VxState.NoStrip)
+                //{
+
+                //}
+                _state = value;
+            }
+        }
+        public bool IsReset { get; set; }
+         
         public enum VxState : byte
         {
+            /// <summary>
+            /// begin state, strip is not created
+            /// </summary>
             NoStrip,
+            /// <summary>
+            /// waiting for strip
+            /// </summary>
             Waiting,
+            /// <summary>
+            /// strip is ready
+            /// </summary>
             Ready,
+
         }
 #if DEBUG
         public abstract string dbugName { get; }

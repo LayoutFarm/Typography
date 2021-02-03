@@ -1331,12 +1331,13 @@ namespace PixelFarm.CpuBlit.Rasterization
                 }
                 else
                 {
+                    byte new_v = (byte)((alpha) - ((BASE_MASK) >> (int)CO.BASE_SHIFT));
                     do
                     {
                         //original
                         //buffer[bufferOffset] = (byte)((alpha + EXISTING_A) - ((alpha * EXISTING_A + BASE_MASK) >> (int)Color.BASE_SHIFT));
                         //since in this case EXISTING_A is always 0, so we remove it
-                        buffer[bufferOffset] = (byte)((alpha) - ((BASE_MASK) >> (int)CO.BASE_SHIFT));
+                        buffer[bufferOffset] = new_v;// (byte)((alpha) - ((BASE_MASK) >> (int)CO.BASE_SHIFT));
                         bufferOffset++;
 
                     } while (--len != 0);

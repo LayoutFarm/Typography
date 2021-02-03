@@ -12,10 +12,8 @@ namespace PixelFarm.Drawing.Internal
         public float ViewportWidth => _drawBoard.Width;
         public float ViewportHeight => _drawBoard.Height;
 
-        public DrawboardBuffer CreateOffscreenDrawBoard(int width, int height)
-        {
-            return _drawBoard.CreateBackbuffer(width, height);
-        }
+        public DrawboardBuffer CreateOffscreenDrawBoard(int width, int height) => _drawBoard.CreateBackbuffer(width, height);
+
         public void AttachTo(DrawboardBuffer attachToBackbuffer)
         {
             //save  
@@ -33,6 +31,10 @@ namespace PixelFarm.Drawing.Internal
         }
 
         internal Rectangle CurrentClipRect => _drawBoard.CurrentClipRect;
+        public void DrawImage(Image img, float x, float y)
+        {
+            _drawBoard.DrawImage(img, (int)x, (int)y);
+        }
         public void DrawImage(Image img, float x, float y, float w, float h)
         {
             _drawBoard.DrawImage(img, new RectangleF(x, y, w, h));

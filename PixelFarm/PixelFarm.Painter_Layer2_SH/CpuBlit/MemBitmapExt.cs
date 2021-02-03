@@ -24,7 +24,25 @@ using PixelFarm.Drawing.Internal;
 namespace PixelFarm.CpuBlit
 {
 
-
+    public class MemBitmapProxy
+    {
+        public MemBitmapProxy()
+        {
+        }
+        public void Set(MemBitmap memBmp, int left, int top, int width, int height)
+        {
+            Left = left;
+            Top = top;
+            Width = width;
+            Height = height;
+            OriginalBmp = memBmp;
+        }
+        public MemBitmap OriginalBmp { get; private set; }
+        public int Left { get; private set; }
+        public int Top { get; private set; }
+        public int Width { get; private set; }
+        public int Height { get; private set; }
+    }
 
     public static class MemBitmapExt
     {
@@ -46,6 +64,7 @@ namespace PixelFarm.CpuBlit
             headPtr = (byte*)ptr.Ptr;
             return ptr;
         }
+
 
         public static int[] CopyImgBuffer(this MemBitmap memBmp, int width, int height, bool flipY = false)
         {
@@ -140,14 +159,59 @@ namespace PixelFarm.CpuBlit
             return copyBmp;
         }
 
-        /// <summary>
-        /// swap from gles ARGB to ABGR (Gdi)
-        /// </summary>
-        /// <param name="src"></param>
-        public static void SwapArgbToAbgr(this MemBitmap src)
+        public static void BlendColorWithMask(Color c, MemBitmapProxy mask, MemBitmap dst, int dstX, int dstY, int srcX, int srcY, int srcW, int srcH)
         {
-            //TODO:
+            //select color from mask bitmap and blend to dst bitmap with specific color     
+
         }
+        public static void BitBlt(MemBitmap src, MemBitmap dst, int dstX, int dstY, int srcX, int srcY, int srcW, int srcH)
+        {
+            IntPtr src_h = src.GetRawBufferHead();
+            IntPtr dst_h = dst.GetRawBufferHead();
+            unsafe
+            {
+                int* src_h1 = (int*)src_h;
+                int* dst_h1 = (int*)dst_h;
+                //copy line-by-line
+                src_h1 += srcY * src.Width;//move to src line
+                dst_h1 += dstY * dst.Width;//move to dst line
+
+                if (dstX + srcW > dst.Width)
+                {
+                    srcW = dst.Width - dstX;
+                    if (srcW < 0) { return; }//limit
+                }
+                if (dstY + srcH > dst.Height)
+                {
+                    srcH = dst.Height - dstY;
+                    if (srcH < 0) return;//limit
+                }
+
+                for (int t_count = 0; t_count < srcH; ++t_count)
+                {
+                    MemMx.memcpy((byte*)(dst_h1 + dstX), (byte*)(src_h1 + srcX), srcW * 4);
+                    //move to next line
+                    src_h1 += src.Width;
+                    dst_h1 += dst.Width;
+                }
+            }
+
+            src.ReleaseRawBufferHead(src_h);
+            dst.ReleaseRawBufferHead(dst_h);
+
+#if DEBUG
+            //dst.SaveImage("tmpN1.png");
+#endif
+        }
+
+        ///// <summary>
+        ///// swap from gles ARGB to ABGR (Gdi)
+        ///// </summary>
+        ///// <param name="src"></param>
+        //public static void SwapArgbToAbgr(this MemBitmap src)
+        //{
+        //    //TODO:
+        //}
         //public static void InvertColor(this MemBitmap memBmp)
         //{
         //    //temp fix
@@ -175,98 +239,115 @@ namespace PixelFarm.CpuBlit
         //        } 
         //    }
         //}
-        internal static void Clear(PixelFarm.CpuBlit.TempMemPtr tmp, Color color)
+
+        internal static void Clear(PixelFarm.CpuBlit.TempMemPtr tmp, Color color, int left, int top, int width, int height)
         {
             unsafe
             {
                 int* buffer = (int*)tmp.Ptr;
-                int len32 = tmp.LengthInBytes / 4;
+                //------------------------------
+                //fast clear buffer
+                //skip clipping ****
+                //TODO: reimplement clipping***
+                //------------------------------  
+
+                unsafe
+                {
+                    //clear only 1st row 
+                    uint* head_i32 = (uint*)buffer;
+                    //first line
+                    //other color
+                    //#if WIN32
+                    //  uint colorARGB = (uint)((color.alpha << 24) | ((color.red << 16) | (color.green << 8) | color.blue));
+                    //#else
+                    //  uint colorARGB = (uint)((color.alpha << 24) | ((color.blue << 16) | (color.green << 8) | color.red));
+                    //#endif
+
+                    //ARGB
+                    uint colorARGB = 0;//empty
+                    if (color != Color.Empty)
+                    {
+                        colorARGB = (uint)((color.A << CO.A_SHIFT) | ((color.R << CO.R_SHIFT) | (color.G << CO.G_SHIFT) | color.B << CO.B_SHIFT));
+                    }
+
+
+
+                    head_i32 += top * width;//move to first line 
+                    //and first line only
+                    uint* head_i32_1 = head_i32 + left;
+                    for (int i = width - 1; i >= 0; --i)
+                    {
+                        *head_i32_1 = colorARGB; //black (ARGB)
+                        head_i32_1++;
+                    }
+
+                    int stride = width * 4;//bytes
+                    //and copy to another line
+                    head_i32 += width;//move to another line
+
+                    for (int i = height - 2; i >= 0; --i)
+                    {
+                        MemMx.memcpy((byte*)(head_i32 + left), (byte*)buffer, stride);
+                        head_i32 += width;
+                    }
+                }
+            }
+        }
+
+        internal static void Clear(PixelFarm.CpuBlit.TempMemPtr tmp, Color color, int width, int height)
+        {
+            unsafe
+            {
+                int* buffer = (int*)tmp.Ptr;
+
 
                 //------------------------------
                 //fast clear buffer
                 //skip clipping ****
                 //TODO: reimplement clipping***
                 //------------------------------ 
-                if (color == Color.White)
+
+
+                unsafe
                 {
-                    //fast cleat with white color
-                    int n = len32;
-                    unsafe
-                    {
-                        //fixed (void* head = &buffer[0])
-                        {
-                            uint* head_i32 = (uint*)buffer;
-                            for (int i = n - 1; i >= 0; --i)
-                            {
-                                *head_i32 = 0xffffffff; //white (ARGB)
-                                head_i32++;
-                            }
-                        }
-                    }
-                }
-                else if (color == Color.Black)
-                {
-                    //fast clear with black color
-                    int n = len32;
-                    unsafe
-                    {
-                        //fixed (void* head = &buffer[0])
-                        {
-                            uint* head_i32 = (uint*)buffer;
-                            for (int i = n - 1; i >= 0; --i)
-                            {
-                                *head_i32 = 0xff000000; //black (ARGB)
-                                head_i32++;
-                            }
-                        }
-                    }
-                }
-                else if (color == Color.Empty)
-                {
-                    int n = len32;
-                    unsafe
-                    {
-                        //fixed (void* head = &buffer[0])
-                        {
-                            uint* head_i32 = (uint*)buffer;
-                            for (int i = n - 1; i >= 0; --i)
-                            {
-                                *head_i32 = 0x00000000; //empty
-                                head_i32++;
-                            }
-                        }
-                    }
-                }
-                else
-                {
+                    //clear only 1st row 
+                    uint* head_i32 = (uint*)buffer;
+                    //first line
+
                     //other color
                     //#if WIN32
-                    //                            uint colorARGB = (uint)((color.alpha << 24) | ((color.red << 16) | (color.green << 8) | color.blue));
+                    //  uint colorARGB = (uint)((color.alpha << 24) | ((color.red << 16) | (color.green << 8) | color.blue));
                     //#else
-                    //                            uint colorARGB = (uint)((color.alpha << 24) | ((color.blue << 16) | (color.green << 8) | color.red));
+                    //  uint colorARGB = (uint)((color.alpha << 24) | ((color.blue << 16) | (color.green << 8) | color.red));
                     //#endif
 
                     //ARGB
-                    uint colorARGB = (uint)((color.A << CO.A_SHIFT) | ((color.R << CO.R_SHIFT) | (color.G << CO.G_SHIFT) | color.B << CO.B_SHIFT));
-                    int n = len32;
-                    unsafe
+                    uint colorARGB = 0;//empty
+                    if (color != Color.Empty)
                     {
-                        //fixed (void* head = &buffer[0])
-                        {
-                            uint* head_i32 = (uint*)buffer;
-                            for (int i = n - 1; i >= 0; --i)
-                            {
-                                *head_i32 = colorARGB;
-                                head_i32++;
-                            }
-                        }
+                        colorARGB = (uint)((color.A << CO.A_SHIFT) | ((color.R << CO.R_SHIFT) | (color.G << CO.G_SHIFT) | color.B << CO.B_SHIFT));
+                    }
+
+                    //first line only
+                    for (int i = width - 1; i >= 0; --i)
+                    {
+                        *head_i32 = colorARGB; //black (ARGB)
+                        head_i32++;
+                    }
+                    //and copy to another line
+                    int stride = width * 4;
+                    for (int i = height - 2; i >= 0; --i)
+                    {
+                        //copy from first line to another line
+                        MemMx.memcpy((byte*)head_i32, (byte*)buffer, stride);
+                        head_i32 += width;
                     }
                 }
             }
         }
         public static void Clear(this MemBitmap bmp, Color color)
         {
-            Clear(MemBitmap.GetBufferPtr(bmp), color);
+            Clear(MemBitmap.GetBufferPtr(bmp), color, bmp.Width, bmp.Height);
         }
         /// <summary>
         /// create thumbnail img with super-sampling technique,(Expensive, High quality thumb)
@@ -609,31 +690,19 @@ namespace PixelFarm.CpuBlit
             MemBitmapIO.OutputImageFormat outputFormat = MemBitmapIO.OutputImageFormat.Default, object saveParameters = null)
         {
             DefaultMemBitmapIO.SaveImage(source, output, outputFormat, saveParameters);
-
-            ////save image with default parameter 
-            //if (outputFormat == MemBitmapIO.OutputImageFormat.Default)
-            //{
-            //    string ext = System.IO.Path.GetExtension(filename).ToLower();
-            //    switch (ext)
-            //    {
-            //        case ".png":
-            //            outputFormat = MemBitmapIO.OutputImageFormat.Png;
-            //            break;
-            //        case ".jpg":
-            //        case ".jpeg":
-            //            outputFormat = MemBitmapIO.OutputImageFormat.Jpeg;
-            //            break;
-            //    }
-            //}
-
-            //DefaultMemBitmapIO.SaveImage(source, filename, outputFormat, saveParameters);
         }
+
+#if DEBUG
+        public static bool s_dbugEnableDebugImage;
+#endif
+
     }
 
     public abstract class MemBitmapIO
     {
         public enum OutputImageFormat
         {
+
             Default,
             Png,
             Jpeg,

@@ -47,8 +47,8 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                     ObjectKind objKind = (ObjectKind)reader.ReadUInt16();
                     switch (objKind)
                     {
-                        default:
-                            throw new NotSupportedException();
+                        default: throw new NotSupportedException();
+                      
                         case ObjectKind.OverviewMultiSizeFontInfo:
                             listCount = reader.ReadUInt16();
                             break;

@@ -51,8 +51,11 @@ namespace PixelFarm.CpuBlit
 
     public sealed class ArrayList<T>
     {
+        static readonly T[] s_empty = new T[0];
+        
         int _currentSize;
-        T[] _internalArray = new T[0];
+        T[] _internalArray = s_empty;
+
         public ArrayList()
         {
         }

@@ -110,49 +110,49 @@ namespace PixelFarm.Drawing
                 base.OnFontSizeChanged();
             }
         }
-        public void DrawString(RenderVxFormattedString renderVx, double left, double top)
-        {
-            //TODO: review here
-            float ox = _painter.OriginX;
-            float oy = _painter.OriginY;
+        //public void DrawString(RenderVxFormattedString renderVx, double left, double top)
+        //{
+        //    //TODO: review here
+        //    float ox = _painter.OriginX;
+        //    float oy = _painter.OriginY;
 
-            //1. update some props.. 
-            //2. update current type face
-            UpdateGlyphLayoutSettings();
-            _glyphMeshStore.SetFont(_currentTypeface, this.FontSizeInPoints);
-            _glyphMeshStore.SimulateOblique = this.SimulateSlant;
+        //    //1. update some props.. 
+        //    //2. update current type face
+        //    UpdateGlyphLayoutSettings();
+        //    _glyphMeshStore.SetFont(_currentTypeface, this.FontSizeInPoints);
+        //    _glyphMeshStore.SimulateOblique = this.SimulateSlant;
 
-            //3. layout glyphs with selected layout technique
-            //TODO: review this again, we should use pixel? 
-            float fontSizePoint = this.FontSizeInPoints;
-            float scale = _currentTypeface.CalculateScaleToPixelFromPointSize(fontSizePoint);
-            Internal.RenderVxGlyphPlan[] glyphPlans = ((PixelFarm.CpuBlit.AggRenderVxFormattedString)renderVx).GlyphList;
-            int j = glyphPlans.Length;
-            //---------------------------------------------------
-            //consider use cached glyph, to increase performance 
+        //    //3. layout glyphs with selected layout technique
+        //    //TODO: review this again, we should use pixel? 
+        //    float fontSizePoint = this.FontSizeInPoints;
+        //    float scale = _currentTypeface.CalculateScaleToPixelFromPointSize(fontSizePoint);
+        //    Internal.RenderVxGlyphPlan[] glyphPlans = ((PixelFarm.CpuBlit.AggRenderVxFormattedString)renderVx).GlyphList;
+        //    int j = glyphPlans.Length;
+        //    //---------------------------------------------------
+        //    //consider use cached glyph, to increase performance 
 
-            float g_x = 0;
-            float g_y = 0;
-            float baseY = (int)top; //TODO, review here again
+        //    float g_x = 0;
+        //    float g_y = 0;
+        //    float baseY = (int)top; //TODO, review here again
 
-            for (int i = 0; i < j; ++i)
-            {
-                Internal.RenderVxGlyphPlan glyphPlan = glyphPlans[i];
-                //-----------------------------------
-                //TODO: review here ***
-                //PERFORMANCE revisit here 
-                //if we have create a vxs we can cache it for later use?
-                //-----------------------------------  
-                VertexStore vxs = _glyphMeshStore.GetGlyphMesh(glyphPlan.glyphIndex);
-                g_x = (float)(glyphPlan.x * scale + left);
-                g_y = (float)glyphPlan.y * scale;
+        //    for (int i = 0; i < j; ++i)
+        //    {
+        //        Internal.RenderVxGlyphPlan glyphPlan = glyphPlans[i];
+        //        //-----------------------------------
+        //        //TODO: review here ***
+        //        //PERFORMANCE revisit here 
+        //        //if we have create a vxs we can cache it for later use?
+        //        //-----------------------------------  
+        //        VertexStore vxs = _glyphMeshStore.GetGlyphMesh(glyphPlan.glyphIndex);
+        //        g_x = (float)(glyphPlan.x * scale + left);
+        //        g_y = (float)glyphPlan.y * scale;
 
-                _painter.SetOrigin(g_x, g_y);
-                _painter.Fill(vxs);
-            }
-            //restore prev origin
-            _painter.SetOrigin(ox, oy);
-        }
+        //        _painter.SetOrigin(g_x, g_y);
+        //        _painter.Fill(vxs);
+        //    }
+        //    //restore prev origin
+        //    _painter.SetOrigin(ox, oy);
+        //}
 
 
         int _latestAccumulateWidth;

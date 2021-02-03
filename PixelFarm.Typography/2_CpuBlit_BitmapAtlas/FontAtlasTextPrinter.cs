@@ -171,7 +171,8 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
         }
         public void DrawString(AggRenderVxFormattedString renderVx, double x, double y)
         {
-            DrawFromGlyphPlans(renderVx.Seq, 0, renderVx.Seq.len, (float)x, (float)y);
+            Typography.TextLayout.GlyphPlanSequence seq = (Typography.TextLayout.GlyphPlanSequence)renderVx.Seq;
+            DrawFromGlyphPlans(seq, 0, seq.len, (float)x, (float)y);
         }
         public override void DrawFromGlyphPlans(GlyphPlanSequence glyphPlanSeq, int startAt, int len, float left, float top)
         {
@@ -271,12 +272,11 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
 
                 //copy sub-img from font-glyph-atlas to mask-bitmap
                 //we can use a more simple copy 
-                //_maskBufferPainter.DrawImage(_fontBmp, gx, gy, srcX, srcY, srcW, srcH);//
 
+                //_maskBufferPainter.DrawImage(_fontBmp, gx, gy, srcX, srcY, srcW, srcH);// 
 
-
-                _maskBufferPainter.BitBlt(_fontBmp, gx, gy, srcX, srcY, srcW, srcH); //faster 
-
+                //just copy (portion) from glyph-bitmap to mask_painter
+                MemBitmapExt.BitBlt(_fontBmp, _maskBufferPainter.RenderSurface.DestBitmap, (int)gx, (int)gy, srcX, srcY, srcW, srcH); //faster 
 #if DEBUG
                 //_alphaBmp.SaveImage("alpha_0.png");
 #endif
@@ -300,7 +300,6 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                             _maskPixelBlenderPerCompo.SelectedMaskComponent = PixelBlenderColorComponent.R;
                             _maskPixelBlenderPerCompo.EnableOutputColorComponent = EnableOutputColorComponent.R;
                             _painter.FillRect(gx + 1, gy, srcW, srcH);
-
 #if DEBUG
                             //  _painter.RenderSurface.DestBitmap.SaveImage("alpha_2.png");
 #endif
