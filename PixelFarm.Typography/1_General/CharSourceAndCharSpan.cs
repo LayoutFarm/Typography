@@ -236,6 +236,7 @@ namespace Typography.Text
                 case BackupBufferKind.Utf16ArrayList:
                     {
                         //from utf16 to utf32
+                         
                         stbuilder.Append(_utf16Buffer.UnsafeInternalArray, 0, _utf16Buffer.Length);
                     }
                     break;
@@ -243,7 +244,38 @@ namespace Typography.Text
                     throw new NotSupportedException();
             }
         }
-
+        public void CopyTo(StringBuilder stbuilder, int startIndex, int len)
+        {
+            switch (BackupKind)
+            {
+                case BackupBufferKind.Utf32ArrayList:
+                    {
+                        for (int i = startIndex; i < len; ++i)
+                        {
+                            int codepoint = _utf32Buffer[i];
+                            if (((codepoint) >> 16) != 0)
+                            {
+                                InputReader.GetChars(codepoint, out char c0, out char c1);
+                                stbuilder.Append(c0);
+                                stbuilder.Append(c1);
+                            }
+                            else
+                            {
+                                stbuilder.Append((char)codepoint);
+                            }
+                        }
+                    }
+                    break;
+                case BackupBufferKind.Utf16ArrayList:
+                    {
+                        //from utf16 to utf32
+                        stbuilder.Append(_utf16Buffer.UnsafeInternalArray, startIndex, len);
+                    }
+                    break;
+                default:
+                    throw new NotSupportedException();
+            }
+        }
         public override string ToString()
         {
             //TODO:review here
