@@ -18,7 +18,7 @@ namespace Typography.OpenFont
         TableHeader[] _tblHeaders;
         bool _hasTtfOutline;
         bool _hasCffData;
-
+        internal bool _useTypographicMertic;
 #if DEBUG 
         static int s_dbugTotalId;
         public readonly int dbugId = ++s_dbugTotalId;
@@ -111,13 +111,14 @@ namespace Typography.OpenFont
         /// </summary>
         public string Filename { get; set; }
         /// <summary>
-        /// OS2 sTypoAscender, in font designed unit
-        /// </summary>
-        public short Ascender => OS2Table.sTypoAscender;
+        /// OS2 sTypoAscender/HheaTable.Ascent, in font designed unit
+        /// </summary>         
+        public short Ascender => _useTypographicMertic ? OS2Table.sTypoAscender : HheaTable.Ascent;
+
         /// <summary>
         /// OS2 sTypoDescender, in font designed unit
         /// </summary>
-        public short Descender => OS2Table.sTypoDescender;
+        public short Descender => _useTypographicMertic ? OS2Table.sTypoDescender : HheaTable.Descent;
         /// <summary>
         /// OS2 usWinAscender
         /// </summary>
@@ -130,7 +131,7 @@ namespace Typography.OpenFont
         /// <summary>
         /// OS2 Linegap
         /// </summary>
-        public short LineGap => OS2Table.sTypoLineGap;
+        public short LineGap => _useTypographicMertic ? OS2Table.sTypoLineGap : HheaTable.LineGap;
         //The typographic line gap for this font.
         //Remember that this is not the same as the LineGap value in the 'hhea' table, 
         //which Apple defines in a far different manner.
