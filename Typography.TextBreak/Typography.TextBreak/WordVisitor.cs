@@ -399,7 +399,7 @@ namespace Typography.TextBreak
                 return false;
             }
             //----------------------
-            _index += _inc;
+            //_index += _inc;
             //read until found the end of line
 
             //find       
@@ -417,6 +417,7 @@ namespace Typography.TextBreak
                             _inc = 1;
 
                             end = _index - 2;
+                            _index++;
                             endlineWith = LineEnd.RN;
                             return true;
                         }
