@@ -118,13 +118,8 @@ namespace Typography.Text
                 }
             }
 
-
-            //---------
-
-
-            //then measure the result
-
-
+             
+            //then measure the result 
             short minOffsetY = 0;
             short maxOffsetY = 0;
             int outputTotalW = 0;
@@ -167,6 +162,7 @@ namespace Typography.Text
                             }
                         }
 
+                        int pos1 = measureResult.outputXAdvances[pos];
                         outputTotalW += measureResult.outputXAdvances[pos] = (int)Math.Round(glyphPlan.AdvanceX * scale1);
                         pos++;
                         //if (_isSurrogates[pos])

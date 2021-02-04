@@ -163,12 +163,11 @@ namespace Typography.Text
             //[A] break words
             _lineSegs.Clear();//clear before reuse
 
-            _textPrinterWordVisitor.SetLineSegmentList(_lineSegs);
+            _textPrinterWordVisitor.SetLineSegmentList(_lineSegs); //temp
 
             BreakToLineSegments(bufferSpan, _textPrinterWordVisitor);
 
-
-            _textPrinterWordVisitor.SetLineSegmentList(null);
+            _textPrinterWordVisitor.SetLineSegmentList(null);//reset
             //--------------------------------------------------------------------             
 
             //[B]
@@ -198,12 +197,12 @@ namespace Typography.Text
                   bufferSpan.len);
             }
 
+            SpanBreakInfo latest_ws_breakInfo = null;
             for (int i = 0; i < count; ++i)
             {
                 //
                 LineSegment line_seg = _lineSegs.GetLineSegment(i);
                 SpanBreakInfo spBreakInfo = line_seg.BreakInfo;
-
 #if DEBUG
                 if (spBreakInfo == null)
                 {
@@ -226,6 +225,7 @@ namespace Typography.Text
                     {
                         latestFmtGlyphPlanSeq.PostfixWhitespaceCount += line_seg.Length;
                     }
+                    latest_ws_breakInfo = spBreakInfo;
                     continue; //***
                 }
 
@@ -325,7 +325,6 @@ namespace Typography.Text
                 //create an object that hold more information about GlyphPlanSequence
 
                 FormattedGlyphPlanSeq formattedGlyphPlanSeq = fmtGlyphs.AppendNew();
-
                 formattedGlyphPlanSeq.PrefixWhitespaceCount = (ushort)prefix_whitespaceCount;//***
                 prefix_whitespaceCount = 0;//reset 
 
@@ -338,6 +337,15 @@ namespace Typography.Text
                 curTypeface = defaultTypeface;//switch back to default
 
                 //restore latest script lang?
+            }
+
+            if (prefix_whitespaceCount > 0)
+            {
+                FormattedGlyphPlanSeq formattedGlyphPlanSeq = fmtGlyphs.AppendNew();
+                formattedGlyphPlanSeq.PrefixWhitespaceCount = (ushort)prefix_whitespaceCount;//***
+                prefix_whitespaceCount = 0;//reset 
+                ResolvedFont foundResolvedFont = LocalResolveFont(curTypeface, FontSizeInPoints);
+                formattedGlyphPlanSeq.SetData(GlyphPlanSequence.Empty, foundResolvedFont, latest_ws_breakInfo);
             }
         }
 
