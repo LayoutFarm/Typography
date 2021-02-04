@@ -118,7 +118,7 @@ namespace Typography.Text
                 }
             }
 
-             
+
             //then measure the result 
             short minOffsetY = 0;
             short maxOffsetY = 0;
@@ -145,6 +145,8 @@ namespace Typography.Text
                         pos++;
                     }
 
+                    int begin_glyph_at = pos;
+                    int max_cp_offset = -1;
                     for (int s = 0; s < seqLen; ++s)
                     {
                         //for each glyph index
@@ -161,10 +163,8 @@ namespace Typography.Text
                                 maxOffsetY = glyphPlan.OffsetY;
                             }
                         }
-
-                        int pos1 = measureResult.outputXAdvances[pos];
-                        outputTotalW += measureResult.outputXAdvances[pos] = (int)Math.Round(glyphPlan.AdvanceX * scale1);
-                        pos++;
+                        outputTotalW += measureResult.outputXAdvances[begin_glyph_at + glyphPlan.input_cp_offset] = (int)Math.Round(glyphPlan.AdvanceX * scale1);
+                        max_cp_offset = Math.Max(max_cp_offset, glyphPlan.input_cp_offset);
                         //if (_isSurrogates[pos])
                         //{
                         //    outputTotalW += measureResult.outputXAdvances[pos] = (int)Math.Round(glyphPlan.AdvanceX * scale1);
@@ -175,9 +175,16 @@ namespace Typography.Text
                         //    outputTotalW += measureResult.outputXAdvances[pos] = (int)Math.Round(glyphPlan.AdvanceX * scale1);
                         //    pos++;
                         //}
-
                     }
+
+
                     ws_count = fmtSeq.PostfixWhitespaceCount;
+                    if (max_cp_offset > 0)
+                    {
+                        pos += max_cp_offset;
+                        pos++;
+                    }
+
                     for (int n = 0; n < ws_count; ++n)
                     {
                         outputTotalW += measureResult.outputXAdvances[pos] = resFont.WhitespaceWidth;
