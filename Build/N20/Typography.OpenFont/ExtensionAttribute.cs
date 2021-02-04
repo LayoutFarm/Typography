@@ -1,6 +1,6 @@
 ﻿#if NET20
 namespace System.Runtime.CompilerServices
 {
-    public partial class ExtensionAttribute : Attribute { }
+    internal partial class ExtensionAttribute : Attribute { }
 }
 #endif
