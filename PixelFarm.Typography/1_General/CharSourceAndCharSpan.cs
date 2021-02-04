@@ -173,30 +173,14 @@ namespace Typography.Text
                     {
                         //from utf16 to utf32
                         int end = _utf16Buffer.Length;
+                        char c1;
                         for (int i = 0; i < end; ++i)
                         {
                             char c = _utf16Buffer[i];
-                            if (char.IsUpper(c))
+                            if (char.IsHighSurrogate(c) && (i + 1 < end) && char.IsLowSurrogate(c1 = _utf16Buffer[i + 1]))
                             {
-                                if (i + 1 < end)
-                                {
-                                    char c1 = _utf16Buffer[i + 1];
-                                    if (char.IsLower(c1))
-                                    {
-                                        output.Append(char.ConvertToUtf32(c, c1));
-                                        ++i;
-                                    }
-                                    else
-                                    {
-                                        //TODO: review here
-                                        //skip c    
-                                        output.Append(c1);
-                                    }
-                                }
-                                else
-                                {
-                                    output.Append(c);
-                                }
+                                output.Append(char.ConvertToUtf32(c, c1));
+                                ++i;
                             }
                             else
                             {
@@ -210,6 +194,10 @@ namespace Typography.Text
             }
         }
 
+        /// <summary>
+        /// copy content to string builder
+        /// </summary>
+        /// <param name="stbuilder"></param>
         public void CopyTo(StringBuilder stbuilder)
         {
             switch (BackupKind)
@@ -236,7 +224,7 @@ namespace Typography.Text
                 case BackupBufferKind.Utf16ArrayList:
                     {
                         //from utf16 to utf32
-                         
+
                         stbuilder.Append(_utf16Buffer.UnsafeInternalArray, 0, _utf16Buffer.Length);
                     }
                     break;
@@ -244,6 +232,12 @@ namespace Typography.Text
                     throw new NotSupportedException();
             }
         }
+        /// <summary>
+        /// copy content to string builder
+        /// </summary>
+        /// <param name="stbuilder"></param>
+        /// <param name="startIndex"></param>
+        /// <param name="len"></param>
         public void CopyTo(StringBuilder stbuilder, int startIndex, int len)
         {
             switch (BackupKind)
