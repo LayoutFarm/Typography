@@ -8,271 +8,211 @@ using Typography.TextBreak;
 
 namespace Typography.Text
 {
-
-    public class TextCopyBuffer
+    public abstract class TextCopyBuffer
     {
         public enum BackupBufferKind
         {
             Utf16ArrayList,
             Utf32ArrayList
         }
+        public abstract BackupBufferKind Kind { get; }
+        public abstract void AppendLine();
+        public abstract int Length { get; }
+        public abstract void Clear();
+        public abstract void AppendData(char[] buffer, int start, int len);
+        public abstract void AppendData(int[] buffer, int start, int len);
+        public abstract unsafe void AppendData(char* buffer, int len);
+        //
+        public abstract void CopyTo(ArrayList<int> output);
+        public abstract void CopyTo(StringBuilder stbuilder);
+        public abstract void CopyTo(StringBuilder stbuilder, int startIndex, int len);
+        //
+        public abstract void GetReader(out InputReader reader);
+    }
 
-        //TODO: review this 2 buffer here again***
-        readonly ArrayList<int> _utf32Buffer = new ArrayList<int>();
+    public sealed class TextCopyBufferUtf16 : TextCopyBuffer
+    {
         readonly ArrayList<char> _utf16Buffer = new ArrayList<char>();
-
-        public TextCopyBuffer()
+        public TextCopyBufferUtf16() { }
+        public override BackupBufferKind Kind => BackupBufferKind.Utf16ArrayList;
+        public override void AppendLine()
         {
-
+            _utf16Buffer.Append('\r');
+            _utf16Buffer.Append('\n');
         }
-        public BackupBufferKind BackupKind { get; set; }
-
-        public void AppendNewLine()
+        public override int Length => _utf16Buffer.Count;
+        public override void Clear()
         {
-            //push content of current line 
-            //into plain doc
-            switch (BackupKind)
-            {
-                default:
-                    throw new NotSupportedException();
-                case BackupBufferKind.Utf32ArrayList:
-                    _utf32Buffer.Append('\r');
-                    _utf32Buffer.Append('\n');
-                    break;
-                case BackupBufferKind.Utf16ArrayList:
-                    _utf16Buffer.Append('\r');
-                    _utf16Buffer.Append('\n');
-                    break;
-            }
-        }
-        public bool HasSomeRuns
-        {
-            get
-            {
-                switch (BackupKind)
-                {
-                    default:
-                        throw new NotSupportedException();
-                    case BackupBufferKind.Utf32ArrayList: return _utf32Buffer.Length > 0;
-                    case BackupBufferKind.Utf16ArrayList: return _utf16Buffer.Length > 0;
-                }
-            }
-        }
-
-        public unsafe void AppendData(char* buffer, int len)
-        {
-            switch (BackupKind)
-            {
-                case BackupBufferKind.Utf16ArrayList:
-                    {
-                        for (int i = 0; i < len; ++i)
-                        {
-                            _utf16Buffer.Append(*buffer);
-                            buffer++;//move next
-                        }
-                    }
-                    break;
-                case BackupBufferKind.Utf32ArrayList:
-                    {
-
-                        for (int i = 0; i < len; ++i)
-                        {
-                            char c = *buffer;
-                            if (char.IsHighSurrogate(c) && i + 1 < len)
-                            {
-                                buffer++;
-                                char c2 = *buffer;
-                                if (char.IsLowSurrogate(c2))
-                                {
-                                    _utf32Buffer.Append(char.ConvertToUtf32(c, c2));
-                                }
-                                else
-                                {
-                                    //skip c?
-                                    _utf32Buffer.Append(c2);
-                                }
-                            }
-                            else
-                            {
-                                _utf32Buffer.Append(c);
-                            }
-                            buffer++;
-                        }
-                    }
-                    break;
-            }
-        }
-        public void AppendData(char[] buffer, int start, int len)
-        {
-            switch (BackupKind)
-            {
-                case BackupBufferKind.Utf16ArrayList:
-                    _utf16Buffer.Append(buffer, start, len);
-                    break;
-                case BackupBufferKind.Utf32ArrayList:
-                    {
-                        int end = start + len;
-                        for (int i = start; i < end; ++i)
-                        {
-                            char c = buffer[i];
-                            if (char.IsHighSurrogate(c) && i + 1 < end)
-                            {
-                                char c2 = buffer[i + 1];
-                                if (char.IsLowSurrogate(c2))
-                                {
-                                    _utf32Buffer.Append(char.ConvertToUtf32(c, c2));
-                                }
-                                else
-                                {
-                                    //skip c?
-                                    _utf32Buffer.Append(c2);
-                                }
-                                i++;
-                            }
-                            else
-                            {
-                                _utf32Buffer.Append(c);
-                            }
-                        }
-                    }
-                    break;
-            }
-
-        }
-        public void AppendData(int[] buffer, int start, int len)
-        {
-            int end = start + len;
-            switch (BackupKind)
-            {
-                default: throw new NotSupportedException();
-                case BackupBufferKind.Utf32ArrayList:
-                    {
-                        _utf32Buffer.Append(buffer, start, len);
-                    }
-                    break;
-                case BackupBufferKind.Utf16ArrayList:
-                    {
-                        for (int i = start; i < end; ++i)
-                        {
-                            int d = buffer[i];
-                            char upper = (char)(d >> 16);
-                            if (upper > 0)
-                            {
-                                InputReader.GetChars(buffer[i], out upper, out char lower);
-                                _utf16Buffer.Append(upper);
-                                _utf16Buffer.Append(lower);
-                            }
-                            else
-                            {
-                                _utf16Buffer.Append((char)d);
-                            }
-                        }
-                    }
-                    break;
-            }
-
-        }
-        public void Clear()
-        {
-            _utf32Buffer.Clear();
             _utf16Buffer.Clear();
         }
-
-        public int Length
+        public override unsafe void AppendData(char* buffer, int len)
         {
-            get
+            for (int i = 0; i < len; ++i)
             {
-                switch (BackupKind)
+                _utf16Buffer.Append(*buffer);
+                buffer++;//move next
+            }
+        }
+        public override void AppendData(char[] buffer, int start, int len)
+        {
+            _utf16Buffer.Append(buffer, start, len);
+        }
+        public override void AppendData(int[] buffer, int start, int len)
+        {
+            int end = start + len;
+            for (int i = start; i < end; ++i)
+            {
+                int d = buffer[i];
+                char upper = (char)(d >> 16);
+                if (upper > 0)
                 {
-                    default: throw new NotSupportedException();
-                    case BackupBufferKind.Utf16ArrayList:
-                        return _utf16Buffer.Length;
-                    case BackupBufferKind.Utf32ArrayList:
-                        return _utf32Buffer.Length;
+                    InputReader.GetChars(buffer[i], out upper, out char lower);
+                    _utf16Buffer.Append(upper);
+                    _utf16Buffer.Append(lower);
+                }
+                else
+                {
+                    _utf16Buffer.Append((char)d);
+                }
+            }
+        }
+        public int GetChar(int index)
+        {
+            //TODO: review here
+            return _utf16Buffer[index];
+        }
+        public override void CopyTo(ArrayList<int> output)
+        {
+            //from utf16 to utf32
+            int end = _utf16Buffer.Length;
+            char c1;
+            for (int i = 0; i < end; ++i)
+            {
+                char c = _utf16Buffer[i];
+                if (char.IsHighSurrogate(c) && (i + 1 < end) && char.IsLowSurrogate(c1 = _utf16Buffer[i + 1]))
+                {
+                    output.Append(char.ConvertToUtf32(c, c1));
+                    ++i;
+                }
+                else
+                {
+                    output.Append(c);
+                }
+            }
+        }
+        public override void CopyTo(StringBuilder stbuilder)
+        {
+            stbuilder.Append(_utf16Buffer.UnsafeInternalArray, 0, _utf16Buffer.Length);
+        }
+        public override void CopyTo(StringBuilder stbuilder, int startIndex, int len)
+        {
+            //from utf16 to utf32
+            stbuilder.Append(_utf16Buffer.UnsafeInternalArray, startIndex, len);
+        }
+        public override void GetReader(out InputReader reader)
+        {
+            reader = new InputReader(_utf16Buffer.UnsafeInternalArray, 0, _utf16Buffer.Length);
+        }
+    }
+    public sealed class TextCopyBufferUtf32 : TextCopyBuffer
+    {
+
+        readonly ArrayList<int> _utf32Buffer = new ArrayList<int>();
+        public TextCopyBufferUtf32() { }
+        public override BackupBufferKind Kind => BackupBufferKind.Utf32ArrayList;
+        public override void AppendLine()
+        {
+            _utf32Buffer.Append('\r');
+            _utf32Buffer.Append('\n');
+        }
+        public override int Length => _utf32Buffer.Count;
+        public override void Clear()
+        {
+            _utf32Buffer.Clear();
+        }
+        public override unsafe void AppendData(char* buffer, int len)
+        {
+            for (int i = 0; i < len; ++i)
+            {
+                char c = *buffer;
+                if (char.IsHighSurrogate(c) && i + 1 < len)
+                {
+                    buffer++;
+                    char c2 = *buffer;
+                    if (char.IsLowSurrogate(c2))
+                    {
+                        _utf32Buffer.Append(char.ConvertToUtf32(c, c2));
+                    }
+                    else
+                    {
+                        //skip c?
+                        _utf32Buffer.Append(c2);
+                    }
+                }
+                else
+                {
+                    _utf32Buffer.Append(c);
+                }
+                buffer++;
+            }
+        }
+
+        public override void AppendData(char[] buffer, int start, int len)
+        {
+            int end = start + len;
+            for (int i = start; i < end; ++i)
+            {
+                char c = buffer[i];
+                if (char.IsHighSurrogate(c) && i + 1 < end)
+                {
+                    char c2 = buffer[i + 1];
+                    if (char.IsLowSurrogate(c2))
+                    {
+                        _utf32Buffer.Append(char.ConvertToUtf32(c, c2));
+                    }
+                    else
+                    {
+                        //skip c?
+                        _utf32Buffer.Append(c2);
+                    }
+                    i++;
+                }
+                else
+                {
+                    _utf32Buffer.Append(c);
                 }
             }
         }
 
+        public override void AppendData(int[] buffer, int start, int len)
+        {
+            _utf32Buffer.Append(buffer, start, len);
+        }
         public int GetChar(int index)
         {
-            //TODO: review here again
-            switch (BackupKind)
-            {
-                default: throw new NotSupportedException();
-                case BackupBufferKind.Utf16ArrayList:
-                    return _utf16Buffer[index];
-                case BackupBufferKind.Utf32ArrayList:
-                    return _utf32Buffer[index];
-            }
+            //TODO: review here
+            return _utf32Buffer[index];
         }
-        public void CopyTo(ArrayList<int> output)
+        public override void CopyTo(ArrayList<int> output)
         {
-            switch (BackupKind)
-            {
-                case BackupBufferKind.Utf32ArrayList:
-                    output.Append(_utf32Buffer.UnsafeInternalArray, 0, _utf32Buffer.Length);
-                    break;
-                case BackupBufferKind.Utf16ArrayList:
-                    {
-                        //from utf16 to utf32
-                        int end = _utf16Buffer.Length;
-                        char c1;
-                        for (int i = 0; i < end; ++i)
-                        {
-                            char c = _utf16Buffer[i];
-                            if (char.IsHighSurrogate(c) && (i + 1 < end) && char.IsLowSurrogate(c1 = _utf16Buffer[i + 1]))
-                            {
-                                output.Append(char.ConvertToUtf32(c, c1));
-                                ++i;
-                            }
-                            else
-                            {
-                                output.Append(c);
-                            }
-                        }
-                    }
-                    break;
-                default:
-                    throw new NotSupportedException();
-            }
+            output.Append(_utf32Buffer.UnsafeInternalArray, 0, _utf32Buffer.Length);
         }
-
-        /// <summary>
-        /// copy content to string builder
-        /// </summary>
-        /// <param name="stbuilder"></param>
-        public void CopyTo(StringBuilder stbuilder)
+        public override void CopyTo(StringBuilder stbuilder)
         {
-            switch (BackupKind)
+            int j = _utf32Buffer.Length;
+            for (int i = 0; i < j; ++i)
             {
-                case BackupBufferKind.Utf32ArrayList:
-                    {
-                        int j = _utf32Buffer.Length;
-                        for (int i = 0; i < j; ++i)
-                        {
-                            int codepoint = _utf32Buffer[i];
-                            if (((codepoint) >> 16) != 0)
-                            {
-                                InputReader.GetChars(codepoint, out char c0, out char c1);
-                                stbuilder.Append(c0);
-                                stbuilder.Append(c1);
-                            }
-                            else
-                            {
-                                stbuilder.Append((char)codepoint);
-                            }
-                        }
-                    }
-                    break;
-                case BackupBufferKind.Utf16ArrayList:
-                    {
-                        //from utf16 to utf32
-
-                        stbuilder.Append(_utf16Buffer.UnsafeInternalArray, 0, _utf16Buffer.Length);
-                    }
-                    break;
-                default:
-                    throw new NotSupportedException();
+                int codepoint = _utf32Buffer[i];
+                if (((codepoint) >> 16) != 0)
+                {
+                    InputReader.GetChars(codepoint, out char c0, out char c1);
+                    stbuilder.Append(c0);
+                    stbuilder.Append(c1);
+                }
+                else
+                {
+                    stbuilder.Append((char)codepoint);
+                }
             }
         }
         /// <summary>
@@ -281,56 +221,30 @@ namespace Typography.Text
         /// <param name="stbuilder"></param>
         /// <param name="startIndex"></param>
         /// <param name="len"></param>
-        public void CopyTo(StringBuilder stbuilder, int startIndex, int len)
+        public override void CopyTo(StringBuilder stbuilder, int startIndex, int len)
         {
-            switch (BackupKind)
+            for (int i = startIndex; i < len; ++i)
             {
-                case BackupBufferKind.Utf32ArrayList:
-                    {
-                        for (int i = startIndex; i < len; ++i)
-                        {
-                            int codepoint = _utf32Buffer[i];
-                            if (((codepoint) >> 16) != 0)
-                            {
-                                InputReader.GetChars(codepoint, out char c0, out char c1);
-                                stbuilder.Append(c0);
-                                stbuilder.Append(c1);
-                            }
-                            else
-                            {
-                                stbuilder.Append((char)codepoint);
-                            }
-                        }
-                    }
-                    break;
-                case BackupBufferKind.Utf16ArrayList:
-                    {
-                        //from utf16 to utf32
-                        stbuilder.Append(_utf16Buffer.UnsafeInternalArray, startIndex, len);
-                    }
-                    break;
-                default:
-                    throw new NotSupportedException();
+                int codepoint = _utf32Buffer[i];
+                if (((codepoint) >> 16) != 0)
+                {
+                    InputReader.GetChars(codepoint, out char c0, out char c1);
+                    stbuilder.Append(c0);
+                    stbuilder.Append(c1);
+                }
+                else
+                {
+                    stbuilder.Append((char)codepoint);
+                }
             }
         }
-        public override string ToString()
+        public override void GetReader(out InputReader reader)
         {
-            //TODO:review here
-            return "";
-            //_sb.ToString();
-        }
-
-
-        public InputReader GetReader()
-        {
-            switch (BackupKind)
-            {
-                default: throw new NotSupportedException();
-                case BackupBufferKind.Utf16ArrayList: return new InputReader(_utf16Buffer.UnsafeInternalArray, 0, _utf16Buffer.Length);
-                case BackupBufferKind.Utf32ArrayList: return new InputReader(_utf32Buffer.UnsafeInternalArray, 0, _utf32Buffer.Length);
-            }
+            reader = new InputReader(_utf32Buffer.UnsafeInternalArray, 0, _utf32Buffer.Length);
         }
     }
+
+
 
     public static class TextCopyBufferExtension
     {
