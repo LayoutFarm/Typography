@@ -34,6 +34,10 @@ namespace Typography.Text
     {
         readonly ArrayList<char> _utf16Buffer = new ArrayList<char>();
         public TextCopyBufferUtf16() { }
+        public TextCopyBufferUtf16(char[] buffer)
+        {
+            AppendData(buffer, 0, buffer.Length);
+        }
         public override BackupBufferKind Kind => BackupBufferKind.Utf16ArrayList;
         public override void AppendLine()
         {
@@ -119,6 +123,10 @@ namespace Typography.Text
 
         readonly ArrayList<int> _utf32Buffer = new ArrayList<int>();
         public TextCopyBufferUtf32() { }
+        public TextCopyBufferUtf32(char[] buffer)
+        {
+            AppendData(buffer, 0, buffer.Length);
+        }
         public override BackupBufferKind Kind => BackupBufferKind.Utf32ArrayList;
         public override void AppendLine()
         {
@@ -223,9 +231,10 @@ namespace Typography.Text
         /// <param name="len"></param>
         public override void CopyTo(StringBuilder stbuilder, int startIndex, int len)
         {
-            for (int i = startIndex; i < len; ++i)
+
+            for (int i = 0; i < len; ++i)
             {
-                int codepoint = _utf32Buffer[i];
+                int codepoint = _utf32Buffer[i + startIndex];
                 if (((codepoint) >> 16) != 0)
                 {
                     InputReader.GetChars(codepoint, out char c0, out char c1);
@@ -248,6 +257,16 @@ namespace Typography.Text
 
     public static class TextCopyBufferExtension
     {
+        public static void AppendData(this TextCopyBuffer buff, char[] data)
+        {
+            unsafe
+            {
+                fixed (char* c = &data[0])
+                {
+                    buff.AppendData(c, data.Length);
+                }
+            }
+        }
         public static void AppendData(this TextCopyBuffer buff, string data)
         {
             unsafe
