@@ -59,6 +59,49 @@ namespace Typography.Text
             }
         }
 
+        public unsafe void AppendData(char* buffer, int len)
+        {
+            switch (BackupKind)
+            {
+                case BackupBufferKind.Utf16ArrayList:
+                    {
+                        for (int i = 0; i < len; ++i)
+                        {
+                            _utf16Buffer.Append(*buffer);
+                            buffer++;//move next
+                        }
+                    }
+                    break;
+                case BackupBufferKind.Utf32ArrayList:
+                    {
+
+                        for (int i = 0; i < len; ++i)
+                        {
+                            char c = *buffer;
+                            if (char.IsHighSurrogate(c) && i + 1 < len)
+                            {
+                                buffer++;
+                                char c2 = *buffer;
+                                if (char.IsLowSurrogate(c2))
+                                {
+                                    _utf32Buffer.Append(char.ConvertToUtf32(c, c2));
+                                }
+                                else
+                                {
+                                    //skip c?
+                                    _utf32Buffer.Append(c2);
+                                }
+                            }
+                            else
+                            {
+                                _utf32Buffer.Append(c);
+                            }
+                            buffer++;
+                        }
+                    }
+                    break;
+            }
+        }
         public void AppendData(char[] buffer, int start, int len)
         {
             switch (BackupKind)
@@ -289,7 +332,19 @@ namespace Typography.Text
         }
     }
 
-
+    public static class TextCopyBufferExtension
+    {
+        public static void AppendData(this TextCopyBuffer buff, string data)
+        {
+            unsafe
+            {
+                fixed (char* c = data)
+                {
+                    buff.AppendData(c, data.Length);
+                }
+            }
+        }
+    }
     /// <summary>
     /// forward only character source 
     /// </summary>
