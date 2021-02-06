@@ -150,12 +150,14 @@ namespace Typography.Text
                     if (char.IsLowSurrogate(c2))
                     {
                         _utf32Buffer.Append(char.ConvertToUtf32(c, c2));
+
                     }
                     else
                     {
                         //skip c?
                         _utf32Buffer.Append(c2);
                     }
+                    ++i;
                 }
                 else
                 {

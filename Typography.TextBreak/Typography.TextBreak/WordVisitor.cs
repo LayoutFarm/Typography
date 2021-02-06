@@ -394,7 +394,7 @@ namespace Typography.TextBreak
             begin = _index;
             end = begin;
             endlineWith = LineEnd.None;
-            if (_index + _inc >= _end)
+            if (_index + _inc > _end)
             {
                 return false;
             }
