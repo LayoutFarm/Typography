@@ -389,13 +389,14 @@ namespace Typography.TextBreak
         }
 
 
-        public bool Readline(out int begin, out int end, out LineEnd endlineWith)
+        public bool Readline(out int begin, out int len, out LineEnd endlineWith)
         {
             begin = _index;
-            end = begin;
+        
             endlineWith = LineEnd.None;
             if (_index + _inc > _end)
             {
+                len = 0;
                 return false;
             }
             //----------------------
@@ -416,7 +417,8 @@ namespace Typography.TextBreak
                             _index++;
                             _inc = 1;
 
-                            end = _index - 2;
+                            len = _index - begin - 1;
+
                             _index++;
                             endlineWith = LineEnd.RN;
                             return true;
@@ -424,7 +426,8 @@ namespace Typography.TextBreak
                         else
                         {
                             _inc = 1;
-                            end = _index - 1;
+
+                            len = _index - begin;
                             endlineWith = LineEnd.R;
                             return true;
                         }
@@ -432,14 +435,16 @@ namespace Typography.TextBreak
                     else
                     {
                         _inc = 1;
-                        end = _index - 1;
+
+                        len = _index - begin;
                         endlineWith = LineEnd.R;
                         return true;
                     }
                 }
                 else if (codepoint == '\n')
                 {
-                    end = _index - 1;
+
+                    len = _index - begin;
                     _inc = 1;
                     endlineWith = LineEnd.N;
                     return true;
@@ -453,11 +458,11 @@ namespace Typography.TextBreak
             //----------------
             if (_index > begin)
             {
-                end = _index - 1;//
 
+                len = _index - begin;
                 return true;
             }
-
+            len = 0;
             return false;
         }
         public bool IsEnd => _index >= _end;
