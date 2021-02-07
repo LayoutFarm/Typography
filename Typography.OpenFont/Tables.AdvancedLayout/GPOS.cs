@@ -216,8 +216,8 @@ namespace Typography.OpenFont.Tables
                     default: throw new NotSupportedException();
                     case 1:
                         {
-                            var valueRecord = ValueRecord.CreateFrom(reader, valueFormat);
-                            var coverageTable = CoverageTable.CreateFrom(reader, subTableStartAt + coverage);
+                            ValueRecord valueRecord = ValueRecord.CreateFrom(reader, valueFormat);
+                            CoverageTable coverageTable = CoverageTable.CreateFrom(reader, subTableStartAt + coverage);
                             return new LkSubTableType1(coverageTable, valueRecord);
                         }
                     case 2:
@@ -228,7 +228,7 @@ namespace Typography.OpenFont.Tables
                             {
                                 valueRecords[n] = ValueRecord.CreateFrom(reader, valueFormat);
                             }
-                            var coverageTable = CoverageTable.CreateFrom(reader, subTableStartAt + coverage);
+                            CoverageTable coverageTable = CoverageTable.CreateFrom(reader, subTableStartAt + coverage);
                             return new LkSubTableType1(coverageTable, valueRecords);
                         }
                 }
@@ -634,7 +634,7 @@ namespace Typography.OpenFont.Tables
                             }
                         }
 
-                        var prev_glyph = inputGlyphs.GetGlyph(j, out short prev_glyph_adv_w);
+                        ushort prev_glyph = inputGlyphs.GetGlyph(j, out short prev_glyph_adv_w);
                         int baseFound = BaseCoverageTable.FindPosition(prev_glyph);
                         if (baseFound < 0)
                         {
@@ -753,7 +753,7 @@ namespace Typography.OpenFont.Tables
                 lookupType4.MarkArrayTable = MarkArrayTable.CreateFrom(reader, subTableStartAt + markArrayOffset);
                 lookupType4.BaseArrayTable = BaseArrayTable.CreateFrom(reader, subTableStartAt + baseArrayOffset, markClassCount);
 #if DEBUG
-                lookupType4.dbugTest();
+                //lookupType4.dbugTest();
 #endif
                 return lookupType4;
             }
@@ -1040,9 +1040,9 @@ namespace Typography.OpenFont.Tables
                             continue;
                         }
 
-                        foreach (var rule in PosClassSetTables[glyph1_class].PosClassRules)
+                        foreach (PosClassRule rule in PosClassSetTables[glyph1_class].PosClassRules)
                         {
-                            var glyphIds = rule.InputGlyphIds;
+                            ushort[] glyphIds = rule.InputGlyphIds;
                             int matches = 0;
                             for (int n = 0; n < glyphIds.Length && i + 1 + n < lim; ++n)
                             {
@@ -1057,9 +1057,9 @@ namespace Typography.OpenFont.Tables
 
                             if (matches == glyphIds.Length)
                             {
-                                foreach (var plr in rule.PosLookupRecords)
+                                foreach (PosLookupRecord plr in rule.PosLookupRecords)
                                 {
-                                    var lookup = OwnerGPos.LookupList[plr.lookupListIndex];
+                                    LookupTable lookup = OwnerGPos.LookupList[plr.lookupListIndex];
                                     lookup.DoGlyphPosition(inputGlyphs, i + plr.seqIndex, glyphIds.Length - plr.seqIndex);
                                 }
                                 break;
@@ -1102,7 +1102,7 @@ namespace Typography.OpenFont.Tables
                 public ClassDefTable LookaheadClassDef { get; set; }
 
                 public override void DoGlyphPosition(IGlyphPositions inputGlyphs, int startAt, int len)
-                {                    
+                {
                     ushort glyphIndex = inputGlyphs.GetGlyph(startAt, out short advW);
 
                     int coverage_pos = CoverageTable.FindPosition(glyphIndex);
@@ -1231,7 +1231,6 @@ namespace Typography.OpenFont.Tables
                             }
                             subTable.PosClassSetTables = posClassSetTables;
                             subTable.CoverageTable = CoverageTable.CreateFrom(reader, subTableStartAt + coverageOffset);
-
 
                             return subTable;
                         }
