@@ -668,10 +668,10 @@ namespace Typography.TextLayout
         /// <param name="index">glyph index</param>
         /// <param name="advW">advanced width</param>
         /// <returns></returns>
-        public ushort GetGlyph(int index, out ushort advW)
+        public ushort GetGlyph(int index, out short advW)
         {
             GlyphPos pos = _glyphPosList[index];
-            advW = (ushort)pos.advanceW;
+            advW = pos.advanceW;
             return pos.glyphIndex;
         }
         /// <summary>
