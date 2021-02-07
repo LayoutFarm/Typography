@@ -13,6 +13,13 @@ namespace Typography.OpenFont.Tables
         public const string _N = "GPOS";
         public override string Name => _N;
 
+        /// <summary>
+        /// heuristic lookback optimization,
+        /// some layout-context may need=> eg. **Emoji**, some complex script
+        /// some layout-context may not need. 
+        /// </summary>
+        public bool EnableLongLookBack { get; set; }
+
 #if DEBUG
         public GPOS() { }
 #endif
@@ -29,6 +36,14 @@ namespace Typography.OpenFont.Tables
                 LookupSubTable subTable = LookupTable.ReadSubTable(lookupType, reader, lookupTablePos + subTableOffsets[i]);
                 subTable.OwnerGPos = this;
                 subTables[i] = subTable;
+
+
+                if (lookupType == 9)
+                {
+                    //temp fix 
+                    // (eg. Emoji) => enable long look back
+                    this.EnableLongLookBack = true;
+                }
             }
 
 
@@ -51,7 +66,6 @@ namespace Typography.OpenFont.Tables
         public abstract class LookupSubTable
         {
             public GPOS OwnerGPos;
-
             public abstract void DoGlyphPosition(IGlyphPositions inputGlyphs, int startAt, int len);
         }
 
@@ -61,6 +75,7 @@ namespace Typography.OpenFont.Tables
         public class UnImplementedLookupSubTable : LookupSubTable
         {
             readonly string _msg;
+
             public UnImplementedLookupSubTable(string message)
             {
                 _msg = message;
@@ -154,7 +169,6 @@ namespace Typography.OpenFont.Tables
                     _coverageTable = coverage;
                     _valueRecords = valueRecords;
                 }
-
                 public int Format { get; private set; }
                 CoverageTable _coverageTable;
                 ValueRecord[] _valueRecords;
@@ -607,6 +621,7 @@ namespace Typography.OpenFont.Tables
                     int lim = Math.Min(startAt + len, inputGlyphs.Count);
 
                     // Find the mark glyph, starting at 1
+                    bool longLookBack = this.OwnerGPos.EnableLongLookBack;
                     for (int i = Math.Max(startAt, 1); i < lim; ++i)
                     {
                         int markFound = MarkCoverageTable.FindPosition(inputGlyphs.GetGlyph(i, out short glyph_advW));
@@ -616,11 +631,11 @@ namespace Typography.OpenFont.Tables
                         }
 
                         // Look backwards for the base glyph
-                        int j = FindGlyphBackwardByKind(inputGlyphs, GlyphClassKind.Base, i, startAt);
+                        int j = FindGlyphBackwardByKind(inputGlyphs, GlyphClassKind.Base, i, longLookBack ? startAt : i - 1);
                         if (j < 0)
                         {
                             // Fall back to type 0
-                            j = FindGlyphBackwardByKind(inputGlyphs, GlyphClassKind.Zero, i, startAt);
+                            j = FindGlyphBackwardByKind(inputGlyphs, GlyphClassKind.Zero, i, longLookBack ? startAt : i - 1);
                             if (j < 0)
                             {
                                 continue;
@@ -812,7 +827,6 @@ namespace Typography.OpenFont.Tables
             /// </summary>
             class LkSubTableType6 : LookupSubTable
             {
-
                 public CoverageTable MarkCoverage1 { get; set; }
                 public CoverageTable MarkCoverage2 { get; set; }
                 public MarkArrayTable Mark1ArrayTable { get; set; }
@@ -828,6 +842,7 @@ namespace Typography.OpenFont.Tables
                     //(skipping glyphs according to LookupFlags)
 
                     //@prepare: we must found mark2 glyph before mark1
+                    bool longLookBack = this.OwnerGPos.EnableLongLookBack;
 #if DEBUG
                     if (len == 3 || len == 4)
                     {
@@ -847,7 +862,7 @@ namespace Typography.OpenFont.Tables
                         }
 
                         // Look back for previous mark glyph
-                        int prev_mark = FindGlyphBackwardByKind(inputGlyphs, GlyphClassKind.Mark, i, startAt);
+                        int prev_mark = FindGlyphBackwardByKind(inputGlyphs, GlyphClassKind.Mark, i, longLookBack ? startAt : i - 1);
                         if (prev_mark < 0)
                         {
                             continue;
@@ -1035,7 +1050,7 @@ namespace Typography.OpenFont.Tables
 
                         foreach (var rule in PosClassSetTables[glyph1_class].PosClassRules)
                         {
-                            ushort[] glyphIds = rule.InputGlyphIds;
+                            var glyphIds = rule.InputGlyphIds;
                             int matches = 0;
                             for (int n = 0; n < glyphIds.Length && i + 1 + n < lim; ++n)
                             {
@@ -1073,7 +1088,6 @@ namespace Typography.OpenFont.Tables
             //----------------------------------------------------------------
             class LkSubTableType8Fmt1 : LookupSubTable
             {
-
                 public CoverageTable CoverageTable { get; set; }
                 public PosRuleSetTable[] PosRuleSetTables { get; set; }
                 public override void DoGlyphPosition(IGlyphPositions inputGlyphs, int startAt, int len)
@@ -1086,6 +1100,7 @@ namespace Typography.OpenFont.Tables
             {
                 public LkSubTableType8Fmt2()
                 {
+
                 }
                 public CoverageTable CoverageTable { get; set; }
                 public PosClassSetTable[] PosClassSetTables { get; set; }
