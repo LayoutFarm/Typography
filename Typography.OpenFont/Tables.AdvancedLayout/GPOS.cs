@@ -59,7 +59,7 @@ namespace Typography.OpenFont.Tables
             Utils.WarnUnimplemented("GPOS feature variations");
         }
 
-        private List<LookupTable> _lookupList = new List<LookupTable>();
+        readonly List<LookupTable> _lookupList = new List<LookupTable>();
 
         public IList<LookupTable> LookupList => _lookupList;
 
@@ -81,13 +81,8 @@ namespace Typography.OpenFont.Tables
                 _msg = message;
                 Utils.WarnUnimplemented(message);
             }
-            public override string ToString()
-            {
-                return _msg;
-            }
-            public override void DoGlyphPosition(IGlyphPositions inputGlyphs, int startAt, int len)
-            {
-            }
+            public override string ToString() => _msg;
+            public override void DoGlyphPosition(IGlyphPositions inputGlyphs, int startAt, int len) { }
         }
 
         /// <summary>
@@ -169,9 +164,9 @@ namespace Typography.OpenFont.Tables
                     _coverageTable = coverage;
                     _valueRecords = valueRecords;
                 }
-                public int Format { get; private set; }
-                CoverageTable _coverageTable;
-                ValueRecord[] _valueRecords;
+                public int Format { get; }
+                readonly CoverageTable _coverageTable;
+                readonly ValueRecord[] _valueRecords;
 
                 public override void DoGlyphPosition(IGlyphPositions inputGlyphs, int startAt, int len)
                 {
@@ -608,9 +603,6 @@ namespace Typography.OpenFont.Tables
             /// </summary>
             class LkSubTableType4 : LookupSubTable
             {
-                public LkSubTableType4()
-                {
-                }
                 public CoverageTable MarkCoverageTable { get; set; }
                 public CoverageTable BaseCoverageTable { get; set; }
                 public BaseArrayTable BaseArrayTable { get; set; }
@@ -1110,8 +1102,7 @@ namespace Typography.OpenFont.Tables
                 public ClassDefTable LookaheadClassDef { get; set; }
 
                 public override void DoGlyphPosition(IGlyphPositions inputGlyphs, int startAt, int len)
-                {
-                    int lim = Math.Min(startAt + len, inputGlyphs.Count);
+                {                    
                     ushort glyphIndex = inputGlyphs.GetGlyph(startAt, out short advW);
 
                     int coverage_pos = CoverageTable.FindPosition(glyphIndex);
