@@ -165,19 +165,19 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Build\Typography.GlyphLayout\Typography.GlyphLayout.csproj">
-      <Project>{7f481a1e-38f8-484c-960b-45ebb185a00e}</Project>
+      <Project>{a34ca253-f035-4bef-a73f-ff91d46bed47}</Project>
       <Name>Typography.GlyphLayout</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\Build\Typography.OpenFont\Typography.OpenFont.csproj">
-      <Project>{29ed0dfe-373c-4e98-bd4b-43f8e5fb16f6}</Project>
+      <Project>{fde9f6a7-c791-4f33-8a2c-a6f6e5f3670e}</Project>
       <Name>Typography.OpenFont</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\Build\Typography.TextServices\Typography.TextServices.csproj">
-      <Project>{6c5f8d13-5d4e-405b-9bf2-f4c9e5aa405c}</Project>
+      <Project>{a3fceedd-99c2-4e58-944c-d9e49c92ef78}</Project>
       <Name>Typography.TextServices</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\Build\Unpack\Unpack.csproj">
-      <Project>{9b1d6d45-7a2f-4ed1-95a6-54b3b892bbd1}</Project>
+      <Project>{55d0efe6-54a2-46c5-b82c-d08f92928e60}</Project>
       <Name>Unpack</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\PixelFarm.Typography\PixelFarm.Typography.csproj">
@@ -192,8 +192,8 @@
       <Project>{466dd2ae-eadc-4e20-82b3-da6d018006c5}</Project>
       <Name>PaintLab.Svg</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\x_autogen_netstandard2.0\PixelFarm.MiniAgg.One\PixelFarm.MiniAgg.One.csproj">
-      <Project>{40d0dbfa-6427-478f-83b0-daa0f0a8014a}</Project>
+    <ProjectReference Include="..\..\..\x_autogen\PixelFarm.MiniAgg.One\PixelFarm.MiniAgg.One.csproj">
+      <Project>{e7aed396-79c0-405d-8f20-4555aed90341}</Project>
       <Name>PixelFarm.MiniAgg.One</Name>
     </ProjectReference>
     <ProjectReference Include="..\TypographyTest.WinForms\TypographyTest.WinForms.csproj">

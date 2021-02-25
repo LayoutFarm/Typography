@@ -80,23 +80,23 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Build\Typography.GlyphLayout\Typography.GlyphLayout.csproj">
-      <Project>{7f481a1e-38f8-484c-960b-45ebb185a00e}</Project>
+      <Project>{a34ca253-f035-4bef-a73f-ff91d46bed47}</Project>
       <Name>Typography.GlyphLayout</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\Build\Typography.OpenFont\Typography.OpenFont.csproj">
-      <Project>{55c6ccff-6bf9-45fe-bf86-406100e8d170}</Project>
+      <Project>{fde9f6a7-c791-4f33-8a2c-a6f6e5f3670e}</Project>
       <Name>Typography.OpenFont</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\Build\Typography.TextServices\Typography.TextServices.csproj">
-      <Project>{6c5f8d13-5d4e-405b-9bf2-f4c9e5aa405c}</Project>
+      <Project>{a3fceedd-99c2-4e58-944c-d9e49c92ef78}</Project>
       <Name>Typography.TextServices</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\PixelFarm.Typography\PixelFarm.Typography.csproj">
       <Project>{540a2ea6-dae3-4625-8951-b2c3118603a4}</Project>
       <Name>PixelFarm.Typography</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\x_autogen_netstandard2.0\PixelFarm.MiniAgg.One\PixelFarm.MiniAgg.One.csproj">
-      <Project>{40d0dbfa-6427-478f-83b0-daa0f0a8014a}</Project>
+    <ProjectReference Include="..\..\..\x_autogen\PixelFarm.MiniAgg.One\PixelFarm.MiniAgg.One.csproj">
+      <Project>{e7aed396-79c0-405d-8f20-4555aed90341}</Project>
       <Name>PixelFarm.MiniAgg.One</Name>
     </ProjectReference>
   </ItemGroup>
