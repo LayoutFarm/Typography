@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Typography.OpenFont;
 using Typography.TextLayout;
-using Typography.OpenFont.Contours;
+using Typography.Contours;
 using Tesselate;
 
 namespace DrawingGL.Text

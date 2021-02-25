@@ -78,11 +78,11 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Build\NetStandard\Typography.GlyphLayout\Typography.GlyphLayout.csproj">
-      <Project>{8ce29063-ca6c-4913-bf2d-764ce857da06}</Project>
+      <Project>{7f481a1e-38f8-484c-960b-45ebb185a00e}</Project>
       <Name>Typography.GlyphLayout</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\Build\NetStandard\Typography.OpenFont\Typography.OpenFont.csproj">
-      <Project>{280d17d5-4435-4ead-839a-33c5a8990e7e}</Project>
+      <Project>{55c6ccff-6bf9-45fe-bf86-406100e8d170}</Project>
       <Name>Typography.OpenFont</Name>
     </ProjectReference>
   </ItemGroup>
