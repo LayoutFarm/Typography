@@ -333,7 +333,7 @@
       <Project>{540a2ea6-dae3-4625-8951-b2c3118603a4}</Project>
       <Name>PixelFarm.Typography</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\x_autogen2\PixelFarm.MiniAgg.One\PixelFarm.MiniAgg.One.csproj">
+    <ProjectReference Include="..\..\..\..\x_autogen_netstandard2.0\PixelFarm.MiniAgg.One\PixelFarm.MiniAgg.One.csproj">
       <Project>{18c5fa8f-8579-4616-a1d0-220003627bf8}</Project>
       <Name>PixelFarm.MiniAgg.One</Name>
     </ProjectReference>

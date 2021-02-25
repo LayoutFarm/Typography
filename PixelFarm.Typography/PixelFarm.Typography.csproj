@@ -51,7 +51,7 @@
       <Project>{6b0e034b-0ebd-4907-ad7f-437de66d78d4}</Project>
       <Name>Typography.TextServices</Name>
     </ProjectReference>
-    <ProjectReference Include="..\x_autogen2\PixelFarm.MiniAgg.One\PixelFarm.MiniAgg.One.csproj">
+    <ProjectReference Include="..\x_autogen_netstandard2.0\PixelFarm.MiniAgg.One\PixelFarm.MiniAgg.One.csproj">
       <Project>{18c5fa8f-8579-4616-a1d0-220003627bf8}</Project>
       <Name>PixelFarm.MiniAgg.One</Name>
     </ProjectReference>
