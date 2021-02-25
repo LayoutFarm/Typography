@@ -5,6 +5,6 @@
   </PropertyGroup>
  
 
-  <Import Project="..\..\..\Typography.TextBreak\Typography.TextBreak\Typography.TextBreak.projitems" Label="Shared" />
+  <Import Project="..\..\Typography.TextBreak\Typography.TextBreak\Typography.TextBreak.projitems" Label="Shared" />
 
 </Project>

@@ -57,25 +57,25 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Unpack_SH", "Unpack_SH\Unpa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PaintLab.Svg", "PixelFarm\PaintLab.Svg\PaintLab.Svg.csproj", "{466DD2AE-EADC-4E20-82B3-DA6D018006C5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Typography.OpenFont", "Build\NetStandard\Typography.OpenFont\Typography.OpenFont.csproj", "{55C6CCFF-6BF9-45FE-BF86-406100E8D170}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Typography.OpenFont", "Build\Typography.OpenFont\Typography.OpenFont.csproj", "{55C6CCFF-6BF9-45FE-BF86-406100E8D170}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NETSTD", "NETSTD", "{8DD7A804-99D0-41EE-9546-21E5A89223A2}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Typography.GlyphLayout", "Build\NetStandard\Typography.GlyphLayout\Typography.GlyphLayout.csproj", "{7F481A1E-38F8-484C-960B-45EBB185A00E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Typography.GlyphLayout", "Build\Typography.GlyphLayout\Typography.GlyphLayout.csproj", "{7F481A1E-38F8-484C-960B-45EBB185A00E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Typography.MsdfGen", "Build\NetStandard\Typography.MsdfGen\Typography.MsdfGen.csproj", "{23624298-2E7B-4E44-8FF9-1543CAAB238A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Typography.MsdfGen", "Build\Typography.MsdfGen\Typography.MsdfGen.csproj", "{23624298-2E7B-4E44-8FF9-1543CAAB238A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Typography.TextBreak", "Build\NetStandard\Typography.TextBreak\Typography.TextBreak.csproj", "{87A39D2B-A539-4077-8488-BB98D67AB660}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Typography.TextBreak", "Build\Typography.TextBreak\Typography.TextBreak.csproj", "{87A39D2B-A539-4077-8488-BB98D67AB660}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Typography.TextServices", "Build\NetStandard\Typography.TextServices\Typography.TextServices.csproj", "{6C5F8D13-5D4E-405B-9BF2-F4C9E5AA405C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Typography.TextServices", "Build\Typography.TextServices\Typography.TextServices.csproj", "{6C5F8D13-5D4E-405B-9BF2-F4C9E5AA405C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Unpack", "Build\NetStandard\Unpack\Unpack.csproj", "{9B1D6D45-7A2F-4ED1-95A6-54B3B892BBD1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Unpack", "Build\Unpack\Unpack.csproj", "{9B1D6D45-7A2F-4ED1-95A6-54B3B892BBD1}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PixelFarm.MiniAgg.One", "x_autogen_netstandard2.0\PixelFarm.MiniAgg.One\PixelFarm.MiniAgg.One.csproj", "{40D0DBFA-6427-478F-83B0-DAA0F0A8014A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ONE", "ONE", "{46EDD385-59F7-4402-A023-9314C55471BB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Typography.One", "Build\NetStandard\Typography.One\Typography.One.csproj", "{95E23DEE-0AAA-4F93-94DD-A18AB84625F9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Typography.One", "Build\Typography.One\Typography.One.csproj", "{95E23DEE-0AAA-4F93-94DD-A18AB84625F9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xamarin.Android.OpenGL", "Demo\Android\Xamarin.OpenGL\Xamarin.Android.OpenGL.csproj", "{B824FFB2-D057-490A-8967-892C0E20C0B6}"
 EndProject

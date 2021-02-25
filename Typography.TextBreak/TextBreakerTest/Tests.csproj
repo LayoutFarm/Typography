@@ -85,7 +85,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Build\NetStandard\Typography.TextBreak\Typography.TextBreak.csproj">
+    <ProjectReference Include="..\..\Build\Typography.TextBreak\Typography.TextBreak.csproj">
       <Project>{87a39d2b-a539-4077-8488-bb98d67ab660}</Project>
       <Name>Typography.TextBreak</Name>
     </ProjectReference>

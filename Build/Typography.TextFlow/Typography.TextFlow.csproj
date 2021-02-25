@@ -9,6 +9,6 @@
     <ProjectReference Include="..\Typography.OpenFont\Typography.OpenFont.csproj" />
   </ItemGroup>
 
-  <Import Project="..\..\..\Typography.TextFlow\Typography.TextFlow.projitems" Label="Shared" />
+  <Import Project="..\..\Typography.TextFlow\Typography.TextFlow.projitems" Label="Shared" />
 
 </Project>

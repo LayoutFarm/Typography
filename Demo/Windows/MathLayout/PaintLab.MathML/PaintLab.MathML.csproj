@@ -45,7 +45,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\Build\NetStandard\Typography.OpenFont\Typography.OpenFont.csproj">
+    <ProjectReference Include="..\..\..\..\Build\Typography.OpenFont\Typography.OpenFont.csproj">
       <Project>{55c6ccff-6bf9-45fe-bf86-406100e8d170}</Project>
       <Name>Typography.OpenFont</Name>
     </ProjectReference>

@@ -10,16 +10,13 @@
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DefineConstants>TRACE</DefineConstants>
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\x_autogen_netstandard2.0\PixelFarm.MiniAgg.One\PixelFarm.MiniAgg.One.csproj" />
-    <ProjectReference Include="..\Typography.GlyphLayout\Typography.GlyphLayout.csproj" />
-    <ProjectReference Include="..\Typography.OpenFont\Typography.OpenFont.csproj" />
+  <Import Project="..\..\Unpack_SH\Unpack_SH.projitems" Label="Shared" />
+
+  <ItemGroup Condition="$(TargetFramework) == 'netstandard2.0'">
+    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.5.2" />
   </ItemGroup>
-
-  <Import Project="..\..\..\FontAtlas\FontAtlas.projitems" Label="Shared" />
-
-
 
 </Project>
