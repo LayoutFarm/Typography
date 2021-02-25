@@ -80,15 +80,15 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Build\NetStandard\Typography.GlyphLayout\Typography.GlyphLayout.csproj">
-      <Project>{c6807d05-09be-4313-9f8b-bd2d51c55819}</Project>
+      <Project>{7f481a1e-38f8-484c-960b-45ebb185a00e}</Project>
       <Name>Typography.GlyphLayout</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\Build\NetStandard\Typography.OpenFont\Typography.OpenFont.csproj">
-      <Project>{f7d71e61-9342-4dd7-9afd-69045f2ec98b}</Project>
+      <Project>{55c6ccff-6bf9-45fe-bf86-406100e8d170}</Project>
       <Name>Typography.OpenFont</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\Build\NetStandard\Typography.TextServices\Typography.TextServices.csproj">
-      <Project>{6b0e034b-0ebd-4907-ad7f-437de66d78d4}</Project>
+      <Project>{6c5f8d13-5d4e-405b-9bf2-f4c9e5aa405c}</Project>
       <Name>Typography.TextServices</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\PixelFarm.Typography\PixelFarm.Typography.csproj">
@@ -96,7 +96,7 @@
       <Name>PixelFarm.Typography</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\x_autogen_netstandard2.0\PixelFarm.MiniAgg.One\PixelFarm.MiniAgg.One.csproj">
-      <Project>{fb5f78f5-c921-405d-8f21-42f7c15c2ad9}</Project>
+      <Project>{40d0dbfa-6427-478f-83b0-daa0f0a8014a}</Project>
       <Name>PixelFarm.MiniAgg.One</Name>
     </ProjectReference>
   </ItemGroup>
