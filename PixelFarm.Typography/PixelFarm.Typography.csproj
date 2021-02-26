@@ -39,20 +39,20 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Build\N20\Typography.GlyphLayout\Typography.GlyphLayout.csproj">
-      <Project>{c6807d05-09be-4313-9f8b-bd2d51c55819}</Project>
+    <ProjectReference Include="..\Build\Typography.GlyphLayout\Typography.GlyphLayout.csproj">
+      <Project>{a34ca253-f035-4bef-a73f-ff91d46bed47}</Project>
       <Name>Typography.GlyphLayout</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Build\N20\Typography.OpenFont\Typography.OpenFont.csproj">
-      <Project>{f7d71e61-9342-4dd7-9afd-69045f2ec98b}</Project>
+    <ProjectReference Include="..\Build\Typography.OpenFont\Typography.OpenFont.csproj">
+      <Project>{fde9f6a7-c791-4f33-8a2c-a6f6e5f3670e}</Project>
       <Name>Typography.OpenFont</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Build\N20\Typography.TextServices\Typography.TextServices.csproj">
-      <Project>{6b0e034b-0ebd-4907-ad7f-437de66d78d4}</Project>
+    <ProjectReference Include="..\Build\Typography.TextServices\Typography.TextServices.csproj">
+      <Project>{a3fceedd-99c2-4e58-944c-d9e49c92ef78}</Project>
       <Name>Typography.TextServices</Name>
     </ProjectReference>
-    <ProjectReference Include="..\x_autogen2\PixelFarm.MiniAgg.One\PixelFarm.MiniAgg.One.csproj">
-      <Project>{18c5fa8f-8579-4616-a1d0-220003627bf8}</Project>
+    <ProjectReference Include="..\x_autogen\PixelFarm.MiniAgg.One\PixelFarm.MiniAgg.One.csproj">
+      <Project>{e7aed396-79c0-405d-8f20-4555aed90341}</Project>
       <Name>PixelFarm.MiniAgg.One</Name>
     </ProjectReference>
   </ItemGroup>

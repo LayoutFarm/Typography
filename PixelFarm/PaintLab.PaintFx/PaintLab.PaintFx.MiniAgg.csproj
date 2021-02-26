@@ -52,8 +52,8 @@
     <Compile Include="IImageFilterFunc.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\x_autogen2\PixelFarm.MiniAgg.One\PixelFarm.MiniAgg.One.csproj">
-      <Project>{fb5f78f5-c921-405d-8f21-42f7c15c2ad9}</Project>
+    <ProjectReference Include="..\..\x_autogen\PixelFarm.MiniAgg.One\PixelFarm.MiniAgg.One.csproj">
+      <Project>{e7aed396-79c0-405d-8f20-4555aed90341}</Project>
       <Name>PixelFarm.MiniAgg.One</Name>
     </ProjectReference>
   </ItemGroup>
