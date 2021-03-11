@@ -60,7 +60,7 @@ namespace Typography.TextBreak
         protected BreakingEngine SelectEngine(int c)
         {
             //from 
-            InputReader.GetChars(c, out char c0, out char c1);
+            InputReader.SeparateCodePoint(c, out char c0, out char c1);
             return SelectEngine(c0);
         }
         protected BreakingEngine SelectEngine(char c)

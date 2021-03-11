@@ -77,12 +77,12 @@
     <None Include="Properties\AndroidManifest.xml" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Build\NetStandard\Typography.GlyphLayout\Typography.GlyphLayout.csproj">
-      <Project>{8ce29063-ca6c-4913-bf2d-764ce857da06}</Project>
+    <ProjectReference Include="..\..\..\Build\Typography.GlyphLayout\Typography.GlyphLayout.csproj">
+      <Project>{a34ca253-f035-4bef-a73f-ff91d46bed47}</Project>
       <Name>Typography.GlyphLayout</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\Build\NetStandard\Typography.OpenFont\Typography.OpenFont.csproj">
-      <Project>{280d17d5-4435-4ead-839a-33c5a8990e7e}</Project>
+    <ProjectReference Include="..\..\..\Build\Typography.OpenFont\Typography.OpenFont.csproj">
+      <Project>{fde9f6a7-c791-4f33-8a2c-a6f6e5f3670e}</Project>
       <Name>Typography.OpenFont</Name>
     </ProjectReference>
   </ItemGroup>

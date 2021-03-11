@@ -292,7 +292,7 @@ namespace Typography.Text
 
                 //layout glyphs in each context
 
-                Typography.Text.TextBufferSpan buff = bufferSpan.CreateSubspan(line_seg.StartAt, line_seg.Length);
+                Typography.Text.TextBufferSpan buff = bufferSpan.CreateSubspan(line_seg.StartAt - bufferSpan.start, line_seg.Length);
 
                 _glyphLayout.ScriptLang = new ScriptLang(spBreakInfo.ScriptTag, spBreakInfo.LangTag);
 
@@ -472,15 +472,14 @@ namespace Typography.Text
             return found;
         }
 
-        public void BreakToLineSegments(in TextBufferSpan textBufferSpan, WordVisitor visitor)
+        public void BreakToLineSegments(in TextBufferSpan ts, WordVisitor visitor)
         {
 
             //user must setup the CustomBreakerBuilder before use      
-            if (textBufferSpan.len < 1)
+            if (ts.len < 1)
             {
                 return;
             }
-
 
             if (_textBreaker == null)
             {
@@ -492,13 +491,13 @@ namespace Typography.Text
             _textBreaker.UseUnicodeRangeBreaker = true;
             _textBreaker.CurrentVisitor = visitor;
 
-            if (textBufferSpan.IsUtf32Buffer)
+            if (ts.IsUtf32Buffer)
             {
-                _textBreaker.BreakWords(textBufferSpan.GetRawUtf32Buffer(), textBufferSpan.start, textBufferSpan.len);
+                _textBreaker.BreakWords(ts.GetRawUtf32Buffer(), ts.start, ts.len);
             }
             else
             {
-                _textBreaker.BreakWords(textBufferSpan.GetRawUtf16Buffer(), textBufferSpan.start, textBufferSpan.len);
+                _textBreaker.BreakWords(ts.GetRawUtf16Buffer(), ts.start, ts.len);
             }
         }
 
@@ -545,15 +544,7 @@ namespace Typography.Text
         {
             //use CACHE,
             _glyphPlanCache.SetCurrentFont(_currentTypeface, FontSizeInPoints, this.ScriptLang);
-            if (buffSpan.IsUtf32Buffer)
-            {
-                return _glyphPlanCache.GetUnscaledGlyphPlanSequence(buffSpan, _glyphLayout);
-            }
-            else
-            {
-                return _glyphPlanCache.GetUnscaledGlyphPlanSequence(buffSpan, _glyphLayout);
-            }
-
+            return _glyphPlanCache.GetUnscaledGlyphPlanSequence(buffSpan, _glyphLayout);
         }
 
 

@@ -9,15 +9,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Dep", "Dep", "{A3EC24E1-909
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PixelFarm.Typography", "..\..\..\PixelFarm.Typography\PixelFarm.Typography.csproj", "{540A2EA6-DAE3-4625-8951-B2C3118603A4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Typography.OpenFont", "..\..\..\Build\N20\Typography.OpenFont\Typography.OpenFont.csproj", "{F7D71E61-9342-4DD7-9AFD-69045F2EC98B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Typography.OpenFont", "..\..\..\Build\Typography.OpenFont\Typography.OpenFont.csproj", "{F7D71E61-9342-4DD7-9AFD-69045F2EC98B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Typography.TextServices", "..\..\..\Build\N20\Typography.TextServices\Typography.TextServices.csproj", "{6B0E034B-0EBD-4907-AD7F-437DE66D78D4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Typography.TextServices", "..\..\..\Build\Typography.TextServices\Typography.TextServices.csproj", "{6B0E034B-0EBD-4907-AD7F-437DE66D78D4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Typography.GlyphLayout", "..\..\..\Build\N20\Typography.GlyphLayout\Typography.GlyphLayout.csproj", "{C6807D05-09BE-4313-9F8B-BD2D51C55819}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Typography.GlyphLayout", "..\..\..\Build\Typography.GlyphLayout\Typography.GlyphLayout.csproj", "{C6807D05-09BE-4313-9F8B-BD2D51C55819}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PaintLab.Svg", "..\..\..\PixelFarm\PaintLab.Svg\PaintLab.Svg.csproj", "{466DD2AE-EADC-4E20-82B3-DA6D018006C5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PixelFarm.MiniAgg.One", "..\..\..\x_autogen2\PixelFarm.MiniAgg.One\PixelFarm.MiniAgg.One.csproj", "{18C5FA8F-8579-4616-A1D0-220003627BF8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PixelFarm.MiniAgg.One", "..\..\..\x_autogen_netstandard2.0\PixelFarm.MiniAgg.One\PixelFarm.MiniAgg.One.csproj", "{18C5FA8F-8579-4616-A1D0-220003627BF8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PaintLab.PaintFx.MiniAgg", "..\..\..\PixelFarm\PaintLab.PaintFx\PaintLab.PaintFx.MiniAgg.csproj", "{A533E1C7-AB74-4BCF-BC7A-12D4DBBFA918}"
 EndProject

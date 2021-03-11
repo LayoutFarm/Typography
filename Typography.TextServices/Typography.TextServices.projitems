@@ -9,6 +9,7 @@
     <Import_RootNamespace>Typography.TextServices</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Text\TextBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Text\AbstractTextSpanPrinter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FontCollections\InstalledTypeface.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FontCollections\InstalledTypefaceCollection.cs" />
@@ -23,11 +24,11 @@
     <Compile Include="$(MSBuildThisFileDirectory)Text\TextBufferSpan.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TextLayout\GlyphPlanCache.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TextLayout\CRC32.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Text\TextCopyBuffers.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Text\VirtualTextSpanPrinter.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="$(MSBuildThisFileDirectory)FontCollections\" />
-    <Folder Include="$(MSBuildThisFileDirectory)Text\" />
     <Folder Include="$(MSBuildThisFileDirectory)TextLayout\" />
   </ItemGroup>
 </Project>

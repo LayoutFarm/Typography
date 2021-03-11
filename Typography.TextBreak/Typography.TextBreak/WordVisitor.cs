@@ -68,8 +68,8 @@ namespace Typography.TextBreak
             _endIndex = index + len;
 
             _latestBreakAt = LatestSpanStartAt = index;
-
             _tempCandidateBreaks.Clear();
+
         }
         internal void LoadText(char[] buffer, int index, int len)
         {
@@ -79,13 +79,12 @@ namespace Typography.TextBreak
 
             _latestBreakAt = LatestSpanStartAt = index;
             _tempCandidateBreaks.Clear();
+
         }
         internal void LoadText(char[] buffer, int index)
         {
             LoadText(buffer, index, buffer.Length);
         }
-
-
         protected virtual void OnBreak() { }
 
         public VisitorState State { get; internal set; }
@@ -98,7 +97,7 @@ namespace Typography.TextBreak
 
         public bool IsEnd => _inputReader.IsEnd;
 
-        internal bool Read() => _inputReader.Read();
+        internal bool Read() => _inputReader.ReadNext();
         internal char C0 => _inputReader.C0;
         internal char C1 => _inputReader.C1;
         internal char PeekNext() => _inputReader.PeekNext();
@@ -172,11 +171,15 @@ namespace Typography.TextBreak
     {
         readonly char[] _utf16Buffer;
         readonly int[] _utf32Buffer;
-        int _start;
-        int _len;
-        int _end;
+        readonly int _start;
+        readonly int _len;
+        readonly int _end;
+
         int _index;//index from start of original buffer
-        int _inc;
+        /// <summary>
+        /// inc for next read
+        /// </summary>
+        int _inc;//inc for next read
 
         //
         char _c0;
@@ -191,7 +194,7 @@ namespace Typography.TextBreak
 
             _end = start + len;
             _c0 = _c1 = '\0';
-            _inc = 0;
+            _inc = 0;//default
             ReadCurrentOffset();
         }
         public InputReader(int[] input, int start, int len)
@@ -206,8 +209,6 @@ namespace Typography.TextBreak
             _inc = 0;
             ReadCurrentOffset();
         }
-
-
 
         public int Length => _len;
         /// <summary>
@@ -245,13 +246,14 @@ namespace Typography.TextBreak
             return '\0';
         }
 
+        public int Inc => _inc;
 
         //------------------
         // constants
         const int LEAD_OFFSET = 0xD800 - (0x10000 >> 10);
         const int SURROGATE_OFFSET = 0x10000 - (0xD800 << 10) - 0xDC00;
 
-        public static void GetChars(int codepoint, out char c0, out char c1)
+        public static void SeparateCodePoint(int codepoint, out char c0, out char c1)
         {
             //https://www.unicode.org/faq/utf_bom.html#utf16-1
 
@@ -317,8 +319,8 @@ namespace Typography.TextBreak
             {
                 if (_utf32Buffer != null)
                 {
-                    GetChars(_utf32Buffer[_index], out _c0, out _c1);
-                    _inc = 1;
+                    SeparateCodePoint(_utf32Buffer[_index], out _c0, out _c1);
+                    _inc = 1;//inc for next read
                 }
                 else
                 {
@@ -344,7 +346,7 @@ namespace Typography.TextBreak
                         else
                         {
                             _c1 = '\0';
-                            _inc = 0;
+                            _inc = 1;
                         }
                     }
                     else
@@ -357,17 +359,19 @@ namespace Typography.TextBreak
             {
                 _c0 = '\0';
                 _c1 = '\0';
+                _inc = 0;
             }
         }
 
-        public bool Read()
+        public bool ReadNext()
         {
             if (_index + _inc <= _end)
             {
                 _index += _inc;
-                ReadCurrentOffset();
+                ReadCurrentOffset();                
                 return true;
             }
+
             return false;
         }
 
@@ -392,7 +396,7 @@ namespace Typography.TextBreak
         public bool Readline(out int begin, out int len, out LineEnd endlineWith)
         {
             begin = _index;
-        
+
             endlineWith = LineEnd.None;
             if (_index + _inc > _end)
             {
@@ -415,7 +419,7 @@ namespace Typography.TextBreak
                         if (next_codepoint == '\n')
                         {
                             _index++;
-                            _inc = 1;
+                            _inc = 0;
 
                             len = _index - begin - 1;
 
@@ -458,7 +462,7 @@ namespace Typography.TextBreak
             //----------------
             if (_index > begin)
             {
-
+                _inc = 1;
                 len = _index - begin;
                 return true;
             }
@@ -469,7 +473,6 @@ namespace Typography.TextBreak
 
         public char C0 => _c0;
         public char C1 => _c1;
-
         public int Codepoint => (_c1 != '\0') ? char.ConvertToUtf32(_c0, _c1) : _c0;
 
         public void SetCurrentOffset(int offset)

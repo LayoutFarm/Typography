@@ -1,0 +1,11 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net452;netstandard2.0</TargetFrameworks>
+    <UserSecretsId>05254712-9845-49d7-9cd6-545db35f69b5</UserSecretsId>
+  </PropertyGroup>
+ 
+
+  <Import Project="..\..\Typography.TextBreak\Typography.TextBreak\Typography.TextBreak.projitems" Label="Shared" />
+
+</Project>

@@ -30,7 +30,6 @@ public class BasicTests
 
         //
         customBreaker.BreakWords(input);
-        //customBreaker.CopyBreakResults(outputList);
         for (int i = 0; i < outputList.Count - 1; i++)
         {
             string result = output[i];

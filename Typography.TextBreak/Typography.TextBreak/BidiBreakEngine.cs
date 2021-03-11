@@ -57,9 +57,7 @@ namespace Typography.TextBreak
 
         internal override void BreakWord(WordVisitor visitor)
         {
-            //collect arabic char and break
-
-
+            //collect arabic char and break 
             int arabic_len = 0;
             int startAt = visitor.Offset;
 

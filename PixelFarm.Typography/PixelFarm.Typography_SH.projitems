@@ -9,7 +9,6 @@
     <Import_RootNamespace>PixelFarm.Typography_SH</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)1_General\CharSourceAndCharSpan.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)1_General\FontStyleExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)1_General\MultiLayerGlyphTx.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)1_General\OpenFontTextService.cs" />

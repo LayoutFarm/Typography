@@ -482,6 +482,8 @@ namespace Typography.OpenFont.CFF
     class Type2CharStringParser
     {
         //from https://www.adobe.com/content/dam/acom/en/devnet/font/pdfs/5177.Type2.pdf
+        //or https://adobe-type-tools.github.io/font-tech-notes/pdfs/5177.Type2.pdf
+
         //Type 2 Charstring Organization:
         //...
         //The sequence and form of a Type 2 charstring program may be represented as:

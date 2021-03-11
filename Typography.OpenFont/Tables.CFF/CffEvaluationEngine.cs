@@ -12,8 +12,6 @@ namespace Typography.OpenFont.CFF
     public class CffEvaluationEngine
     {
 
-
-
         float _scale = 1;//default 
         readonly Stack<Type2EvaluationStack> _evalStackPool = new Stack<Type2EvaluationStack>();
 

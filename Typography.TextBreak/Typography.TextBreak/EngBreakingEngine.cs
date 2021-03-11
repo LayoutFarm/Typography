@@ -62,10 +62,10 @@ namespace Typography.TextBreak
 
 
             LexState lexState = LexState.Init;
-            BreakBounds bb = new BreakBounds();
-
-
-            bb.startIndex = visitor.Offset;
+            BreakBounds bb = new BreakBounds
+            {
+                startIndex = visitor.Offset
+            };
 
             bool enableUnicodeRangeBreaker = EnableUnicodeRangeBreaker;
             bool breakPeroidInTextSpan = BreakPeroidInTextSpan;
@@ -77,6 +77,7 @@ namespace Typography.TextBreak
             char prev_char = '\0';
             int prev_pos = -1;
 #endif
+
             while (!visitor.IsEnd)
             {
 
@@ -637,9 +638,9 @@ namespace Typography.TextBreak
             //vis.AddWordBreakAtCurrentIndex(bb.kind);
             if (bb.startIndex + bb.length != vis.Offset)
             {
-              //  System.Diagnostics.Debugger.Break();
+                //  System.Diagnostics.Debugger.Break();
             }
-            
+
 
             vis.AddWordBreak_AndSetCurrentIndex(bb.startIndex + bb.length, bb.kind);
         }

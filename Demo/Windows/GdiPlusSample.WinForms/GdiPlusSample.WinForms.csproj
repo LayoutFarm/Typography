@@ -84,7 +84,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Build\NetStandard\Typography.One\Typography.One.csproj">
+    <ProjectReference Include="..\..\..\Build\Typography.One\Typography.One.csproj">
       <Project>{95e23dee-0aaa-4f93-94dd-a18ab84625f9}</Project>
       <Name>Typography.One</Name>
     </ProjectReference>

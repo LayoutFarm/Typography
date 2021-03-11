@@ -26,15 +26,10 @@ namespace Typography.TextLayout
             //https://stackoverflow.com/questions/114085/fast-string-hashing-algorithm-with-low-collision-rates-with-32-bit-integer
             //https://stackoverflow.com/questions/2351087/what-is-the-best-32bit-hash-function-for-short-strings-tag-names
 
-            if (buffer.IsUtf32Buffer)
-            {
-                return CRC32.CalculateCRC32(buffer.GetRawUtf32Buffer(), buffer.start, buffer.len);
-            }
-            else
-            {
-                return CRC32.CalculateCRC32(buffer.GetRawUtf16Buffer(), buffer.start, buffer.len);
-            }
 
+            return buffer.IsUtf32Buffer ?
+                      CRC32.CalculateCRC32(buffer.GetRawUtf32Buffer(), buffer.start, buffer.len) :
+                      CRC32.CalculateCRC32(buffer.GetRawUtf16Buffer(), buffer.start, buffer.len);
         }
 #if DEBUG
         internal Typeface dbug_typeface;

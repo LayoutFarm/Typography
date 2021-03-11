@@ -9,7 +9,6 @@ using Typography.TextLayout;
 using Typography.TextBreak;
 
 using PixelFarm.Drawing;
-using PixelFarm.CpuBlit;
 
 namespace Typography.Text
 {
@@ -47,7 +46,7 @@ namespace Typography.Text
 
 
         readonly FormattedGlyphPlanSeqPool _fmtGlyphPlanList = new FormattedGlyphPlanSeqPool();
-        readonly ArrayList<bool> _isSurrogates = new ArrayList<bool>();
+        readonly System.Collections.Generic.List<bool> _isSurrogates = new System.Collections.Generic.List<bool>();
 
         public void CalculateUserCharGlyphAdvancePos(in Typography.Text.TextBufferSpan textBufferSpan, RequestFont font, ref TextSpanMeasureResult measureResult)
         {
@@ -68,18 +67,16 @@ namespace Typography.Text
                 for (int i = 0; i < textBufferSpan.len; ++i)
                 {
                     int c = rawBuffer[pos1];
-
-                    InputReader.GetChars(c, out char c0, out char c1);
+                    InputReader.SeparateCodePoint(c, out char c0, out char c1);
                     if (c1 != 0)
                     {
-                        _isSurrogates.Append(true);
+                        _isSurrogates.Add(true);
                     }
                     else
                     {
-                        _isSurrogates.Append(false);
+                        _isSurrogates.Add(false);
                     }
                     pos1++;
-
                 }
             }
             else
@@ -96,8 +93,8 @@ namespace Typography.Text
                         char c2 = rawBuffer[pos1 + 1];
                         if (char.IsLowSurrogate(c2))
                         {
-                            _isSurrogates.Append(true);
-                            _isSurrogates.Append(true);
+                            _isSurrogates.Add(true);
+                            _isSurrogates.Add(true);
                             ++i;
                             ++pos1;
                         }
@@ -112,7 +109,7 @@ namespace Typography.Text
                     }
                     else
                     {
-                        _isSurrogates.Append(false);
+                        _isSurrogates.Add(false);
                     }
                     ++pos1;
                 }
