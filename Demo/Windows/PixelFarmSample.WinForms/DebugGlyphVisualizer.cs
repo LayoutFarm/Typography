@@ -238,8 +238,6 @@ namespace SampleWinForms.UI
             }
         }
 
-
-
         static readonly PixelFarm.Drawing.Color ColorLightGray = new PixelFarm.Drawing.Color(0xFF, 0xD3, 0xD3, 0xD3);
         static readonly PixelFarm.Drawing.Color ColorGray = new PixelFarm.Drawing.Color(0xFF, 0x80, 0x80, 0x80);
         static readonly PixelFarm.Drawing.Color ColorDeepPink = new PixelFarm.Drawing.Color(0xFF, 0xFF, 0x14, 0x93);
@@ -573,6 +571,7 @@ namespace SampleWinForms.UI
             tri.CalculateCentroid(out float centroidX, out float centroidY);
             OnTriangle(tri.Id, tri.e0, tri.e1, tri.e2, centroidX, centroidY);
         }
+
         void OnTriangle(int triangleId, EdgeLine e0, EdgeLine e1, EdgeLine e2, double centroidX, double centroidY)
         {
 
@@ -666,6 +665,16 @@ namespace SampleWinForms.UI
                 }
             }
         }
+#else
+
+        protected override void OnBeginBoneLinks(Vector2f branchHeadPos, int startAt, int endAt) { }
+        protected override void OnBone(Bone bone, int boneIndex) { }
+        protected override void OnEndBoneLinks() { }
+        protected override void OnEdgeN(EdgeLine edge) { }
+        protected override void OnStartLineHub(float centerX, float centerY) { }
+        protected override void OnJoint(Joint joint) { }
+        protected override void OnEndLineHub(float centerX, float centerY, Joint joint) { }
+        protected override void OnTriangle(AnalyzedTriangle tri) { }
 #endif
 
     }

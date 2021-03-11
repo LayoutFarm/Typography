@@ -9,6 +9,10 @@
     <DefineConstants>TRACE;NETSTANDARD1_6;NETSTANDARD1_6;NETSTANDARD2_0</DefineConstants>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
   <Import Project="..\..\Typography.OpenFont\Typography.OpenFont.projitems" Label="Shared" />
 
   <Import Project="..\..\Typography.GlyphLayout\Typography.GlyphLayout.projitems" Label="Shared" />
