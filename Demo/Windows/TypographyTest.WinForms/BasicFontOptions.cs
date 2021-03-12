@@ -42,7 +42,7 @@ namespace TypographyTest
             _installedTypefaces = new InstalledTypefaceCollection();
             _installedTypefaces.SetFontNameDuplicatedHandler(
                 (f0, f1) => FontNameDuplicatedDecision.Skip);
-
+            _installedTypefaces.SetDefaultFontNotFoundHandler();
         }
         public RenderChoice RenderChoice { get; set; }
 

@@ -95,12 +95,20 @@ namespace Typography.FontCollections
         InstalledTypeface GetInstalledTypeface(string fontName, TypefaceStyle style, ushort weight);
     }
 
-    public delegate InstalledTypeface FontNotFoundHandler(InstalledTypefaceCollection typefaceCollection,
-        string fontName,
-        TypefaceStyle style,
-        ushort weightClass,
-        InstalledTypeface available,
-        List<InstalledTypeface> availableList);
+    public class FontNotFoundRequest
+    {
+        public InstalledTypefaceCollection typefaceCollection;
+        public InstalledTypefaceCollection.InstalledTypefaceGroup foundSameNames;
+        public InstalledTypefaceCollection.InstalledTypefaceGroup foundOtherNames;
+
+        public string fontName;
+        public TypefaceStyle style;
+        public ushort weightClass;
+        public InstalledTypeface available;
+        public List<InstalledTypeface> availableList;
+    }
+
+    public delegate InstalledTypeface FontNotFoundHandler(FontNotFoundRequest req); //temp TODO: use Func<T,R>
 
     public class FontFileStreamProvider : IFontStreamSource
     {
@@ -222,7 +230,7 @@ namespace Typography.FontCollections
 
         public static int CalculateCrc32(byte[] buffer) => SlurpBlock(buffer, 0, buffer.Length);
     }
-     
+
 
     public static class InstalledTypefaceCollectionExtensions
     {
@@ -232,7 +240,7 @@ namespace Typography.FontCollections
         public delegate R MyFunc<T1, T2, R>(T1 t1, T2 t2);
         public delegate R MyFunc<T, R>(T t);
 
-        
+
         public static Action<InstalledTypefaceCollection> CustomSystemFontListLoader;
         public static MyFunc<string, Stream> CustomFontStreamLoader;
 
@@ -427,5 +435,136 @@ namespace Typography.FontCollections
         //        }
 
 
+        public static void SetDefaultFontNotFoundHandler(this InstalledTypefaceCollection fontCollection)
+        {
+            fontCollection.SetFontNotFoundHandler(req =>
+            {
+                if (req.foundSameNames != null)
+                {
+                    return ResolveFontWeightMissing(req, req.foundSameNames);
+                }
+                return null;
+            });
+        }
+
+        /// <summary>
+        /// Mozillar font weight fallback
+        /// </summary>
+        /// <param name="req"></param>
+        /// <param name="typefaceGroup"></param>
+        /// <returns></returns>
+        public static InstalledTypeface ResolveFontWeightMissing(FontNotFoundRequest req, InstalledTypefaceCollection.InstalledTypefaceGroup typefaceGroup)
+        {
+            //Fallback weights
+            //implement **weight-not-found handler
+            //check other available wright                    
+            //https://developer.mozilla.org/en-US/docs/Web/CSS/font-weight
+
+            //1) If the target weight given is between 400 and 500 inclusive:
+            //    1.1) Look for available weights between the target and 500, in ascending order.
+            //    1.2) If no match is found, look for available weights less than the target, in descending order.
+            //    1.3) If no match is found, look for available weights greater than 500, in ascending order.
+            //
+            //2) If a weight less than 400 is given, look for available weights less than the target, in descending order.
+            //   If no match is found, look for available weights greater than the target, in ascending order.
+            //
+            //3) If a weight greater than 500 is given, look for available weights greater than the target, in ascending order.
+            //If no match is found, look for available weights less than the target, in descending order.
+
+            List<InstalledTypeface> candidates = new List<InstalledTypeface>();
+            if (req.weightClass >= 400 && req.weightClass <= 500)
+            {
+                //eg req.weightClass= 400, (but we have weight only 500)
+
+                //1.1)Look for available weights between the target and 500, in ascending order.
+                for (int w = req.weightClass + 100; w <= 500;)
+                {
+                    typefaceGroup.CollectCandidateFont(req.style, (ushort)w, candidates);
+                    if (candidates.Count > 0)
+                    {
+                        //ok
+                        return candidates[0];
+                    }
+                    w += 100;
+                }
+                //1.2) If no match is found, look for available weights less than the target, in descending order.
+                for (int w = req.weightClass - 100; w >= 0;)
+                {
+                    typefaceGroup.CollectCandidateFont(req.style, (ushort)w, candidates);
+                    if (candidates.Count > 0)
+                    {
+                        //ok
+                        return candidates[0];
+                    }
+                    w -= 100;
+                }
+                //1.3) If no match is found, look for available weights greater than 500, in ascending order.
+                for (int w = 500; w < 1000; ++w)
+                {
+                    typefaceGroup.CollectCandidateFont(req.style, (ushort)w, candidates);
+                    if (candidates.Count > 0)
+                    {
+                        //ok
+                        return candidates[0];
+                    }
+                    w += 100;
+                }
+            }
+            else if (req.weightClass < 400)
+            {
+                //2) If a weight less than 400 is given, look for available weights less than the target, in descending order.
+                for (int w = req.weightClass - 100; w >= 0;)
+                {
+                    typefaceGroup.CollectCandidateFont(req.style, (ushort)w, candidates);
+                    if (candidates.Count > 0)
+                    {
+                        //ok
+                        return candidates[0];
+                    }
+                    w -= 100;
+                }
+
+                //If no match is found, look for available weights greater than the target, in ascending order.
+                for (int w = req.weightClass + 100; w < 1000;)
+                {
+                    typefaceGroup.CollectCandidateFont(req.style, (ushort)w, candidates);
+                    if (candidates.Count > 0)
+                    {
+                        //ok
+                        return candidates[0];
+                    }
+                    w += 100;
+                }
+            }
+            else if (req.weightClass > 500)
+            {
+                //3) If a weight greater than 500 is given, look for available weights greater than the target, in ascending order.
+                //If no match is found, look for available weights less than the target, in descending order.
+                for (int w = req.weightClass + 100; w < 1000;)
+                {
+                    typefaceGroup.CollectCandidateFont(req.style, (ushort)w, candidates);
+                    if (candidates.Count > 0)
+                    {
+                        //ok
+                        return candidates[0];
+                    }
+                    w += 100;
+                }
+                for (int w = req.weightClass - 100; w >= 0;)
+                {
+                    typefaceGroup.CollectCandidateFont(req.style, (ushort)w, candidates);
+                    if (candidates.Count > 0)
+                    {
+                        //ok
+                        return candidates[0];
+                    }
+                    w -= 100;
+                }
+            }
+
+
+            return null;//custom handler
+        }
     }
+
 }

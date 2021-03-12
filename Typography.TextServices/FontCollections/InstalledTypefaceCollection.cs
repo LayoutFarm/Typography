@@ -30,7 +30,7 @@ namespace Typography.FontCollections
             }
             public string FontName { get; }
 
-            internal void CollectCandidateFont(TypefaceStyle style, ushort weight, List<InstalledTypeface> candidates)
+            public void CollectCandidateFont(TypefaceStyle style, ushort weight, List<InstalledTypeface> candidates)
             {
                 if ((ushort)_first.WeightClass == weight && _first.TypefaceStyle == style)
                 {
@@ -230,9 +230,9 @@ namespace Typography.FontCollections
             _candidates.Clear();
             string upper = fontName.Trim().ToUpper();
 
-            if (_regNames.TryGetValue(upper, out InstalledTypefaceGroup found))
+            if (_regNames.TryGetValue(upper, out InstalledTypefaceGroup sameNames))
             {
-                found.CollectCandidateFont(wellknownSubFam, weight, _candidates);
+                sameNames.CollectCandidateFont(wellknownSubFam, weight, _candidates);
 
                 if (_candidates.Count == 1)
                 {
@@ -250,10 +250,9 @@ namespace Typography.FontCollections
                 }
             }
 
-
-            if (_otherNames.TryGetValue(upper, out found))
+            if (_otherNames.TryGetValue(upper, out InstalledTypefaceGroup otherNames))
             {
-                found.CollectCandidateFont(wellknownSubFam, weight, _candidates);
+                otherNames.CollectCandidateFont(wellknownSubFam, weight, _candidates);
 
                 if (_candidates.Count == 1)
                 {
@@ -270,7 +269,18 @@ namespace Typography.FontCollections
                     return _candidates[_candidates.Count - 1];
                 }
             }
-            return _fontNotFoundHandler?.Invoke(this, upper, wellknownSubFam, weight, null, null);
+
+            return _fontNotFoundHandler?.Invoke(new FontNotFoundRequest()
+            {
+                typefaceCollection = this,
+                foundSameNames = sameNames,
+                foundOtherNames = otherNames,
+                fontName = upper,
+                style = wellknownSubFam,
+                weightClass = weight,
+                available = null,
+                availableList = null
+            });
         }
 
         public IEnumerable<InstalledTypefaceGroup> GetInstalledTypefaceGroupIter()
@@ -326,6 +336,7 @@ namespace Typography.FontCollections
             {
                 //first time
                 s_intalledTypefaces = new InstalledTypefaceCollection();
+                s_intalledTypefaces.SetDefaultFontNotFoundHandler();
                 initdel(s_intalledTypefaces);
             }
             return s_intalledTypefaces;
@@ -540,7 +551,7 @@ namespace Typography.FontCollections
                 }
                 else if (installedTypefaceList.Count > 0)
                 {
-    
+
                     selectedTypeface = this.ResolveTypeface(installedTypefaceList[0]);//default
                     return selectedTypeface != null;
                 }
