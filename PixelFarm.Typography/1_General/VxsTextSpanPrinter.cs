@@ -669,12 +669,5 @@ namespace PixelFarm.Drawing
                 throw new NotSupportedException();
             }
         }
-
-
-
-
-
     }
-
-
 }

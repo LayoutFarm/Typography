@@ -46,8 +46,7 @@ namespace Typography.Text
 
 
         readonly FormattedGlyphPlanSeqPool _fmtGlyphPlanList = new FormattedGlyphPlanSeqPool();
-        readonly System.Collections.Generic.List<bool> _isSurrogates = new System.Collections.Generic.List<bool>();
-
+    
         public void CalculateUserCharGlyphAdvancePos(in Typography.Text.TextBufferSpan textBufferSpan, RequestFont font, ref TextSpanMeasureResult measureResult)
         {
             ResolvedFont resFont1 = _openFontTextService.ResolveFont(font);
@@ -56,63 +55,18 @@ namespace Typography.Text
             _p.FontSizeInPoints = font.SizeInPoints;
 
             _fmtGlyphPlanList.Clear();
-            _isSurrogates.Clear();
+            //_isSurrogates.Clear();
 
             if (textBufferSpan.IsUtf32Buffer)
             {
                 int[] rawBuffer = textBufferSpan.GetRawUtf32Buffer();
-                _p.PrepareFormattedStringList(rawBuffer, textBufferSpan.start, textBufferSpan.len, _fmtGlyphPlanList);
-
-                int pos1 = textBufferSpan.start;
-                for (int i = 0; i < textBufferSpan.len; ++i)
-                {
-                    int c = rawBuffer[pos1];
-                    InputReader.SeparateCodePoint(c, out char c0, out char c1);
-                    if (c1 != 0)
-                    {
-                        _isSurrogates.Add(true);
-                    }
-                    else
-                    {
-                        _isSurrogates.Add(false);
-                    }
-                    pos1++;
-                }
+                _p.PrepareFormattedStringList(rawBuffer, textBufferSpan.start, textBufferSpan.len, _fmtGlyphPlanList); 
             }
             else
             {
                 char[] rawBuffer = textBufferSpan.GetRawUtf16Buffer();
                 _p.PrepareFormattedStringList(rawBuffer, textBufferSpan.start, textBufferSpan.len, _fmtGlyphPlanList);
-
-                int pos1 = textBufferSpan.start;
-                for (int i = 0; i < textBufferSpan.len; ++i)
-                {
-                    char c = rawBuffer[pos1];
-                    if (char.IsHighSurrogate(c) && i < textBufferSpan.len - 1)
-                    {
-                        char c2 = rawBuffer[pos1 + 1];
-                        if (char.IsLowSurrogate(c2))
-                        {
-                            _isSurrogates.Add(true);
-                            _isSurrogates.Add(true);
-                            ++i;
-                            ++pos1;
-                        }
-                        else
-                        {
-                            throw new NotSupportedException();
-                        }
-                    }
-                    else if (char.IsLowSurrogate(c))
-                    {
-                        throw new NotSupportedException();
-                    }
-                    else
-                    {
-                        _isSurrogates.Add(false);
-                    }
-                    ++pos1;
-                }
+                 
             }
 
 
