@@ -332,7 +332,7 @@ namespace Typography.Text
 
     public static class TextCopyBufferExtension
     {
-        public static void AppendData(this TextCopyBuffer buff, char[] data)
+        public static void Append(this TextCopyBuffer buff, char[] data)
         {
             unsafe
             {
@@ -342,7 +342,7 @@ namespace Typography.Text
                 }
             }
         }
-        public static void AppendData(this TextCopyBuffer buff, string data)
+        public static void Append(this TextCopyBuffer buff, string data)
         {
             unsafe
             {
