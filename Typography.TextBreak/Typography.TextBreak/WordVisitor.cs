@@ -393,7 +393,7 @@ namespace Typography.TextBreak
         }
 
 
-        public bool Readline(out int begin, out int len, out LineEnd endlineWith)
+        public bool ReadLine(out int begin, out int len, out LineEnd endlineWith)
         {
             begin = _index;
 
