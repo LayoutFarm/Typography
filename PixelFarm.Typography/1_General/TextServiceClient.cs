@@ -46,7 +46,7 @@ namespace Typography.Text
 
 
         readonly FormattedGlyphPlanSeqPool _fmtGlyphPlanList = new FormattedGlyphPlanSeqPool();
-    
+
         public void CalculateUserCharGlyphAdvancePos(in Typography.Text.TextBufferSpan textBufferSpan, RequestFont font, ref TextSpanMeasureResult measureResult)
         {
             ResolvedFont resFont1 = _openFontTextService.ResolveFont(font);
@@ -60,13 +60,13 @@ namespace Typography.Text
             if (textBufferSpan.IsUtf32Buffer)
             {
                 int[] rawBuffer = textBufferSpan.GetRawUtf32Buffer();
-                _p.PrepareFormattedStringList(rawBuffer, textBufferSpan.start, textBufferSpan.len, _fmtGlyphPlanList); 
+                _p.PrepareFormattedStringList(rawBuffer, textBufferSpan.start, textBufferSpan.len, _fmtGlyphPlanList);
             }
             else
             {
                 char[] rawBuffer = textBufferSpan.GetRawUtf16Buffer();
                 _p.PrepareFormattedStringList(rawBuffer, textBufferSpan.start, textBufferSpan.len, _fmtGlyphPlanList);
-                 
+
             }
 
 
@@ -86,7 +86,7 @@ namespace Typography.Text
                     int seqLen = seq.Count;
                     //
                     ResolvedFont resFont = fmtSeq.ResolvedFont;
-                    float scale1 = resFont.GetScaleToPixelFromPointUnit();
+                    float scale = resFont.GetScaleToPixelFromPointUnit();
 
                     //1. prefix whitespace count
                     int ws_count = fmtSeq.PrefixWhitespaceCount;
@@ -114,7 +114,7 @@ namespace Typography.Text
                                 maxOffsetY = glyphPlan.OffsetY;
                             }
                         }
-                        outputTotalW += measureResult.outputXAdvances[begin_glyph_at + glyphPlan.input_cp_offset] = (int)Math.Round(glyphPlan.AdvanceX * scale1);
+                        outputTotalW += measureResult.outputXAdvances[begin_glyph_at + glyphPlan.input_cp_offset] = (int)Math.Round(glyphPlan.AdvanceX * scale);
                         max_cp_offset = Math.Max(max_cp_offset, glyphPlan.input_cp_offset);
                         //if (_isSurrogates[pos])
                         //{
@@ -130,10 +130,10 @@ namespace Typography.Text
 
 
                     ws_count = fmtSeq.PostfixWhitespaceCount;
-                    
-                    pos += max_cp_offset+1;
-                         
-                     
+
+                    pos += max_cp_offset + 1;
+
+
 
                     for (int n = 0; n < ws_count; ++n)
                     {
