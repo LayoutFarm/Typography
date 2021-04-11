@@ -130,11 +130,10 @@ namespace Typography.Text
 
 
                     ws_count = fmtSeq.PostfixWhitespaceCount;
-                    if (max_cp_offset > 0)
-                    {
-                        pos += max_cp_offset;
-                        pos++;
-                    }
+                    
+                    pos += max_cp_offset+1;
+                         
+                     
 
                     for (int n = 0; n < ws_count; ++n)
                     {
