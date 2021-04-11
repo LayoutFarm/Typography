@@ -97,7 +97,7 @@ namespace Typography.Text
                     }
 
                     int begin_glyph_at = pos;
-                    int max_cp_offset = -1;
+                    int max_cp_offset = 0;
                     for (int s = 0; s < seqLen; ++s)
                     {
                         //for each glyph index
