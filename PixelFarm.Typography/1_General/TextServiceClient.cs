@@ -86,7 +86,7 @@ namespace Typography.Text
                     int seqLen = seq.Count;
                     //
                     ResolvedFont resFont = fmtSeq.ResolvedFont;
-                    float scale = resFont.GetScaleToPixelFromPointUnit();
+                    float scale1 = resFont.GetScaleToPixelFromPointUnit();
 
                     //1. prefix whitespace count
                     int ws_count = fmtSeq.PrefixWhitespaceCount;
@@ -114,7 +114,7 @@ namespace Typography.Text
                                 maxOffsetY = glyphPlan.OffsetY;
                             }
                         }
-                        outputTotalW += measureResult.outputXAdvances[begin_glyph_at + glyphPlan.input_cp_offset] = (int)Math.Round(glyphPlan.AdvanceX * scale);
+                        outputTotalW += measureResult.outputXAdvances[begin_glyph_at + glyphPlan.input_cp_offset] = (int)Math.Round(glyphPlan.AdvanceX * scale1);
                         max_cp_offset = Math.Max(max_cp_offset, glyphPlan.input_cp_offset);
                         //if (_isSurrogates[pos])
                         //{
@@ -131,8 +131,10 @@ namespace Typography.Text
 
                     ws_count = fmtSeq.PostfixWhitespaceCount;
 
-                    pos += max_cp_offset + 1;
-
+                    if (seqLen > 0)
+                    {
+                        pos += max_cp_offset + 1;
+                    }
 
 
                     for (int n = 0; n < ws_count; ++n)
