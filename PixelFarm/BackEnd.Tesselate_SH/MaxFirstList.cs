@@ -152,7 +152,7 @@ namespace Tesselate
             }
             else
             {
-                if (begin == end)
+                if (begin >= end)
                 {
                     return -1;//not found
                 }
