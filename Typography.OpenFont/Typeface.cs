@@ -101,7 +101,7 @@ namespace Typography.OpenFont
         internal Kern KernTable { get; set; }
         internal Gasp GaspTable { get; set; }
         internal HorizontalHeader HheaTable { get; set; }
-        internal OS2Table OS2Table { get; set; }
+        public OS2Table OS2Table { get; set; }
         //
         public bool HasPrepProgramBuffer => PrepProgramBuffer != null;
 
