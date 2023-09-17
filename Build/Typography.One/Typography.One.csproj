@@ -34,12 +34,12 @@
     <Compile Include="..\..\PixelFarm.Typography\1_General\TextServiceClient.cs" Link="Ty_Text\TextServiceClient.cs" />
     <Compile Include="..\..\PixelFarm.Typography\3_Typography_Contours\GlyphMeshCollection.cs" Link="Ty_Contours\GlyphMeshCollection.cs" />
     <Compile Include="..\..\PixelFarm.Typography\3_Typography_Contours\GlyphOutlineBuilderBase.cs" Link="Ty_Contours\GlyphOutlineBuilderBase.cs" />
-    <Compile Include="..\..\PixelFarm\PixelFarm.BasicVisualElements_SH\BasicGeometries.cs" Link="Drawing_Ess\BasicGeometries.cs" />
-    <Compile Include="..\..\PixelFarm\PixelFarm.Painter_Layer2_SH\Drawing\TextBaseline.cs" Link="Drawing_Ess\TextBaseline.cs" />
-    <Compile Include="..\..\PixelFarm\PixelFarm.Painter_Layer2_SH\_ESS_LINK_WITH_TY\LenAndLenUnit.cs" Link="Drawing_Ess\LenAndLenUnit.cs" />
-    <Compile Include="..\..\PixelFarm\PixelFarm.Painter_Layer2_SH\_ESS_LINK_WITH_TY\RequestFont.cs" Link="Drawing_Ess\RequestFont.cs" />
-    <Compile Include="..\..\PixelFarm\PixelFarm.Painter_Layer2_SH\_ESS_LINK_WITH_TY\TextBufferSpan.cs" Link="Drawing_Ess\TextBufferSpan.cs" />
-    <Compile Include="..\..\PixelFarm\PixelFarm.Painter_Layer2_SH\_ESS_LINK_WITH_TY\TextSpanMeasureResult.cs" Link="Drawing_Ess\TextSpanMeasureResult.cs" />
+    <Compile Include="..\..\Mini\PixelFarm.BasicVisualElements_SH\BasicGeometries.cs" Link="Drawing_Ess\BasicGeometries.cs" />
+    <Compile Include="..\..\Mini\PixelFarm.Painter_Layer2_SH\Drawing\TextBaseline.cs" Link="Drawing_Ess\TextBaseline.cs" />
+    <Compile Include="..\..\Mini\PixelFarm.Painter_Layer2_SH\_ESS_LINK_WITH_TY\LenAndLenUnit.cs" Link="Drawing_Ess\LenAndLenUnit.cs" />
+    <Compile Include="..\..\Mini\PixelFarm.Painter_Layer2_SH\_ESS_LINK_WITH_TY\RequestFont.cs" Link="Drawing_Ess\RequestFont.cs" />
+    <Compile Include="..\..\Mini\PixelFarm.Painter_Layer2_SH\_ESS_LINK_WITH_TY\TextBufferSpan.cs" Link="Drawing_Ess\TextBufferSpan.cs" />
+    <Compile Include="..\..\Mini\PixelFarm.Painter_Layer2_SH\_ESS_LINK_WITH_TY\TextSpanMeasureResult.cs" Link="Drawing_Ess\TextSpanMeasureResult.cs" />
   </ItemGroup>
 
   <ItemGroup>
