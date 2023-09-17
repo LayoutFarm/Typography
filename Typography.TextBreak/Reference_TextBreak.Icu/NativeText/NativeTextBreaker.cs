@@ -6,47 +6,23 @@
 //-----------------------------------
 using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices; 
+using System.IO;
+using System.Runtime.InteropServices;
 namespace Typography.TextBreak.ICU
 {
-    static class NativeTextBreakerLib
-    {
-        const string myfontLib = NativeDLL.MyFtLibName;
-
-        [DllImport(myfontLib, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void MyFtLibGetFullVersion(out int major, out int minor, out int revision);
-        [DllImport(myfontLib, CharSet = CharSet.Ansi)]
-        public static extern void MyFt_IcuSetDataDir(string datadir);
-        [DllImport(myfontLib)]
-        public static unsafe extern void MyFt_IcuSetData(void* data, out int err);
-        [DllImport(myfontLib, CharSet = CharSet.Unicode)]
-        public static unsafe extern IntPtr MtFt_UbrkOpen(UBreakIteratorType iterType, byte[] locale, char* startChar, int len, out int err);
-        [DllImport(myfontLib)]
-        public static extern void MtFt_UbrkClose(IntPtr naitveBreakIter);
-        [DllImport(myfontLib)]
-        public static extern int MtFt_UbrkFirst(IntPtr nativeBreakIter);
-        [DllImport(myfontLib)]
-        public static extern int MtFt_UbrkNext(IntPtr nativeBreakIter);
-        [DllImport(myfontLib)]
-        public static extern int MtFt_UbrkGetRuleStatus(IntPtr nativeBreakIter);
-    }
-
-
-
-
 
     /// <summary>
     /// text breaker with icu4c
     /// </summary>
     public class NativeTextBreaker : TextBreaker
     {
-        string locale;
-        byte[] localebuff;
+        string _locale;
+        byte[] _localebuff;
         public NativeTextBreaker(TextBreakKind breakKind, string locale)
         {
             this.BreakKind = breakKind;
-            this.locale = locale;
-            localebuff = System.Text.Encoding.ASCII.GetBytes(locale);
+            this._locale = locale;
+            _localebuff = System.Text.Encoding.ASCII.GetBytes(locale);
         }
         public override void DoBreak(char[] input, int start, int len, OnBreak onbreak)
         {
@@ -69,19 +45,19 @@ namespace Typography.TextBreak.ICU
             {
                 fixed (char* h = &input[start])
                 {
-                    IntPtr nativeIter = NativeTextBreakerLib.MtFt_UbrkOpen(type, localebuff, h, len, out errCode);
-                    int cur = NativeTextBreakerLib.MtFt_UbrkFirst(nativeIter);
+                    IntPtr nativeIter = Icu4c.ubrk_open(type, _localebuff, h, len, out errCode);
+                    int cur = Icu4c.ubrk_first(nativeIter);
                     while (cur != DONE)
                     {
-                        int next = NativeTextBreakerLib.MtFt_UbrkNext(nativeIter);
-                        int status = NativeTextBreakerLib.MtFt_UbrkGetRuleStatus(nativeIter);
+                        int next = Icu4c.ubrk_next(nativeIter);
+                        int status = Icu4c.ubrk_getRuleStatus(nativeIter);
                         if (next != DONE && AddToken(type, status))
                         {
                             onbreak(new SplitBound(cur, next - cur));
                         }
                         cur = next;
                     }
-                    NativeTextBreakerLib.MtFt_UbrkClose(nativeIter);
+                    Icu4c.ubrk_close(nativeIter);
                 }
             }
         }
@@ -102,8 +78,36 @@ namespace Typography.TextBreak.ICU
             return false;
         }
 
-        //this is text breaker impl with ICU lib
-        static InMemoryIcuDataHolder dataHolder;
+
+        static bool s_init = false;
+        public static void LoadLib(string iculibDir, int version)
+        {
+            //TODO:
+            if (s_init) { return; }
+
+            s_init = true;
+            Icu4c.Load(iculibDir, version);
+            unsafe
+            {
+                //check version
+                byte[] version_buffer = new byte[20];
+                fixed (byte* version_buffer_ptr = &version_buffer[0])
+                {
+                    Icu4c.u_getVersion(version_buffer_ptr);
+                }
+                s_versionMajor = version_buffer[0];
+                s_versionMinor = version_buffer[1];
+            }
+        }
+
+        static int s_versionMajor;
+        static int s_versionMinor;
+        public static void GetVersion(out int major, out int minor)
+        {
+            major = s_versionMajor;
+            minor = s_versionMinor;
+        }
+        static InMemoryIcuDataHolder s_dataHolder;
 
         static string s_icuDataFile;
         static bool s_isDataLoaded;
@@ -124,13 +128,11 @@ namespace Typography.TextBreak.ICU
             s_isDataLoaded = true;
             s_icuDataFile = icudatafile;
             //----------
-            int major, minor, revision;
-            NativeTextBreakerLib.MyFtLibGetFullVersion(out major, out minor, out revision);
-            if (dataHolder == null)
+
+            if (s_dataHolder == null)
             {
-               
-                dataHolder = new InMemoryIcuDataHolder(icudatafile);
-                dataHolder.Use();
+                s_dataHolder = new InMemoryIcuDataHolder(icudatafile);
+                s_dataHolder.Use();
             }
         }
 
@@ -190,69 +192,121 @@ namespace Typography.TextBreak.ICU
         SEP = 100,
         SEP_LIMIT = 200,
     }
-    //------
+
+
+
+
+
     class InMemoryIcuDataHolder : IDisposable
     {
-        IntPtr unmanagedICUMemData;
+        IntPtr _unmanagedICUMemData;
         public InMemoryIcuDataHolder(string loadIcuDataFromFile)
         {
             byte[] inMemoryICUData = System.IO.File.ReadAllBytes(loadIcuDataFromFile);
-            unmanagedICUMemData = System.Runtime.InteropServices.Marshal.AllocHGlobal(inMemoryICUData.Length);
-            System.Runtime.InteropServices.Marshal.Copy(inMemoryICUData, 0, unmanagedICUMemData, inMemoryICUData.Length);
+            _unmanagedICUMemData = System.Runtime.InteropServices.Marshal.AllocHGlobal(inMemoryICUData.Length);
+            System.Runtime.InteropServices.Marshal.Copy(inMemoryICUData, 0, _unmanagedICUMemData, inMemoryICUData.Length);
         }
         public void Use()
         {
             int errCode;
-            unsafe
+            if (_unmanagedICUMemData != IntPtr.Zero)
             {
-                NativeTextBreakerLib.MyFt_IcuSetData((void*)unmanagedICUMemData, out errCode);
+                Icu4c.urk_setCommonData(_unmanagedICUMemData, out errCode);
             }
+
         }
         public void Dispose()
         {
-            if (unmanagedICUMemData != IntPtr.Zero)
+            if (_unmanagedICUMemData != IntPtr.Zero)
             {
-                System.Runtime.InteropServices.Marshal.FreeHGlobal(unmanagedICUMemData);
-                unmanagedICUMemData = IntPtr.Zero;
+                System.Runtime.InteropServices.Marshal.FreeHGlobal(_unmanagedICUMemData);
+                _unmanagedICUMemData = IntPtr.Zero;
             }
         }
     }
 
 
-#if DEBUG
-    public static class dbugTestMyFtLib
+    static class Icu4c
     {
-        static InMemoryIcuDataHolder dataHolder;
+        static IntPtr s_icuuclib;
+        internal static udata_setCommonData urk_setCommonData;
+        internal static ubrk_open ubrk_open;
+        internal static ubrk_close ubrk_close;
+        internal static ubrk_first ubrk_first;
+        internal static ubrk_next ubrk_next;
+        internal static ubrk_getRuleStatus ubrk_getRuleStatus;
+        internal static u_getVersion u_getVersion;
 
-        public static void Test1()
+
+        public static void Load(string icuLibDirectory, int version)
         {
+            string cur_dir = Directory.GetCurrentDirectory(); //save
+            Directory.SetCurrentDirectory(icuLibDirectory);
+            s_icuuclib = LoadLibrary($"icuuc{version}.dll");
 
-
-            int major, minor, revision;
-            NativeTextBreakerLib.MyFtLibGetFullVersion(out major, out minor, out revision);
-            NativeTextBreaker.SetICUDataFile(@"icudt57l\icudt57l.dat");
-
-            string str = "ABCD EFGH IJKL\0";
-            var textBreaker = new NativeTextBreaker(TextBreakKind.Word, "en-US");
-            List<SplitBound> tokens = new List<SplitBound>();
-            textBreaker.DoBreak(str, splitBound =>
+#if DEBUG
+            if (s_icuuclib == IntPtr.Zero)
             {
-                tokens.Add(splitBound);
-            });
 
-        }
-        public static void Test2()
-        {
-            //string str = "ABCD EFGH IJKL\0";
-            //var textBreaker = new ManagedTextBreaker(TextBreakKind.Word, "en-US");
-            //List<SplitBound> tokens = new List<SplitBound>();
-            //textBreaker.DoBreak(str, splitBound =>
-            //{
-            //    tokens.Add(splitBound);
-            //});
-
-        }
-    }
+            }
 #endif
+
+            GetFuncPtr(s_icuuclib, $"udata_setCommonData_{version}", out urk_setCommonData);
+            GetFuncPtr(s_icuuclib, $"ubrk_open_{version}", out ubrk_open);
+            GetFuncPtr(s_icuuclib, $"ubrk_close_{version}", out ubrk_close);
+            GetFuncPtr(s_icuuclib, $"ubrk_first_{version}", out ubrk_first);
+            GetFuncPtr(s_icuuclib, $"ubrk_next_{version}", out ubrk_next);
+            GetFuncPtr(s_icuuclib, $"ubrk_getRuleStatus_{version}", out ubrk_getRuleStatus);
+            GetFuncPtr(s_icuuclib, $"u_getVersion_{version}", out u_getVersion);
+            Directory.SetCurrentDirectory(cur_dir); //restore    
+        }
+
+        public static void Unload()
+        {
+            FreeLibrary(s_icuuclib);
+            s_icuuclib = IntPtr.Zero;
+            urk_setCommonData = null;
+            ubrk_open = null;
+            ubrk_close = null;
+            ubrk_first = null;
+            ubrk_next = null;
+            ubrk_getRuleStatus = null;
+        }
+        static bool GetFuncPtr<T>(IntPtr module_ptr, string funcName, out T funcptr)
+        {
+            IntPtr ptr = GetProcAddress(module_ptr, funcName);       //win32
+            if (ptr == IntPtr.Zero)
+            {
+                funcptr = default;
+                return false;
+            }
+            funcptr = (T)(object)System.Runtime.InteropServices.Marshal.GetDelegateForFunctionPointer(ptr, typeof(T));
+            return true;
+        }
+
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        static extern bool FreeLibrary(IntPtr hModule);
+        [DllImport("kernel32", CharSet = CharSet.Ansi, ExactSpelling = true, SetLastError = true)]
+        static extern IntPtr GetProcAddress(IntPtr hModule, string procName);
+        [DllImport("kernel32", SetLastError = true, CharSet = CharSet.Ansi)]
+        static extern IntPtr LoadLibrary([MarshalAs(UnmanagedType.LPStr)] string lpFileName);
+    }
+
+    [System.Runtime.InteropServices.UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    delegate void udata_setCommonData(IntPtr data, out int err);
+    [System.Runtime.InteropServices.UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    unsafe delegate IntPtr ubrk_open(UBreakIteratorType iterType, byte[] locale, char* startChar, int len, out int err);
+    [System.Runtime.InteropServices.UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    delegate void ubrk_close(IntPtr nativeBreakIter);
+    [System.Runtime.InteropServices.UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    delegate int ubrk_first(IntPtr nativeBreakIter);
+    [System.Runtime.InteropServices.UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    delegate int ubrk_next(IntPtr nativeBreakIter);
+    [System.Runtime.InteropServices.UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    delegate int ubrk_getRuleStatus(IntPtr nativeBreakIter);
+    [System.Runtime.InteropServices.UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    unsafe delegate void u_getVersion(/*icu version max len =20*/byte* version);  //see uversion.h
 
 }

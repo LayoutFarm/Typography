@@ -5,6 +5,8 @@ using Typography.TextBreak;
 
 namespace Typography.OpenFont
 {
+    using static InstallationHelper;
+
     //https://docs.microsoft.com/en-us/typography/opentype/spec/os2#ulunicoderange1-bits-031ulunicoderange2-bits-3263ulunicoderange3-bits-6495ulunicoderange4-bits-96127     
 
     public class ScriptLangInfo
@@ -784,10 +786,12 @@ namespace Typography.OpenFont
 
             var scriptTagDef = new ScriptTagDef(tag, name);
 
-            if (!s_registerScriptTags.ContainsKey(tag))
+            if (s_registerScriptTags.ContainsKey(tag))
             {
                 //duplicated script tag
+#if DEBUG
                 System.Diagnostics.Debug.WriteLine("script_tags: duplicated");
+#endif
             }
             s_registerScriptTags[tag] = scriptTagDef;
 
@@ -968,40 +972,42 @@ Zanabazar_Square__Zanabazarin_Dörböljin_Useg__Xewtee_Dörböljin_Bicig__Horizo
 
     }
 
-    public partial class ScriptLangs
+
+    class MyLog2
     {
-        //https://docs.microsoft.com/en-us/typography/opentype/spec/scripttags
-        //https://docs.microsoft.com/en-us/typography/opentype/spec/languagetags
-        //--------------------------------------------------------------------
-        readonly static Dictionary<string, int> s_registerNames = new Dictionary<string, int>();
-        readonly static Dictionary<string, ScriptLangInfo> s_registeredScriptTags = new Dictionary<string, ScriptLangInfo>();
-        readonly static Dictionary<string, ScriptLangInfo> s_registerScriptFromFullNames = new Dictionary<string, ScriptLangInfo>();
-        readonly static List<UnicodeRangeMapWithScriptLang> s_unicodeLangToScriptLang = new List<UnicodeRangeMapWithScriptLang>();
-
-        readonly static Dictionary<string, UnicodeRangeInfo[]> s_registeredScriptTagsToUnicodeLangRanges = new Dictionary<string, UnicodeRangeInfo[]>();
-
-        readonly struct UnicodeRangeMapWithScriptLang
+        [System.Diagnostics.Conditional("DEBUG")]
+        public static void dbugShowMsg(string msg)
         {
-            public readonly ScriptLangInfo scLang;
-            public readonly UnicodeRangeInfo unicodeLangRange;
-            public UnicodeRangeMapWithScriptLang(UnicodeRangeInfo unicodeRangeBits, ScriptLangInfo scLang)
-            {
-                this.scLang = scLang;
-                this.unicodeLangRange = unicodeRangeBits;
-            }
-            public bool IsInRange(char c) => unicodeLangRange.IsInRange(c);
+            string current_dir = System.IO.Directory.GetCurrentDirectory();
+            System.IO.File.AppendAllText("temp1.txt", msg + "\r\n");
+            // MessageBox.Show(msg);
         }
+    }
 
-        static ScriptLangInfo _(string fullname, string shortname, params UnicodeRangeInfo[] langRanges)
+    static class InstallationHelper
+    {
+        public static ScriptLangInfo _(string fullname, string shortname, UnicodeRangeInfo rangeInfo)
         {
+            MyLog2.dbugShowMsg("inst_helper15");
+            return _(fullname, shortname, new UnicodeRangeInfo[] { rangeInfo });
+        }
+        public static ScriptLangInfo _(string fullname, string shortname, UnicodeRangeInfo[] langRanges = null)
+        {
+            MyLog2.dbugShowMsg("inst_helper11");
 
-            if (s_registeredScriptTags.ContainsKey(shortname))
+            if (langRanges == null)
+            {
+                langRanges = new UnicodeRangeInfo[0];
+            }
+
+            if (ScriptLangs.s_registeredScriptTags.ContainsKey(shortname))
             {
                 if (shortname == "kana")
                 {
                     //***
                     //Hiragana and Katakana 
-                    //both have same short name "kana"                     
+                    //both have same short name "kana"
+                    MyLog2.dbugShowMsg("inst_helper12");
                     return new ScriptLangInfo(fullname, shortname, langRanges);
                 }
                 else
@@ -1012,34 +1018,66 @@ Zanabazar_Square__Zanabazarin_Dörböljin_Useg__Xewtee_Dörböljin_Bicig__Horizo
             }
             else
             {
-                int internalName = s_registerNames.Count;
-                s_registerNames[shortname] = internalName;
+                int internalName = ScriptLangs.s_registerNames.Count;
+                ScriptLangs.s_registerNames[shortname] = internalName;
                 var scriptLang = new ScriptLangInfo(fullname, shortname, langRanges);
-                s_registeredScriptTags.Add(shortname, scriptLang);
+                ScriptLangs.s_registeredScriptTags.Add(shortname, scriptLang);
                 //                 
-                s_registerScriptFromFullNames[fullname] = scriptLang;
+                ScriptLangs.s_registerScriptFromFullNames[fullname] = scriptLang;
 
                 //also register unicode langs with the script lang
 
                 for (int i = langRanges.Length - 1; i >= 0; --i)
                 {
-                    s_unicodeLangToScriptLang.Add(new UnicodeRangeMapWithScriptLang(langRanges[i], scriptLang));
+                    ScriptLangs.s_unicodeLangToScriptLang.Add(new UnicodeRangeMapWithScriptLang(langRanges[i], scriptLang));
                 }
-
-
                 if (langRanges.Length > 0)
                 {
-                    s_registeredScriptTagsToUnicodeLangRanges.Add(shortname, langRanges);
+                    ScriptLangs.s_registeredScriptTagsToUnicodeLangRanges.Add(shortname, langRanges);
                 }
+
+                MyLog2.dbugShowMsg("inst_helper14");
                 return scriptLang;
             }
         }
+    }
+
+    readonly struct UnicodeRangeMapWithScriptLang
+    {
+        public readonly ScriptLangInfo scLang;
+        public readonly UnicodeRangeInfo unicodeLangRange;
+        public UnicodeRangeMapWithScriptLang(UnicodeRangeInfo unicodeRangeBits, ScriptLangInfo scLang)
+        {
+            this.scLang = scLang;
+            this.unicodeLangRange = unicodeRangeBits;
+        }
+        public bool IsInRange(char c) => unicodeLangRange.IsInRange(c);
+    }
+
+    public class ScriptLangs
+    {
+        //https://docs.microsoft.com/en-us/typography/opentype/spec/scripttags
+        //https://docs.microsoft.com/en-us/typography/opentype/spec/languagetags
+        //--------------------------------------------------------------------
+        internal readonly static Dictionary<string, int> s_registerNames = new Dictionary<string, int>();
+        internal readonly static Dictionary<string, ScriptLangInfo> s_registeredScriptTags = new Dictionary<string, ScriptLangInfo>();
+        internal readonly static Dictionary<string, ScriptLangInfo> s_registerScriptFromFullNames = new Dictionary<string, ScriptLangInfo>();
+        internal readonly static List<UnicodeRangeMapWithScriptLang> s_unicodeLangToScriptLang = new List<UnicodeRangeMapWithScriptLang>();
+
+        internal readonly static Dictionary<string, UnicodeRangeInfo[]> s_registeredScriptTagsToUnicodeLangRanges = new Dictionary<string, UnicodeRangeInfo[]>();
+
+
+
+
+
         public static bool TryGetUnicodeLangRangesArray(string langShortName, out UnicodeRangeInfo[] unicodeLangRanges)
         {
+            Init();
             return s_registeredScriptTagsToUnicodeLangRanges.TryGetValue(langShortName, out unicodeLangRanges);
         }
         public static bool TryGetScriptLang(int codepoint, out ScriptLangInfo scLang)
         {
+            Init();
             if (UnicodeRangeFinder.GetUniCodeRangeFor(codepoint, out UnicodeRangeInfo rangeInfo, out SpanBreakInfo breakInfo))
             {
 
@@ -1049,6 +1087,7 @@ Zanabazar_Square__Zanabazarin_Dörböljin_Useg__Xewtee_Dörböljin_Bicig__Horizo
         }
         public static bool TryGetUnicodeRangeInfo(int codepoint, out UnicodeRangeInfo unicodeRangeInfo)
         {
+            Init();
             if (UnicodeRangeFinder.GetUniCodeRangeFor(codepoint, out unicodeRangeInfo, out SpanBreakInfo breakInfo))
             {
                 return true;
@@ -1057,231 +1096,258 @@ Zanabazar_Square__Zanabazarin_Dörböljin_Useg__Xewtee_Dörböljin_Bicig__Horizo
         }
         public static ScriptLangInfo GetRegisteredScriptLang(string shortname)
         {
+            Init();
             s_registeredScriptTags.TryGetValue(shortname, out ScriptLangInfo found);
             return found;
         }
         public static ScriptLangInfo GetRegisteredScriptLangFromLanguageName(string languageName)
         {
+            Init();
             s_registerScriptFromFullNames.TryGetValue(languageName, out ScriptLangInfo found);
             return found;
         }
+
+
+        static bool s_init;
+        public static void Init()
+        {
+            MyLog2.dbugShowMsg("sc05:001");
+
+            if (s_init) { return; }
+
+            s_init = true;
+
+            //MyLog2.dbugShowMsg("sc05:002.2");
+            //UnicodeRangeInfo[] aa = new UnicodeRangeInfo[10];
+
+            //MyLog2.dbugShowMsg("sc05:002.2.2");
+            //ScriptLangInfo ss = new ScriptLangInfo("a", "b", null);
+            //MyLog2.dbugShowMsg("sc05:002.2.3");
+
+            ////_("Adlam", "adlm");
+            ////_("Anatolian Hieroglyphs", "hluw");
+
+            MyLog2.dbugShowMsg("sc05:003.1");
+
+            ScriptLangInfo
+           //
+           Adlam = _("Adlam", "adlm"),
+           Anatolian_Hieroglyphs = _("Anatolian Hieroglyphs", "hluw"),
+           Arabic = _("Arabic", "arab",
+           new UnicodeRangeInfo[] {
+               Unicode13RangeInfoList.Arabic,
+               Unicode13RangeInfoList.Arabic_Extended_A,
+               Unicode13RangeInfoList.Arabic_Mathematical_Alphabetic_Symbols,
+               Unicode13RangeInfoList.Arabic_Presentation_Forms_A,
+               Unicode13RangeInfoList.Arabic_Presentation_Forms_B,
+               Unicode13RangeInfoList.Arabic_Supplement }
+           ),
+           Armenian = _("Armenian", "armn", new UnicodeRangeInfo[] { Unicode13RangeInfoList.Armenian, Unicode13RangeInfoList.Armenian_Ligatures }),
+           Avestan = _("Avestan", "avst"),
+           //
+           Balinese = _("Balinese", "bali", Unicode13RangeInfoList.Balinese),
+           Bamum = _("Bamum", "bamu"),
+           Bassa_Vah = _("Bassa Vah ", "bass"),
+           Batak = _("Batak", "batk"),
+           Bengali = _("Bengali", "beng", Unicode13RangeInfoList.Bengali),
+           Bengali_v_2 = _("Bengali v.2", "bng2", Unicode13RangeInfoList.Bengali),
+           Bhaiksuki = _("Bhaiksuki", "bhks"),
+           Brahmi = _("Brahmi", "brah"),
+           Braille = _("Braille", "brai", Unicode13RangeInfoList.Braille_Patterns),
+           Buginese = _("Buginese", "bugi", Unicode13RangeInfoList.Buginese),
+           Buhid = _("Buhid", "buhd", Unicode13RangeInfoList.Buhid),
+           Byzantine_Music = _("Byzantine Music", "byzm", Unicode13RangeInfoList.Byzantine_Musical_Symbols),
+           //
+           Canadian_Syllabics = _("Canadian Syllabics", "cans", Unicode13RangeInfoList.Unified_Canadian_Aboriginal_Syllabics),
+           Carian = _("Carian", "cari", Unicode13RangeInfoList.Carian),
+           Caucasian_Albanian = _("Caucasian Albanian", "aghb"),
+           Chakma = _("Chakma", "cakm"),
+           Cham = _("Cham", "cham", Unicode13RangeInfoList.Cham),
+           Cherokee = _("Cherokee", "cher", Unicode13RangeInfoList.Cherokee),
+           CJK_Ideographic = _("CJK Ideographic", "hani",
+           new UnicodeRangeInfo[] {
+               Unicode13RangeInfoList.CJK_Compatibility,
+               Unicode13RangeInfoList.CJK_Compatibility_Forms,
+               Unicode13RangeInfoList.CJK_Compatibility_Ideographs,
+               Unicode13RangeInfoList.CJK_Compatibility_Ideographs_Supplement,
+               Unicode13RangeInfoList.CJK_Unified_Ideographs_Extension_A,
+               Unicode13RangeInfoList.CJK_Unified_Ideographs_Extension_B,
+               Unicode13RangeInfoList.CJK_Radicals_Supplement,
+               Unicode13RangeInfoList.CJK_Strokes
+           }),
+
+
+           Coptic = _("Coptic", "copt", Unicode13RangeInfoList.Coptic),
+           Cypriot_Syllabary = _("Cypriot Syllabary", "cprt", Unicode13RangeInfoList.Cypriot_Syllabary),
+           Cyrillic = _("Cyrillic", "cyrl",
+               new UnicodeRangeInfo[] {
+                   Unicode13RangeInfoList.Cyrillic,
+                   Unicode13RangeInfoList.Cyrillic_Extended_A,
+                   Unicode13RangeInfoList.Cyrillic_Extended_B }),
+           ////
+           Default = _("Default", "DFLT"),
+           Deseret = _("Deseret", "dsrt", Unicode13RangeInfoList.Deseret),
+           Devanagari = _("Devanagari", "deva", Unicode13RangeInfoList.Devanagari),
+           Devanagari_v_2 = _("Devanagari v.2", "dev2", Unicode13RangeInfoList.Devanagari),
+           Duployan = _("Duployan", "dupl"),
+           ////            
+           Egyptian_Hieroglyphs = _("Egyptian Hieroglyphs", "egyp"),
+           Elbasan = _("Elbasan", "elba"),
+           Ethiopic = _("Ethiopic", "ethi",
+               new UnicodeRangeInfo[] {
+                   Unicode13RangeInfoList.Ethiopic,
+                   Unicode13RangeInfoList.Ethiopic_Extended,
+                   Unicode13RangeInfoList.Ethiopic_Supplement }),
+           //// 
+           Georgian = _("Georgian", "geor", new UnicodeRangeInfo[] { Unicode13RangeInfoList.Georgian, Unicode13RangeInfoList.Georgian_Supplement }),
+           Glagolitic = _("Glagolitic", "glag", Unicode13RangeInfoList.Glagolitic),
+           Gothic = _("Gothic", "goth", Unicode13RangeInfoList.Gothic),
+           Grantha = _("Grantha", "gran"),
+           Greek = _("Greek", "grek", new UnicodeRangeInfo[] { Unicode13RangeInfoList.Greek_and_Coptic, Unicode13RangeInfoList.Greek_Extended }),
+           Gujarati = _("Gujarati", "gujr", Unicode13RangeInfoList.Gujarati),
+           Gujarati_v_2 = _("Gujarati v.2", "gjr2", Unicode13RangeInfoList.Gujarati),
+           Gurmukhi = _("Gurmukhi", "guru", Unicode13RangeInfoList.Gurmukhi),
+           Gurmukhi_v_2 = _("Gurmukhi v.2", "gur2", Unicode13RangeInfoList.Gurmukhi),
+           //// 
+           Hangul = _("Hangul", "hang", Unicode13RangeInfoList.Hangul_Jamo),
+           Hangul_Jamo = _("Hangul Jamo", "jamo", Unicode13RangeInfoList.Hangul_Jamo),
+           Hanunoo = _("Hanunoo", "hano", Unicode13RangeInfoList.Hanunoo),
+           Hatran = _("Hatran", "hatr"),
+           Hebrew = _("Hebrew", "hebr", Unicode13RangeInfoList.Hebrew),
+           Hiragana = _("Hiragana", "kana", Unicode13RangeInfoList.Hiragana),
+           //// 
+           Imperial_Aramaic = _("Imperial Aramaic", "armi"),
+           Inscriptional_Pahlavi = _("Inscriptional Pahlavi", "phli"),
+           Inscriptional_Parthian = _("Inscriptional Parthian", "prti"),
+           ////             	
+           Javanese = _("Javanese", "java"),
+           //// 
+           Kaithi = _("Kaithi", "kthi"),
+           Kannada = _("Kannada", "knda", Unicode13RangeInfoList.Kannada),
+           Kannada_v_2 = _("Kannada v.2", "knd2", Unicode13RangeInfoList.Kannada),
+           Katakana = _("Katakana", "kana", new UnicodeRangeInfo[] { Unicode13RangeInfoList.Katakana, Unicode13RangeInfoList.Katakana_Phonetic_Extensions }),
+           Kayah_Li = _("Kayah Li", "kali"),
+           Kharosthi = _("Kharosthi", "khar", Unicode13RangeInfoList.Kharoshthi),
+           Khmer = _("Khmer", "khmr", new UnicodeRangeInfo[] { Unicode13RangeInfoList.Khmer, Unicode13RangeInfoList.Khmer_Symbols }),
+           Khojki = _("Khojki", "khoj"),
+           Khudawadi = _("Khudawadi", "sind"),
+           //// 
+           Lao = _("Lao", "lao", Unicode13RangeInfoList.Lao),
+           Latin = _("Latin", "latn",
+               //0-127
+               new UnicodeRangeInfo[] {
+               Unicode13RangeInfoList.C0_Controls_and_Basic_Latin,
+               Unicode13RangeInfoList.C1_Controls_and_Latin_1_Supplement,
+               Unicode13RangeInfoList.Latin_Extended_A,
+               Unicode13RangeInfoList.Latin_Extended_Additional,
+               Unicode13RangeInfoList.Latin_Extended_B,
+               Unicode13RangeInfoList.Latin_Extended_C,
+               Unicode13RangeInfoList.Latin_Extended_D }),
+
+           Lepcha = _("Lepcha", "lepc", Unicode13RangeInfoList.Lepcha),
+           Limbu = _("Limbu", "limb", Unicode13RangeInfoList.Limbu),
+           Linear_A = _("Linear A", "lina"),
+           Linear_B = _("Linear B", "linb", new UnicodeRangeInfo[] { Unicode13RangeInfoList.Linear_B_Ideograms, Unicode13RangeInfoList.Linear_B_Syllabary }),
+           Lisu = _("Lisu (Fraser)", "lisu"),
+           Lycian = _("Lycian", "lyci", Unicode13RangeInfoList.Lycian),
+           Lydian = _("Lydian", "lydi", Unicode13RangeInfoList.Lydian),
+           //// 
+           Mahajani = _("Mahajani", "mahj"),
+           Malayalam = _("Malayalam", "mlym", Unicode13RangeInfoList.Malayalam),
+           Malayalam_v_2 = _("Malayalam v.2", "mlm2", Unicode13RangeInfoList.Malayalam),
+           Mandaic = _("Mandaic, Mandaean", "mand"),
+           Manichaean = _("Manichaean", "mani"),
+           Marchen = _("Marchen", "marc"),
+           Math = _("Mathematical Alphanumeric Symbols", "math", Unicode13RangeInfoList.Mathematical_Alphanumeric_Symbols),
+           Meitei_Mayek = _("Meitei Mayek (Meithei, Meetei)", "mtei"),
+           Mende_Kikakui = _("Mende Kikakui", "mend"),
+           Meroitic_Cursive = _("Meroitic Cursive", "merc"),
+           Meroitic_Hieroglyphs = _("Meroitic Hieroglyphs", "mero"),
+           Miao = _("Miao", "plrd"),
+           Modi = _("Modi", "modi"),
+           Mongolian = _("Mongolian", "mong", Unicode13RangeInfoList.Mongolian),
+           Mro = _("Mro", "mroo"),
+           Multani = _("Multani", "mult"),
+           Musical_Symbols = _("Musical Symbols", "musc", Unicode13RangeInfoList.Musical_Symbols),
+           Myanmar = _("Myanmar", "mymr", Unicode13RangeInfoList.Myanmar),
+           Myanmar_v_2 = _("Myanmar v.2", "mym2", Unicode13RangeInfoList.Myanmar),
+           ////      
+           Nabataean = _("Nabataean", "nbat"),
+           Newa = _("Newa", "newa"),
+           New_Tai_Lue = _("New Tai Lue", "talu", Unicode13RangeInfoList.New_Tai_Lue),
+           N_Ko = _("N'Ko", "nko", Unicode13RangeInfoList.N_Ko),
+           //// 
+           Odia = _("Odia (formerly Oriya)", "orya"),
+           Odia_V_2 = _("Odia v.2 (formerly Oriya v.2)", "ory2"),
+           Ogham = _("Ogham", "ogam", Unicode13RangeInfoList.Ogham),
+           Ol_Chiki = _("Ol Chiki", "olck", Unicode13RangeInfoList.Ol_Chiki),
+           Old_Italic = _("Old Italic", "ital"),
+           Old_Hungarian = _("Old Hungarian", "hung"),
+           Old_North_Arabian = _("Old North Arabian", "narb"),
+           Old_Permic = _("Old Permic", "perm"),
+           Old_Persian_Cuneiform = _("Old Persian Cuneiform ", "xpeo"),
+           Old_South_Arabian = _("Old South Arabian", "sarb"),
+           Old_Turkic = _("Old Turkic, Orkhon Runic", "orkh"),
+           Osage = _("Osage", "osge"),
+           Osmanya = _("Osmanya", "osma", Unicode13RangeInfoList.Osmanya),
+           //// 
+           Pahawh_Hmong = _("Pahawh Hmong", "hmng"),
+           Palmyrene = _("Palmyrene", "palm"),
+           Pau_Cin_Hau = _("Pau Cin Hau", "pauc"),
+           Phags_pa = _("Phags-pa", "phag", Unicode13RangeInfoList.Phags_pa),
+           Phoenician = _("Phoenician ", "phnx"),
+           Psalter_Pahlavi = _("Psalter Pahlavi", "phlp"),
+
+           //// 
+           Rejang = _("Rejang", "rjng", Unicode13RangeInfoList.Rejang),
+           Runic = _("Runic", "runr", Unicode13RangeInfoList.Runic),
+
+           //// 
+           Samaritan = _("Samaritan", "samr"),
+           Saurashtra = _("Saurashtra", "saur", Unicode13RangeInfoList.Saurashtra),
+           Sharada = _("Sharada", "shrd"),
+           Shavian = _("Shavian", "shaw", Unicode13RangeInfoList.Shavian),
+           Siddham = _("Siddham", "sidd"),
+           Sign_Writing = _("Sign Writing", "sgnw"),
+           Sinhala = _("Sinhala", "sinh", Unicode13RangeInfoList.Sinhala),
+           Sora_Sompeng = _("Sora Sompeng", "sora"),
+           Sumero_Akkadian_Cuneiform = _("Sumero-Akkadian Cuneiform", "xsux"),
+           Sundanese = _("Sundanese", "sund", Unicode13RangeInfoList.Sundanese),
+           Syloti_Nagri = _("Syloti Nagri", "sylo", Unicode13RangeInfoList.Syloti_Nagri),
+           Syriac = _("Syriac", "syrc", Unicode13RangeInfoList.Syriac),
+           ////       
+           Tagalog = _("Tagalog", "tglg"),
+           Tagbanwa = _("Tagbanwa", "tagb", Unicode13RangeInfoList.Tagbanwa),
+           Tai_Le = _("Tai Le", "tale", Unicode13RangeInfoList.Tai_Le),
+           Tai_Tham = _("Tai Tham (Lanna)", "lana"),
+           Tai_Viet = _("Tai Viet", "tavt"),
+           Takri = _("Takri", "takr"),
+           Tamil = _("Tamil", "taml", Unicode13RangeInfoList.Tamil),
+           Tamil_v_2 = _("Tamil v.2", "tml2", Unicode13RangeInfoList.Tamil),
+           Tangut = _("Tangut", "tang"),
+           Telugu = _("Telugu", "telu", Unicode13RangeInfoList.Telugu),
+           Telugu_v_2 = _("Telugu v.2", "tel2", Unicode13RangeInfoList.Telugu),
+           Thaana = _("Thaana", "thaa", Unicode13RangeInfoList.Thaana),
+           Thai = _("Thai", "thai", Unicode13RangeInfoList.Thai),
+           Tibetan = _("Tibetan", "tibt", Unicode13RangeInfoList.Tibetan),
+           Tifinagh = _("Tifinagh", "tfng", Unicode13RangeInfoList.Tifinagh),
+           Tirhuta = _("Tirhuta", "tirh"),
+           ////
+           Ugaritic_Cuneiform = _("Ugaritic Cuneiform", "ugar"),
+           ////
+           Vai = _("Vai", "vai"),
+           ////
+           Warang_Citi = _("Warang Citi", "wara"),
+
+           ////
+           Yi = _("Yi", "yi", Unicode13RangeInfoList.Yi_Syllables)
+           //
+           ;
+
+            MyLog2.dbugShowMsg("sc05:003.4");
+        }
     }
 
-    partial class ScriptLangs
-    {
-        //Manual map
-        //TODO: find a proper method
-        public static readonly ScriptLangInfo
-        //
-        Adlam = _("Adlam", "adlm"),
-        Anatolian_Hieroglyphs = _("Anatolian Hieroglyphs", "hluw"),
-        Arabic = _("Arabic", "arab",
-            Unicode13RangeInfoList.Arabic,
-            Unicode13RangeInfoList.Arabic_Extended_A,
-            Unicode13RangeInfoList.Arabic_Mathematical_Alphabetic_Symbols,
-            Unicode13RangeInfoList.Arabic_Presentation_Forms_A,
-            Unicode13RangeInfoList.Arabic_Presentation_Forms_B,
-            Unicode13RangeInfoList.Arabic_Supplement),
-        Armenian = _("Armenian", "armn", Unicode13RangeInfoList.Armenian, Unicode13RangeInfoList.Armenian_Ligatures),
-        Avestan = _("Avestan", "avst"),
-        //
-        Balinese = _("Balinese", "bali", Unicode13RangeInfoList.Balinese),
-        Bamum = _("Bamum", "bamu"),
-        Bassa_Vah = _("Bassa Vah ", "bass"),
-        Batak = _("Batak", "batk"),
-        Bengali = _("Bengali", "beng", Unicode13RangeInfoList.Bengali),
-        Bengali_v_2 = _("Bengali v.2", "bng2", Unicode13RangeInfoList.Bengali),
-        Bhaiksuki = _("Bhaiksuki", "bhks"),
-        Brahmi = _("Brahmi", "brah"),
-        Braille = _("Braille", "brai", Unicode13RangeInfoList.Braille_Patterns),
-        Buginese = _("Buginese", "bugi", Unicode13RangeInfoList.Buginese),
-        Buhid = _("Buhid", "buhd", Unicode13RangeInfoList.Buhid),
-        Byzantine_Music = _("Byzantine Music", "byzm", Unicode13RangeInfoList.Byzantine_Musical_Symbols),
-        //
-        Canadian_Syllabics = _("Canadian Syllabics", "cans", Unicode13RangeInfoList.Unified_Canadian_Aboriginal_Syllabics),
-        Carian = _("Carian", "cari", Unicode13RangeInfoList.Carian),
-        Caucasian_Albanian = _("Caucasian Albanian", "aghb"),
-        Chakma = _("Chakma", "cakm"),
-        Cham = _("Cham", "cham", Unicode13RangeInfoList.Cham),
-        Cherokee = _("Cherokee", "cher", Unicode13RangeInfoList.Cherokee),
-        CJK_Ideographic = _("CJK Ideographic", "hani",
-            Unicode13RangeInfoList.CJK_Compatibility,
-            Unicode13RangeInfoList.CJK_Compatibility_Forms,
-            Unicode13RangeInfoList.CJK_Compatibility_Ideographs,
-            Unicode13RangeInfoList.CJK_Compatibility_Ideographs_Supplement,
-            Unicode13RangeInfoList.CJK_Unified_Ideographs_Extension_A,
-            Unicode13RangeInfoList.CJK_Unified_Ideographs_Extension_B,
-            Unicode13RangeInfoList.CJK_Radicals_Supplement,
-            Unicode13RangeInfoList.CJK_Strokes
-            ),
-
-
-        Coptic = _("Coptic", "copt", Unicode13RangeInfoList.Coptic),
-        Cypriot_Syllabary = _("Cypriot Syllabary", "cprt", Unicode13RangeInfoList.Cypriot_Syllabary),
-        Cyrillic = _("Cyrillic", "cyrl",
-            Unicode13RangeInfoList.Cyrillic,
-            Unicode13RangeInfoList.Cyrillic_Extended_A,
-            Unicode13RangeInfoList.Cyrillic_Extended_B),
-        ////
-        Default = _("Default", "DFLT"),
-        Deseret = _("Deseret", "dsrt", Unicode13RangeInfoList.Deseret),
-        Devanagari = _("Devanagari", "deva", Unicode13RangeInfoList.Devanagari),
-        Devanagari_v_2 = _("Devanagari v.2", "dev2", Unicode13RangeInfoList.Devanagari),
-        Duployan = _("Duployan", "dupl"),
-        ////            
-        Egyptian_Hieroglyphs = _("Egyptian Hieroglyphs", "egyp"),
-        Elbasan = _("Elbasan", "elba"),
-        Ethiopic = _("Ethiopic", "ethi",
-            Unicode13RangeInfoList.Ethiopic,
-            Unicode13RangeInfoList.Ethiopic_Extended,
-            Unicode13RangeInfoList.Ethiopic_Supplement),
-        //// 
-        Georgian = _("Georgian", "geor", Unicode13RangeInfoList.Georgian, Unicode13RangeInfoList.Georgian_Supplement),
-        Glagolitic = _("Glagolitic", "glag", Unicode13RangeInfoList.Glagolitic),
-        Gothic = _("Gothic", "goth", Unicode13RangeInfoList.Gothic),
-        Grantha = _("Grantha", "gran"),
-        Greek = _("Greek", "grek", Unicode13RangeInfoList.Greek_and_Coptic, Unicode13RangeInfoList.Greek_Extended),
-        Gujarati = _("Gujarati", "gujr", Unicode13RangeInfoList.Gujarati),
-        Gujarati_v_2 = _("Gujarati v.2", "gjr2", Unicode13RangeInfoList.Gujarati),
-        Gurmukhi = _("Gurmukhi", "guru", Unicode13RangeInfoList.Gurmukhi),
-        Gurmukhi_v_2 = _("Gurmukhi v.2", "gur2", Unicode13RangeInfoList.Gurmukhi),
-        //// 
-        Hangul = _("Hangul", "hang", Unicode13RangeInfoList.Hangul_Jamo),
-        Hangul_Jamo = _("Hangul Jamo", "jamo", Unicode13RangeInfoList.Hangul_Jamo),
-        Hanunoo = _("Hanunoo", "hano", Unicode13RangeInfoList.Hanunoo),
-        Hatran = _("Hatran", "hatr"),
-        Hebrew = _("Hebrew", "hebr", Unicode13RangeInfoList.Hebrew),
-        Hiragana = _("Hiragana", "kana", Unicode13RangeInfoList.Hiragana),
-        //// 
-        Imperial_Aramaic = _("Imperial Aramaic", "armi"),
-        Inscriptional_Pahlavi = _("Inscriptional Pahlavi", "phli"),
-        Inscriptional_Parthian = _("Inscriptional Parthian", "prti"),
-        ////             	
-        Javanese = _("Javanese", "java"),
-        //// 
-        Kaithi = _("Kaithi", "kthi"),
-        Kannada = _("Kannada", "knda", Unicode13RangeInfoList.Kannada),
-        Kannada_v_2 = _("Kannada v.2", "knd2", Unicode13RangeInfoList.Kannada),
-        Katakana = _("Katakana", "kana", Unicode13RangeInfoList.Katakana, Unicode13RangeInfoList.Katakana_Phonetic_Extensions),
-        Kayah_Li = _("Kayah Li", "kali"),
-        Kharosthi = _("Kharosthi", "khar", Unicode13RangeInfoList.Kharoshthi),
-        Khmer = _("Khmer", "khmr", Unicode13RangeInfoList.Khmer, Unicode13RangeInfoList.Khmer_Symbols),
-        Khojki = _("Khojki", "khoj"),
-        Khudawadi = _("Khudawadi", "sind"),
-        //// 
-        Lao = _("Lao", "lao", Unicode13RangeInfoList.Lao),
-        Latin = _("Latin", "latn",
-            //0-127
-            Unicode13RangeInfoList.C0_Controls_and_Basic_Latin,
-            Unicode13RangeInfoList.C1_Controls_and_Latin_1_Supplement,
-            Unicode13RangeInfoList.Latin_Extended_A,
-            Unicode13RangeInfoList.Latin_Extended_Additional,
-            Unicode13RangeInfoList.Latin_Extended_B,
-            Unicode13RangeInfoList.Latin_Extended_C,
-            Unicode13RangeInfoList.Latin_Extended_D),
-
-        Lepcha = _("Lepcha", "lepc", Unicode13RangeInfoList.Lepcha),
-        Limbu = _("Limbu", "limb", Unicode13RangeInfoList.Limbu),
-        Linear_A = _("Linear A", "lina"),
-        Linear_B = _("Linear B", "linb", Unicode13RangeInfoList.Linear_B_Ideograms, Unicode13RangeInfoList.Linear_B_Syllabary),
-        Lisu = _("Lisu (Fraser)", "lisu"),
-        Lycian = _("Lycian", "lyci", Unicode13RangeInfoList.Lycian),
-        Lydian = _("Lydian", "lydi", Unicode13RangeInfoList.Lydian),
-        //// 
-        Mahajani = _("Mahajani", "mahj"),
-        Malayalam = _("Malayalam", "mlym", Unicode13RangeInfoList.Malayalam),
-        Malayalam_v_2 = _("Malayalam v.2", "mlm2", Unicode13RangeInfoList.Malayalam),
-        Mandaic = _("Mandaic, Mandaean", "mand"),
-        Manichaean = _("Manichaean", "mani"),
-        Marchen = _("Marchen", "marc"),
-        Math = _("Mathematical Alphanumeric Symbols", "math", Unicode13RangeInfoList.Mathematical_Alphanumeric_Symbols),
-        Meitei_Mayek = _("Meitei Mayek (Meithei, Meetei)", "mtei"),
-        Mende_Kikakui = _("Mende Kikakui", "mend"),
-        Meroitic_Cursive = _("Meroitic Cursive", "merc"),
-        Meroitic_Hieroglyphs = _("Meroitic Hieroglyphs", "mero"),
-        Miao = _("Miao", "plrd"),
-        Modi = _("Modi", "modi"),
-        Mongolian = _("Mongolian", "mong", Unicode13RangeInfoList.Mongolian),
-        Mro = _("Mro", "mroo"),
-        Multani = _("Multani", "mult"),
-        Musical_Symbols = _("Musical Symbols", "musc", Unicode13RangeInfoList.Musical_Symbols),
-        Myanmar = _("Myanmar", "mymr", Unicode13RangeInfoList.Myanmar),
-        Myanmar_v_2 = _("Myanmar v.2", "mym2", Unicode13RangeInfoList.Myanmar),
-        ////      
-        Nabataean = _("Nabataean", "nbat"),
-        Newa = _("Newa", "newa"),
-        New_Tai_Lue = _("New Tai Lue", "talu", Unicode13RangeInfoList.New_Tai_Lue),
-        N_Ko = _("N'Ko", "nko", Unicode13RangeInfoList.N_Ko),
-        //// 
-        Odia = _("Odia (formerly Oriya)", "orya"),
-        Odia_V_2 = _("Odia v.2 (formerly Oriya v.2)", "ory2"),
-        Ogham = _("Ogham", "ogam", Unicode13RangeInfoList.Ogham),
-        Ol_Chiki = _("Ol Chiki", "olck", Unicode13RangeInfoList.Ol_Chiki),
-        Old_Italic = _("Old Italic", "ital"),
-        Old_Hungarian = _("Old Hungarian", "hung"),
-        Old_North_Arabian = _("Old North Arabian", "narb"),
-        Old_Permic = _("Old Permic", "perm"),
-        Old_Persian_Cuneiform = _("Old Persian Cuneiform ", "xpeo"),
-        Old_South_Arabian = _("Old South Arabian", "sarb"),
-        Old_Turkic = _("Old Turkic, Orkhon Runic", "orkh"),
-        Osage = _("Osage", "osge"),
-        Osmanya = _("Osmanya", "osma", Unicode13RangeInfoList.Osmanya),
-        //// 
-        Pahawh_Hmong = _("Pahawh Hmong", "hmng"),
-        Palmyrene = _("Palmyrene", "palm"),
-        Pau_Cin_Hau = _("Pau Cin Hau", "pauc"),
-        Phags_pa = _("Phags-pa", "phag", Unicode13RangeInfoList.Phags_pa),
-        Phoenician = _("Phoenician ", "phnx"),
-        Psalter_Pahlavi = _("Psalter Pahlavi", "phlp"),
-
-        //// 
-        Rejang = _("Rejang", "rjng", Unicode13RangeInfoList.Rejang),
-        Runic = _("Runic", "runr", Unicode13RangeInfoList.Runic),
-
-        //// 
-        Samaritan = _("Samaritan", "samr"),
-        Saurashtra = _("Saurashtra", "saur", Unicode13RangeInfoList.Saurashtra),
-        Sharada = _("Sharada", "shrd"),
-        Shavian = _("Shavian", "shaw", Unicode13RangeInfoList.Shavian),
-        Siddham = _("Siddham", "sidd"),
-        Sign_Writing = _("Sign Writing", "sgnw"),
-        Sinhala = _("Sinhala", "sinh", Unicode13RangeInfoList.Sinhala),
-        Sora_Sompeng = _("Sora Sompeng", "sora"),
-        Sumero_Akkadian_Cuneiform = _("Sumero-Akkadian Cuneiform", "xsux"),
-        Sundanese = _("Sundanese", "sund", Unicode13RangeInfoList.Sundanese),
-        Syloti_Nagri = _("Syloti Nagri", "sylo", Unicode13RangeInfoList.Syloti_Nagri),
-        Syriac = _("Syriac", "syrc", Unicode13RangeInfoList.Syriac),
-        ////       
-        Tagalog = _("Tagalog", "tglg"),
-        Tagbanwa = _("Tagbanwa", "tagb", Unicode13RangeInfoList.Tagbanwa),
-        Tai_Le = _("Tai Le", "tale", Unicode13RangeInfoList.Tai_Le),
-        Tai_Tham = _("Tai Tham (Lanna)", "lana"),
-        Tai_Viet = _("Tai Viet", "tavt"),
-        Takri = _("Takri", "takr"),
-        Tamil = _("Tamil", "taml", Unicode13RangeInfoList.Tamil),
-        Tamil_v_2 = _("Tamil v.2", "tml2", Unicode13RangeInfoList.Tamil),
-        Tangut = _("Tangut", "tang"),
-        Telugu = _("Telugu", "telu", Unicode13RangeInfoList.Telugu),
-        Telugu_v_2 = _("Telugu v.2", "tel2", Unicode13RangeInfoList.Telugu),
-        Thaana = _("Thaana", "thaa", Unicode13RangeInfoList.Thaana),
-        Thai = _("Thai", "thai", Unicode13RangeInfoList.Thai),
-        Tibetan = _("Tibetan", "tibt", Unicode13RangeInfoList.Tibetan),
-        Tifinagh = _("Tifinagh", "tfng", Unicode13RangeInfoList.Tifinagh),
-        Tirhuta = _("Tirhuta", "tirh"),
-        ////
-        Ugaritic_Cuneiform = _("Ugaritic Cuneiform", "ugar"),
-        ////
-        Vai = _("Vai", "vai"),
-        ////
-        Warang_Citi = _("Warang Citi", "wara"),
-
-        ////
-        Yi = _("Yi", "yi", Unicode13RangeInfoList.Yi_Syllables)
-        //
-        ;
-
-
-    }
 
 
 }

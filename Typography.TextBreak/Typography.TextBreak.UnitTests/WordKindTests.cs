@@ -1,12 +1,16 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Typography.TextBreak;
 using static Typography.TextBreak.WordKind;
 
 
+
 [TestClass]
 public class WordKindTests
 {
+
+
     public void WordKindTest(string input, (string section, WordKind wordKind)[] output)
     {
         var customBreaker = new CustomBreaker();
@@ -40,7 +44,7 @@ public class WordKindTests
     {
         foreach (var testCase in new[] {
 
-           
+
           ("Hi!", new [] { ("Hi", Text), ("!", Punc) }),
 
           ("We are #1", new[] { ("We", Text), (" ", Whitespace),

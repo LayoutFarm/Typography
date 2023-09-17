@@ -11,10 +11,10 @@ namespace Typography.TextBreak
     public class CustomBreaker
     {
         //default for latin breaking engine
-        EngBreakingEngine _engBreakingEngine = new EngBreakingEngine();
+        readonly EngBreakingEngine _engBreakingEngine = new EngBreakingEngine();
         //current lang breaking engine
         BreakingEngine _breakingEngine;
-        List<BreakingEngine> _otherEngines = new List<BreakingEngine>();
+        readonly List<BreakingEngine> _otherEngines = new List<BreakingEngine>();
 
         WordVisitor _visitor;
         int _endAt;
@@ -57,7 +57,12 @@ namespace Typography.TextBreak
             _otherEngines.Add(engine);
             _breakingEngine = engine;
         }
-
+        protected BreakingEngine SelectEngine(int c)
+        {
+            //from 
+            InputReader.SeparateCodePoint(c, out char c0, out char c1);
+            return SelectEngine(c0);
+        }
         protected BreakingEngine SelectEngine(char c)
         {
             if (_breakingEngine.CanHandle(c))
@@ -90,33 +95,17 @@ namespace Typography.TextBreak
             }
         }
 
-        public void BreakWords(char[] charBuff)
+        void BreakWords()
         {
-            BreakWords(charBuff, 0, charBuff.Length);
-        }
-        public void BreakWords(char[] charBuff, int startAt, int len)
-        {
-            //conver to char buffer 
-            int j = charBuff.Length;
-            if (j < 1)
-            {
-                _endAt = 0;
-                return;
-            }
-            _endAt = startAt + len;
-            _visitor.LoadText(charBuff, startAt, len); 
-            BreakingEngine currentEngine = _breakingEngine = (UseUnicodeRangeBreaker) ? _engBreakingEngine : SelectEngine(charBuff[startAt]);
-            //----------------------------------------
-            //select breaking engine
-            int endAt = startAt + len;
-
+            int startAt = _visitor.Offset;
+            BreakingEngine currentEngine = _breakingEngine = (UseUnicodeRangeBreaker) ? _engBreakingEngine : SelectEngine(_visitor.C0);
             for (; ; )
             {
                 //----------------------------------------
-                currentEngine.BreakWord(_visitor, charBuff, startAt, endAt - startAt); //please note that len is decreasing
+                currentEngine.BreakWord(_visitor); //please note that len is decreasing
                 switch (_visitor.State)
                 {
-                    default: throw new NotSupportedException();
+                    default: throw new OpenFont.OpenFontNotSupportedException();
 
                     case VisitorState.End:
                         //ok
@@ -139,30 +128,63 @@ namespace Typography.TextBreak
                                 }
 #endif
 
-                                if (ThrowIfCharOutOfRange) throw new NotSupportedException($"A proper breaking engine for character '{_visitor.Char}' was not found.");
-                                startAt = _visitor.CurrentIndex + 1;
+                                if (ThrowIfCharOutOfRange) throw new OpenFont.OpenFontNotSupportedException($"A proper breaking engine for character '{_visitor.Char}' was not found.");
+                                startAt = _visitor.Offset + 1;
                                 _visitor.SetCurrentIndex(startAt);
-
-
                                 _visitor.AddWordBreakAtCurrentIndex(WordKind.Unknown);
+
                             }
                             else
                             {
                                 currentEngine = anotherEngine;
-                                startAt = _visitor.CurrentIndex;
+                                startAt = _visitor.Offset;
+
                             }
                         }
                         break;
                 }
             }
         }
-
-        public void BreakWords(string inputstr)
+        
+        
+        public void BreakWords(int[] charBuff, int startAt, int len)
         {
-            //TODO: review here
-            char[] buffer = inputstr.ToCharArray();
-            BreakWords(buffer, 0, inputstr.Length); //all
+            //conver to char buffer 
+            int j = charBuff.Length;
+            if (j < 1)
+            {
+                _endAt = 0;
+                return;
+            }
+            _endAt = startAt + len;
+            _visitor.LoadText(charBuff, startAt, len);
+
+            //----------------------------------------
+            //select breaking engine
+            //int endAt = startAt + len;
+            //InputReader reader = new InputReader(charBuff, startAt, endAt - startAt);
+            BreakWords();
+
         }
+
+        public void BreakWords(char[] charBuff, int startAt, int len)
+        {
+            //conver to char buffer 
+            int j = charBuff.Length;
+            if (j < 1)
+            {
+                _endAt = 0;
+                return;
+            }
+            _endAt = startAt + len;
+            _visitor.LoadText(charBuff, startAt, len);
+
+            //----------------------------------------
+            //select breaking engine  
+
+            BreakWords();
+        }
+
         public BreakingEngine GetBreakingEngineFor(char c)
         {
             return SelectEngine(c);
@@ -178,5 +200,17 @@ namespace Typography.TextBreak
         }
     }
 
+    public static class CustomBreakerExtensions
+    {
+        public static void BreakWords(this CustomBreaker breaker, string str)
+        {
+            char[] buffer = str.ToCharArray();
+            breaker.BreakWords(buffer, 0, buffer.Length);
+        }
+        public static void BreakWords(this CustomBreaker breaker, char[] charBuff)
+        {
+            breaker.BreakWords(charBuff, 0, charBuff.Length);
+        }
+    }
 
 }

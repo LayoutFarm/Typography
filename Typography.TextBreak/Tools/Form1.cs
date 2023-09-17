@@ -961,5 +961,110 @@ namespace Tools
             unicodeTxtParser.Parse("icu_data/data/unidata/UnicodeData.txt");
 
         }
+
+        static readonly char[] s_seps = new char[] { ' ' };
+        private void button10_Click(object sender, EventArgs e)
+        {
+            //find min and max emoji
+
+            Dictionary<int, bool> emoji_dic = new Dictionary<int, bool>();
+            using (FileStream fs = new FileStream("unicode14_emoji.txt", FileMode.Open))
+            using (StreamReader r = new StreamReader(fs))
+            {
+                string line = r.ReadLine();
+                int line_count = 0;
+                while (line != null)
+                {
+                    if (!line.StartsWith("#"))
+                    {
+                        int semi_colon_pos = line.IndexOf(';');
+                        if (semi_colon_pos > -1)
+                        {
+                            string[] code_points = line.Substring(0, semi_colon_pos).Split(s_seps, StringSplitOptions.RemoveEmptyEntries);
+                            if (code_points.Length > 0)
+                            {
+                                for (int i = 0; i < code_points.Length; ++i)
+                                {
+                                    emoji_dic[int.Parse(code_points[i], System.Globalization.NumberStyles.HexNumber)] = true;
+                                }
+                            }
+                        }
+                    }
+                    line_count++;
+                    line = r.ReadLine();
+                }
+            }
+
+            List<int> emoji_list = new List<int>();
+            foreach (int emoji in emoji_dic.Keys)
+            {
+                emoji_list.Add(emoji);
+            }
+            emoji_list.Sort();
+
+             
+
+            List<EmojiRange> ranges = new List<EmojiRange>();
+            int latest_value = 0;
+
+            EmojiRange cur_range = null;
+            foreach (int emoji in emoji_list)
+            {
+                if (emoji != latest_value + 1)
+                {
+                    //begin new range
+                    cur_range = new EmojiRange();
+                    cur_range.StartAt = emoji;
+                    cur_range.Count = 1;
+                    ranges.Add(cur_range);
+                }
+                else
+                {
+                    //consecutive
+                    cur_range.Count++;
+                }
+                latest_value = emoji;
+            }
+
+
+            //write to file
+            StringBuilder sb = new StringBuilder();
+            int index = 0;
+            sb.AppendLine("//AUTOGEN," + DateTime.Now.ToString("s"));
+            sb.AppendLine("//tools, Typography.I18N's Tool.exe");
+            sb.AppendLine("//https://unicode.org/Public/emoji/14.0/emoji-test.txt");
+            sb.AppendLine("//sorted emoji");
+            sb.Append("static readonly int[] s_emoji_list =new int[]{");
+            int code_count = 0;
+            foreach (int emoji in emoji_list)
+            {
+                if (index > 0)
+                {
+                    sb.Append(',');
+                }
+                sb.Append("0x" + emoji.ToString("X"));
+                index++;
+                code_count++;
+
+                if (code_count > 31)
+                {
+                    sb.AppendLine();
+                    code_count = 0;
+                }
+            }
+            sb.Append("};");
+            File.WriteAllText("unicode_emoji.cs", sb.ToString());
+
+        }
+
+        class EmojiRange
+        {
+            public int StartAt;
+            public int Count;
+            public override string ToString()
+            {
+                return StartAt + ":" + Count;
+            }
+        }
     }
 }

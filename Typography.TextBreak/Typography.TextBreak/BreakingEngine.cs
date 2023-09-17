@@ -10,10 +10,12 @@ namespace Typography.TextBreak
 {
     public abstract class BreakingEngine
     {
-        internal abstract void BreakWord(WordVisitor visitor, char[] charBuff, int startAt, int len);
+      
+        internal abstract void BreakWord(WordVisitor visitor);
         public abstract bool CanBeStartChar(char c);
         public abstract bool CanHandle(char c);
     }
+
     public abstract class DictionaryBreakingEngine : BreakingEngine
     {
         readonly SpanBreakInfo _breakInfo;
@@ -34,27 +36,33 @@ namespace Typography.TextBreak
         protected abstract WordGroup GetWordGroupForFirstChar(char c);
         public bool BreakPeroidInTextSpan { get; set; }
 
-
         public bool DontMergeLastIncompleteWord { get; set; }
 
-        internal override void BreakWord(WordVisitor visitor, char[] charBuff, int startAt, int len)
+        internal override void BreakWord(WordVisitor visitor)
         {
+
             visitor.State = VisitorState.Parsing;
             char c_first = this.FirstUnicodeChar;
             char c_last = this.LastUnicodeChar;
-            int endAt = startAt + len;
 
             visitor.SpanBreakInfo = _breakInfo;
 
             Stack<int> candidateBreakList = visitor.GetTempCandidateBreaks();
             bool breakPeroidInTextSpan = BreakPeroidInTextSpan;
 
+
+            int startAt = visitor.Offset;//startAt current offset
+            int endAt = visitor.EndIndex;
+            int len = endAt - startAt;
+
+
             for (int i = startAt; i < endAt;)
             {
+
             ENTER_LOOP:
 
                 //find proper start words;
-                char c = charBuff[i];
+                char c = visitor.Char;// charBuff[i];
                 //----------------------
                 //check if c is in our responsiblity
 
@@ -88,6 +96,7 @@ namespace Typography.TextBreak
                 }
                 //----------------------
 
+                //get word group for current char
                 WordGroup wordgroup = GetWordGroupForFirstChar(c);
                 if (wordgroup == null)
                 {
@@ -159,7 +168,7 @@ namespace Typography.TextBreak
                             {
                                 if (c_wordgroup.WordSpanListCount > 0)
                                 {
-                                    int p1 = visitor.CurrentIndex;
+                                    int p1 = visitor.Offset;
                                     //p2: suggest position
                                     int p2 = FindInWordSpans(visitor, c_wordgroup);
                                     if (p2 - p1 > 0)
@@ -192,7 +201,7 @@ namespace Typography.TextBreak
                             }
                             continueRead = false;
                             //----------------------------------------                            
-                            if (visitor.CurrentIndex >= len - 1)
+                            if (visitor.Offset >= len - 1)
                             {
                                 //flush remaining char
                                 if (visitor.LatestBreakAt < startAt + len)
@@ -223,7 +232,7 @@ namespace Typography.TextBreak
                                 candidateBreakList.Push(candidateLen);
                             }
                             c_wordgroup = next;
-                            i = visitor.CurrentIndex;
+                            i = visitor.Offset;
 
                             if (visitor.IsEnd)
                             {
@@ -273,7 +282,7 @@ namespace Typography.TextBreak
                             //then check if 
                             if (c_wordgroup.WordSpanListCount > 0)
                             {
-                                int p1 = visitor.CurrentIndex;
+                                int p1 = visitor.Offset;
                                 //p2: suggest position
                                 int p2 = FindInWordSpans(visitor, c_wordgroup);
                                 if (p2 - p1 > 0)
@@ -289,7 +298,7 @@ namespace Typography.TextBreak
                                         if (this.DontMergeLastIncompleteWord)
                                         {
                                             //choose best match 
-                                            int p3 = visitor.CurrentIndex;
+                                            int p3 = visitor.Offset;
                                             int p4 = p3;
                                             if (candidateBreakList.Count > 0)
                                             {
@@ -320,11 +329,11 @@ namespace Typography.TextBreak
                                             //no candidate 
                                             //need to step back
                                             int latestBreakAt = visitor.LatestBreakAt;
-                                            if (visitor.CurrentIndex - 1 > latestBreakAt)
+                                            if (visitor.Offset - 1 > latestBreakAt)
                                             {
                                                 //step back
 
-                                                visitor.SetCurrentIndex(visitor.CurrentIndex - 1);
+                                                visitor.SetCurrentIndex(visitor.Offset - 1);
 
                                                 //TODO: review here again
 #if DEBUG
@@ -332,7 +341,7 @@ namespace Typography.TextBreak
                                                 if (CanBeStartChar(current_char))
                                                 {
 
-                                                    if (visitor.CurrentIndex - 1 > latestBreakAt)
+                                                    if (visitor.Offset - 1 > latestBreakAt)
                                                     {
 
                                                     }
@@ -349,7 +358,7 @@ namespace Typography.TextBreak
                                             }
                                             else
                                             {
-                                                throw new NotSupportedException("i-3311");
+                                                throw new OpenFont.OpenFontNotSupportedException("i-3311");
                                             }
                                         }
                                         else
@@ -449,22 +458,24 @@ namespace Typography.TextBreak
                                 }
 
                             }
-                            i = visitor.CurrentIndex;
+                            i = visitor.Offset;
                         }
                     }
                 }
             }
             //------
-            if (visitor.CurrentIndex >= len - 1)
+            if (visitor.Offset >= len - 1)
             {
-                //the last one 
+                ////the last one 
                 visitor.State = VisitorState.End;
                 if (visitor.LatestBreakAt < startAt + len)
                 {
-                    visitor.AddWordBreakAt(startAt + len, WordKind.Text);
+                    throw new OpenFont.OpenFontNotSupportedException();
+                    //visitor.AddWordBreakAt(startAt + len, WordKind.Text);
                 }
             }
         }
+
         internal WordGroup GetSubGroup(WordVisitor visitor, WordGroup wordGroup)
         {
 
@@ -491,7 +502,7 @@ namespace Typography.TextBreak
             WordSpan[] wordSpans = wordGroup.GetWordSpans();
             if (wordSpans == null)
             {
-                throw new NotSupportedException();
+                throw new OpenFont.OpenFontNotSupportedException();
             }
 
             //at this wordgroup
@@ -500,7 +511,7 @@ namespace Typography.TextBreak
             //start at prefix
             //and select the one that 
 
-            int readLen = visitor.CurrentIndex - visitor.LatestBreakAt;
+            int readLen = visitor.Offset - visitor.LatestBreakAt;
             int nwords = wordSpans.Length;
             //only 1 that match 
 
@@ -516,7 +527,7 @@ namespace Typography.TextBreak
                 //string dbugstr = w.GetString(currentTextBuffer);
 #endif
 
-                int savedIndex = visitor.CurrentIndex;
+                int savedIndex = visitor.Offset;
                 char c = visitor.Char;
                 int wordLen = w.len;
                 int matchCharCount = 0;
@@ -532,7 +543,7 @@ namespace Typography.TextBreak
                             //read next
                             if (!visitor.IsEnd)
                             {
-                                visitor.SetCurrentIndex(visitor.CurrentIndex + 1);
+                                visitor.SetCurrentIndex(visitor.Offset + 1);
                                 c = visitor.Char;
                             }
                             else

@@ -46,15 +46,26 @@ namespace TextBreakerTest
             icu_currentLocale = "lo-LA";
             //string test1 = "ສະບາຍດີແປ້ນພິມລາວ";
             //string test1 = "ສາທາລະນະລັດ ປະຊາທິປະໄຕ ປະຊາຊົນລາວ";
-            string test1 = "ABCD1234567890ສາທາລະນະລັດ ປະຊາທິປະໄຕ ປະຊາຊົນລາວ ผู้ใหญ่หาผ้าใหม่ให้สะใภ้ใช้คล้องคอ" +
-            "ใฝ่ใจเอาใส่ห่อมิหลงใหลใครขอดูจะใคร่ลงเรือใบดูน้ำใสและปลาปูสิ่งใดอยู่ในตู้มิใช่อยู่ใต้ตั่งเตียงบ้าใบถือใยบัวหูตามัวมาใกล้เคียงเล่าท่องอย่าละเลี่ยงยี่สิบม้วนจำจงดี";
+
+            //string test1 = "ABCD1234567890ສາທາລະນະລັດ ປະຊາທິປະໄຕ ປະຊາຊົນລາວ ผู้ใหญ่หาผ้าใหม่ให้สะใภ้ใช้คล้องคอ" +
+            // "ใฝ่ใจเอาใส่ห่อมิหลงใหลใครขอดูจะใคร่ลงเรือใบดูน้ำใสและปลาปูสิ่งใดอยู่ในตู้มิใช่อยู่ใต้ตั่งเตียงบ้าใบถือใยบัวหูตามัวมาใกล้เคียงเล่าท่องอย่าละเลี่ยงยี่สิบม้วนจำจงดี";
+
             //this.textBox1.Text = test1;
+            //string test1 = "abc\r\n123";
+
+            //string test1 = "4th";
+            //string test1 = "\r\n4th line\u00855th line";
+            //string test1 = "6+23-456*78/9";
 
             string test2 = "یہ ایک (car) ہے۔";
-
             string test3 = "👩🏾‍👨🏾‍👧🏾‍👶🏾";
+            //string test4 = "aBこん😁";
+            string test4 = "AB";
 
-            this.textBox1.Text = test3 + " " + test3;
+            //this.textBox1.Text = test3 + " " + test2;
+            //this.textBox1.Text = test1;
+            //this.textBox1.Text = test2;
+            this.textBox1.Text = test4;
 
             //this.textBox1.Text = test1 + test2;
             //this.textBox1.Text = test2;
@@ -74,7 +85,8 @@ namespace TextBreakerTest
             if (icuLoaded) return;
             //
 
-            string icu_dataFile = @"../../icudt57l.dat";
+            Typography.TextBreak.ICU.NativeTextBreaker.LoadLib("icu73_x64", 73);
+            string icu_dataFile = @"icudt73l.dat";
             Typography.TextBreak.ICU.NativeTextBreaker.SetICUDataFile(icu_dataFile);
             icuLoaded = true;
         }
@@ -95,12 +107,11 @@ namespace TextBreakerTest
                 //sub string               
                 string s = new string(textBuffer, bounds.startIndex, bounds.length);
                 this.listBox1.Items.Add(bounds.startIndex + " " + s);
-
             });
 
         }
 
-        void InitNewCustomTextBreakerAndBreakWords(char[] inputBuffer)
+        void InitNewCustomTextBreakerAndBreakWords(char[] utf16Buffer)
         {
             //---------------------------
             //we don't have to create a new text breaker everytime.
@@ -124,17 +135,21 @@ namespace TextBreakerTest
             breaker1.BreakNumberAfterText = true;
 
 
-
+            List<string> list01 = new List<string>();
             this.listBox1.Items.Clear();
             breaker1.SetNewBreakHandler(vis =>
             {
                 BreakSpan span = vis.GetBreakSpan();
-                string s = new string(inputBuffer, span.startAt, span.len);
+                string s = new string(utf16Buffer, span.startAt, span.len);
                 this.listBox1.Items.Add(span.startAt + " " + s);
-
+                list01.Add(s);
             });
 
-            breaker1.BreakWords(inputBuffer, 0, inputBuffer.Length);
+
+            //experiment convert to utf32
+            int[] utf32Buffer = ConvertToUtf32(utf16Buffer);
+            //breaker1.BreakWords(utf32Buffer, 0, utf32Buffer.Length);
+            breaker1.BreakWords(utf16Buffer, 0, utf16Buffer.Length);
 
             //foreach (BreakSpan span in breaker1.GetBreakSpanIter())
             //{
@@ -142,6 +157,34 @@ namespace TextBreakerTest
             //    this.listBox1.Items.Add(span.startAt + " " + s);
             //}
         }
+
+        static int[] ConvertToUtf32(char[] buffer)
+        {
+            List<int> output = new List<int>();
+            for (int i = 0; i < buffer.Length; ++i)
+            {
+                char c0 = buffer[i];
+                if (char.IsHighSurrogate(c0))
+                {
+                    if (i < buffer.Length - 1)
+                    {
+                        output.Add(char.ConvertToUtf32(c0, buffer[i + 1]));
+                        i++;
+                    }
+                    else
+                    {
+                        output.Add(c0);
+                    }
+                }
+                else
+                {
+                    output.Add(c0);
+                }
+            }
+            return output.ToArray();
+        }
+
+
         private void cmdManaged_Click(object sender, EventArgs e)
         {
             InitNewCustomTextBreakerAndBreakWords(this.textBox1.Text.ToCharArray());

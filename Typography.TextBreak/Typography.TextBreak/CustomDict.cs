@@ -38,7 +38,7 @@ namespace Typography.TextBreak
             }
             if (_firstChar == '\0' || _lastChar == '\0')
             {
-                throw new NotSupportedException();
+                throw new OpenFont.OpenFontNotSupportedException();
             }
 
             //---------------
@@ -57,7 +57,7 @@ namespace Typography.TextBreak
 #if DEBUG
                     if (lineLen > byte.MaxValue)
                     {
-                        throw new NotSupportedException();
+                        throw new OpenFont.OpenFontNotSupportedException();
                     }
 #endif
 

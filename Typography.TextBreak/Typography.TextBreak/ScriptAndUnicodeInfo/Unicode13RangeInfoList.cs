@@ -2,12 +2,21 @@
 using System;
 using System.Collections.Generic;
 using Typography.OpenFont;
+
 namespace Typography.TextBreak
 {
+    using static SetupHelper;
+    static class SetupHelper
+    {
+        public static UnicodeRangeInfo _(string rangeName, int beginCodePoint, int endCodePoint)
+        {
+            return new UnicodeRangeInfo(beginCodePoint, endCodePoint, rangeName);
+        }
+    }
 
     public static class Unicode13RangeInfoList
     {
-      
+
         //AUTOGEN
         public static readonly UnicodeRangeInfo
   C0_Controls_and_Basic_Latin = _("C0 Controls and Basic Latin", 0x0000/*0*/, 0x007F/*0*/),
@@ -641,10 +650,9 @@ Supplementary_Private_Use_Area_A,
 Supplementary_Private_Use_Area_B,
 
         };
-        static UnicodeRangeInfo _(string rangeName, int beginCodePoint, int endCodePoint)
-        {
-            return new UnicodeRangeInfo(beginCodePoint, endCodePoint, rangeName);
-        }
+
+
+
         public static IEnumerable<UnicodeRangeInfo> GetUnicodeRangeInfoIter()
         {
             for (int i = 0; i < s_list.Length; ++i)
