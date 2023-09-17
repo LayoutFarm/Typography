@@ -13,11 +13,12 @@ namespace Xamarin.iOS.GLES2
     {
 
         EAGLContext context { get; set; }
-        //[Export("initWithCoder:")]
         public GameViewController()
         {
         }
-
+        public GameViewController(IntPtr handle) : base(handle)
+        {
+        }
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
