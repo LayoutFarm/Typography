@@ -11,7 +11,7 @@ namespace Typography.OpenFont.Extensions
         Windows,
         Mac
     }
-   
+
     public readonly struct OS2FsSelection
     {
         //Bit # 	macStyle bit 	C definition 	Description
@@ -59,7 +59,7 @@ namespace Typography.OpenFont.Extensions
         OBLIQUE = 1 << 3,
     }
 
-   
+
     public enum OS2WidthClass : byte
     {
         //from https://docs.microsoft.com/en-us/typography/opentype/spec/os2#uswidthclass 

@@ -45,7 +45,7 @@ namespace Typography.OpenFont.Tables
 #if DEBUG
             if (numGlyphs < numOfHMetrics)
             {
-                throw new NotSupportedException();
+                throw new OpenFontNotSupportedException();
             }
 #endif
         }

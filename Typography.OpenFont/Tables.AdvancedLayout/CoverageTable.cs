@@ -22,7 +22,7 @@ namespace Typography.OpenFont.Tables
             ushort format = reader.ReadUInt16();
             switch (format)
             {
-                default: throw new NotSupportedException();
+                default: throw new OpenFontNotSupportedException();
                 case 1: return CoverageFmt1.CreateFrom(reader);
                 case 2: return CoverageFmt2.CreateFrom(reader);
             }

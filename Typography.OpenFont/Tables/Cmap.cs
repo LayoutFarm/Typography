@@ -71,7 +71,7 @@ namespace Typography.OpenFont.Tables
     //or map correctly to these codepoints from other codepages and character sets. 
     ////////////////////////////////////////////////////////////////////////
 
-    partial class Cmap : TableEntry
+    public class Cmap : TableEntry
     {
         //https://docs.microsoft.com/en-us/typography/opentype/spec/cmap
 
@@ -103,7 +103,7 @@ namespace Typography.OpenFont.Tables
                 {
                     CharacterMap cmap = _charMaps[i];
 
-                   
+
 
                     if (found == 0)
                     {
@@ -364,7 +364,7 @@ namespace Typography.OpenFont.Tables
 
             ushort reserved = input.ReadUInt16();
 #if DEBUG
-            if (reserved != 0) { throw new NotSupportedException(); }
+            if (reserved != 0) { throw new OpenFontNotSupportedException(); }
 #endif
 
             uint length = input.ReadUInt32();// Byte length of this subtable(including the header)
@@ -372,7 +372,7 @@ namespace Typography.OpenFont.Tables
             uint numGroups = input.ReadUInt32();
 
 #if DEBUG
-            if (numGroups > int.MaxValue) { throw new NotSupportedException(); }
+            if (numGroups > int.MaxValue) { throw new OpenFontNotSupportedException(); }
 #endif
             uint[] startCharCodes = new uint[(int)numGroups];
             uint[] endCharCodes = new uint[(int)numGroups];
@@ -411,6 +411,25 @@ namespace Typography.OpenFont.Tables
             for (int i = 0; i < _charMaps.Length; ++i)
             {
                 _charMaps[i].CollectUnicodeChars(unicodes);
+            }
+        }
+        public void CollectUnicode(int platform, List<uint> unicodes, List<ushort> glyphIndexList)
+        {
+            if (_charMaps.Length == 1)
+            {
+
+            }
+            for (int i = 0; i < _charMaps.Length; ++i)
+            {
+                CharacterMap cmap = _charMaps[i];
+                if (platform < 0)
+                {
+                    cmap.CollectUnicodeChars(unicodes, glyphIndexList);
+                }
+                else if (cmap.PlatformId == platform)
+                {
+                    cmap.CollectUnicodeChars(unicodes, glyphIndexList);
+                }
             }
         }
     }

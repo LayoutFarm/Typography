@@ -200,7 +200,7 @@ namespace Typography.OpenFont
 
                                     //for TrueType font 
                                     //we should not be here?
-                                    throw new NotSupportedException();
+                                    throw new OpenFontNotSupportedException();
 
                             }
 
@@ -235,7 +235,7 @@ namespace Typography.OpenFont
                                         tx.MoveTo(latest_moveto_x = p_x, latest_moveto_y = p_y);
                                         curveControlPointCount--;
                                         break;
-                                    default: throw new NotSupportedException();
+                                    default: throw new OpenFontNotSupportedException();
                                 }
                             }
                             else
@@ -333,7 +333,7 @@ namespace Typography.OpenFont
                                 }
                                 break;
                             default:
-                                throw new NotSupportedException();
+                                throw new OpenFontNotSupportedException();
                         }
                         //count
                         curveControlPointCount++;
@@ -378,7 +378,7 @@ namespace Typography.OpenFont
                         default:
                             //for TrueType font 
                             //we should not be here? 
-                            throw new NotSupportedException();
+                            throw new OpenFontNotSupportedException();
 
                     }
                 }

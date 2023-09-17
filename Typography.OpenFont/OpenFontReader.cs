@@ -20,7 +20,16 @@ namespace Typography.OpenFont
         Variation = 1 << 4
     }
 
-
+    public class OpenFontException : Exception
+    {
+        public OpenFontException() { }
+        public OpenFontException(string msg) : base(msg) { }
+    }
+    public class OpenFontNotSupportedException : Exception
+    {
+        public OpenFontNotSupportedException() { }
+        public OpenFontNotSupportedException(string msg) : base(msg) { }
+    }
 
     static class KnownFontFiles
     {
@@ -203,7 +212,7 @@ namespace Typography.OpenFont
             return ReadPreviewFontInfo(tables, input);
         }
         public Typeface Read(Stream stream, int streamStartOffset = 0, ReadFlags readFlags = ReadFlags.Full)
-        { 
+        {
             Typeface typeface = new Typeface();
             if (Read(typeface, null, stream, streamStartOffset, readFlags))
             {
@@ -313,7 +322,7 @@ namespace Typography.OpenFont
                         System.Diagnostics.Debug.WriteLine("this table is already loaded");
                         if (!(found is T))
                         {
-                            throw new NotSupportedException();
+                            throw new OpenFontNotSupportedException();
                         }
 #endif
                         return found as T;
@@ -399,7 +408,7 @@ namespace Typography.OpenFont
                     else
                     {
                         //?
-                        throw new NotSupportedException();
+                        throw new OpenFontNotSupportedException();
                     }
                 }
                 else
@@ -541,7 +550,7 @@ namespace Typography.OpenFont
                     {
                         //TODO:
                         EBLC fontBmpTable = rd.Read(new EBLC());
-                        throw new NotSupportedException();
+                        throw new OpenFontNotSupportedException();
                     }
                 }
                 else

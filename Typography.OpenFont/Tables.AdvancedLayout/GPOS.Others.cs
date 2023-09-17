@@ -256,7 +256,7 @@ namespace Typography.OpenFont.Tables
 
                 switch (anchorPoint.format = reader.ReadUInt16())
                 {
-                    default: throw new NotSupportedException();
+                    default: throw new OpenFontNotSupportedException();
                     case 1:
                         {
                             // AnchorFormat1 table: Design units only

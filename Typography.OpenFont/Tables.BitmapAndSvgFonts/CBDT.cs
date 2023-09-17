@@ -90,7 +90,7 @@ namespace Typography.OpenFont.Tables
                 case 18: _format18.FillGlyphInfo(_binReader, glyph); break;
                 case 19: _format19.FillGlyphInfo(_binReader, glyph); break;
                 default:
-                    throw new NotSupportedException();
+                    throw new OpenFontNotSupportedException();
             }
         }
         public void CopyBitmapContent(Glyph glyph, System.IO.Stream outputStream)
@@ -103,7 +103,7 @@ namespace Typography.OpenFont.Tables
                 case 18: _format18.ReadRawBitmap(_binReader, glyph, outputStream); break;
                 case 19: _format19.ReadRawBitmap(_binReader, glyph, outputStream); break;
                 default:
-                    throw new NotSupportedException();
+                    throw new OpenFontNotSupportedException();
             }
         }
     }

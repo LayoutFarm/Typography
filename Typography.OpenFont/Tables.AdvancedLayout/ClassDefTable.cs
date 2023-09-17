@@ -109,7 +109,7 @@ namespace Typography.OpenFont.Tables
             ClassDefTable classDefTable = new ClassDefTable();
             switch (classDefTable.Format = reader.ReadUInt16())
             {
-                default: throw new NotSupportedException();
+                default: throw new OpenFontNotSupportedException();
                 case 1:
                     {
                         classDefTable.startGlyph = reader.ReadUInt16();
@@ -167,7 +167,7 @@ namespace Typography.OpenFont.Tables
         {
             switch (Format)
             {
-                default: throw new NotSupportedException();
+                default: throw new OpenFontNotSupportedException();
                 case 1:
                     {
                         if (glyphIndex >= startGlyph &&

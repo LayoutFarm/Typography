@@ -71,10 +71,7 @@ namespace Typography.OpenFont.Trimmable
         {
             //use default opent font reader
             RestoreUp(typeface, ticket, new OpenFontReader(), fontStream);
-        }
-
-
-
+        } 
     }
 }
 
@@ -100,7 +97,7 @@ namespace Typography.OpenFont
         {
             switch (_typefaceTrimMode)
             {
-                default: throw new NotSupportedException();
+                default: throw new OpenFontNotSupportedException();
                 case TrimMode.EssentailLayoutInfo: return null;//same mode
                 case TrimMode.Restored:
                 case TrimMode.No:

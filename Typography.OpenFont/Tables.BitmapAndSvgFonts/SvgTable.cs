@@ -95,7 +95,7 @@ namespace Typography.OpenFont.Tables
                 _entries[i].svgBuffer = svgData;
 
 #if DEBUG
-                if (svgData.Length == 0) { throw new NotSupportedException(); }
+                if (svgData.Length == 0) { throw new OpenFontNotSupportedException(); }
 #endif
 
                 if (svgData[0] == (byte)'<')
@@ -142,7 +142,7 @@ namespace Typography.OpenFont.Tables
 
                 if (docEntry.compressed)
                 {
-                    throw new NotSupportedException();
+                    throw new OpenFontNotSupportedException();
                     //TODO: decompress this
                 }
 

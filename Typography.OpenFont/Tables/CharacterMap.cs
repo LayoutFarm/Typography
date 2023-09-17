@@ -7,6 +7,22 @@ using System.IO;
 
 namespace Typography.OpenFont.Tables
 {
+
+    static class CharacterMapExtension
+    {
+        public static void CollectUnicodeChars(this CharacterMap cmap, List<uint> unicodes, List<ushort> glyphIndexList)
+        {
+            //temp fixed
+            int count1 = unicodes.Count;
+            cmap.CollectUnicodeChars(unicodes);
+            int count2 = unicodes.Count;
+            for (int i = count1; i < count2; ++i)
+            {
+                glyphIndexList.Add(cmap.GetGlyphIndex((int)unicodes[i]));
+            }
+        }
+    }
+
     class CharMapFormat4 : CharacterMap
     {
         public override ushort Format => 4;
@@ -88,6 +104,7 @@ namespace Typography.OpenFont.Tables
                 }
             }
         }
+
     }
 
     class CharMapFormat12 : CharacterMap
@@ -128,6 +145,7 @@ namespace Typography.OpenFont.Tables
                 }
             }
         }
+
     }
 
     class CharMapFormat6 : CharacterMap
@@ -153,7 +171,7 @@ namespace Typography.OpenFont.Tables
 
 
         internal readonly ushort _startCode;
-        internal readonly ushort[] _glyphIdArray; 
+        internal readonly ushort[] _glyphIdArray;
         public override void CollectUnicodeChars(List<uint> unicodes)
         {
             ushort u = _startCode;
@@ -188,7 +206,7 @@ namespace Typography.OpenFont.Tables
             {
 
                 // If the sequence is a non-default UVS, return the mapped glyph
- 
+
                 if (sel.UVSMappings.TryGetValue(codepoint, out ushort ret))
                 {
                     return ret;
@@ -374,7 +392,7 @@ namespace Typography.OpenFont.Tables
         public override ushort Format => 0;
         public override ushort GetGlyphIndex(int character) => 0;
         public override void CollectUnicodeChars(List<uint> unicodes) {  /*nothing*/}
- 
+
     }
 
     abstract class CharacterMap
@@ -383,13 +401,14 @@ namespace Typography.OpenFont.Tables
         public abstract ushort Format { get; }
         public ushort PlatformId { get; set; }
         public ushort EncodingId { get; set; }
- 
+
         public ushort CharacterToGlyphIndex(int codepoint)
         {
             return GetGlyphIndex(codepoint);
-        } 
+        }
         public abstract ushort GetGlyphIndex(int codepoint);
-        public abstract void CollectUnicodeChars(List<uint> unicodes); 
+        public abstract void CollectUnicodeChars(List<uint> unicodes);
+
         public override string ToString()
         {
             return $"fmt:{ Format }, plat:{ PlatformId }, enc:{ EncodingId }";

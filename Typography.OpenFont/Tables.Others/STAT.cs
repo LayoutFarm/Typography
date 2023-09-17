@@ -133,7 +133,7 @@ namespace Typography.OpenFont.Tables
                 AxisValueTableBase axisValueTbl = null;
                 switch (format)
                 {
-                    default: throw new NotSupportedException();
+                    default: throw new OpenFontNotSupportedException();
                     case 1: axisValueTbl = new AxisValueTableFmt1(); break;
                     case 2: axisValueTbl = new AxisValueTableFmt2(); break;
                     case 3: axisValueTbl = new AxisValueTableFmt3(); break;

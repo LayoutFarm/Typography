@@ -164,6 +164,7 @@ namespace Typography.OpenFont.Tables
                     _coverageTable = coverage;
                     _valueRecords = valueRecords;
                 }
+
                 public int Format { get; }
                 readonly CoverageTable _coverageTable;
                 readonly ValueRecord[] _valueRecords;
@@ -213,7 +214,7 @@ namespace Typography.OpenFont.Tables
                 ushort valueFormat = reader.ReadUInt16();
                 switch (format)
                 {
-                    default: throw new NotSupportedException();
+                    default: throw new OpenFontNotSupportedException();
                     case 1:
                         {
                             ValueRecord valueRecord = ValueRecord.CreateFrom(reader, valueFormat);
@@ -661,13 +662,13 @@ namespace Typography.OpenFont.Tables
                     List<ushort> expandedMarks = new List<ushort>(MarkCoverageTable.GetExpandedValueIter());
                     if (expandedMarks.Count != MarkArrayTable.dbugGetAnchorCount())
                     {
-                        throw new NotSupportedException();
+                        throw new OpenFontNotSupportedException();
                     }
                     //--------------------------
                     List<ushort> expandedBase = new List<ushort>(BaseCoverageTable.GetExpandedValueIter());
                     if (expandedBase.Count != BaseArrayTable.dbugGetRecordCount())
                     {
-                        throw new NotSupportedException();
+                        throw new OpenFontNotSupportedException();
                     }
                 }
 #endif
@@ -1280,7 +1281,7 @@ namespace Typography.OpenFont.Tables
                 uint extensionOffset = reader.ReadUInt32();
                 if (extensionLookupType == 9)
                 {
-                    throw new NotSupportedException();
+                    throw new OpenFontNotSupportedException();
                 }
                 // Simply read the lookup table again with updated offsets
 

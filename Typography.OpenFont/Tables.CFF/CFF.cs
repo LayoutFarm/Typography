@@ -511,7 +511,7 @@ namespace Typography.OpenFont.CFF
         {
             int j = _glyphs.Length;
 #if DEBUG
-            if (j > ushort.MaxValue) { throw new NotSupportedException(); }
+            if (j > ushort.MaxValue) { throw new OpenFontNotSupportedException(); }
 #endif
             for (int i = 0; i < j; ++i)
             {
@@ -686,7 +686,7 @@ namespace Typography.OpenFont.CFF
             //count ==1
             if (count != 1)
             {
-                throw new NotSupportedException();
+                throw new OpenFontNotSupportedException();
             }
             _currentCff1Font = new Cff1Font();
             _currentCff1Font.FontName = fontNames[0];
@@ -719,7 +719,7 @@ namespace Typography.OpenFont.CFF
             {
                 //temp...
                 //TODO: review here again
-                throw new NotSupportedException();
+                throw new OpenFontNotSupportedException();
             }
             for (int i = 0; i < count; ++i)
             {
@@ -812,7 +812,7 @@ namespace Typography.OpenFont.CFF
 #if DEBUG
                     if (actualRead != len)
                     {
-                        throw new NotSupportedException();
+                        throw new OpenFontNotSupportedException();
                     }
 #endif
                     _uniqueStringTable[i] = Encoding.UTF8.GetString(buff, 0, len);
@@ -1028,7 +1028,7 @@ namespace Typography.OpenFont.CFF
             byte format = _reader.ReadByte();
             switch (format)
             {
-                default: throw new NotSupportedException();
+                default: throw new OpenFontNotSupportedException();
                 case 0:
                     ReadCharsetsFormat0();
                     break;
@@ -1082,7 +1082,7 @@ namespace Typography.OpenFont.CFF
             //font are covered. This format is particularly suited to charsets
             //that are well ordered
 
-            // throw new NotSupportedException();
+            // throw new OpenFontNotSupportedException();
             Glyph[] cff1Glyphs = _currentCff1Font._glyphs;
             int nGlyphs = cff1Glyphs.Length;
             for (int i = 1; i < nGlyphs;)
@@ -1205,7 +1205,7 @@ namespace Typography.OpenFont.CFF
             switch (format)
             {
                 default:
-                    throw new NotSupportedException();
+                    throw new OpenFontNotSupportedException();
                 case 3:
                     {
                         ushort nRanges = _reader.ReadUInt16();
@@ -1273,7 +1273,7 @@ namespace Typography.OpenFont.CFF
                 {
                     switch (entry._operator.Name)
                     {
-                        default: throw new NotSupportedException();
+                        default: throw new OpenFontNotSupportedException();
                         case "FontName":
                             name = (int)entry.operands[0]._realNumValue;
                             break;
@@ -1384,7 +1384,7 @@ namespace Typography.OpenFont.CFF
                     }
                     else
                     {
-                        throw new NotSupportedException();
+                        throw new OpenFontNotSupportedException();
                     }
 
                 }
@@ -1430,7 +1430,7 @@ namespace Typography.OpenFont.CFF
 
 
 #if DEBUG
-            if (offsets.Length > ushort.MaxValue) { throw new NotSupportedException(); }
+            if (offsets.Length > ushort.MaxValue) { throw new OpenFontNotSupportedException(); }
 #endif
             int glyphCount = offsets.Length;
             //assume Type2
@@ -1730,7 +1730,7 @@ namespace Typography.OpenFont.CFF
                 }
                 else
                 {
-                    throw new NotSupportedException("invalid DICT data b0 byte: " + b0);
+                    throw new OpenFontNotSupportedException("invalid DICT data b0 byte: " + b0);
                 }
             }
 
@@ -1838,7 +1838,7 @@ namespace Typography.OpenFont.CFF
                 System.Globalization.NumberStyles.Number | System.Globalization.NumberStyles.AllowExponent,
                 System.Globalization.CultureInfo.InvariantCulture, out double value))
             {
-                throw new NotSupportedException();
+                throw new OpenFontNotSupportedException();
             }
             return value;
         }
@@ -1965,7 +1965,7 @@ namespace Typography.OpenFont.CFF
         {
             switch (offsetSize)
             {
-                default: throw new NotSupportedException();
+                default: throw new OpenFontNotSupportedException();
                 case 1:
                     return reader.ReadByte();
                 case 2:

@@ -93,7 +93,7 @@ namespace Typography.OpenFont.Tables
 
             switch (major)
             {
-                default: throw new NotSupportedException();
+                default: throw new OpenFontNotSupportedException();
                 case 1:
                     {
                         Cff1Parser cff1 = new Cff1Parser();

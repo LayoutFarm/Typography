@@ -136,7 +136,7 @@ namespace Typography.OpenFont.Tables
                 int entry;
                 switch (entrySize)
                 {
-                    default: throw new NotSupportedException();
+                    default: throw new OpenFontNotSupportedException();
                     case 1: entry = reader.ReadByte(); break;
                     case 2: entry = (reader.ReadByte() << 8) | reader.ReadByte(); break;
                     case 3: entry = (reader.ReadByte() << 16) | (reader.ReadByte() << 8) | reader.ReadByte(); break;

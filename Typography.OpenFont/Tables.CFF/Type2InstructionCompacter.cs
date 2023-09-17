@@ -31,7 +31,7 @@ namespace Typography.OpenFont.CFF
                 {
                     switch (collecting_count)
                     {
-                        default: throw new NotSupportedException();
+                        default: throw new OpenFontNotSupportedException();
                         case 0: break; //nothing
                         case 2:
                             _step1List.Add(new Type2Instruction(OperatorName.LoadShort2,
@@ -53,7 +53,7 @@ namespace Typography.OpenFont.CFF
                 {
                     switch (collecting_count)
                     {
-                        default: throw new NotSupportedException();
+                        default: throw new OpenFontNotSupportedException();
                         case 0: break;//nothing
                         case 4:
                             {
@@ -107,7 +107,7 @@ namespace Typography.OpenFont.CFF
                     CompactRange c1 = GetCompactRange(inst.Value);
                     switch (c1)
                     {
-                        default: throw new NotSupportedException();
+                        default: throw new OpenFontNotSupportedException();
                         case CompactRange.None:
                             {
                                 if (collecting_count > 0)
@@ -128,7 +128,7 @@ namespace Typography.OpenFont.CFF
 
                                 switch (collecting_count)
                                 {
-                                    default: throw new NotSupportedException();
+                                    default: throw new OpenFontNotSupportedException();
                                     case 0:
                                         startCollectAt = i;
                                         _latestCompactRange = CompactRange.SByte;
@@ -157,7 +157,7 @@ namespace Typography.OpenFont.CFF
 
                                 switch (collecting_count)
                                 {
-                                    default: throw new NotSupportedException();
+                                    default: throw new OpenFontNotSupportedException();
                                     case 0:
                                         startCollectAt = i;
                                         _latestCompactRange = CompactRange.Short;
@@ -250,7 +250,7 @@ namespace Typography.OpenFont.CFF
                         {
 
 #if DEBUG
-                            if (merge_flags > 3) { throw new NotSupportedException(); }
+                            if (merge_flags > 3) { throw new OpenFontNotSupportedException(); }
 #endif
 
                             _step2List.Add(new Type2Instruction((byte)((merge_flags << 6) | i1.Op), i0.Value));
@@ -351,7 +351,7 @@ namespace Typography.OpenFont.CFF
                     if (inst_exp.Op != inst_org.Op ||
                        inst_exp.Value != inst_org.Value)
                     {
-                        throw new NotSupportedException();
+                        throw new OpenFontNotSupportedException();
                     }
                 }
             }
@@ -366,7 +366,7 @@ namespace Typography.OpenFont.CFF
                     if (inst_exp.Op != inst_org.Op ||
                        inst_exp.Value != inst_org.Value)
                     {
-                        throw new NotSupportedException();
+                        throw new OpenFontNotSupportedException();
                     }
                 }
             }
@@ -435,7 +435,7 @@ namespace Typography.OpenFont.CFF
             //--------------------------------------------
             if (expand2.Count != org.Count)
             {
-                throw new NotSupportedException();
+                throw new OpenFontNotSupportedException();
             }
             else
             {
@@ -448,7 +448,7 @@ namespace Typography.OpenFont.CFF
                     if (inst_exp.Op != inst_org.Op ||
                        inst_exp.Value != inst_org.Value)
                     {
-                        throw new NotSupportedException();
+                        throw new OpenFontNotSupportedException();
                     }
                 }
             }

@@ -7,6 +7,7 @@ using Typography.OpenFont.Tables;
 namespace Typography.OpenFont
 {
 
+
     public partial class Typeface
     {
 
@@ -77,7 +78,7 @@ namespace Typography.OpenFont
 #if DEBUG
                 if (_glyphs.Length != exisitingGlyphs.Length)
                 {
-                    throw new NotSupportedException();
+                    throw new OpenFontNotSupportedException();
                 }
 #endif
                 for (int i = 0; i < exisitingGlyphs.Length; ++i)
@@ -179,7 +180,10 @@ namespace Typography.OpenFont
         {
             CmapTable.CollectUnicode(unicodes);
         }
-
+        public void CollectUnicode(int platform, List<uint> unicodes, List<ushort> glyphIndexList)
+        {
+            CmapTable.CollectUnicode(platform, unicodes, glyphIndexList);
+        }
         public Glyph GetGlyphByName(string glyphName) => GetGlyph(GetGlyphIndexByName(glyphName));
 
         Dictionary<string, ushort> _cachedGlyphDicByName;

@@ -97,7 +97,7 @@ namespace Typography.OpenFont.CFF
                 switch (merge_flags)
                 {
 #if DEBUG
-                    default: throw new NotSupportedException();
+                    default: throw new OpenFontNotSupportedException();
 #endif
                     case 0:
                         //nothing 
@@ -408,7 +408,7 @@ namespace Typography.OpenFont.CFF
             if (_insts.Count == 0) return;
 
             Type2Instruction firstInst = _insts[0];
-            if (!firstInst.IsLoadInt) { throw new NotSupportedException(); }
+            if (!firstInst.IsLoadInt) { throw new OpenFontNotSupportedException(); }
             //the replace
             _insts[0] = new Type2Instruction(OperatorName.GlyphWidth, firstInst.Value);
         }
@@ -482,6 +482,8 @@ namespace Typography.OpenFont.CFF
     class Type2CharStringParser
     {
         //from https://www.adobe.com/content/dam/acom/en/devnet/font/pdfs/5177.Type2.pdf
+        //or https://adobe-type-tools.github.io/font-tech-notes/pdfs/5177.Type2.pdf
+
         //Type 2 Charstring Organization:
         //...
         //The sequence and form of a Type 2 charstring program may be represented as:
@@ -763,7 +765,7 @@ namespace Typography.OpenFont.CFF
 #if DEBUG
                             if (!reader.IsEnd())
                             {
-                                throw new NotSupportedException();
+                                throw new OpenFontNotSupportedException();
                             }
 
 #endif
@@ -778,7 +780,7 @@ namespace Typography.OpenFont.CFF
                                 Type2Instruction inst = _insts.RemoveLast();
                                 if (!inst.IsLoadInt)
                                 {
-                                    throw new NotSupportedException();
+                                    throw new OpenFontNotSupportedException();
                                 }
                                 if (_doStemCount)
                                 {
@@ -796,7 +798,7 @@ namespace Typography.OpenFont.CFF
                                 }
                                 else
                                 {
-                                    throw new NotSupportedException();
+                                    throw new OpenFontNotSupportedException();
                                 }
                             }
                         }
@@ -808,7 +810,7 @@ namespace Typography.OpenFont.CFF
                                 Type2Instruction inst = _insts.RemoveLast();
                                 if (!inst.IsLoadInt)
                                 {
-                                    throw new NotSupportedException();
+                                    throw new OpenFontNotSupportedException();
                                 }
                                 if (_doStemCount)
                                 {
@@ -832,7 +834,7 @@ namespace Typography.OpenFont.CFF
 #if DEBUG
             if (fontdic == null)
             {
-                throw new NotSupportedException();
+                throw new OpenFontNotSupportedException();
             }
 #endif
 
@@ -862,7 +864,7 @@ namespace Typography.OpenFont.CFF
             _dbugInstructionListMark++;
             if (_currentCff1Font == null)
             {
-                throw new NotSupportedException();
+                throw new OpenFontNotSupportedException();
             }
             //
             _insts.dbugGlyphIndex = dbugCurrentGlyphIndex;
@@ -990,7 +992,7 @@ namespace Typography.OpenFont.CFF
 #if DEBUG
                     _insts.dbugDumpInstructionListToFile("test_type2_" + (_dbugInstructionListMark - 1) + ".txt");
 #endif
-                    throw new NotSupportedException();
+                    throw new OpenFontNotSupportedException();
                 }
                 else
                 {
@@ -1024,7 +1026,7 @@ namespace Typography.OpenFont.CFF
 #if DEBUG
                 if ((_current_integer_count % 2) != 0)
                 {
-                    throw new NotSupportedException();
+                    throw new OpenFontNotSupportedException();
                 }
                 else
                 {
@@ -1060,7 +1062,7 @@ namespace Typography.OpenFont.CFF
                             _current_integer_count = 0;//clear
                             break;
                         default:
-                            throw new NotSupportedException();
+                            throw new OpenFontNotSupportedException();
                     }
                 }
                 else
@@ -1082,7 +1084,7 @@ namespace Typography.OpenFont.CFF
                 }
                 else
                 {
-                    throw new NotSupportedException();
+                    throw new OpenFontNotSupportedException();
                 }
             }
 
@@ -1092,7 +1094,7 @@ namespace Typography.OpenFont.CFF
 
             if (reader.Position + properNumberOfMaskBytes >= reader.BufferLength)
             {
-                throw new NotSupportedException();
+                throw new OpenFontNotSupportedException();
             }
             if (properNumberOfMaskBytes > 4)
             {
@@ -1128,7 +1130,7 @@ namespace Typography.OpenFont.CFF
                             (reader.ReadByte() << 16) |
                             (reader.ReadByte() << 8));
                         break;
-                    default: throw new NotSupportedException();//should not occur !
+                    default: throw new OpenFontNotSupportedException();//should not occur !
                 }
 
                 _insts.AddOp(OperatorName.hintmask_bits, properNumberOfMaskBytes);
@@ -1139,7 +1141,7 @@ namespace Typography.OpenFont.CFF
                 switch (properNumberOfMaskBytes)
                 {
                     case 0:
-                    default: throw new NotSupportedException();//should not occur !                     
+                    default: throw new OpenFontNotSupportedException();//should not occur !                     
                     case 1:
                         _insts.AddOp(OperatorName.hintmask1, (reader.ReadByte() << 24));
                         break;
@@ -1183,7 +1185,7 @@ namespace Typography.OpenFont.CFF
                 }
                 else
                 {
-                    throw new NotSupportedException();
+                    throw new OpenFontNotSupportedException();
                 }
             }
             else
@@ -1195,7 +1197,7 @@ namespace Typography.OpenFont.CFF
             int properNumberOfMaskBytes = (_hintStemCount + 7) / 8;
             if (reader.Position + properNumberOfMaskBytes >= reader.BufferLength)
             {
-                throw new NotSupportedException();
+                throw new OpenFontNotSupportedException();
             }
 
             if (properNumberOfMaskBytes > 4)
@@ -1232,7 +1234,7 @@ namespace Typography.OpenFont.CFF
                             (reader.ReadByte() << 16) |
                             (reader.ReadByte() << 8));
                         break;
-                    default: throw new NotSupportedException();//should not occur !
+                    default: throw new OpenFontNotSupportedException();//should not occur !
                 }
 
                 _insts.AddOp(OperatorName.cntrmask_bits, properNumberOfMaskBytes);
@@ -1243,7 +1245,7 @@ namespace Typography.OpenFont.CFF
                 switch (properNumberOfMaskBytes)
                 {
                     case 0:
-                    default: throw new NotSupportedException();//should not occur !
+                    default: throw new OpenFontNotSupportedException();//should not occur !
                     case 1:
                         _insts.AddOp(OperatorName.cntrmask1, (reader.ReadByte() << 24));
                         break;
@@ -1290,7 +1292,7 @@ namespace Typography.OpenFont.CFF
             }
             else
             {
-                throw new NotSupportedException();
+                throw new OpenFontNotSupportedException();
             }
         }
     }

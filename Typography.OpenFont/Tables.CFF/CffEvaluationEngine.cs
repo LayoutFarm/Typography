@@ -12,8 +12,6 @@ namespace Typography.OpenFont.CFF
     public class CffEvaluationEngine
     {
 
-
-
         float _scale = 1;//default 
         readonly Stack<Type2EvaluationStack> _evalStackPool = new Stack<Type2EvaluationStack>();
 
@@ -148,7 +146,7 @@ namespace Typography.OpenFont.CFF
                 //----------
                 switch ((OperatorName)((inst.Op & 0b111111)))//we use only 6 lower bits for op_name
                 {
-                    default: throw new NotSupportedException();
+                    default: throw new OpenFontNotSupportedException();
                     case OperatorName.GlyphWidth:
                         //TODO: 
                         break;
@@ -256,7 +254,7 @@ namespace Typography.OpenFont.CFF
                     //should not occur!-> since we replace this in parsing step
                     case OperatorName.callgsubr:
                     case OperatorName.callsubr:
-                        throw new NotSupportedException();
+                        throw new OpenFontNotSupportedException();
                 }
             }
 
@@ -355,7 +353,7 @@ namespace Typography.OpenFont.CFF
 #if DEBUG
             if (_currentIndex != 2)
             {
-                throw new NotSupportedException();
+                throw new OpenFontNotSupportedException();
             }
 #endif
 
@@ -389,7 +387,7 @@ namespace Typography.OpenFont.CFF
 #if DEBUG
             if (_currentIndex > 1)
             {
-                throw new NotSupportedException();
+                throw new OpenFontNotSupportedException();
             }
 #endif
             _glyphTranslator.MoveTo((float)_currentX, (float)(_currentY += _argStack[0]));
@@ -410,7 +408,7 @@ namespace Typography.OpenFont.CFF
 #if DEBUG
             if ((_currentIndex % 2) != 0)
             {
-                throw new NotSupportedException();
+                throw new OpenFontNotSupportedException();
             }
 #endif
             for (int i = 0; i < _currentIndex;)
@@ -548,7 +546,7 @@ namespace Typography.OpenFont.CFF
 #if DEBUG
             if ((_currentIndex % 6) != 0)
             {
-                throw new NotSupportedException();
+                throw new OpenFontNotSupportedException();
             }
 
 #endif
@@ -640,7 +638,7 @@ namespace Typography.OpenFont.CFF
 
             switch (remainder = (_currentIndex % 8))
             {
-                default: throw new NotSupportedException();
+                default: throw new OpenFontNotSupportedException();
                 case 0:
                 case 1:
                     {
@@ -882,7 +880,7 @@ namespace Typography.OpenFont.CFF
 
             switch (remainder = (_currentIndex % 8))
             {
-                default: throw new NotSupportedException();
+                default: throw new OpenFontNotSupportedException();
                 case 0:
                 case 1:
                     {
@@ -1122,7 +1120,7 @@ namespace Typography.OpenFont.CFF
 #if DEBUG
             if ((_currentIndex % 2) != 0)
             {
-                throw new NotSupportedException();
+                throw new OpenFontNotSupportedException();
             }
 #endif
             //hintCount += _currentIndex / 2;
@@ -1134,7 +1132,7 @@ namespace Typography.OpenFont.CFF
 #if DEBUG
             if ((_currentIndex % 2) != 0)
             {
-                throw new NotSupportedException();
+                throw new OpenFontNotSupportedException();
             }
 #endif
             //hintCount += _currentIndex / 2;
@@ -1147,7 +1145,7 @@ namespace Typography.OpenFont.CFF
 #if DEBUG
             if ((_currentIndex % 2) != 0)
             {
-                throw new NotSupportedException();
+                throw new OpenFontNotSupportedException();
             }
 #endif
             //hintCount += _currentIndex / 2;
@@ -1159,7 +1157,7 @@ namespace Typography.OpenFont.CFF
 #if DEBUG
             if ((_currentIndex % 2) != 0)
             {
-                throw new NotSupportedException();
+                throw new OpenFontNotSupportedException();
             }
 #endif
             //hintCount += _currentIndex / 2;

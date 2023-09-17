@@ -77,7 +77,7 @@ namespace Typography.OpenFont.Tables
 #if DEBUG
             if (version != 1 || flags != 0)
             {
-                throw new NotSupportedException();
+                throw new OpenFontNotSupportedException();
             }
 #endif 
 

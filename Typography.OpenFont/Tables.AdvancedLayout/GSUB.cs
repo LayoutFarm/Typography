@@ -324,7 +324,7 @@ namespace Typography.OpenFont.Tables
                 ushort coverage = reader.ReadUInt16();
                 switch (format)
                 {
-                    default: throw new NotSupportedException();
+                    default: throw new OpenFontNotSupportedException();
                     case 1:
                         {
                             ushort deltaGlyph = reader.ReadUInt16();
@@ -431,7 +431,7 @@ namespace Typography.OpenFont.Tables
                 switch (format)
                 {
                     default:
-                        throw new NotSupportedException();
+                        throw new OpenFontNotSupportedException();
                     case 1:
                         {
                             ushort coverageOffset = reader.ReadUInt16();
@@ -522,7 +522,7 @@ namespace Typography.OpenFont.Tables
                 ushort format = reader.ReadUInt16(); //The subtable has one format: AlternateSubstFormat1.
                 switch (format)
                 {
-                    default: throw new NotSupportedException();
+                    default: throw new OpenFontNotSupportedException();
                     case 1:
                         {
                             ushort coverageOffset = reader.ReadUInt16();
@@ -755,7 +755,7 @@ namespace Typography.OpenFont.Tables
                 ushort format = reader.ReadUInt16();
                 switch (format)
                 {
-                    default: throw new NotSupportedException();
+                    default: throw new OpenFontNotSupportedException();
                     case 1:
                         {
                             ushort coverageOffset = reader.ReadUInt16();
@@ -800,7 +800,7 @@ namespace Typography.OpenFont.Tables
                 ushort substFormat = reader.ReadUInt16();
                 switch (substFormat)
                 {
-                    default: throw new NotSupportedException();
+                    default: throw new OpenFontNotSupportedException();
                     case 1:
                         {
                             //ContextSubstFormat1 Subtable
@@ -1409,6 +1409,12 @@ namespace Typography.OpenFont.Tables
                     }
 
                     // It's a match! Perform substitutions and return true if anything changed
+                    if (SubstLookupRecords.Length == 0)
+                    {
+                        //handled,  NO substituion
+                        return true;
+                    }
+
                     bool hasChanged = false;
                     foreach (SubstLookupRecord lookupRecord in SubstLookupRecords)
                     {
@@ -1457,7 +1463,7 @@ namespace Typography.OpenFont.Tables
                 ushort format = reader.ReadUInt16();
                 switch (format)
                 {
-                    default: throw new NotSupportedException();
+                    default: throw new OpenFontNotSupportedException();
                     case 1:
                         {
                             //6.1 Chaining Context Substitution Format 1: Simple Chaining Context Glyph Substitution 
@@ -1603,7 +1609,7 @@ namespace Typography.OpenFont.Tables
                 uint extensionOffset = reader.ReadUInt32();
                 if (extensionLookupType == 7)
                 {
-                    throw new NotSupportedException();
+                    throw new OpenFontNotSupportedException();
                 }
                 // Simply read the lookup table again with updated offsets 
                 return ReadSubTable(extensionLookupType, reader, subTableStartAt + extensionOffset);
