@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>f91cc836-9578-48a8-82ed-7c8dd325c940</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>WebLexer</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)CssLexer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)dbugLexerReport.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MyXmlLexer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TextSnapshot.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)XmlLexer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)XmlLexer_debug.cs" />
+  </ItemGroup>
+</Project>

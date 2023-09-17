@@ -189,7 +189,7 @@
       <Name>BackEnd.Triangulation</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\PixelFarm\PaintLab.Svg\PaintLab.Svg.csproj">
-      <Project>{466dd2ae-eadc-4e20-82b3-da6d018006c5}</Project>
+      <Project>{3e95b61f-53a0-484a-bf5c-26dc6fa6affe}</Project>
       <Name>PaintLab.Svg</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\x_autogen\PixelFarm.MiniAgg.One\PixelFarm.MiniAgg.One.csproj">
