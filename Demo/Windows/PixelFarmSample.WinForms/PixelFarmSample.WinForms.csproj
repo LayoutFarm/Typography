@@ -180,17 +180,13 @@
       <Project>{55d0efe6-54a2-46c5-b82c-d08f92928e60}</Project>
       <Name>Unpack</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\Mini\PaintLab.Svg\PaintLab.Svg.csproj">
+      <Project>{22b8a1f0-3638-47dc-98b0-5fa6d913892c}</Project>
+      <Name>PaintLab.Svg</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\PixelFarm.Typography\PixelFarm.Typography.csproj">
       <Project>{540a2ea6-dae3-4625-8951-b2c3118603a4}</Project>
       <Name>PixelFarm.Typography</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\PixelFarm\BackEnd.Triangulation\BackEnd.Triangulation.csproj">
-      <Project>{c5e5802d-6a45-4fe9-bae7-5f0ae91d72c1}</Project>
-      <Name>BackEnd.Triangulation</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\PixelFarm\PaintLab.Svg\PaintLab.Svg.csproj">
-      <Project>{3e95b61f-53a0-484a-bf5c-26dc6fa6affe}</Project>
-      <Name>PaintLab.Svg</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\x_autogen\PixelFarm.MiniAgg.One\PixelFarm.MiniAgg.One.csproj">
       <Project>{e7aed396-79c0-405d-8f20-4555aed90341}</Project>

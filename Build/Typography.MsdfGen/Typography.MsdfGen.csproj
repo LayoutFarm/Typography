@@ -5,13 +5,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\6_Msdf\BasicElements.cs" Link="BasicElements.cs" />
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\6_Msdf\EdgeColor.cs" Link="EdgeColor.cs" />
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\6_Msdf\EdgeColoring.cs" Link="EdgeColoring.cs" />
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\6_Msdf\EdgeSegment.cs" Link="EdgeSegment.cs" />
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\6_Msdf\EquationSolver.cs" Link="EquationSolver.cs" />
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\6_Msdf\MsdfGen.cs" Link="MsdfGen.cs" />
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\6_Msdf\SignedDistance.cs" Link="SignedDistance.cs" />
+    <Compile Include="..\..\Mini\PixelFarm.Drawing\6_Msdf\BasicElements.cs" Link="BasicElements.cs" />
+    <Compile Include="..\..\Mini\PixelFarm.Drawing\6_Msdf\EdgeColor.cs" Link="EdgeColor.cs" />
+    <Compile Include="..\..\Mini\PixelFarm.Drawing\6_Msdf\EdgeColoring.cs" Link="EdgeColoring.cs" />
+    <Compile Include="..\..\Mini\PixelFarm.Drawing\6_Msdf\EdgeSegment.cs" Link="EdgeSegment.cs" />
+    <Compile Include="..\..\Mini\PixelFarm.Drawing\6_Msdf\EquationSolver.cs" Link="EquationSolver.cs" />
+    <Compile Include="..\..\Mini\PixelFarm.Drawing\6_Msdf\MsdfGen.cs" Link="MsdfGen.cs" />
+    <Compile Include="..\..\Mini\PixelFarm.Drawing\6_Msdf\SignedDistance.cs" Link="SignedDistance.cs" />
   </ItemGroup>
 
 </Project>
